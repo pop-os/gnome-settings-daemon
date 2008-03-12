@@ -1,5 +1,7 @@
-gnome-settings-daemon (2.22.0-1) experimental; urgency=low
+gnome-settings-daemon (2.22.0-1) UNRELEASED; urgency=low
 
+  * TODO: get b-d packaged, review patches/copyright, backport patches from
+          control center if necessary, .......
   * New package, based on the Ubuntu packaging.
   * debian/control.in:
     + Update and wrap build dependencies/dependencies.
