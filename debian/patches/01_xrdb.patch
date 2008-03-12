@@ -1,0 +1,12 @@
+diff -Nur -x '*.orig' -x '*~' gnome-settings-daemon-2.21.5.2/plugins/xrdb/gsd-xrdb-manager.c gnome-settings-daemon-2.21.5.2.new/plugins/xrdb/gsd-xrdb-manager.c
+--- gnome-settings-daemon-2.21.5.2/plugins/xrdb/gsd-xrdb-manager.c	2007-12-24 12:18:48.000000000 +0100
++++ gnome-settings-daemon-2.21.5.2.new/plugins/xrdb/gsd-xrdb-manager.c	2008-01-16 15:20:14.000000000 +0100
+@@ -41,7 +41,7 @@
+ 
+ #define GSD_XRDB_MANAGER_GET_PRIVATE(o) (G_TYPE_INSTANCE_GET_PRIVATE ((o), GSD_TYPE_XRDB_MANAGER, GsdXrdbManagerPrivate))
+ 
+-#define SYSTEM_AD_DIR    DATADIR "/xrdb"
++#define SYSTEM_AD_DIR    "/etc/gnome/config"
+ #define GENERAL_AD       SYSTEM_AD_DIR "/General.ad"
+ #define USER_AD_DIR      ".gnome2/xrdb"
+ #define USER_X_RESOURCES ".Xresources"

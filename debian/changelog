@@ -1,0 +1,187 @@
+gnome-settings-daemon (2.22.0-1) experimental; urgency=low
+
+  * New package, based on the Ubuntu packaging.
+
+ -- Sebastian Dröge <slomo@debian.org>  Wed, 12 Mar 2008 15:17:19 +0100
+
+gnome-settings-daemon (2.22.0-0ubuntu1) hardy; urgency=low
+
+  * New upstream version:
+    - Actually link against libXi when building with XInput support 
+    - Disable debug by default 
+    - Don't pass GError's if we're not going to use them 
+    - Remove obsolete settings for the removed default editor plugin 
+    - Updated translations
+
+ -- Sebastien Bacher <seb128@canonical.com>  Mon, 10 Mar 2008 18:53:42 +0100
+
+gnome-settings-daemon (2.21.92-0ubuntu1) hardy; urgency=low
+
+  * New upstream version:
+    - Only print debug messages if --debug is used
+    - Only load plugins when requested not at every start
+    - Fixed #515340, Add a way to prioritise plugin load 
+    - Fixed #515341, Signal when plugins finish loading 
+    - Fixed #517259, Escape hostname for use in gconf key 
+    - Fixed #517418, gnome-display-properties resolution change 
+      will not be used after logout or reboot (lp: #191878)
+    - Fixed #518075, Sound plugin should start pulseaudio itself 
+  * debian/patches/90_from_svn_pulseaudio_correct_use.patch:
+    - dropped, fixed in the new version
+  * debian/patches/92_gsd-xrandr-version-check.patch:
+    - fix type which was breaking the build
+
+ -- Sebastien Bacher <seb128@canonical.com>  Sat, 08 Mar 2008 14:13:51 +0100
+
+gnome-settings-daemon (2.21.91-0ubuntu6) hardy; urgency=low
+
+  * debian/patches/92_gsd-xrandr-version-check.patch:
+    - Adds checks that the xserver runs Xrandr 1.2 before starting up the
+      xrandr service.
+
+ -- Bryce Harrington <bryce@ubuntu.com>  Mon, 03 Mar 2008 21:53:34 -0800
+
+gnome-settings-daemon (2.21.91-0ubuntu5) hardy; urgency=low
+
+  * debian/control.in:
+    - updated libgnomedesktop requirements
+
+  [ Bryce Harrington ]
+
+  * debian/patches/91_gsd-add-randr-12.patch:
+      - Incorporate patch from RedHat to hook into the new xrandr 1.2 code
+        added to gnome-desktop.  This enables the daemon to accept xrandr 1.2
+        changes to monitor/screen configuration.
+
+ -- Sebastien Bacher <seb128@canonical.com>  Fri, 29 Feb 2008 18:39:47 +0100
+
+gnome-settings-daemon (2.21.91-0ubuntu4) hardy; urgency=low
+
+  * debian/patches/19_extra_keybindings.patch:
+    - "Add proper xrandr callback when XF86Display is pressed.",
+       thanks Mario Limonciello (lp: #179444)
+  * debian/patches/90_from_svn_pulseaudio_correct_use.patch:
+    - change from svn to make pulseaudio work correctly
+
+ -- Sebastien Bacher <seb128@canonical.com>  Thu, 28 Feb 2008 22:09:04 +0100
+
+gnome-settings-daemon (2.21.91-0ubuntu3) hardy; urgency=low
+
+  * debian/control.in:
+    - rebuild using the new libxklavier due to soname change
+
+ -- Sebastien Bacher <seb128@canonical.com>  Wed, 27 Feb 2008 15:28:24 +0100
+
+gnome-settings-daemon (2.21.91-0ubuntu2) hardy; urgency=low
+
+  * debian/patches/08_extra_touchpad_options.patch:
+    - Turn the touchpad on or off based on the touchpad_enabled gconf
+      setting. 
+
+ -- Scott James Remnant <scott@ubuntu.com>  Thu, 14 Feb 2008 08:16:25 +0000
+
+gnome-settings-daemon (2.21.91-0ubuntu1) hardy; urgency=low
+
+  * New upstream version:
+    - Use a flat directory instead of a hierarchy to install plugins into 
+    - Don't scan the plugins directory recursively     
+    - Install the settings plugin to a versioned directory to fix install
+      with libdir == libexecdir 
+    - Review short and long descriptions for GConf keys     
+    - Don't crash when running the screensaver fails  (lp: #188572)
+    - Rename src folder to gnome-settings-daemon
+    - Add uninstalled.pc file for building against an uninstalled copy of g-s-d 
+    - Add separate checks for libbackground and use external copy
+    - Use gnome_settings_daemon for the GConf path 
+    - Release the Glade XML ASAP and keep track of the 2 widgets we need    
+    - Make sure we return a GError if initialization fails 
+    - Load the XKB settings initially 
+    - Fix leaks 
+    - Unref the GConfClient only after done with it 
+    - Check for xinput 
+    - Fix copy'n'paste error 
+    - Declare variables at the beginning of a block 
+      to make older compilers happy 
+    - Add back support for defining plugin start order 
+    - Assign return value from g_slist_sort to the plugins list variable
+    - Replace gnome_vfs usage with GIO 
+  * debian/control.in:
+    - updated libglib requirement
+  * debian/gnome-settings-daemon.install:
+    - new version changes
+  * debian/patches/80_from_upstream_fix_xkb_loading.patch,
+    debian/patches/90_configure_xinput_change.patch:
+    - dropped, fixed in the new version
+
+ -- Sebastien Bacher <seb128@canonical.com>  Mon, 11 Feb 2008 17:54:34 +0100
+
+gnome-settings-daemon (2.21.90.2-0ubuntu2) hardy; urgency=low
+
+  * debian/patches/80_from_upstream_fix_xkb_loading.patch:
+    - change from upstream, fix xkb loading (lp: #188171)
+
+ -- Sebastien Bacher <seb128@canonical.com>  Fri, 08 Feb 2008 18:53:05 +0100
+
+gnome-settings-daemon (2.21.90.2-0ubuntu1) hardy; urgency=low
+
+  * New upstream version:
+    - Use correct binary path in DBus service file
+    - Updated translations
+  * debian/patches/90_configure_xinput_change.patch:
+    - new version update
+
+ -- Sebastien Bacher <seb128@canonical.com>  Wed, 06 Feb 2008 19:40:58 +0100
+
+gnome-settings-daemon (2.21.90.1-0ubuntu3) hardy; urgency=low
+
+  * debian/control.in:
+    - replaces on gnome-control-center (LP: #187401)
+
+ -- Sebastien Bacher <seb128@canonical.com>  Thu, 31 Jan 2008 09:06:13 +0100
+
+gnome-settings-daemon (2.21.90.1-0ubuntu2) hardy; urgency=low
+
+  * debian/patches/30_pkgconfig-path.patch,
+    debian/gnome-settings-daemon.links: 
+    - updated gnome-control-center changes
+
+ -- Sebastien Bacher <seb128@canonical.com>  Tue, 29 Jan 2008 22:37:57 +0100
+
+gnome-settings-daemon (2.21.90.1-0ubuntu1) hardy; urgency=low
+
+  * New upstream version
+
+ -- Sebastien Bacher <seb128@canonical.com>  Tue, 29 Jan 2008 17:57:47 +0100
+
+gnome-settings-daemon (2.21.90-0ubuntu1) hardy; urgency=low
+
+  * New upstream version:
+    - Add a more appealing animation for locate pointer feature if composite
+      is available 
+    - Quote function names in AC_DEFUN to fix autoconf warnings 
+    - Fix build with builddir != srcdir 
+    - Use g_ascii_dtostr instead of setlocale 
+    - Read check for XFT2 that got loast in the g-s-d split 
+    - Fix typo in typing break key 
+    - Define GNOME_DESKTOP_USE_UNSTABLE_API before including gnome-bg.h
+    - No longer define DBUS_API_SUBJECT_TO_CHANGE 
+    - Initialize GnomeProgram to avoid critical warnings from libgnome
+    - Hopefully allow $(libdir) to be the same directory as $(libexecdir) by
+      installing the gnome-settings-daemon binary into a 
+      subdirectory of $(libexecdir)
+    - Don't use weird autofoo stuff to install gnome-settings-daemon 
+      into another directory 
+    - Suppress verbose GConf schema installation output 
+  * debian/patches/90_configure_xinput_change.patch:
+    - new version update
+
+ -- Sebastien Bacher <seb128@canonical.com>  Tue, 29 Jan 2008 15:44:13 +0100
+
+gnome-settings-daemon (2.21.5.2-0ubuntu1) hardy; urgency=low
+
+  * Upload to ubuntu
+  * debian/patches/90_configure_xinput_change.patch:
+    - use xinput for the build
+
+ -- Sebastien Bacher <seb128@canonical.com>  Wed, 16 Jan 2008 11:12:19 +0100
+

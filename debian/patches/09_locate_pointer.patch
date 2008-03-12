@@ -1,0 +1,18 @@
+diff -Nur -x '*.orig' -x '*~' gnome-settings-daemon-2.21.5.2/plugins/mouse/gsd-mouse-manager.c gnome-settings-daemon-2.21.5.2.new/plugins/mouse/gsd-mouse-manager.c
+--- gnome-settings-daemon-2.21.5.2/plugins/mouse/gsd-mouse-manager.c	2008-01-14 18:49:29.000000000 +0100
++++ gnome-settings-daemon-2.21.5.2.new/plugins/mouse/gsd-mouse-manager.c	2008-01-16 15:22:22.000000000 +0100
+@@ -436,11 +436,11 @@
+                         XAllowEvents (gdk_x11_get_default_xdisplay (),
+                                       ReplayKeyboard,
+                                       xev->xkey.time);
+-                        XUngrabKeyboard (gdk_x11_get_default_xdisplay (),
+-                                         xev->xkey.time);
++                        /* XUngrabKeyboard (gdk_x11_get_default_xdisplay (),
++                                         xev->xkey.time); */
+                 }
+ 
+-                return GDK_FILTER_REMOVE;
++                /* return GDK_FILTER_REMOVE; */
+         }
+         return GDK_FILTER_CONTINUE;
+ }

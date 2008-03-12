@@ -1,0 +1,45 @@
+diff -Nurp gnome-settings-daemon-2.21.91-patched/plugins/xrandr/gsd-xrandr-manager.c gnome-settings-daemon-2.21.91-working/plugins/xrandr/gsd-xrandr-manager.c
+--- gnome-settings-daemon-2.21.91-patched/plugins/xrandr/gsd-xrandr-manager.c	2008-03-03 16:48:36.000000000 -0800
++++ gnome-settings-daemon-2.21.91-working/plugins/xrandr/gsd-xrandr-manager.c	2008-03-03 17:41:58.000000000 -0800
+@@ -107,10 +107,30 @@ gboolean
+ gsd_xrandr_manager_start (GsdXrandrManager *manager,
+                           GError          **error)
+ {
++#ifdef HAVE_RANDR
+         RWScreen *rw_screen;
+-        
++        int major, minor;
++        int event_base, error_base;
++        GdkDisplay *display;
++        Display    *xdisplay;
++
+         g_debug ("Starting xrandr manager");
+-        
++
++        display = gdk_display_get_default ();
++        xdisplay = gdk_x11_display_get_xdisplay (display);
++
++        if (!XRRQueryExtension (xdisplay, &event_base, &error_base) ||
++            XRRQueryVersion (xdisplay, &major, &minor) == 0)
++        {
++                g_warning( _("The X Server does not support the XRandR extension.  Runtime resolution changes to the display size are not available.") );
++                return TRUE;  /* Or should this return FALSE? */
++        }
++        else if (major != 1 || minor < 2)
++        {
++                g_warning( _("The version of the XRandR extension is incompatible with this program. Runtime changes to the display size are not available."));
++                return TRUE;  /* Or should this return FALSE? */
++        }
++
+         rw_screen = rw_screen_new (gdk_screen_get_default(), on_randr_event, NULL);
+ 
+         configuration_apply_stored (rw_screen);
+@@ -118,7 +138,7 @@ gsd_xrandr_manager_start (GsdXrandrManag
+         gdk_add_client_message_filter (gnome_randr_atom(),
+                                        on_client_message,
+                                        rw_screen);
+-        
++#endif /* HAVE_RANDR */
+         return TRUE;
+ }
+ 

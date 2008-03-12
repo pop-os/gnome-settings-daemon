@@ -1,0 +1,309 @@
+diff -Nurp gnome-settings-daemon-2.21.91/plugins/xrandr/gsd-xrandr-manager.c gnome-settings-daemon-2.21.91-modified/plugins/xrandr/gsd-xrandr-manager.c
+--- gnome-settings-daemon-2.21.91/plugins/xrandr/gsd-xrandr-manager.c	2007-12-24 03:18:48.000000000 -0800
++++ gnome-settings-daemon-2.21.91-modified/plugins/xrandr/gsd-xrandr-manager.c	2008-02-20 16:23:14.000000000 -0800
+@@ -36,6 +36,10 @@
+ #include <gdk/gdkx.h>
+ #include <gtk/gtk.h>
+ 
++#define I_KNOW_THIS_IS_UNSTABLE_AND_ONLY_IN_FEDORA
++#include <libgnomeui/monitor-db.h>
++#include <libgnomeui/randrwrap.h>
++
+ #ifdef HAVE_RANDR
+ #include <X11/extensions/Xrandr.h>
+ #endif
+@@ -61,258 +65,60 @@ G_DEFINE_TYPE (GsdXrandrManager, gsd_xra
+ 
+ static gpointer manager_object = NULL;
+ 
+-#ifdef HAVE_RANDR
+-static int
+-get_rotation (GConfClient *client,
+-              char        *display,
+-              int          screen)
+-{
+-        char   *key;
+-        int     val;
+-        GError *error;
+-
+-        key = g_strdup_printf ("%s/%d/rotation", display, screen);
+-        error = NULL;
+-        val = gconf_client_get_int (client, key, &error);
+-        g_free (key);
+-
+-        if (error == NULL) {
+-                return val;
+-        }
+-
+-        g_error_free (error);
+-
+-        return 0;
+-}
+-
+-static int
+-get_resolution (GConfClient *client,
+-                int          screen,
+-                char        *keys[],
+-                int         *width,
+-                int         *height)
+-{
+-        int   i;
+-        char *key;
+-        char *val;
+-        int   w;
+-        int   h;
+-
+-        val = NULL;
+-        for (i = 0; keys[i] != NULL; i++) {
+-                key = g_strdup_printf ("%s/%d/resolution", keys[i], screen);
+-                val = gconf_client_get_string (client, key, NULL);
+-                g_free (key);
+-
+-                if (val != NULL) {
+-                        break;
+-                }
+-        }
+-
+-        if (val == NULL) {
+-                return -1;
+-        }
+-
+-        if (sscanf (val, "%dx%d", &w, &h) != 2) {
+-                g_free (val);
+-                return -1;
+-        }
+-
+-        g_free (val);
+-
+-        *width = w;
+-        *height = h;
+-
+-        return i;
++static GdkAtom
++gnome_randr_atom (void)
++{
++        return gdk_atom_intern ("_GNOME_RANDR_ATOM", FALSE);
+ }
+ 
+-static int
+-get_rate (GConfClient *client,
+-          char        *display,
+-          int          screen)
++static Atom
++gnome_randr_xatom (void)
+ {
+-        char   *key;
+-        int     val;
+-        GError *error;
+-
+-        key = g_strdup_printf ("%s/%d/rate", display, screen);
+-        error = NULL;
+-        val = gconf_client_get_int (client, key, &error);
+-        g_free (key);
+-
+-        if (error == NULL) {
+-                return val;
+-        }
+-
+-        g_error_free (error);
+-
+-        return 0;
++        return gdk_x11_atom_to_xatom (gnome_randr_atom());
+ }
+ 
+-static int
+-find_closest_size (XRRScreenSize *sizes,
+-                   int            nsizes,
+-                   int            width,
+-                   int            height)
+-{
+-        int closest;
+-        int closest_width;
+-        int closest_height;
+-        int i;
+-
+-        closest = 0;
+-        closest_width = sizes[0].width;
+-        closest_height = sizes[0].height;
+-        for (i = 1; i < nsizes; i++) {
+-                if (ABS (sizes[i].width - width) < ABS (closest_width - width) ||
+-                    (sizes[i].width == closest_width &&
+-                     ABS (sizes[i].height - height) < ABS (closest_height - height))) {
+-                        closest = i;
+-                        closest_width = sizes[i].width;
+-                        closest_height = sizes[i].height;
+-                }
++static GdkFilterReturn
++on_client_message (GdkXEvent  *xevent,
++		   GdkEvent   *event,
++		   gpointer    data)
++{
++        RWScreen *screen = data;
++        XEvent *ev = (XEvent *)xevent;
++        
++        if (ev->type == ClientMessage		&&
++            ev->xclient.message_type == gnome_randr_xatom()) {
++                
++                configuration_apply_stored (screen);
++                
++                return GDK_FILTER_REMOVE;
+         }
+-
+-        return closest;
++        
++        /* Pass the event on to GTK+ */
++        return GDK_FILTER_CONTINUE;
+ }
+-#endif /* HAVE_RANDR */
+ 
+ static void
+-apply_settings (GsdXrandrManager *manager)
++on_randr_event (RWScreen *screen, gpointer data)
+ {
+-#ifdef HAVE_RANDR
+-        GdkDisplay  *display;
+-        Display     *xdisplay;
+-        int          major;
+-        int          minor;
+-        int          event_base;
+-        int          error_base;
+-        GConfClient *client;
+-        int          n_screens;
+-        GdkScreen   *screen;
+-        GdkWindow   *root_window;
+-        int          width;
+-        int          height;
+-        int          rate;
+-        int          rotation;
+-#ifdef HOST_NAME_MAX
+-        char         hostname[HOST_NAME_MAX + 1];
+-#else
+-        char         hostname[256];
+-#endif
+-        char        *specific_path;
+-        char        *keys[3];
+-        int          i;
+-        int          residx;
+-
+-        display = gdk_display_get_default ();
+-        xdisplay = gdk_x11_display_get_xdisplay (display);
+-
+-        /* Check if XRandR is supported on the display */
+-        if (!XRRQueryExtension (xdisplay, &event_base, &error_base)
+-            || XRRQueryVersion (xdisplay, &major, &minor) == 0) {
+-                return;
+-        }
+-
+-        if (major != 1 || minor < 1) {
+-                g_message ("Display has unsupported version of XRandR (%d.%d), not setting resolution.", major, minor);
+-                return;
+-        }
+-
+-        client = gconf_client_get_default ();
+-
+-        i = 0;
+-        specific_path = NULL;
+-        if (gethostname (hostname, sizeof (hostname)) == 0) {
+-                specific_path = g_strconcat ("/desktop/gnome/screen/", hostname,  NULL);
+-                keys[i++] = specific_path;
+-        }
+-        keys[i++] = "/desktop/gnome/screen/default";
+-        keys[i++] = NULL;
+-
+-        n_screens = gdk_display_get_n_screens (display);
+-        for (i = 0; i < n_screens; i++) {
+-                screen = gdk_display_get_screen (display, i);
+-                root_window = gdk_screen_get_root_window (screen);
+-                residx = get_resolution (client, i, keys, &width, &height);
+-
+-                if (residx != -1) {
+-                        XRRScreenSize          *sizes;
+-                        int                     nsizes;
+-                        int                     j;
+-                        int                     closest;
+-                        short                  *rates;
+-                        int                     nrates;
+-                        int                     status;
+-                        int                     current_size;
+-                        short                   current_rate;
+-                        XRRScreenConfiguration *config;
+-                        Rotation                current_rotation;
+-
+-                        config = XRRGetScreenInfo (xdisplay, gdk_x11_drawable_get_xid (GDK_DRAWABLE (root_window)));
+-
+-                        rate = get_rate (client, keys[residx], i);
+-
+-                        sizes = XRRConfigSizes (config, &nsizes);
+-                        closest = find_closest_size (sizes, nsizes, width, height);
+-
+-                        rates = XRRConfigRates (config, closest, &nrates);
+-                        for (j = 0; j < nrates; j++) {
+-                                if (rates[j] == rate)
+-                                        break;
+-                        }
+-
+-                        /* Rate not supported, let X pick */
+-                        if (j == nrates)
+-                                rate = 0;
+-
+-                        rotation = get_rotation (client, keys[residx], i);
+-                        if (rotation == 0)
+-                                rotation = RR_Rotate_0;
+-
+-                        current_size = XRRConfigCurrentConfiguration (config, &current_rotation);
+-                        current_rate = XRRConfigCurrentRate (config);
+-
+-                        if (closest != current_size ||
+-                            rate != current_rate ||
+-                            rotation != current_rotation) {
+-                                status = XRRSetScreenConfigAndRate (xdisplay,
+-                                                                    config,
+-                                                                    gdk_x11_drawable_get_xid (GDK_DRAWABLE (root_window)),
+-                                                                    closest,
+-                                                                    (Rotation) rotation,
+-                                                                    rate,
+-                                                                    GDK_CURRENT_TIME);
+-                        }
+-
+-                        XRRFreeScreenConfigInfo (config);
+-                }
+-        }
+-
+-        g_free (specific_path);
+-
+-        /* We need to make sure we process the screen resize event. */
+-        gdk_display_sync (display);
+-
+-        while (gtk_events_pending ()) {
+-                gtk_main_iteration ();
+-        }
+-
+-        if (client != NULL) {
+-                g_object_unref (client);
+-        }
+-
+-#endif /* HAVE_RANDR */
++        /* FIXME: Set up any new screens here */
+ }
+ 
+ gboolean
+ gsd_xrandr_manager_start (GsdXrandrManager *manager,
+                           GError          **error)
+ {
++        RWScreen *rw_screen;
++        
+         g_debug ("Starting xrandr manager");
++        
++        rw_screen = rw_screen_new (gdk_screen_get_default(), on_randr_event, NULL);
+ 
+-        apply_settings (manager);
+-
++        configuration_apply_stored (rw_screen);
++        
++        gdk_add_client_message_filter (gnome_randr_atom(),
++                                       on_client_message,
++                                       rw_screen);
++        
+         return TRUE;
+ }
+ 

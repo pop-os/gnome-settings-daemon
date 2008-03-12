@@ -1,0 +1,3 @@
+debian/tmp/etc/gconf/schemas
+debian/tmp/usr/lib/gnome-settings-daemon*
+debian/tmp/usr/share
