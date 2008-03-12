@@ -3,6 +3,7 @@ gnome-settings-daemon (2.22.0-1) experimental; urgency=low
   * New package, based on the Ubuntu packaging.
   * debian/control.in:
     + Update and wrap build dependencies/dependencies.
+    + Fix dependencies of the -dev package.
 
  -- Sebastian Dröge <slomo@debian.org>  Wed, 12 Mar 2008 15:17:19 +0100
 

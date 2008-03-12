@@ -41,7 +41,9 @@ Description: GNOME settings daemon
 Package: gnome-settings-daemon-dev
 Architecture: any
 Depends: ${shlibs:Depends},
-         ${misc:Depends}
+         ${misc:Depends},
+         libdbus-glib-1-dev (>= 0.74),
+         libglib2.0-dev (>= 2.15.0)
 Replaces: libgnome-settings-daemon-dev
 Description: Utility library for accessing gnome-settings-daemon over DBUS
  The package contains what is required to access gnome-settings-daemon over DBUS
