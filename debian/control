@@ -23,7 +23,7 @@ Build-Depends: cdbs,
                libx11-dev,
                libxrandr-dev,
                libxft2-dev,
-               x11proto-xf86misc-dev,
+               libxxf86misc-dev,
                libesd0-dev (>= 0.2.28),
                libxml-parser-perl,
                gnome-pkg-tools
