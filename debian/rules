@@ -10,3 +10,5 @@ include /usr/share/gnome-pkg-tools/1/rules/uploaders.mk
 binary-install/gnome-settings-daemon::
 	find debian -name '*.a' -delete
 	find debian -name '*.la' -delete
+	rm -f debian/tmp/usr/share/dbus-1/services/org.gnome.SettingsDaemon.service
+
