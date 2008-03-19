@@ -1,3 +1,10 @@
+gnome-settings-daemon (2.22.0-4) UNRELEASED; urgency=low
+
+  * debian/control.in:
+    + Also conflict with totem (<< 2.22.0) for the same reason.
+
+ -- Sebastian Dröge <slomo@debian.org>  Wed, 19 Mar 2008 10:47:07 +0100
+
 gnome-settings-daemon (2.22.0-3) unstable; urgency=low
 
   * Upload to unstable.
