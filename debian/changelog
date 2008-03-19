@@ -1,3 +1,12 @@
+gnome-settings-daemon (2.22.0-3) unstable; urgency=low
+
+  * Upload to unstable.
+  * debian/control.in:
+    + Add conflicts with rhythmbox (<< 0.11.5) and banshee (<< 0.13.2+dfsg-7)
+      as the multimedia keys DBus interface changed.
+
+ -- Sebastian Dröge <slomo@debian.org>  Wed, 19 Mar 2008 01:47:15 +0100
+
 gnome-settings-daemon (2.22.0-2) experimental; urgency=low
 
   * debian/rules:
