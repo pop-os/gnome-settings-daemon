@@ -1,3 +1,11 @@
+gnome-settings-daemon (2.22.0-2) experimental; urgency=low
+
+  * debian/rules:
+    + Don't install the dbus service file. This is not meant to be autostarted
+      but should be started by gnome-session.
+
+ -- Sebastian Dröge <slomo@debian.org>  Sun, 16 Mar 2008 17:39:52 +0100
+
 gnome-settings-daemon (2.22.0-1) experimental; urgency=low
 
   * New package, based on the Ubuntu packaging.
