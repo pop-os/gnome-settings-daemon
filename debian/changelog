@@ -1,9 +1,11 @@
-gnome-settings-daemon (2.22.0-4) UNRELEASED; urgency=low
+gnome-settings-daemon (2.22.0-4) unstable; urgency=low
 
   * debian/control.in:
     + Also conflict with totem (<< 2.22.0) for the same reason.
+  * debian/gnome-settings-daemon.install:
+    + Install xrdb files into /etc/gnome/config again.
 
- -- Sebastian Dröge <slomo@debian.org>  Wed, 19 Mar 2008 10:47:07 +0100
+ -- Sebastian Dröge <slomo@debian.org>  Sat, 22 Mar 2008 14:56:12 +0100
 
 gnome-settings-daemon (2.22.0-3) unstable; urgency=low
 
