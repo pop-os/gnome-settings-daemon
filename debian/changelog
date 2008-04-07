@@ -1,3 +1,11 @@
+gnome-settings-daemon (2.22.1-1) unstable; urgency=low
+
+  * New upstream bugfix release:
+    + debian/patches/09_locate_pointer.patch:
+      - Dropped, fixed upstream.
+
+ -- Sebastian Dröge <slomo@debian.org>  Mon, 07 Apr 2008 14:44:12 +0200
+
 gnome-settings-daemon (2.22.0-4) unstable; urgency=low
 
   * debian/control.in:
