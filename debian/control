@@ -2,7 +2,7 @@ Source: gnome-settings-daemon
 Section: gnome
 Priority: extra
 Maintainer: Debian GNOME Maintainers <pkg-gnome-maintainers@lists.alioth.debian.org>
-Uploaders: Sebastian Dröge <slomo@debian.org>
+Uploaders: Josselin Mouette <joss@debian.org>, Sebastian Dröge <slomo@debian.org>
 Build-Depends: cdbs,
                debhelper (>= 5),
                dpkg-dev (>= 1.13.19),
@@ -37,7 +37,8 @@ Replaces: capplets-data (<< 1:2.21.5),
           gnome-control-center (<< 1:2.21.5)
 Conflicts: rhythmbox (<< 0.11.5),
            banshee (<< 0.13.2+dfsg-7),
-           totem (<< 2.22.0)
+           totem (<< 2.22.0),
+           gnome-control-center (<< 1:2.21.5)
 Description: GNOME settings daemon
  The package contains the GNOME daemon which handles the session settings
 
