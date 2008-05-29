@@ -4,7 +4,9 @@ gnome-settings-daemon (2.22.2.1-1) unstable; urgency=low
   * Fix priority.
 
   [ Sebastian Dröge ]
-  * New upstream bugfix release.
+  * New upstream bugfix release:
+    + debian/rules:
+      - Run touch on every file to fix up timestamps.
 
  -- Sebastian Dröge <slomo@debian.org>  Thu, 29 May 2008 10:31:39 +0200
 
