@@ -1,3 +1,12 @@
+gnome-settings-daemon (2.22.2.1-2) unstable; urgency=low
+
+  * 08_extra_touchpad_options.patch: removed broken patch from Ubuntu. 
+    Closes: #481191.
+  * 11_sleepkey.patch: use gnome-power-cmd to suspend the computer 
+    instead of the nonexistent gdm-signal.
+
+ -- Josselin Mouette <joss@debian.org>  Tue, 11 Nov 2008 16:08:08 +0100
+
 gnome-settings-daemon (2.22.2.1-1) unstable; urgency=low
 
   [ Josselin Mouette ]
