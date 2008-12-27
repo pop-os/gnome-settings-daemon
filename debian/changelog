@@ -8,8 +8,6 @@ gnome-settings-daemon (2.24.1-1) experimental; urgency=low
   * 02_missing_libs.patch: explicitly add X11 libraries to 
     SETTINGS_PLUGINS since plugins are actually relying on them being 
     available.
-  * 30_pkgconfig-path.patch: removed, now g-s-d is started with the 
-    standard autostart mechanism.
   * 70_relibtoolize.patch: new patch, relibtoolize the source.
   * 99_ltmain_as-needed.patch: new patch, make --as-needed work.
   * Pass -O1 -z defs --as-needed to the linker.
@@ -20,8 +18,8 @@ gnome-settings-daemon (2.24.1-1) experimental; urgency=low
   * gnome-settings-daemon.postinst: remove /etc/gnome/config/xrdb.
   * Install .ad files in /etc/gnome/config to replace the ones from 
     capplets-data which are still used.
-  * g-s-d breaks gnome-session < 2.24 because of the startup mechanism 
-    change.
+  * Do not install the autostart file since we still use gnome-session 
+    2.22 which will start g-s-d by hand.
 
  -- Josselin Mouette <joss@debian.org>  Sat, 27 Dec 2008 11:29:41 +0100
 
