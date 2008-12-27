@@ -1,3 +1,30 @@
+gnome-settings-daemon (2.24.1-1) experimental; urgency=low
+
+  * New upstream release.
+    + Cleans up thumbnail cache automatically. Closes: #235067.
+  * Update build-dependencies and -dev dependencies.
+  * Standards version is 3.8.0.
+  * Switch to quilt for patch management; build-depend on quilt.
+  * 02_missing_libs.patch: explicitly add X11 libraries to 
+    SETTINGS_PLUGINS since plugins are actually relying on them being 
+    available.
+  * 30_pkgconfig-path.patch: removed, now g-s-d is started with the 
+    standard autostart mechanism.
+  * 70_relibtoolize.patch: new patch, relibtoolize the source.
+  * 99_ltmain_as-needed.patch: new patch, make --as-needed work.
+  * Pass -O1 -z defs --as-needed to the linker.
+    + Only warn on undefined symbols as plugins need a symbol from the 
+      daemon.
+  * Add some comments in the patches.
+  * Pass --no-act to dh_makeshlibs.
+  * gnome-settings-daemon.postinst: remove /etc/gnome/config/xrdb.
+  * Install .ad files in /etc/gnome/config to replace the ones from 
+    capplets-data which are still used.
+  * g-s-d breaks gnome-session < 2.24 because of the startup mechanism 
+    change.
+
+ -- Josselin Mouette <joss@debian.org>  Sat, 27 Dec 2008 11:29:41 +0100
+
 gnome-settings-daemon (2.22.2.1-2) unstable; urgency=low
 
   * 08_extra_touchpad_options.patch: removed broken patch from Ubuntu. 
