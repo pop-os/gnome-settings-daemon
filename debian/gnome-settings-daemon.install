@@ -1,3 +1,6 @@
 debian/tmp/etc/gconf/schemas
 debian/tmp/usr/lib/gnome-settings-daemon*
-debian/tmp/usr/share
+debian/tmp/usr/share/locale
+debian/tmp/usr/share/gnome-settings-daemon/*.glade
+debian/tmp/usr/share/gnome-settings-daemon/*.png
+debian/tmp/usr/share/gnome-settings-daemon/xrdb /etc/gnome/config
