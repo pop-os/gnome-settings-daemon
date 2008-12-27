@@ -1,3 +1,56 @@
+gnome-settings-daemon (2.22.2.1-2) unstable; urgency=low
+
+  * 08_extra_touchpad_options.patch: removed broken patch from Ubuntu. 
+    Closes: #481191.
+  * 11_sleepkey.patch: use gnome-power-cmd to suspend the computer 
+    instead of the nonexistent gdm-signal.
+
+ -- Josselin Mouette <joss@debian.org>  Tue, 11 Nov 2008 16:08:08 +0100
+
+gnome-settings-daemon (2.22.2.1-1) unstable; urgency=low
+
+  [ Josselin Mouette ]
+  * Fix priority.
+
+  [ Sebastian Dröge ]
+  * New upstream bugfix release:
+    + debian/rules:
+      - Run touch on every file to fix up timestamps.
+
+ -- Sebastian Dröge <slomo@debian.org>  Thu, 29 May 2008 10:31:39 +0200
+
+gnome-settings-daemon (2.22.1-2) unstable; urgency=high
+
+  * Conflict against gnome-control-center < 2.21.5. Closes: #476802.
+
+ -- Josselin Mouette <joss@debian.org>  Sat, 19 Apr 2008 22:17:49 +0200
+
+gnome-settings-daemon (2.22.1-1) unstable; urgency=low
+
+  * New upstream bugfix release:
+    + debian/patches/09_locate_pointer.patch:
+      - Dropped, fixed upstream.
+
+ -- Sebastian Dröge <slomo@debian.org>  Mon, 07 Apr 2008 14:44:12 +0200
+
+gnome-settings-daemon (2.22.0-4) unstable; urgency=low
+
+  * debian/control.in:
+    + Also conflict with totem (<< 2.22.0) for the same reason.
+  * debian/gnome-settings-daemon.install:
+    + Install xrdb files into /etc/gnome/config again.
+
+ -- Sebastian Dröge <slomo@debian.org>  Sat, 22 Mar 2008 14:56:12 +0100
+
+gnome-settings-daemon (2.22.0-3) unstable; urgency=low
+
+  * Upload to unstable.
+  * debian/control.in:
+    + Add conflicts with rhythmbox (<< 0.11.5) and banshee (<< 0.13.2+dfsg-7)
+      as the multimedia keys DBus interface changed.
+
+ -- Sebastian Dröge <slomo@debian.org>  Wed, 19 Mar 2008 01:47:15 +0100
+
 gnome-settings-daemon (2.22.0-2) experimental; urgency=low
 
   * debian/rules:
