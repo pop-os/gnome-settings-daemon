@@ -44,8 +44,21 @@ Conflicts: rhythmbox (<< 0.11.5),
            banshee (<< 0.13.2+dfsg-7),
            totem (<< 2.22.0),
            gnome-control-center (<< 1:2.21.5)
-Description: GNOME settings daemon
- The package contains the GNOME daemon which handles the session settings
+Description: daemon handling the GNOME session settings
+ This package contains the daemon which is responsible for setting the 
+ various parameters of a GNOME session and the applications that run 
+ under it. It handles the following kinds of settings:
+ .
+  * Keyboard: layout, accessibility options, shortcuts, media keys
+  * Clipboard management
+  * Theming: background, icons, GTK+ applications
+  * Cleanup of unused files
+  * Mouse: cursors, speed, accessibility options
+  * Startup of other daemons: screensaver, sound daemon
+  * Typing break
+ .
+ It also sets various application settings through X resources and 
+ freedesktop.org XSETTINGS.
 
 Package: gnome-settings-daemon-dev
 Architecture: any
@@ -54,5 +67,6 @@ Depends: ${shlibs:Depends},
          libdbus-glib-1-dev (>= 0.74),
          libglib2.0-dev (>= 2.17.3)
 Replaces: libgnome-settings-daemon-dev
-Description: Utility library for accessing gnome-settings-daemon over DBUS
- The package contains what is required to access gnome-settings-daemon over DBUS
+Description: Headers for building applications communicating with gnome-settings-daemon
+ This package contains header files required to build applications that 
+ communicate with the GNOME settings daemon over D-Bus.
