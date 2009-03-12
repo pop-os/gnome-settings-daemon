@@ -1,8 +1,6 @@
 gnome-settings-daemon (2.24.1-2) UNRELEASED; urgency=low
 
   * Improve package descriptions. Mention XSETTINGS. Closes: #511905.
-  * Require libgnomekbd 2.24 to force building against libgnomekbd3.
-    Closes: #511411.
 
  -- Josselin Mouette <joss@debian.org>  Thu, 15 Jan 2009 16:15:55 +0100
 
