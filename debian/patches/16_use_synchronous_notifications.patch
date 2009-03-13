@@ -1,0 +1,223 @@
+=== modified file 'configure.ac'
+diff -Nur -x '*.orig' -x '*~' gnome-settings-daemon-2.25.90/configure.ac gnome-settings-daemon-2.25.90.new/configure.ac
+--- gnome-settings-daemon-2.25.90/configure.ac	2009-02-19 15:28:17.665443880 +0100
++++ gnome-settings-daemon-2.25.90.new/configure.ac	2009-02-19 15:28:19.293443865 +0100
+@@ -69,6 +69,7 @@
+         gio-2.0 >= $GIO_REQUIRED_VERSION
+         libglade-2.0 >= 2.0.0
+         dbus-glib-1 >= $DBUS_GLIB_REQUIRED_VERSION
++	libnotify >= $LIBNOTIFY_REQUIRED_VERSION
+ )
+ 
+ GSD_PLUGIN_LDFLAGS="-export_dynamic -module -avoid-version -no-undefined"
+diff -Nur -x '*.orig' -x '*~' gnome-settings-daemon-2.25.90/plugins/media-keys/gsd-media-keys-manager.c gnome-settings-daemon-2.25.90.new/plugins/media-keys/gsd-media-keys-manager.c
+diff -Nur -x '*.orig' -x '*~' gnome-settings-daemon-2.25.90/plugins/media-keys/Makefile.am gnome-settings-daemon-2.25.90.new/plugins/media-keys/Makefile.am
+--- gnome-settings-daemon-2.25.90/plugins/media-keys/Makefile.am	2009-02-19 15:28:17.701442446 +0100
++++ gnome-settings-daemon-2.25.90.new/plugins/media-keys/Makefile.am	2009-02-19 15:28:19.293443865 +0100
+@@ -29,6 +29,7 @@
+ 	gsd-media-keys-manager.c	\
+ 	gsd-media-keys-window.h		\
+ 	gsd-media-keys-window.c		\
++	gsd-media-keys-notification.c	\
+ 	$(BUILT_SOURCES)		\
+ 	$(NULL)
+ 
+@@ -42,10 +43,12 @@
+ 	$(AM_CPPFLAGS)
+ 
+ libmedia_keys_la_CFLAGS = \
++	$(LIBNOTIFY_CFLAGS)		\
+ 	$(SETTINGS_PLUGIN_CFLAGS)	\
+ 	$(AM_CFLAGS)
+ 
+ libmedia_keys_la_LDFLAGS = 		\
++	$(LIBNOTIFY_LDFLAGS)		\
+ 	$(GSD_PLUGIN_LDFLAGS)
+ 
+ libmedia_keys_la_LIBADD  = 		\
+@@ -92,6 +95,7 @@
+ test_media_keys_SOURCES =			\
+ 	gsd-media-keys-manager.c		\
+ 	gsd-media-keys-manager.h		\
++	gsd-media-keys-notification.c		\
+ 	gsd-media-keys-window.h			\
+ 	gsd-media-keys-window.c			\
+ 	test-media-keys.c			\
+diff -Nur -x '*.orig' -x '*~' gnome-settings-daemon-2.25.90.orig/plugins/media-keys/gsd-media-keys-manager.c gnome-settings-daemon-2.25.90/plugins/media-keys/gsd-media-keys-manager.c
+--- gnome-settings-daemon-2.25.90.orig/plugins/media-keys/gsd-media-keys-manager.c	2009-03-03 11:32:33.000000000 +0100
++++ gnome-settings-daemon-2.25.90/plugins/media-keys/gsd-media-keys-manager.c	2009-03-02 17:18:32.000000000 +0100
+@@ -51,6 +51,14 @@
+ #include "actions/acme-volume.h"
+ #include "gsd-media-keys-window.h"
+ 
++/* HACK: fwd declaration */
++gboolean
++gsd_media_keys_notification_volume (int value, gboolean muted);
++
++gboolean
++gsd_media_keys_notification_eject (void);
++
++
+ #define GSD_DBUS_PATH "/org/gnome/SettingsDaemon"
+ #define GSD_DBUS_NAME "org.gnome.SettingsDaemon"
+ #define GSD_MEDIA_KEYS_DBUS_PATH GSD_DBUS_PATH "/MediaKeys"
+@@ -586,10 +594,13 @@
+ {
+         char *command;
+ 
++        if (! gsd_media_keys_notification_eject ())
++        {
+         dialog_init (manager);
+         gsd_media_keys_window_set_action (GSD_MEDIA_KEYS_WINDOW (manager->priv->dialog),
+                                           GSD_MEDIA_KEYS_WINDOW_ACTION_EJECT);
+         dialog_show (manager);
++        }
+ 
+         command = gconf_client_get_string (manager->priv->conf_client,
+                                            GCONF_MISC_DIR "/eject_command",
+@@ -661,6 +672,10 @@
+         muted = acme_volume_get_mute (manager->priv->volume);
+         vol = acme_volume_get_volume (manager->priv->volume);
+ 
++        /* try to use the new notification service, if available */
++        if (gsd_media_keys_notification_volume (vol, muted))
++                return;
++
+         /* FIXME: AcmeVolume should probably emit signals
+            instead of doing it like this */
+         dialog_init (manager);
+diff -Nur -x '*.orig' -x '*~' gnome-settings-daemon-2.25.90.orig/plugins/media-keys/gsd-media-keys-notification.c gnome-settings-daemon-2.25.90/plugins/media-keys/gsd-media-keys-notification.c
+--- gnome-settings-daemon-2.25.90.orig/plugins/media-keys/gsd-media-keys-notification.c	1970-01-01 01:00:00.000000000 +0100
++++ gnome-settings-daemon-2.25.90/plugins/media-keys/gsd-media-keys-notification.c	2009-03-03 11:13:27.000000000 +0100
+@@ -0,0 +1,131 @@
++/* -*- Mode: C; tab-width: 8; indent-tabs-mode: nil; c-basic-offset: 8 -*-
++ *
++ * Copyright (C) 2009 Canonical Ltd
++ *
++ * This program is free software; you can redistribute it and/or modify
++ * it under the terms of the GNU General Public License as published by
++ * the Free Software Foundation; either version 2 of the License, or
++ * (at your option) any later version.
++ *
++ * This program is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ * GNU General Public License for more details.
++ *
++ * You should have received a copy of the GNU General Public License
++ * along with this program; if not, write to the Free Software
++ * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
++ *
++ */
++
++#include <libnotify/notify.h>
++
++gboolean
++gsd_media_keys_notification_check_service (void)
++{
++        GList * caps = NULL;
++	gchar *name = NULL, *vendor = NULL, *version = NULL, *specver = NULL;
++        gboolean compat = FALSE;
++
++        if (! notify_is_initted())
++                notify_init ("gnome-settings-daemon");
++
++	if (! notify_get_server_info (&name, &vendor, &version, &specver))
++	{
++		g_debug ("unable to reach notification service");
++		return FALSE;
++	}
++
++        caps = notify_get_server_caps();
++        if (g_list_find_custom (caps,
++                                "x-canonical-private-synchronous",
++                                (GCompareFunc) g_strcmp0) != NULL)
++                compat = TRUE;
++
++        g_list_foreach(caps, (GFunc)g_free, NULL);
++        g_list_free(caps);
++
++        if (! compat)
++                g_debug ("the service does not support the 'x-canonical-private-synchronous' capability");
++
++        g_free (name); g_free (vendor); g_free (version); g_free (specver);
++
++	return compat;
++}
++
++static const char *icon_name[] = {
++        "notification-audio-volume-muted",
++        /* "notification-audio-volume-off", */
++        "notification-audio-volume-low",
++        "notification-audio-volume-medium",
++        "notification-audio-volume-high",
++        NULL
++};
++
++
++gboolean
++gsd_media_keys_notification_volume (int value, gboolean muted)
++{
++        static NotifyNotification *n = NULL;
++        int s;
++
++	if (! gsd_media_keys_notification_check_service ())
++		return FALSE;
++
++	if (n == NULL)
++		n = notify_notification_new (" ",
++					     "",
++					     NULL,
++					     NULL);
++        if (value < 0)
++        {
++                value = 0; /* notify-osd doesn't like -1 */
++                s = 0; /* off, ie with the undershoot effect */
++        } else {
++                s = 3 * value / 100 + 1;
++                if (s < 1)
++                        s = 1;
++                if (s > 3)
++                        s = 3;
++        }
++
++        if (muted)
++                s = 0;
++
++        notify_notification_update (n,
++                                    " ",
++                                    "",
++                                    icon_name[s]);
++		
++	notify_notification_set_hint_int32(n, "value", value);
++	notify_notification_set_hint_string(n, "x-canonical-private-synchronous", "volume");
++
++	notify_notification_show (n, NULL);
++
++        return TRUE;
++}
++
++gboolean
++gsd_media_keys_notification_eject (void)
++{
++        static NotifyNotification *n = NULL;
++
++	if (! gsd_media_keys_notification_check_service ())
++		return FALSE;
++
++	if (n == NULL)
++        {
++		n = notify_notification_new ("Eject",
++					     "",
++					     "notification-device-eject",
++                                             NULL);
++                notify_notification_set_hint_string(n, "x-canonical-private-synchronous", "eject");
++                notify_notification_set_hint_string (n,
++                                                     "icon-only",
++                                                     "allowed");
++        }
++
++	notify_notification_show (n, NULL);
++
++        return TRUE;
++}

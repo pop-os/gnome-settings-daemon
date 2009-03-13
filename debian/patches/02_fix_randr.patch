@@ -1,0 +1,23 @@
+# Description: Fix application of ~/.config/monitors.xml
+# Ubuntu: https://launchpad.net/bugs/329410
+# Upstream: http://bugzilla.gnome.org/show_bug.cgi?id=572876
+Index: plugins/xrandr/gsd-xrandr-manager.c
+===================================================================
+--- plugins/xrandr/gsd-xrandr-manager.c	(revision 734)
++++ plugins/xrandr/gsd-xrandr-manager.c	(working copy)
+@@ -1343,7 +1343,6 @@
+                  */
+ 
+                 unlink (backup_filename);
+-                goto out;
+         }
+ 
+         /* 2. There was no backup configuration!  This means we are
+@@ -1351,6 +1350,7 @@
+          */
+ 
+         apply_intended_configuration (manager, intended_filename);
++        goto out;
+ 
+ out:
+ 

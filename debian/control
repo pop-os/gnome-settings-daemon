@@ -1,0 +1,54 @@
+Source: gnome-settings-daemon
+Section: gnome
+Priority: optional
+Maintainer: Ubuntu Desktop Team <ubuntu-desktop@lists.ubuntu.com>
+XSBC-Original-Maintainer: Debian GNOME Maintainers <pkg-gnome-maintainers@lists.alioth.debian.org>
+Uploaders: Debian GNOME Maintainers <pkg-gnome-maintainers@lists.alioth.debian.org>
+Build-Depends: cdbs,
+               debhelper (>= 5),
+               dpkg-dev (>= 1.13.19),
+               autotools-dev,
+               libdbus-glib-1-dev (>= 0.74),
+               libglib2.0-dev (>= 2.17.3),
+               libgtk2.0-dev (>= 2.13.1),
+               libgconf2-dev (>= 2.6.1),
+               gconf2,
+               libgnome-desktop-dev (>= 1:2.25.6),
+               libglade2-dev,
+               libgnomekbd-dev (>= 2.21.4),
+               libgstreamer0.10-dev (>= 0.10.1.2),
+               libgstreamer-plugins-base0.10-dev (>= 0.10.1.2),
+               libxklavier12-dev (>= 3.8),
+               libx11-dev,
+               libxi-dev (>= 2:1.1.3-1ubuntu4),
+               libxrandr-dev,
+               libxft2-dev,
+               libxxf86misc-dev,
+               libxml-parser-perl,
+               libnotify-dev,
+               gnome-pkg-tools
+Standards-Version: 3.7.3
+Vcs-Bzr: https://code.launchpad.net/~ubuntu-desktop/gnome-settings-daemon/ubuntu
+
+Package: gnome-settings-daemon
+Architecture: any
+Depends: ${shlibs:Depends},
+         ${misc:Depends}
+Replaces: capplets-data (<< 1:2.21.5),
+          gnome-control-center (<< 1:2.21.5)
+Conflicts: rhythmbox (<< 0.11.5),
+           banshee (<< 0.13.2+dfsg-7),
+           totem (<< 2.22.0),
+           gnome-control-center (<< 1:2.21.5)
+Description: GNOME settings daemon
+ The package contains the GNOME daemon which handles the session settings
+
+Package: gnome-settings-daemon-dev
+Architecture: any
+Depends: ${shlibs:Depends},
+         ${misc:Depends},
+         libdbus-glib-1-dev (>= 0.74),
+         libglib2.0-dev (>= 2.15.0)
+Replaces: libgnome-settings-daemon-dev
+Description: Utility library for accessing gnome-settings-daemon over DBUS
+ The package contains what is required to access gnome-settings-daemon over DBUS

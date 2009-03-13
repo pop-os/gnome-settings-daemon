@@ -1,0 +1,224 @@
+diff -Nur -x '*.orig' -x '*~' gnome-settings-daemon-2.25.92/plugins/mouse/gsd-mouse-manager.c gnome-settings-daemon-2.25.92.new/plugins/mouse/gsd-mouse-manager.c
+--- gnome-settings-daemon-2.25.92/plugins/mouse/gsd-mouse-manager.c	2009-02-15 19:12:26.000000000 +0100
++++ gnome-settings-daemon-2.25.92.new/plugins/mouse/gsd-mouse-manager.c	2009-03-03 11:04:01.000000000 +0100
+@@ -38,9 +38,11 @@
+ #include <gdk/gdkx.h>
+ #include <gdk/gdkkeysyms.h>
+ #include <X11/keysym.h>
++#include <X11/Xatom.h>
+ 
+ #ifdef HAVE_X11_EXTENSIONS_XINPUT_H
+ #include <X11/extensions/XInput.h>
++#include <X11/extensions/XIproto.h>
+ #endif
+ #include <gconf/gconf.h>
+ #include <gconf/gconf-client.h>
+@@ -61,6 +63,10 @@
+ #define KEY_LOCATE_POINTER      GCONF_MOUSE_DIR "/locate_pointer"
+ #define KEY_DWELL_ENABLE        GCONF_MOUSE_A11Y_DIR "/dwell_enable"
+ #define KEY_DELAY_ENABLE        GCONF_MOUSE_A11Y_DIR "/delay_enable"
++#define KEY_TOUCHPAD_ENABLED    "/desktop/gnome/peripherals/mouse/touchpad_enabled"
++#define KEY_TAP_TO_CLICK        "/desktop/gnome/peripherals/mouse/tap_to_click"
++#define KEY_PAD_VERT_SCROLL     "/desktop/gnome/peripherals/mouse/pad_vert_scroll"
++#define KEY_PAD_HORIZ_SCROLL    "/desktop/gnome/peripherals/mouse/pad_horiz_scroll"
+ 
+ struct GsdMouseManagerPrivate
+ {
+@@ -261,6 +267,9 @@
+ 
+         device_info = XListInputDevices (GDK_DISPLAY (), &n_devices);
+ 
++        if (device_info == NULL)
++                return;
++              
+         if (n_devices > 0)
+                 buttons = g_new (guchar, buttons_capacity);
+         else
+@@ -436,6 +445,144 @@
+                                0, 0, motion_threshold);
+ }
+ 
++static XDevice
++*device_is_touchpad (XDeviceInfo deviceinfo)
++{
++	XDevice *device;
++	Atom realtype, prop;
++	int realformat;
++	unsigned long nitems, bytes_after;
++	unsigned char *data;
++
++	if (deviceinfo.type != XInternAtom(GDK_DISPLAY(), XI_TOUCHPAD, False))
++		return NULL;
++
++	prop = XInternAtom(GDK_DISPLAY(), "Synaptics Off", False);
++
++	gdk_error_trap_push();
++	device = XOpenDevice(GDK_DISPLAY(), deviceinfo.id);
++	if (gdk_error_trap_pop() || (device == NULL))
++		return NULL;
++
++	gdk_error_trap_push();
++	if ((XGetDeviceProperty(GDK_DISPLAY(), device, prop, 0, 1, False, 
++			       XA_INTEGER, &realtype, &realformat, &nitems,
++			       &bytes_after, &data) == Success) && (realtype != None))
++	{
++		gdk_error_trap_pop();
++		XFree(data);
++		return device;
++	}
++	gdk_error_trap_pop();
++
++	XCloseDevice(GDK_DISPLAY(), device);
++	return NULL;
++}
++
++static int
++set_touchpad_enabled (gboolean state)
++{
++	int numdevices, i;
++        XDeviceInfo *devicelist = XListInputDevices (GDK_DISPLAY(), &numdevices);
++	XDevice * device;
++	unsigned char data;
++	Atom prop;
++	
++	if (devicelist == NULL)
++                return 0;
++	
++	prop = XInternAtom(GDK_DISPLAY(), "Synaptics Off", False);
++	data = (char)!state;
++
++	for (i = 0; i < numdevices; i++) {
++		if ((device = device_is_touchpad(devicelist[i]))) {
++			gdk_error_trap_push();
++			XChangeDeviceProperty(GDK_DISPLAY(), device, prop, XA_INTEGER, 8,
++					      PropModeReplace, &data, 1);
++			XCloseDevice (GDK_DISPLAY(), device);
++			if (gdk_error_trap_pop()) {
++				g_warning("Error in setting touchpad enabled on \"%s\"", devicelist[i].name);
++				continue;
++			}
++		}
++	}
++
++	XFreeDeviceList(devicelist);
++	return 0;
++}
++
++static int
++set_tap_to_click (gboolean state)
++{
++	int numdevices, i;
++        XDeviceInfo *devicelist = XListInputDevices (GDK_DISPLAY(), &numdevices);
++	XDevice * device;
++	unsigned long data;
++	Atom prop;
++
++	if (devicelist == NULL)
++                return 0;
++
++	prop = XInternAtom(GDK_DISPLAY(), "Synaptics Tap Time", False);
++	data = state ? 180 : 0;
++
++	for (i = 0; i < numdevices; i++) {
++		if ((device = device_is_touchpad(devicelist[i]))) {
++			gdk_error_trap_push();
++			XChangeDeviceProperty(GDK_DISPLAY(), device, prop, XA_INTEGER, 32,
++					      PropModeReplace, (unsigned char *)&data, 1);
++			XCloseDevice (GDK_DISPLAY(), device);
++			if (gdk_error_trap_pop()) {
++				g_warning("Error in setting tap to click on \"%s\"", devicelist[i].name);
++				continue;
++			}
++		}
++	}
++
++	XFreeDeviceList(devicelist);
++	return 0;
++}
++
++static int
++set_edge_scroll (int which, gboolean state)
++{
++	int numdevices, i;
++        XDeviceInfo *devicelist = XListInputDevices (GDK_DISPLAY(), &numdevices);
++	XDevice *device;
++	Atom act_type, prop;
++	int act_format;
++	unsigned long nitems, bytes_after;
++	unsigned char *data;
++
++	if (devicelist == NULL)
++                return 0;
++
++	prop = XInternAtom(GDK_DISPLAY(), "Synaptics Edge Scrolling", False);
++
++	for (i = 0; i < numdevices; i++) {
++		if ((device = device_is_touchpad(devicelist[i]))) {
++			gdk_error_trap_push();
++			XGetDeviceProperty(GDK_DISPLAY(), device, prop, 0, 3, False,
++					   XA_INTEGER, &act_type, &act_format, &nitems,
++					   &bytes_after, &data);
++			if (which < nitems)
++			{
++				data[which] = state;
++				XChangeDeviceProperty(GDK_DISPLAY(), device, prop, XA_INTEGER, 8,
++						      PropModeReplace, data, 3);
++			}
++			XFree(data);
++			XCloseDevice (GDK_DISPLAY(), device);
++			if (gdk_error_trap_pop() || (which >= nitems)) {
++				g_warning("Error in setting edge scroll on \"%s\"", devicelist[i].name);
++				continue;
++			}
++		}
++	}
++
++	XFreeDeviceList(devicelist);
++	return 0;
++}
+ 
+ #define KEYBOARD_GROUP_SHIFT 13
+ #define KEYBOARD_GROUP_MASK ((1 << 13) | (1 << 14))
+@@ -647,6 +794,11 @@
+         set_motion_acceleration (manager, gconf_client_get_float (client, KEY_MOTION_ACCELERATION , NULL));
+         set_motion_threshold (manager, gconf_client_get_int (client, KEY_MOTION_THRESHOLD, NULL));
+ 
++        set_touchpad_enabled (gconf_client_get_bool (client, KEY_TOUCHPAD_ENABLED, NULL));
++        set_tap_to_click (gconf_client_get_bool (client, KEY_TAP_TO_CLICK, NULL));
++        set_edge_scroll (0, gconf_client_get_bool (client, KEY_PAD_VERT_SCROLL, NULL));
++        set_edge_scroll (1, gconf_client_get_bool (client, KEY_PAD_HORIZ_SCROLL, NULL));
++
+         g_object_unref (client);
+ }
+ 
+@@ -668,6 +820,18 @@
+                 if (entry->value->type == GCONF_VALUE_INT) {
+                         set_motion_threshold (manager, gconf_value_get_int (entry->value));
+                 }
++	} else if (! strcmp (entry->key, KEY_TOUCHPAD_ENABLED)) {
++		if (entry->value->type == GCONF_VALUE_BOOL)
++			set_touchpad_enabled (gconf_value_get_bool (entry->value));
++	} else if (! strcmp (entry->key, KEY_TAP_TO_CLICK)) {
++		if (entry->value->type == GCONF_VALUE_BOOL)
++			set_tap_to_click (gconf_value_get_bool (entry->value));
++	} else if (! strcmp (entry->key, KEY_PAD_VERT_SCROLL)) {
++		if (entry->value->type == GCONF_VALUE_BOOL)
++			set_edge_scroll (0, gconf_value_get_bool (entry->value));
++	} else if (! strcmp (entry->key, KEY_PAD_HORIZ_SCROLL)) {
++		if (entry->value->type == GCONF_VALUE_BOOL)
++                        set_edge_scroll (1, gconf_value_get_bool (entry->value));
+         } else if (! strcmp (entry->key, KEY_LOCATE_POINTER)) {
+                 if (entry->value->type == GCONF_VALUE_BOOL) {
+                         set_locate_pointer (manager, gconf_value_get_bool (entry->value));
+@@ -732,6 +896,11 @@
+                                 gconf_client_get_bool (client, KEY_DWELL_ENABLE, NULL),
+                                 gconf_client_get_bool (client, KEY_DELAY_ENABLE, NULL));
+ 
++	set_touchpad_enabled (gconf_client_get_bool (client, KEY_TOUCHPAD_ENABLED, NULL));
++	set_tap_to_click (gconf_client_get_bool (client, KEY_TAP_TO_CLICK, NULL));
++	set_edge_scroll (0, gconf_client_get_bool (client, KEY_PAD_VERT_SCROLL, NULL));
++	set_edge_scroll (1, gconf_client_get_bool (client, KEY_PAD_HORIZ_SCROLL, NULL));
++
+         g_object_unref (client);
+ 
+         gnome_settings_profile_end (NULL);

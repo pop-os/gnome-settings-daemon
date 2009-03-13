@@ -1,0 +1,523 @@
+gnome-settings-daemon (2.25.92-0ubuntu6) jaunty; urgency=low
+
+  * debian/control.in:
+    - list vcs url
+  * debian/patches/16_use_synchronous_notifications.patch:
+    - updated capability naming (lp: #340817)
+  * debian/watch:
+    - new file to watch upstream updates
+
+ -- Sebastien Bacher <seb128@ubuntu.com>  Fri, 13 Mar 2009 15:59:39 +0100
+
+gnome-settings-daemon (2.25.92-0ubuntu5) jaunty; urgency=low
+
+  * debian/gnome-settings-daemon.gconf-defaults: use subpixel
+    rendering and slight hinting as the default in jaunty (even on CRT
+    monitors for now)  (LP: #332172)
+
+ -- Alexander Sack <asac@ubuntu.com>  Tue, 10 Mar 2009 11:06:03 +0100
+
+gnome-settings-daemon (2.25.92-0ubuntu4) jaunty; urgency=low
+
+  * debian/patches/02_fix_randr.patch:
+    - readd this change which is not in the new version yet
+
+ -- Sebastien Bacher <seb128@ubuntu.com>  Wed, 04 Mar 2009 16:54:03 +0100
+
+gnome-settings-daemon (2.25.92-0ubuntu3) jaunty; urgency=low
+
+  * 16_use_synchronous_notifications.patch: Update for new hint names and
+    eject key. Patch by David Barth. (LP: #329245)
+
+ -- Martin Pitt <martin.pitt@ubuntu.com>  Tue, 03 Mar 2009 14:58:19 +0100
+
+gnome-settings-daemon (2.25.92-0ubuntu2) jaunty; urgency=low
+
+  * debian/patches/08_extra_touchpad_options.patch:
+    - updated to not crash when there is no device listed, 
+      thank to Dimitry Andric who suggested the change (lp: #204850)
+
+ -- Sebastien Bacher <seb128@ubuntu.com>  Tue, 03 Mar 2009 11:14:31 +0100
+
+gnome-settings-daemon (2.25.92-0ubuntu1) jaunty; urgency=low
+
+  * New upstream version
+  * debian/patches/02_fix_randr.patch:
+    - the change is in the new version
+
+ -- Sebastien Bacher <seb128@ubuntu.com>  Mon, 02 Mar 2009 23:43:25 +0100
+
+gnome-settings-daemon (2.25.90-0ubuntu4) jaunty; urgency=low
+
+  * Add 02_fix_randr.patch: Actually apply the RandR settings in
+    ~/.config/monitors.xml again. Many thanks to Alberto Milone for
+    fixing this! (LP: #329410)
+
+ -- Martin Pitt <martin.pitt@ubuntu.com>  Mon, 23 Feb 2009 19:17:56 +0100
+
+gnome-settings-daemon (2.25.90-0ubuntu3) jaunty; urgency=low
+
+  * 16_use_synchronous_notifications.patch: Update for new icon names
+    in the recent alsdorf -> notify-osd renaming. Fixes brightness
+    notifications again. (LP: #331311)
+
+ -- Martin Pitt <martin.pitt@ubuntu.com>  Thu, 19 Feb 2009 15:28:55 +0100
+
+gnome-settings-daemon (2.25.90-0ubuntu2) jaunty; urgency=low
+
+  * debian/control.in:
+    - build-depends on libnotify-dev
+  * debian/patches/16_use_synchronous_notifications.patch:
+    - use synchronous notifications when they are supported
+      thanks to the dx-team and James Westby for their work (lp: #329245)
+ 
+ -- Sebastien Bacher <seb128@ubuntu.com>  Tue, 17 Feb 2009 16:39:26 +0100
+
+gnome-settings-daemon (2.25.90-0ubuntu1) jaunty; urgency=low
+
+  * New upstream version:
+    - Initialize thread system 
+    - Better support for Eject and Sleep actions on BSD   
+    - Spawn screensaver after a 30 second timeout instead of when idle so that 
+      it doesn't compete with other processes when the session starts 
+    - Add low diskspace notification 
+    - Support hotkeys for a11y tools 
+    - Quiet xrdb when there are duplicate rules in the .ad files 
+    - Add debugging output when de/registering media players  
+    - Add a new sound plugin that tells PulseAudio to drop its sample cache when
+      the sound theme changes (lp: #267210)
+    - Don't pop up an error message when there's no randr configuration file 
+    - Ungrab keys when key-related plugins are disabled 
+    - Use PulseAudio directly to change the volume 
+    - Don't draw_background immediately when nautilus is disabled, GnomeBG will
+      send a signal 
+    - Add crossfade transition when switching backgrounds 
+    - Use XF86Explorer to launch the file manager 
+    - Fix possible crash when pressing Fn-F7 
+    - Delay drawing the background until SessionRunning 
+    - Ask for confirmation with a timeout after changing the randr configuration 
+    - Require gnome-desktop 2.25.6 
+    - Plug leaks
+    - Build fixes
+  * debian/control.in:
+    - updated build requirement
+  * debian/patches/07_use_gstreamer_volume.patch:
+    - still use the gstreamer code to countrol sound
+  * debian/patches/11_sleepkey.patch:
+    - new version update
+  * debian/patches/90_autoreconf.patch:
+    - run autoreconf to build the gstreamer code correctly
+  * debian/patches/99_svn_crash_on_xrandr.patch:
+    - the change is in the new version
+
+ -- Sebastien Bacher <seb128@ubuntu.com>  Wed, 11 Feb 2009 14:06:00 +0100
+
+gnome-settings-daemon (2.25.3-0ubuntu2) jaunty; urgency=low
+
+  * Drop 19_extra_keybindings.patch, the keybinding has been wrong since
+    Ubuntu 8.10 and this should be superseded by the upstream xrandr
+    plugin anyway.  LP: #267018.
+  * 99_svn_crash_on_xrandr.patch: patch from upstream svn to fix a
+    crasher bug in the xrandr plugin due to broken error handling.
+    LP: #315974.
+
+ -- Steve Langasek <steve.langasek@ubuntu.com>  Tue, 27 Jan 2009 15:46:19 -0800
+
+gnome-settings-daemon (2.25.3-0ubuntu1) jaunty; urgency=low
+
+  * New upstream version:
+    - Add support for fn-f7 type keys 
+    - Use D-Bus instead of an X client mesage in the xrandr plugin, so
+      the front-end can get error messages as well 
+    - Fix crash when the X server doesn't have the XInput extension 
+    - Don't call umask 
+    - Shut the daemon down properly when the SIGTERM signal is received or the
+      D-Bus bus goes away 
+    - Restore AccessX bits to original values on exit, fixes sticky keys
+      coming on when gnome-settings-daemon has exited 
+    - Use only top-level glib and gtk+ headers 
+  * debian/control.in:
+    - updated build requirement
+  * debian/patches/02_xrandr_api.patch:
+    - the change are in the new version
+
+ -- Sebastien Bacher <seb128@ubuntu.com>  Mon, 05 Jan 2009 15:19:06 +0100
+
+gnome-settings-daemon (2.25.2-0ubuntu3) jaunty; urgency=low
+
+  * debian/patches/02_xrandr_api.patch:
+    - fixes for the api chagnes in the gnome xrandr api
+
+ -- Michael Vogt <michael.vogt@ubuntu.com>  Wed, 17 Dec 2008 22:16:45 +0100
+
+gnome-settings-daemon (2.25.2-0ubuntu2) jaunty; urgency=low
+
+  * debian/patches/08_extra_touchpad_options.patch:
+     - Set touchpad settings on DeviceEnabled. This was previously done by
+       20_mouse_devicepresencenotify.patch, but that was mostly upstreamed
+       and dropped in the last upload.
+
+ -- William Grant <wgrant@ubuntu.com>  Wed, 03 Dec 2008 12:27:00 +1100
+
+gnome-settings-daemon (2.25.2-0ubuntu1) jaunty; urgency=low
+
+  * New upstream version:
+    - No need to trap XkbQueryExtension and friends errors 
+    - Add some performance annotations around libxklavier calls 
+    - Start managers in idle callbacks 
+    - Only initialize fontconfig when starting up 
+    - Remove unnecessary X error traps 
+    - Init a11y status icon only when needed 
+    - Reshufle plugin priorities a bit 
+    - Delay constructing the GnomeBg object until we need it 
+    - Listen for DeviceEnabled instead of DeviceAdded to be sure the mouse has
+      been initialized 
+    - Add debugging output for volume_step 
+    - Fork before gtk_init 
+    - Lockdown in the keybinding plugin 
+    - Trap X errors so we don't crash on X servers that 
+      don't support DevicePresence
+    - Fix handling of time = GDK_CURRENT_TIME 
+    - Add bundle_loader linker flag to fix compilation on MacOS X 
+    - Grab all keycodes that match the respective keysim 
+    - Fix --no-daemon 
+    - Depend on libxklavier 3.8 
+    - Fix checks for various X libraries 
+    - Fix check for xklavier device discovery 
+  * debian/control.in:
+     - the new version doesn't require libesd, libpulse, libgnomeui
+     - updated gtk and libxklavier requirements
+  * debian/patches/08_extra_touchpad_options.patch:
+    - new version update
+  * debian/patches/20_mouse_devicepresencenotify.patch:
+    - the change is in the new version
+  * debian/patches/31_multikeycodes.patch:
+    - the change is in the new version
+
+ -- Sebastien Bacher <seb128@ubuntu.com>  Tue, 02 Dec 2008 15:17:12 +0100
+
+gnome-settings-daemon (2.24.0-0ubuntu4) jaunty; urgency=low
+
+  * debian/patches/31_multikeycodes.patch:
+    - Backported patch from rev 610 of gsd trunk.
+    - Makes keysyms with multiple keycodes bound to them functional.
+      This fixes cases such as where XF86Eject doesn't work. (LP: #299194)
+
+ -- Mario Limonciello <mario_limonciello@dell.com>  Mon, 24 Nov 2008 16:11:01 -0600
+
+gnome-settings-daemon (2.24.0-0ubuntu3.2) intrepid-proposed; urgency=low
+
+  * debian/patches/20_mouse_devicepresencenotify.patch:
+    - Fix the DevicePresenceNotify storm. Now we only watch for DeviceEnabled
+      (rather than DeviceAdded) events. (LP: #293318)
+  * debian/patches/08_extra_touchpad_options.patch:
+    - device_is_touchpad: Decide that it's not a touchpad unless it is of type
+      XI_TOUCHPAD.
+    - set_tap_to_click: Fix a couple of potential memory leaks.
+
+ -- William Grant <wgrant@ubuntu.com>  Sat, 08 Nov 2008 11:46:30 +1100
+
+gnome-settings-daemon (2.24.0-0ubuntu3.1) intrepid-proposed; urgency=low
+
+  * debian/patches/20_mouse_devicepresencenotify.patch: Listen for X input
+    device changes, and reconfigure pointers if necessary. This makes
+    hotplugged pointing devices respect user settings. (LP: #280148)
+
+ -- William Grant <wgrant@ubuntu.com>  Mon, 03 Nov 2008 19:35:58 +1100
+
+gnome-settings-daemon (2.24.0-0ubuntu3) intrepid; urgency=low
+
+  * debian/control.in: Add a build-depend on libxi-dev
+    (>= 2:1.1.3-1ubuntu4) (FTBFS).
+
+ -- Timo Aaltonen <tepsipakki@ubuntu.com>  Fri, 10 Oct 2008 12:59:21 +0300
+
+gnome-settings-daemon (2.24.0-0ubuntu2) intrepid; urgency=low
+
+  [ William Grant ]
+  * debian/patches/08_extra_touchpad_options.patch:
+    - Update for the new property API. (LP: #274728)
+      + No longer use XQueryDeviceProperty to check if a property exists - the
+        function has been removed.
+      + Remove the 'pending' argument from calls to XGetDeviceProperty.
+    - Don't trust that a device that looks like a touchpad has all properties
+      that a real touchpad does, as properties can be added by a user, and
+      things segfault.
+    - Label set failure warnings with the device name to make things a bit
+      less scary.
+    - Fix a couple of compiler warnings.
+
+ -- Timo Aaltonen <tepsipakki@ubuntu.com>  Fri, 10 Oct 2008 12:40:40 +0300
+
+gnome-settings-daemon (2.24.0-0ubuntu1) intrepid; urgency=low
+
+  * New upstream version:
+    - Fix the fix for read-only home directories 
+    - Make the volume popup not crash when invoking it on any screen but
+      the first when using a compositing manager 
+    - Add GPLv2 copyright notice explicitly so that newer versions of
+      autotools don't declare us GPLv3 
+    - Specify GTK modules to load in a GConf directory instead of the
+      single /desktop/gnome/gtk-modules key 
+    - Also allow linking the module state to other boolean keys by using
+      a string value that is the name of the key to use 
+    - Made the housekeeping plugin less aggressive by default
+
+ -- Sebastien Bacher <seb128@ubuntu.com>  Tue, 23 Sep 2008 12:48:51 +0200
+
+gnome-settings-daemon (2.23.92-0ubuntu3) intrepid; urgency=low
+
+  * Rebuild due to libgnomekbd soname change
+
+ -- Sebastien Bacher <seb128@ubuntu.com>  Wed, 10 Sep 2008 14:39:44 +0200
+
+gnome-settings-daemon (2.23.92-0ubuntu2) intrepid; urgency=low
+
+  * Drop 80_evdev_no_model.patch, since there's no need to force the
+    model anymore. The evdev driver uses evdev rules instead, and so
+    the user is able to change the kb model again.
+
+ -- Timo Aaltonen <tepsipakki@ubuntu.com>  Tue, 09 Sep 2008 18:21:36 +0300
+
+gnome-settings-daemon (2.23.92-0ubuntu1) intrepid; urgency=low
+
+  * New upstream version:
+    - Try harder to use the keyboard layout passed by GDM
+    - Updated translations
+
+ -- Sebastien Bacher <seb128@ubuntu.com>  Mon, 08 Sep 2008 13:35:27 +0200
+
+gnome-settings-daemon (2.23.91-0ubuntu2) intrepid; urgency=low
+
+  * debian/patches/08_extra_touchpad_options.patch:
+    - Look for the "Synaptics Off" XInput property to determine whether
+      a given device is a touchpad, rather than hardcoding the device
+      name. (LP: #207781)
+    - Use XInput device properties to set touchpad settings.
+
+ -- William Grant <wgrant@ubuntu.com>  Tue, 02 Sep 2008 09:07:34 +1000
+
+gnome-settings-daemon (2.23.91-0ubuntu1) intrepid; urgency=low
+
+  * New upstream version:
+    - Removed translatable property on stock gtk-close 
+    - Fix a constness warning 
+    - Fix a crash due to an incorrect signal handler definition
+    - Use a scale factor instead of a fixed DPI 
+    - Use g_warning instead of g_error when setup fails so we don't abort
+
+ -- Sebastien Bacher <seb128@canonical.com>  Mon, 01 Sep 2008 16:54:56 +0200
+
+gnome-settings-daemon (2.23.90-0ubuntu1) intrepid; urgency=low
+
+  * New upstream version:
+    - PulseAudio check to not ouput "no" twice 
+    - Add status icon when a11y hotkeys are enabled, and display Universal
+      Access preferences when it is clicked 
+    - Simplify libnotify check, fix fontconfig result output 
+    - Put the Glade file where all the others are 
+    - Remove some unnecessary boilerplate 
+    - Use g_file_monitor instead of g_file_monitor_file/_directory  
+    - Remove warning that isn't 
+    - Fixed crash in randr startup 
+    - Fail xrandr initialization if we couldn't start xrandr 
+    - Try harder to clean up xrandr in _stop  so we can enable/disable 
+      the plugin on the fly 
+    - For LIBSOUNDS, check for libgnomeui, not just libgnome 
+    - Add sexy labels when setting up dual monitors 
+    - Add a separator to the menu before "Configure display settings"
+    - Use GDK to get DPI 
+  * debian/control.in:
+    - updated the requirements
+
+ -- Sebastien Bacher <seb128@canonical.com>  Tue, 19 Aug 2008 00:11:28 +0200
+
+gnome-settings-daemon (2.23.6-0ubuntu2) intrepid; urgency=low
+
+  * debian/patches/80_evdev_no_model.patch:
+    - don't set a keyboard model when evdev is being used (lp: #255008)
+
+ -- Sebastien Bacher <seb128@canonical.com>  Wed, 13 Aug 2008 23:27:21 +0200
+
+gnome-settings-daemon (2.23.6-0ubuntu1) intrepid; urgency=low
+
+  * New upstream version:
+    - Remove libgnomeui dependency 
+    - Bump glib dependency to 2.15 
+    - Use standard icon names for the OSD 
+    - Make the display notification icon configurable (lp: #252546)
+    - Resolve NumLock dynamically 
+  * debian/control.in:
+    - don't use libgnomeui
+
+ -- Sebastien Bacher <seb128@canonical.com>  Mon, 04 Aug 2008 18:43:28 +0200
+
+gnome-settings-daemon (2.23.5-0ubuntu1) intrepid; urgency=low
+
+  * New upstream version:
+    - New settings for event sounds 
+    - Fix include path for building against uninstalled package.    
+    - Remove 'daemon' from the warning message 
+    - Make more shortcuts with shift work 
+    - Update RandR code to use new gnome-desktop API 
+    - Fix accelerator check 
+    - Detect and enable PulseAudio
+  * debian/control.in:
+    - build-depends on libpulse-dev
+    - updated libgnome-desktop requirement
+  * debian/gnome-settings-daemon.install:
+    - install new icons
+  * debian/patches/91_gsd-add-randr-12.patch,
+    debian/patches/92_gsd-xrandr-version-check.patch:
+    - dropped, the new version has similar changes
+  * debian/rules:
+    - no need to workaround timestamp issue those are correct in the new version
+	
+ -- Sebastien Bacher <seb128@canonical.com>  Fri, 25 Jul 2008 14:23:09 +0200
+
+gnome-settings-daemon (2.23.3-0ubuntu3) intrepid; urgency=low
+
+  * rebuild due to the libgnome-desktop soname change
+
+ -- Sebastien Bacher <seb128@canonical.com>  Fri, 06 Jun 2008 11:11:50 +0200
+
+gnome-settings-daemon (2.23.3-0ubuntu2) intrepid; urgency=low
+
+  * debian/rules:
+    - the new tarball has broken timestamps again, workaround the issue
+
+ -- Sebastien Bacher <seb128@canonical.com>  Wed, 04 Jun 2008 10:30:06 +0200
+
+gnome-settings-daemon (2.23.3-0ubuntu1) intrepid; urgency=low
+
+  * New upstream version:
+    - Execute the correct action when there are multiple keyboard shortcuts with
+      the same keycode but different keysyms 
+    - Fix wallpaper handling for people running a session without nautilus
+    - Try to keep the keyboard layout from gdm 
+    - Don't die when the user's home directory is read-only     
+    - Fix artifacts from the locate pointer animation in non-composited mode    
+    - Pass clicks to the media popup window through to the underlying window    
+    - Use new gnome-desktop background API and get rid of libbackground
+    - Don't eat keypresses for multimedia key events in the mouse plugin
+    - Shutdown when receiving the "SessionOver" signal from gnome-session
+    - Fix memory leaks in the font plugin 
+    - Move the locate pointer animation with the mouse cursor 
+    - Fix build without GStreamer
+  * debian/control.in:
+    - updated libgnome-desktop requirement
+  * debian/gnome-settings-daemon.install:
+    - install the new autostart and the dbus service
+  * debian/rules:
+    - don't remove the dbus service
+
+ -- Sebastien Bacher <seb128@canonical.com>  Tue, 03 Jun 2008 23:09:04 +0200
+
+gnome-settings-daemon (2.23.1.1-0ubuntu1) intrepid; urgency=low
+
+  * New upstream version:
+    - Sound server startup based on GConf setting, even when esd is disabled   
+    - Added a new "housekeeping" plugin to set limits on the size and age of the
+      thumbnail cache (lp: #37643)
+    - Fix mismatched modifier maping between egg and GTK 
+    - Replace some custom functionality with stock GTK 
+    - Mark string for translation 
+    - Use G_DEFINE_TYPE instead of open-coding 
+    - Change data types to match glib, avoid using time_t 
+    - Add mapping for Gtk/Modules xsetting using GConf 
+    - Set GConf keys back to false if mousetweaks is not installed 
+    - Don't try to add grabas with invalid modifiers 
+    - Remove trailing newlines from messages since g_warning already takes care
+      of those 
+    - Fix various leaks 
+    - Fix TYPE macro and remove unimplemented prototype 
+    - Add a special volume subclass for better support of IBM Thinkpad hardware
+      volume buttons 
+    - Initialize inited_ok or behaviour is undefined when xkb setup fails
+    - Continued attempt at making XKB setup and error handling a bit less arcane
+      and crufty 
+    - Only use the built-in default for volume_step if we get an 
+      error from GConf, not just when the value is 0 which might be what 
+      the user wants
+    - Adds a "threshold" property to the AcmeVolume class that denotes 
+      the minimum percentage required to actually affect the volume 
+    - Don't install any listeners or callbacks when XKB is not available
+    - Remove excessive key grab logging 
+    - Make plugins deactivation work
+    - Properly null-terminate g_build_filename 
+    - Turn into a daemon by default and make --no-daemon work
+    - DBus API has been stable for a while; 
+      don't define DBUS_API_SUBJECT_TO_CHANGE anymore 
+    - Drop GConf backup for xkb 
+    - Extract some functionality used by several plugins into a separate 
+      shared helper library 
+    - Reset GConf keys when we can't launch the daemon 
+    - Updated translations
+  * Sync on Debian
+  * debian/control.in:
+    - updated maintainer information
+  * debian/gnome-settings-daemon.install:
+    - install the xrdb files in the correct directory
+  * debian/rules:
+    - don't do timestamps change since this tarball has no issue
+
+ -- Sebastien Bacher <seb128@canonical.com>  Tue, 03 Jun 2008 15:46:21 +0200
+
+gnome-settings-daemon (2.22.2.1-1) unstable; urgency=low
+
+  [ Josselin Mouette ]
+  * Fix priority.
+
+  [ Sebastian Dröge ]
+  * New upstream bugfix release:
+    + debian/rules:
+      - Run touch on every file to fix up timestamps.
+
+ -- Sebastian Dröge <slomo@debian.org>  Thu, 29 May 2008 10:31:39 +0200
+
+gnome-settings-daemon (2.22.1-2) unstable; urgency=high
+
+  * Conflict against gnome-control-center < 2.21.5. Closes: #476802.
+
+ -- Josselin Mouette <joss@debian.org>  Sat, 19 Apr 2008 22:17:49 +0200
+
+gnome-settings-daemon (2.22.1-1) unstable; urgency=low
+
+  * New upstream bugfix release:
+    + debian/patches/09_locate_pointer.patch:
+      - Dropped, fixed upstream.
+
+ -- Sebastian Dröge <slomo@debian.org>  Mon, 07 Apr 2008 14:44:12 +0200
+
+gnome-settings-daemon (2.22.0-4) unstable; urgency=low
+
+  * debian/control.in:
+    + Also conflict with totem (<< 2.22.0) for the same reason.
+  * debian/gnome-settings-daemon.install:
+    + Install xrdb files into /etc/gnome/config again.
+
+ -- Sebastian Dröge <slomo@debian.org>  Sat, 22 Mar 2008 14:56:12 +0100
+
+gnome-settings-daemon (2.22.0-3) unstable; urgency=low
+
+  * Upload to unstable.
+  * debian/control.in:
+    + Add conflicts with rhythmbox (<< 0.11.5) and banshee (<< 0.13.2+dfsg-7)
+      as the multimedia keys DBus interface changed.
+
+ -- Sebastian Dröge <slomo@debian.org>  Wed, 19 Mar 2008 01:47:15 +0100
+
+gnome-settings-daemon (2.22.0-2) experimental; urgency=low
+
+  * debian/rules:
+    + Don't install the dbus service file. This is not meant to be autostarted
+      but should be started by gnome-session.
+
+ -- Sebastian Dröge <slomo@debian.org>  Sun, 16 Mar 2008 17:39:52 +0100
+
+gnome-settings-daemon (2.22.0-1) experimental; urgency=low
+
+  * New package, based on the Ubuntu packaging.
+
+ -- Sebastian Dröge <slomo@debian.org>  Wed, 12 Mar 2008 15:17:19 +0100
+

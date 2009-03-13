@@ -1,0 +1,12 @@
+diff -Nur -x '*.orig' -x '*~' gnome-settings-daemon-2.25.90/plugins/media-keys/gsd-media-keys-manager.c gnome-settings-daemon-2.25.90.new/plugins/media-keys/gsd-media-keys-manager.c
+--- gnome-settings-daemon-2.25.90/plugins/media-keys/gsd-media-keys-manager.c	2009-02-11 14:31:10.000000000 +0100
++++ gnome-settings-daemon-2.25.90.new/plugins/media-keys/gsd-media-keys-manager.c	2009-02-11 14:31:22.000000000 +0100
+@@ -67,7 +67,7 @@
+ #if defined(__OpenBSD__) || defined(__FreeBSD__)
+ # define SLEEP_COMMAND "zzz"
+ #else
+-# define SLEEP_COMMAND "apm"
++# define SLEEP_COMMAND "gdm-signal -s"
+ #endif
+ 
+ #define GSD_MEDIA_KEYS_MANAGER_GET_PRIVATE(o) (G_TYPE_INSTANCE_GET_PRIVATE ((o), GSD_TYPE_MEDIA_KEYS_MANAGER, GsdMediaKeysManagerPrivate))
