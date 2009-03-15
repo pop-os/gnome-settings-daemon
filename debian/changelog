@@ -7,7 +7,7 @@ gnome-settings-daemon (2.24.1-2) UNRELEASED; urgency=low
   * Suggest x11-xserver-utils as gnome-settings-daemon attempts to run xrdb by
     default and logs a warning when that fails.
   * Suggest gnome-screensaver as gnome-settings-daemon attempts to start it by
-    default and logs a warnings when that fails.
+    default and logs a warning when that fails.
   * Suggest metacity | x-window-manager as gnome-settings-daemon attemts to
     start a window manager and logs a warning when that fails.
 
