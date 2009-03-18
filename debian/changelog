@@ -1,6 +1,8 @@
 gnome-settings-daemon (2.26.0-0ubuntu1) jaunty; urgency=low
 
   * New upstream version
+  * debian/patches/06_undo_build_change.patch:
+    - undo upstream build changes they break plugins loaded for some reason
 
  -- Sebastien Bacher <seb128@ubuntu.com>  Wed, 18 Mar 2009 13:37:27 +0100
 
