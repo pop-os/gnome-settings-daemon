@@ -1,3 +1,11 @@
+gnome-settings-daemon (2.25.92-0ubuntu7) jaunty; urgency=low
+
+  * debian/patches/16_use_synchronous_notifications.patch:
+    - updated version by David Barth to fix other capability naming issues 
+      (lp: #329245)
+
+ -- Sebastien Bacher <seb128@ubuntu.com>  Wed, 18 Mar 2009 13:21:35 +0100
+
 gnome-settings-daemon (2.25.92-0ubuntu6) jaunty; urgency=low
 
   * debian/control.in:

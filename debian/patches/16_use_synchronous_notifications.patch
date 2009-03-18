@@ -10,7 +10,6 @@ diff -Nur -x '*.orig' -x '*~' gnome-settings-daemon-2.25.90/configure.ac gnome-s
  )
  
  GSD_PLUGIN_LDFLAGS="-export_dynamic -module -avoid-version -no-undefined"
-diff -Nur -x '*.orig' -x '*~' gnome-settings-daemon-2.25.90/plugins/media-keys/gsd-media-keys-manager.c gnome-settings-daemon-2.25.90.new/plugins/media-keys/gsd-media-keys-manager.c
 diff -Nur -x '*.orig' -x '*~' gnome-settings-daemon-2.25.90/plugins/media-keys/Makefile.am gnome-settings-daemon-2.25.90.new/plugins/media-keys/Makefile.am
 --- gnome-settings-daemon-2.25.90/plugins/media-keys/Makefile.am	2009-02-19 15:28:17.701442446 +0100
 +++ gnome-settings-daemon-2.25.90.new/plugins/media-keys/Makefile.am	2009-02-19 15:28:19.293443865 +0100
@@ -43,9 +42,8 @@ diff -Nur -x '*.orig' -x '*~' gnome-settings-daemon-2.25.90/plugins/media-keys/M
  	gsd-media-keys-window.h			\
  	gsd-media-keys-window.c			\
  	test-media-keys.c			\
-diff -Nur -x '*.orig' -x '*~' gnome-settings-daemon-2.25.90.orig/plugins/media-keys/gsd-media-keys-manager.c gnome-settings-daemon-2.25.90/plugins/media-keys/gsd-media-keys-manager.c
 --- gnome-settings-daemon-2.25.90.orig/plugins/media-keys/gsd-media-keys-manager.c	2009-03-03 11:32:33.000000000 +0100
-+++ gnome-settings-daemon-2.25.90/plugins/media-keys/gsd-media-keys-manager.c	2009-03-02 17:18:32.000000000 +0100
++++ gnome-settings-daemon-2.25.92/plugins/media-keys/gsd-media-keys-manager.c	2009-03-18 10:17:32.000000000 +0100
 @@ -51,6 +51,14 @@
  #include "actions/acme-volume.h"
  #include "gsd-media-keys-window.h"
@@ -55,7 +53,7 @@ diff -Nur -x '*.orig' -x '*~' gnome-settings-daemon-2.25.90.orig/plugins/media-k
 +gsd_media_keys_notification_volume (int value, gboolean muted);
 +
 +gboolean
-+gsd_media_keys_notification_eject (void);
++gsd_media_keys_notification (int key, const char *hint);
 +
 +
  #define GSD_DBUS_PATH "/org/gnome/SettingsDaemon"
@@ -65,7 +63,7 @@ diff -Nur -x '*.orig' -x '*~' gnome-settings-daemon-2.25.90.orig/plugins/media-k
  {
          char *command;
  
-+        if (! gsd_media_keys_notification_eject ())
++        if (! gsd_media_keys_notification (EJECT_KEY, "Eject"))
 +        {
          dialog_init (manager);
          gsd_media_keys_window_set_action (GSD_MEDIA_KEYS_WINDOW (manager->priv->dialog),
@@ -86,10 +84,45 @@ diff -Nur -x '*.orig' -x '*~' gnome-settings-daemon-2.25.90.orig/plugins/media-k
          /* FIXME: AcmeVolume should probably emit signals
             instead of doing it like this */
          dialog_init (manager);
-diff -Nur -x '*.orig' -x '*~' gnome-settings-daemon-2.25.90.orig/plugins/media-keys/gsd-media-keys-notification.c gnome-settings-daemon-2.25.90/plugins/media-keys/gsd-media-keys-notification.c
+@@ -777,8 +792,10 @@
+ 
+ static gboolean
+ do_multimedia_player_action (GsdMediaKeysManager *manager,
++                             int                  type,
+                              const char          *key)
+ {
++        gsd_media_keys_notification (type, key);
+         return gsd_media_player_key_pressed (manager, key);
+ }
+ 
+@@ -847,19 +864,19 @@
+                 execute (manager, "gcalctool", FALSE, FALSE);
+                 break;
+         case PLAY_KEY:
+-                return do_multimedia_player_action (manager, "Play");
++                return do_multimedia_player_action (manager, type, "Play");
+                 break;
+         case PAUSE_KEY:
+-                return do_multimedia_player_action (manager, "Pause");
++                return do_multimedia_player_action (manager, type, "Pause");
+                 break;
+         case STOP_KEY:
+-                return do_multimedia_player_action (manager, "Stop");
++                return do_multimedia_player_action (manager, type, "Stop");
+                 break;
+         case PREVIOUS_KEY:
+-                return do_multimedia_player_action (manager, "Previous");
++                return do_multimedia_player_action (manager, type, "Previous");
+                 break;
+         case NEXT_KEY:
+-                return do_multimedia_player_action (manager, "Next");
++                return do_multimedia_player_action (manager, type, "Next");
+                 break;
+         default:
+                 g_assert_not_reached ();
 --- gnome-settings-daemon-2.25.90.orig/plugins/media-keys/gsd-media-keys-notification.c	1970-01-01 01:00:00.000000000 +0100
-+++ gnome-settings-daemon-2.25.90/plugins/media-keys/gsd-media-keys-notification.c	2009-03-03 11:13:27.000000000 +0100
-@@ -0,0 +1,131 @@
++++ gnome-settings-daemon-2.25.92/plugins/media-keys/gsd-media-keys-notification.c	2009-03-18 10:05:28.000000000 +0100
+@@ -0,0 +1,166 @@
 +/* -*- Mode: C; tab-width: 8; indent-tabs-mode: nil; c-basic-offset: 8 -*-
 + *
 + * Copyright (C) 2009 Canonical Ltd
@@ -111,6 +144,8 @@ diff -Nur -x '*.orig' -x '*~' gnome-settings-daemon-2.25.90.orig/plugins/media-k
 + */
 +
 +#include <libnotify/notify.h>
++#include <gdk/gdkx.h>
++#include "actions/acme.h"
 +
 +gboolean
 +gsd_media_keys_notification_check_service (void)
@@ -138,7 +173,7 @@ diff -Nur -x '*.orig' -x '*~' gnome-settings-daemon-2.25.90.orig/plugins/media-k
 +        g_list_free(caps);
 +
 +        if (! compat)
-+                g_debug ("the service does not support the 'x-canonical-private-synchronous' capability");
++                g_debug ("the service does not support the 'synchronous' capability");
 +
 +        g_free (name); g_free (vendor); g_free (version); g_free (specver);
 +
@@ -197,27 +232,60 @@ diff -Nur -x '*.orig' -x '*~' gnome-settings-daemon-2.25.90.orig/plugins/media-k
 +        return TRUE;
 +}
 +
++/* Warning: keep that in sync with the enum in action/acme.h */
++static const char *media_key_icon[] = {
++        NULL, /* MUTE_KEY */
++        NULL, /* VOLUME_DOWN_KEY */
++        NULL, /* VOLUME_UP_KEY */
++        NULL, /* POWER_KEY */
++        NULL, /* EJECT_KEY */
++        NULL, /* HOME_KEY */
++        NULL, /* MEDIA_KEY */
++        NULL, /* CALCULATOR_KEY */
++        NULL, /* SEARCH_KEY */
++        NULL, /* EMAIL_KEY */
++        NULL, /* SLEEP_KEY */
++        NULL, /* SCREENSAVER_KEY */
++        NULL, /* HELP_KEY */
++        NULL, /* WWW_KEY */
++        NULL, /* "notification-audio-play", */ /* PLAY_KEY */
++        NULL, /* "notification-audio-pause",*/ /* PAUSE_KEY */
++        "notification-audio-stop", /* STOP_KEY */
++        "notification-audio-previous", /* PREVIOUS_KEY */
++        "notification-audio-next", /* NEXT_KEY */
++        NULL, /* HANDLED_KEYS */
++        NULL
++};
++
 +gboolean
-+gsd_media_keys_notification_eject (void)
++gsd_media_keys_notification (int key, const char *hint)
 +{
 +        static NotifyNotification *n = NULL;
++
++        if (key >= HANDLED_KEYS) return FALSE;
++
++        if (media_key_icon[key] == NULL) return FALSE;
 +
 +	if (! gsd_media_keys_notification_check_service ())
 +		return FALSE;
 +
 +	if (n == NULL)
 +        {
-+		n = notify_notification_new ("Eject",
++		n = notify_notification_new (hint,
 +					     "",
-+					     "notification-device-eject",
++					     media_key_icon[key],
 +                                             NULL);
-+                notify_notification_set_hint_string(n, "x-canonical-private-synchronous", "eject");
-+                notify_notification_set_hint_string (n,
-+                                                     "icon-only",
-+                                                     "allowed");
++        } else {
++                notify_notification_update (n,
++                                            hint,
++                                            "",
++                                            media_key_icon[key]);
 +        }
-+
-+	notify_notification_show (n, NULL);
++        notify_notification_set_hint_string(n,
++                                            "x-canonical-private-synchronous",
++                                            hint);
++        notify_notification_set_hint_string (n, "x-canonical-private-icon-only", "true");
++        notify_notification_show (n, NULL);
 +
 +        return TRUE;
 +}
