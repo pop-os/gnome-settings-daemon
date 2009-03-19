@@ -238,7 +238,7 @@ diff -Nur -x '*.orig' -x '*~' gnome-settings-daemon-2.25.90/plugins/media-keys/M
 +        NULL, /* VOLUME_DOWN_KEY */
 +        NULL, /* VOLUME_UP_KEY */
 +        NULL, /* POWER_KEY */
-+        NULL, /* EJECT_KEY */
++        "notification-device-eject", /* EJECT_KEY */
 +        NULL, /* HOME_KEY */
 +        NULL, /* MEDIA_KEY */
 +        NULL, /* CALCULATOR_KEY */
