@@ -1,7 +1,8 @@
-gnome-settings-daemon (2.24.1-2) UNRELEASED; urgency=low
+gnome-settings-daemon (2.24.1-2) unstable; urgency=low
 
   [ Josselin Mouette ]
   * Improve package descriptions. Mention XSETTINGS. Closes: #511905.
+  * Upload to unstable.
 
   [ Loic Minier ]
   * Suggest x11-xserver-utils as gnome-settings-daemon attempts to run xrdb by
@@ -11,7 +12,7 @@ gnome-settings-daemon (2.24.1-2) UNRELEASED; urgency=low
   * Suggest metacity | x-window-manager as gnome-settings-daemon attemts to
     start a window manager and logs a warning when that fails.
 
- -- Josselin Mouette <joss@debian.org>  Thu, 12 Mar 2009 12:24:45 +0100
+ -- Josselin Mouette <joss@debian.org>  Tue, 07 Apr 2009 08:48:36 +0200
 
 gnome-settings-daemon (2.24.1-1) experimental; urgency=low
 
