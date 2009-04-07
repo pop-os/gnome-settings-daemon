@@ -1,3 +1,11 @@
+gnome-settings-daemon (2.26.0-0ubuntu3) jaunty; urgency=low
+
+  * debian/patches/16_use_synchronous_notifications.patch:
+    - don't display stop, previous, next key notifications 
+      (lp: #351986, #345363)
+
+ -- Sebastien Bacher <seb128@ubuntu.com>  Mon, 06 Apr 2009 11:39:37 +0200
+
 gnome-settings-daemon (2.26.0-0ubuntu2) jaunty; urgency=low
 
   * debian/patches/16_use_synchronous_notifications.patch:

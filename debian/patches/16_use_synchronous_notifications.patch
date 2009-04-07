@@ -250,9 +250,9 @@ diff -Nur -x '*.orig' -x '*~' gnome-settings-daemon-2.25.90/plugins/media-keys/M
 +        NULL, /* WWW_KEY */
 +        NULL, /* "notification-audio-play", */ /* PLAY_KEY */
 +        NULL, /* "notification-audio-pause",*/ /* PAUSE_KEY */
-+        "notification-audio-stop", /* STOP_KEY */
-+        "notification-audio-previous", /* PREVIOUS_KEY */
-+        "notification-audio-next", /* NEXT_KEY */
++        NULL, /* STOP_KEY */
++        NULL, /* PREVIOUS_KEY */
++        NULL, /* NEXT_KEY */
 +        NULL, /* HANDLED_KEYS */
 +        NULL
 +};
