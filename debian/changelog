@@ -1,3 +1,20 @@
+gnome-settings-daemon (2.26.0-1) experimental; urgency=low
+
+  * New upstream release.
+  * Update build-dependencies.
+  * Install the autostart file and the keybindings XML file.
+    + Break gnome-session < 2.24 which would attempt to start it twice 
+      with the autostart file.
+  * 11_sleepkey.patch: updated for the new version.
+  * 20_gstreamer.patch: new patch from Romain Périer, adds back support 
+    for GStreamer with a selection at compile time.
+  * 70_relibtoolize.patch: regenerated.
+  * Refresh other patches.
+  * Pass --disable-pulse to configure, to use the GStreamer code 
+    instead.
+
+ -- Josselin Mouette <joss@debian.org>  Sat, 11 Apr 2009 11:31:52 +0200
+
 gnome-settings-daemon (2.24.1-2) unstable; urgency=low
 
   [ Josselin Mouette ]

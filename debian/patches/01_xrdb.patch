@@ -1,9 +1,10 @@
 Change the directory for xrdb data.
 
-diff -Nur -x '*.orig' -x '*~' gnome-settings-daemon-2.21.5.2/plugins/xrdb/gsd-xrdb-manager.c gnome-settings-daemon-2.21.5.2.new/plugins/xrdb/gsd-xrdb-manager.c
---- gnome-settings-daemon-2.21.5.2/plugins/xrdb/gsd-xrdb-manager.c	2007-12-24 12:18:48.000000000 +0100
-+++ gnome-settings-daemon-2.21.5.2.new/plugins/xrdb/gsd-xrdb-manager.c	2008-01-16 15:20:14.000000000 +0100
-@@ -41,7 +41,7 @@
+Index: gnome-settings-daemon-2.26.0/plugins/xrdb/gsd-xrdb-manager.c
+===================================================================
+--- gnome-settings-daemon-2.26.0.orig/plugins/xrdb/gsd-xrdb-manager.c	2009-01-05 17:26:26.000000000 +0100
++++ gnome-settings-daemon-2.26.0/plugins/xrdb/gsd-xrdb-manager.c	2009-04-11 13:36:54.898047572 +0200
+@@ -42,7 +42,7 @@
  
  #define GSD_XRDB_MANAGER_GET_PRIVATE(o) (G_TYPE_INSTANCE_GET_PRIVATE ((o), GSD_TYPE_XRDB_MANAGER, GsdXrdbManagerPrivate))
  
