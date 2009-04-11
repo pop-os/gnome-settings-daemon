@@ -26,7 +26,7 @@ Build-Depends: cdbs,
                libxxf86misc-dev,
                libxext-dev,
                libx11-dev,
-               libgnomekbd-dev (>= 2.24),
+               libgnomekbd-dev (>= 2.21.4),
                libxklavier12-dev (>= 3.3),
                libesd0-dev (>= 0.2.28),
                libgstreamer0.10-dev (>= 0.10.1.2),
@@ -44,6 +44,9 @@ Conflicts: rhythmbox (<< 0.11.5),
            banshee (<< 0.13.2+dfsg-7),
            totem (<< 2.22.0),
            gnome-control-center (<< 1:2.21.5)
+Suggests: x11-xserver-utils,
+          gnome-screensaver,
+          metacity | x-window-manager
 Description: daemon handling the GNOME session settings
  This package contains the daemon which is responsible for setting the 
  various parameters of a GNOME session and the applications that run 
