@@ -8,11 +8,11 @@ GNOME #571145
  plugins/media-keys/gsd-media-keys-manager.c |  101 ++++++-
  6 files changed, 645 insertions(+), 22 deletions(-)
 
-diff --git a/configure.ac b/configure.ac
-index 9cff33f..1a03810 100644
---- a/configure.ac
-+++ b/configure.ac
-@@ -253,11 +253,50 @@ if test x$WANT_PULSE = xyes ; then
+Index: gnome-settings-daemon-2.26.0/configure.ac
+===================================================================
+--- gnome-settings-daemon-2.26.0.orig/configure.ac	2009-04-11 14:20:21.234052846 +0200
++++ gnome-settings-daemon-2.26.0/configure.ac	2009-04-12 19:45:11.641975223 +0200
+@@ -255,11 +255,54 @@ if test x$WANT_PULSE = xyes ; then
                AC_DEFINE(HAVE_PULSE, 1, [Define if PULSE sound server should be used])],
               [have_pulse=false])
  fi
@@ -49,10 +49,14 @@ index 9cff33f..1a03810 100644
 +   PKG_CHECK_MODULES(GST, $PKGS, have_gstreamer=yes,
 +                     AC_MSG_RESULT([no]))
 +
++   if test "x$have_pulse" = "xtrue"; then
++      AC_MSG_ERROR([*** GStreamer & Pulseaudio both are selected ***])
++   fi
++
 +   if test "x$have_gstreamer" = "xyes"; then
 +      GST_LIBS="$GST_LIBS -lgstinterfaces-0.10 -lgstaudio-0.10"
++      AC_DEFINE(HAVE_GSTREAMER,1,[enable gstreamer])
 +   fi
-+   AC_DEFINE(HAVE_GSTREAMER, 1, have gstreamer support)
 +else
 +   AC_MSG_NOTICE([*** GStreamer support disabled ***])
 +fi
@@ -63,7 +67,7 @@ index 9cff33f..1a03810 100644
  # ---------------------------------------------------------------------------
  # Enable Profiling
  # ---------------------------------------------------------------------------
-@@ -355,6 +394,7 @@ plugins/housekeeping/Makefile
+@@ -357,6 +400,7 @@ plugins/housekeeping/Makefile
  plugins/keybindings/Makefile
  plugins/keyboard/Makefile
  plugins/media-keys/Makefile
@@ -71,7 +75,7 @@ index 9cff33f..1a03810 100644
  plugins/media-keys/cut-n-paste/Makefile
  plugins/mouse/Makefile
  plugins/screensaver/Makefile
-@@ -397,6 +437,7 @@ echo "
+@@ -399,6 +443,7 @@ echo "
          dbus-1 system.d dir:      ${DBUS_SYS_DIR}
  
          Libnotify support:        ${have_libnotify}
@@ -79,10 +83,10 @@ index 9cff33f..1a03810 100644
          PulseAudio support:       ${have_pulse}
          Profiling support:        ${enable_profiling}
  "
-diff --git a/plugins/media-keys/Makefile.am b/plugins/media-keys/Makefile.am
-index b308edb..34aa464 100644
---- a/plugins/media-keys/Makefile.am
-+++ b/plugins/media-keys/Makefile.am
+Index: gnome-settings-daemon-2.26.0/plugins/media-keys/Makefile.am
+===================================================================
+--- gnome-settings-daemon-2.26.0.orig/plugins/media-keys/Makefile.am	2009-03-16 15:35:38.000000000 +0100
++++ gnome-settings-daemon-2.26.0/plugins/media-keys/Makefile.am	2009-04-11 14:20:22.274551290 +0200
 @@ -1,11 +1,12 @@
  NULL =
  
@@ -160,11 +164,10 @@ index b308edb..34aa464 100644
  
  EXTRA_DIST = 				\
  	gsd-media-keys-manager.xml	\
-diff --git a/plugins/media-keys/actions/Makefile.am b/plugins/media-keys/actions/Makefile.am
-new file mode 100644
-index 0000000..4bf215a
---- /dev/null
-+++ b/plugins/media-keys/actions/Makefile.am
+Index: gnome-settings-daemon-2.26.0/plugins/media-keys/actions/Makefile.am
+===================================================================
+--- /dev/null	1970-01-01 00:00:00.000000000 +0000
++++ gnome-settings-daemon-2.26.0/plugins/media-keys/actions/Makefile.am	2009-04-11 14:20:22.274551290 +0200
 @@ -0,0 +1,44 @@
 +NULL =
 +
@@ -210,11 +213,10 @@ index 0000000..4bf215a
 +	$(glade_DATA)		\
 +	$(pixmaps_DATA)		\
 +	$(NULL)
-diff --git a/plugins/media-keys/actions/acme-volume.c b/plugins/media-keys/actions/acme-volume.c
-new file mode 100644
-index 0000000..e468669
---- /dev/null
-+++ b/plugins/media-keys/actions/acme-volume.c
+Index: gnome-settings-daemon-2.26.0/plugins/media-keys/actions/acme-volume.c
+===================================================================
+--- /dev/null	1970-01-01 00:00:00.000000000 +0000
++++ gnome-settings-daemon-2.26.0/plugins/media-keys/actions/acme-volume.c	2009-04-11 14:20:22.274551290 +0200
 @@ -0,0 +1,402 @@
 +/* -*- Mode: C; tab-width: 8; indent-tabs-mode: t; c-basic-offset: 8 -*- */
 +
@@ -618,11 +620,10 @@ index 0000000..e468669
 +	return ACME_VOLUME(acme_volume_object);
 +}
 +
-diff --git a/plugins/media-keys/actions/acme-volume.h b/plugins/media-keys/actions/acme-volume.h
-new file mode 100644
-index 0000000..c14ebc8
---- /dev/null
-+++ b/plugins/media-keys/actions/acme-volume.h
+Index: gnome-settings-daemon-2.26.0/plugins/media-keys/actions/acme-volume.h
+===================================================================
+--- /dev/null	1970-01-01 00:00:00.000000000 +0000
++++ gnome-settings-daemon-2.26.0/plugins/media-keys/actions/acme-volume.h	2009-04-11 14:20:22.274551290 +0200
 @@ -0,0 +1,56 @@
 +/* acme-volume.h
 +
@@ -680,10 +681,10 @@ index 0000000..c14ebc8
 +gint        acme_volume_get_threshold (AcmeVolume *self);
 +
 +
-diff --git a/plugins/media-keys/gsd-media-keys-manager.c b/plugins/media-keys/gsd-media-keys-manager.c
-index d35048c..ce52019 100644
---- a/plugins/media-keys/gsd-media-keys-manager.c
-+++ b/plugins/media-keys/gsd-media-keys-manager.c
+Index: gnome-settings-daemon-2.26.0/plugins/media-keys/gsd-media-keys-manager.c
+===================================================================
+--- gnome-settings-daemon-2.26.0.orig/plugins/media-keys/gsd-media-keys-manager.c	2009-04-11 14:20:21.722555087 +0200
++++ gnome-settings-daemon-2.26.0/plugins/media-keys/gsd-media-keys-manager.c	2009-04-12 19:46:01.037977228 +0200
 @@ -48,11 +48,12 @@
  
  #include "eggaccelerators.h"
@@ -708,7 +709,7 @@ index d35048c..ce52019 100644
  #endif /* HAVE_PULSE */
          GtkWidget       *dialog;
          GConfClient     *conf_client;
-@@ -131,9 +134,8 @@ init_screens (GsdMediaKeysManager *manager)
+@@ -131,9 +134,8 @@ init_screens (GsdMediaKeysManager *manag
                  GdkScreen *screen;
  
                  screen = gdk_display_get_screen (display, i);
@@ -719,7 +720,7 @@ index d35048c..ce52019 100644
                  manager->priv->screens = g_slist_append (manager->priv->screens, screen);
          }
  
-@@ -650,40 +652,68 @@ on_stream_event_notify (GObject             *object,
+@@ -650,40 +652,75 @@ on_stream_event_notify (GObject         
  {
          update_dialog (manager);
  }
@@ -731,23 +732,29 @@ index d35048c..ce52019 100644
                   int                  type)
  {
          gboolean muted;
++	int vol_step;
 +#ifdef HAVE_PULSE
          guint vol, norm_vol_step;
-         int vol_step;
+-        int vol_step;
 -
          if (manager->priv->stream == NULL)
 +#else
 +        int      vol;
-+        int      vol_step;
 +        GError  *error = NULL;
 +        if (manager->priv->volume == NULL)
 +#endif
                  return;
  
++#ifdef HAVE_PULSE
++	vol_step = gconf_client_get_int (manager->priv->conf_client,
++					 GCONF_MISC_DIR "/volume_step",
++					 NULL);
++#else
          vol_step = gconf_client_get_int (manager->priv->conf_client,
                                           GCONF_MISC_DIR "/volume_step",
 -                                         NULL);
 +                                         &error);
++#endif
  
 -        if (vol_step <= 0 || vol_step > 100)
 +#ifdef HAVE_PULSE
@@ -756,7 +763,9 @@ index d35048c..ce52019 100644
 +        if (error) {
 +#endif
                  vol_step = VOLUME_STEP;
++#ifndef HAVE_PULSE
 +                g_error_free (error);
++#endif
 +	}
  
 +#ifdef HAVE_PULSE
@@ -794,7 +803,7 @@ index d35048c..ce52019 100644
                  if (!muted && (vol <= norm_vol_step)) {
                          manager->priv->num_expected_update_signals = 2;
                          gvc_mixer_stream_change_is_muted (manager->priv->stream, !muted);
-@@ -692,18 +722,31 @@ do_sound_action (GsdMediaKeysManager *manager,
+@@ -692,18 +729,31 @@ do_sound_action (GsdMediaKeysManager *ma
                          manager->priv->num_expected_update_signals = 1;
                          gvc_mixer_stream_change_volume (manager->priv->stream, vol - norm_vol_step);
                  }
@@ -827,7 +836,7 @@ index d35048c..ce52019 100644
                          if (vol < MAX_VOLUME) {
                                  manager->priv->num_expected_update_signals = 1;
                                  if (vol + norm_vol_step >= MAX_VOLUME) {
-@@ -712,17 +755,39 @@ do_sound_action (GsdMediaKeysManager *manager,
+@@ -712,17 +762,39 @@ do_sound_action (GsdMediaKeysManager *ma
                                          gvc_mixer_stream_change_volume (manager->priv->stream, vol + norm_vol_step);
                                  }
                          }
@@ -868,7 +877,7 @@ index d35048c..ce52019 100644
  static void
  update_default_sink (GsdMediaKeysManager *manager)
  {
-@@ -887,9 +952,9 @@ do_action (GsdMediaKeysManager *manager,
+@@ -887,9 +959,9 @@ do_action (GsdMediaKeysManager *manager,
          case MUTE_KEY:
          case VOLUME_DOWN_KEY:
          case VOLUME_UP_KEY:
@@ -880,7 +889,7 @@ index d35048c..ce52019 100644
                  break;
          case POWER_KEY:
                  do_exit_action (manager);
-@@ -1069,13 +1134,13 @@ gsd_media_keys_manager_start (GsdMediaKeysManager *manager,
+@@ -1069,13 +1141,13 @@ gsd_media_keys_manager_start (GsdMediaKe
  {
          gnome_settings_profile_start (NULL);
  
@@ -895,7 +904,7 @@ index d35048c..ce52019 100644
          gnome_settings_profile_start ("gvc_mixer_control_new");
  
          manager->priv->volume = gvc_mixer_control_new ();
-@@ -1092,6 +1157,10 @@ gsd_media_keys_manager_start (GsdMediaKeysManager *manager,
+@@ -1092,6 +1164,10 @@ gsd_media_keys_manager_start (GsdMediaKe
          gvc_mixer_control_open (manager->priv->volume);
  
          gnome_settings_profile_end ("gvc_mixer_control_new");
@@ -906,7 +915,7 @@ index d35048c..ce52019 100644
  #endif /* HAVE_PULSE */
          g_idle_add ((GSourceFunc) start_media_keys_idle_cb, manager);
  
-@@ -1164,13 +1233,13 @@ gsd_media_keys_manager_stop (GsdMediaKeysManager *manager)
+@@ -1164,13 +1240,13 @@ gsd_media_keys_manager_stop (GsdMediaKey
                  g_object_unref (priv->stream);
                  priv->stream = NULL;
          }
