@@ -515,7 +515,7 @@ Index: gnome-settings-daemon-2.26.0/plugins/media-keys/actions/acme-volume.c
 +	if (self->_priv->mixer != NULL) {
 +		const GList *m;
 +		GSList *tracks, *t;
-+		GError *error;
++		GError *error = NULL;
 +
 +		/* Try to use tracks saved in GConf 
 +		   Note: errors need to be treated , for example if the user set a non type list for this key
