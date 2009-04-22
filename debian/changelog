@@ -1,3 +1,30 @@
+gnome-settings-daemon (2.26.1-0ubuntu1) jaunty-proposed; urgency=low
+
+  * New upstream version:
+    - Fix crash when closing the lid on some laptops (lp: #349628)
+    - Fix crash when closing a11y notification bubble  
+    - Fix problems with saving/restoring screen setup (lp: #222297)
+    - Make the screen resolution confirmation dialog always appear in front of
+      the settings window (lp: #360084)
+    - Increase confirmation timeout to 30 seconds to give slower devices (like
+      projectors) time to adjust (lp: #355912)
+    - Avoid some GConf roundtrips 
+    - Build fixes 
+  * debian/patches/06_undo_build_change.patch:
+    - the issue is fixed in the new version
+  * debian/patches/07_use_gstreamer_volume.patch,
+    debian/patches/90_autoreconf.patch:
+    - new version update
+
+ -- Sebastien Bacher <seb128@ubuntu.com>  Wed, 22 Apr 2009 11:15:29 +0200
+
+gnome-settings-daemon (2.26.0-0ubuntu4) jaunty; urgency=low
+
+  * debian/patches/40_xres_lcddefault.patch: fix LP: #271283 - OpenOffice.org
+    subpixel font rendering broken with new cairo 
+
+ -- Alexander Sack <asac@ubuntu.com>  Tue, 07 Apr 2009 11:49:01 +0200
+
 gnome-settings-daemon (2.26.0-0ubuntu3) jaunty; urgency=low
 
   * debian/patches/16_use_synchronous_notifications.patch:
