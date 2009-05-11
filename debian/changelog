@@ -1,3 +1,20 @@
+gnome-settings-daemon (2.27.1-0ubuntu1) karmic; urgency=low
+
+  * New upstream version:
+    - Use ngettext for the reset dialog 
+    - Replace deprecated gtk_status_icon_set_tooltip 
+  * debian/control.in:
+    - updated gtk requirement
+
+ -- Sebastien Bacher <seb128@ubuntu.com>  Mon, 11 May 2009 17:30:06 +0200
+
+gnome-settings-daemon (2.26.1-0ubuntu2) jaunty-proposed; urgency=low
+
+  * debian/patches/40_xres_lcddefault.patch:
+    - reapply this change (lp: #372746)
+
+ -- Sebastien Bacher <seb128@ubuntu.com>  Fri, 08 May 2009 15:10:06 +0200
+
 gnome-settings-daemon (2.26.1-0ubuntu1) jaunty-proposed; urgency=low
 
   * New upstream version:
