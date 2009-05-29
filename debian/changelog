@@ -1,3 +1,14 @@
+gnome-settings-daemon (2.26.1-1) unstable; urgency=low
+
+  * New upstream release.
+    + Refresh 70_relibtoolize.patch.
+  * Move the autostart file to /usr/share/gnome/autostart.
+  * gnome-settings-daemon.postinst:
+    + Remove the old autostart file if needed.
+    + Only remove the xrdb stuff upon upgrades from pre-2.24.1.
+
+ -- Josselin Mouette <joss@debian.org>  Fri, 29 May 2009 11:25:35 +0200
+
 gnome-settings-daemon (2.26.0-2) experimental; urgency=low
 
   * 20_gstreamer.patch: Initialize Gerror * variables to NULL before
