@@ -1,3 +1,11 @@
+gnome-settings-daemon (2.26.1-2) unstable; urgency=low
+
+  * 03_maintainer_mode.patch: new patch, add AM_MAINTAINER_MODE. Fixes 
+    FTBFS.
+  * Regenerate 70_relibtoolize.patch.
+
+ -- Josselin Mouette <joss@debian.org>  Fri, 29 May 2009 16:19:52 +0200
+
 gnome-settings-daemon (2.26.1-1) unstable; urgency=low
 
   * New upstream release.
