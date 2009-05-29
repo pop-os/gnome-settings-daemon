@@ -4,7 +4,7 @@ set -e
 # Remove obsolete conffiles
 
 case "$1" in
-install|upgrade)
+configure)
     if dpkg --compare-versions "$2" lt-nl "2.24.1"; then
         rm -rf /etc/gnome/config/xrdb
     fi
