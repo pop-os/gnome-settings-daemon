@@ -1,3 +1,10 @@
+gnome-settings-daemon (2.26.1-3) UNRELEASED; urgency=low
+
+  * debian/rules: add --enable-gstreamer to actually enable gstreamer 
+    support and fix multimedia keys functionality. 
+
+ -- Alan Baghumian <alan@technotux.org>  Sun, 31 May 2009 15:21:27 -0700
+
 gnome-settings-daemon (2.26.1-2) unstable; urgency=low
 
   * 03_maintainer_mode.patch: new patch, add AM_MAINTAINER_MODE. Fixes 
