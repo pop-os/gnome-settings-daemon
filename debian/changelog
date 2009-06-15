@@ -1,3 +1,19 @@
+gnome-settings-daemon (2.27.3-0ubuntu1) karmic; urgency=low
+
+  * New upstream version:
+    - Make the RANDR tray icon's per-monitor labels explicitly black
+    - Include config.h so that the notifications code in housekeeping plugin can
+      actually be built 
+    - Use "screen reader" instead of "screenreader" in schema 
+    - Lots of RANDR fixes and improvements 
+    - Nicer handling of broken XKB configuration in gconf 
+    - Make 'locate pointer' deal with wm/cm changes 
+    - Be more careful when comparing two key structs 
+  * debian/patches/02_fix_randr.patch:
+    - new version update
+
+ -- Sebastien Bacher <seb128@ubuntu.com>  Mon, 15 Jun 2009 12:57:08 +0200
+
 gnome-settings-daemon (2.27.1-0ubuntu1) karmic; urgency=low
 
   * New upstream version:

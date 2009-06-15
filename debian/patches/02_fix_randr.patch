@@ -1,11 +1,10 @@
 # Description: Fix application of ~/.config/monitors.xml
 # Ubuntu: https://launchpad.net/bugs/329410
 # Upstream: http://bugzilla.gnome.org/show_bug.cgi?id=572876
-Index: plugins/xrandr/gsd-xrandr-manager.c
-===================================================================
---- plugins/xrandr/gsd-xrandr-manager.c	(revision 734)
-+++ plugins/xrandr/gsd-xrandr-manager.c	(working copy)
-@@ -1343,7 +1343,6 @@
+diff -Nur -x '*.orig' -x '*~' gnome-settings-daemon-2.27.3/plugins/xrandr/gsd-xrandr-manager.c gnome-settings-daemon-2.27.3.new/plugins/xrandr/gsd-xrandr-manager.c
+--- gnome-settings-daemon-2.27.3/plugins/xrandr/gsd-xrandr-manager.c	2009-06-15 11:09:35.000000000 +0200
++++ gnome-settings-daemon-2.27.3.new/plugins/xrandr/gsd-xrandr-manager.c	2009-06-15 13:51:00.000000000 +0200
+@@ -1718,7 +1718,6 @@
                   */
  
                  unlink (backup_filename);
@@ -13,10 +12,10 @@ Index: plugins/xrandr/gsd-xrandr-manager.c
          }
  
          /* 2. There was no backup configuration!  This means we are
-@@ -1351,6 +1350,7 @@
+@@ -1726,6 +1725,7 @@
           */
  
-         apply_intended_configuration (manager, intended_filename);
+         apply_intended_configuration (manager, intended_filename, timestamp);
 +        goto out;
  
  out:
