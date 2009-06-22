@@ -1,7 +1,7 @@
 === modified file 'configure.ac'
-diff -Nur -x '*.orig' -x '*~' gnome-settings-daemon-2.25.90/configure.ac gnome-settings-daemon-2.25.90.new/configure.ac
---- gnome-settings-daemon-2.25.90/configure.ac	2009-02-19 15:28:17.665443880 +0100
-+++ gnome-settings-daemon-2.25.90.new/configure.ac	2009-02-19 15:28:19.293443865 +0100
+diff -Nur -x '*.orig' -x '*~' gnome-settings-daemon-2.26.1/configure.ac gnome-settings-daemon-2.26.1.new/configure.ac
+--- gnome-settings-daemon-2.26.1/configure.ac	2009-06-18 12:53:07.000000000 +0200
++++ gnome-settings-daemon-2.26.1.new/configure.ac	2009-06-18 12:53:07.000000000 +0200
 @@ -69,6 +69,7 @@
          gio-2.0 >= $GIO_REQUIRED_VERSION
          libglade-2.0 >= 2.0.0
@@ -10,40 +10,9 @@ diff -Nur -x '*.orig' -x '*~' gnome-settings-daemon-2.25.90/configure.ac gnome-s
  )
  
  GSD_PLUGIN_LDFLAGS="-export_dynamic -module -avoid-version -no-undefined"
-diff -Nur -x '*.orig' -x '*~' gnome-settings-daemon-2.25.90/plugins/media-keys/Makefile.am gnome-settings-daemon-2.25.90.new/plugins/media-keys/Makefile.am
---- gnome-settings-daemon-2.25.90/plugins/media-keys/Makefile.am	2009-02-19 15:28:17.701442446 +0100
-+++ gnome-settings-daemon-2.25.90.new/plugins/media-keys/Makefile.am	2009-02-19 15:28:19.293443865 +0100
-@@ -29,6 +29,7 @@
- 	gsd-media-keys-manager.c	\
- 	gsd-media-keys-window.h		\
- 	gsd-media-keys-window.c		\
-+	gsd-media-keys-notification.c	\
- 	$(BUILT_SOURCES)		\
- 	$(NULL)
- 
-@@ -42,10 +43,12 @@
- 	$(AM_CPPFLAGS)
- 
- libmedia_keys_la_CFLAGS = \
-+	$(LIBNOTIFY_CFLAGS)		\
- 	$(SETTINGS_PLUGIN_CFLAGS)	\
- 	$(AM_CFLAGS)
- 
- libmedia_keys_la_LDFLAGS = 		\
-+	$(LIBNOTIFY_LDFLAGS)		\
- 	$(GSD_PLUGIN_LDFLAGS)
- 
- libmedia_keys_la_LIBADD  = 		\
-@@ -92,6 +95,7 @@
- test_media_keys_SOURCES =			\
- 	gsd-media-keys-manager.c		\
- 	gsd-media-keys-manager.h		\
-+	gsd-media-keys-notification.c		\
- 	gsd-media-keys-window.h			\
- 	gsd-media-keys-window.c			\
- 	test-media-keys.c			\
---- gnome-settings-daemon-2.25.90.orig/plugins/media-keys/gsd-media-keys-manager.c	2009-03-03 11:32:33.000000000 +0100
-+++ gnome-settings-daemon-2.25.92/plugins/media-keys/gsd-media-keys-manager.c	2009-03-18 10:17:32.000000000 +0100
+diff -Nur -x '*.orig' -x '*~' gnome-settings-daemon-2.26.1/plugins/media-keys/gsd-media-keys-manager.c gnome-settings-daemon-2.26.1.new/plugins/media-keys/gsd-media-keys-manager.c
+--- gnome-settings-daemon-2.26.1/plugins/media-keys/gsd-media-keys-manager.c	2009-06-18 12:53:07.000000000 +0200
++++ gnome-settings-daemon-2.26.1.new/plugins/media-keys/gsd-media-keys-manager.c	2009-06-18 13:02:40.000000000 +0200
 @@ -51,6 +51,14 @@
  #include "actions/acme-volume.h"
  #include "gsd-media-keys-window.h"
@@ -73,18 +42,62 @@ diff -Nur -x '*.orig' -x '*~' gnome-settings-daemon-2.25.90/plugins/media-keys/M
  
          command = gconf_client_get_string (manager->priv->conf_client,
                                             GCONF_MISC_DIR "/eject_command",
-@@ -661,6 +672,10 @@
+@@ -608,7 +619,10 @@
+                  int                  type)
+ {
+         gboolean muted;
++        gboolean vol_at_0;
++        gboolean vol_at_100;
+         int      vol;
++        int      osd_vol;
+         int      vol_step;
+         GError  *error = NULL;
+ 
+@@ -636,6 +650,9 @@
+         vol = acme_volume_get_volume (manager->priv->volume);
+         muted = acme_volume_get_mute (manager->priv->volume);
+ 
++        vol_at_0 = vol == 0 ? TRUE: FALSE;
++        vol_at_100 = vol == 100 ? TRUE: FALSE;
++
+         switch (type) {
+         case MUTE_KEY:
+                 acme_volume_mute_toggle (manager->priv->volume);
+@@ -645,6 +662,7 @@
+                         acme_volume_mute_toggle (manager->priv->volume);
+                 }
+                 acme_volume_set_volume (manager->priv->volume, vol - vol_step);
++                vol -= vol_step;
+                 break;
+         case VOLUME_UP_KEY:
+                 if (muted) {
+@@ -658,9 +676,25 @@
+                 break;
+         }
+ 
++        osd_vol = acme_volume_get_volume (manager->priv->volume);
++
++        /* if user hit volume-down while already at volume 0 trigger undershoot
++        ** effect of notify-osd's value indicator */
++        if ((type == VOLUME_DOWN_KEY) && vol_at_0)
++                osd_vol = -1;
++
++        /* if user hit volume-up while already at volume 100 trigger overshoot
++        ** effect of notify-osd's value indicator */
++        if ((type == VOLUME_UP_KEY) && vol_at_100)
++                osd_vol = 101;
++
          muted = acme_volume_get_mute (manager->priv->volume);
          vol = acme_volume_get_volume (manager->priv->volume);
  
 +        /* try to use the new notification service, if available */
-+        if (gsd_media_keys_notification_volume (vol, muted))
++        if (gsd_media_keys_notification_volume (osd_vol, muted))
 +                return;
 +
          /* FIXME: AcmeVolume should probably emit signals
             instead of doing it like this */
          dialog_init (manager);
-@@ -777,8 +792,10 @@
+@@ -777,8 +811,10 @@
  
  static gboolean
  do_multimedia_player_action (GsdMediaKeysManager *manager,
@@ -95,7 +108,7 @@ diff -Nur -x '*.orig' -x '*~' gnome-settings-daemon-2.25.90/plugins/media-keys/M
          return gsd_media_player_key_pressed (manager, key);
  }
  
-@@ -847,19 +864,19 @@
+@@ -847,19 +883,19 @@
                  execute (manager, "gcalctool", FALSE, FALSE);
                  break;
          case PLAY_KEY:
@@ -120,9 +133,10 @@ diff -Nur -x '*.orig' -x '*~' gnome-settings-daemon-2.25.90/plugins/media-keys/M
                  break;
          default:
                  g_assert_not_reached ();
---- gnome-settings-daemon-2.25.90.orig/plugins/media-keys/gsd-media-keys-notification.c	1970-01-01 01:00:00.000000000 +0100
-+++ gnome-settings-daemon-2.25.92/plugins/media-keys/gsd-media-keys-notification.c	2009-03-18 10:05:28.000000000 +0100
-@@ -0,0 +1,166 @@
+diff -Nur -x '*.orig' -x '*~' gnome-settings-daemon-2.26.1/plugins/media-keys/gsd-media-keys-notification.c gnome-settings-daemon-2.26.1.new/plugins/media-keys/gsd-media-keys-notification.c
+--- gnome-settings-daemon-2.26.1/plugins/media-keys/gsd-media-keys-notification.c	1970-01-01 01:00:00.000000000 +0100
++++ gnome-settings-daemon-2.26.1.new/plugins/media-keys/gsd-media-keys-notification.c	2009-06-18 12:53:07.000000000 +0200
+@@ -0,0 +1,169 @@
 +/* -*- Mode: C; tab-width: 8; indent-tabs-mode: nil; c-basic-offset: 8 -*-
 + *
 + * Copyright (C) 2009 Canonical Ltd
@@ -204,10 +218,13 @@ diff -Nur -x '*.orig' -x '*~' gnome-settings-daemon-2.25.90/plugins/media-keys/M
 +					     "",
 +					     NULL,
 +					     NULL);
++        if (value > 100)
++                value = 101; /* triggers overshoot effect */
++
 +        if (value < 0)
 +        {
-+                value = 0; /* notify-osd doesn't like -1 */
-+                s = 0; /* off, ie with the undershoot effect */
++                value = -1; /* triggers undershoot effect */
++                s = 0;      /* off  */
 +        } else {
 +                s = 3 * value / 100 + 1;
 +                if (s < 1)
@@ -289,3 +306,35 @@ diff -Nur -x '*.orig' -x '*~' gnome-settings-daemon-2.25.90/plugins/media-keys/M
 +
 +        return TRUE;
 +}
+diff -Nur -x '*.orig' -x '*~' gnome-settings-daemon-2.26.1/plugins/media-keys/Makefile.am gnome-settings-daemon-2.26.1.new/plugins/media-keys/Makefile.am
+--- gnome-settings-daemon-2.26.1/plugins/media-keys/Makefile.am	2009-06-18 12:53:07.000000000 +0200
++++ gnome-settings-daemon-2.26.1.new/plugins/media-keys/Makefile.am	2009-06-18 12:53:07.000000000 +0200
+@@ -29,6 +29,7 @@
+ 	gsd-media-keys-manager.c	\
+ 	gsd-media-keys-window.h		\
+ 	gsd-media-keys-window.c		\
++	gsd-media-keys-notification.c	\
+ 	$(BUILT_SOURCES)		\
+ 	$(NULL)
+ 
+@@ -42,10 +43,12 @@
+ 	$(AM_CPPFLAGS)
+ 
+ libmedia_keys_la_CFLAGS = \
++	$(LIBNOTIFY_CFLAGS)		\
+ 	$(SETTINGS_PLUGIN_CFLAGS)	\
+ 	$(AM_CFLAGS)
+ 
+ libmedia_keys_la_LDFLAGS = 		\
++	$(LIBNOTIFY_LDFLAGS)		\
+ 	$(GSD_PLUGIN_LDFLAGS)
+ 
+ libmedia_keys_la_LIBADD  = 		\
+@@ -92,6 +95,7 @@
+ test_media_keys_SOURCES =			\
+ 	gsd-media-keys-manager.c		\
+ 	gsd-media-keys-manager.h		\
++	gsd-media-keys-notification.c		\
+ 	gsd-media-keys-window.h			\
+ 	gsd-media-keys-window.c			\
+ 	test-media-keys.c			\

@@ -1,3 +1,10 @@
+gnome-settings-daemon (2.27.3-0ubuntu2) karmic; urgency=low
+
+  * debian/patches/16_use_synchronous_notifications.patch:
+    - update by Mirco Müller to work better with notify-osd
+
+ -- Sebastien Bacher <seb128@ubuntu.com>  Tue, 23 Jun 2009 00:07:34 +0200
+
 gnome-settings-daemon (2.27.3-0ubuntu1) karmic; urgency=low
 
   * New upstream version:
