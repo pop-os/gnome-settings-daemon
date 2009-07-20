@@ -1,6 +1,6 @@
-diff -Nur -x '*.orig' -x '*~' gnome-settings-daemon-2.27.1/aclocal.m4 gnome-settings-daemon-2.27.1.new/aclocal.m4
---- gnome-settings-daemon-2.27.1/aclocal.m4	2009-05-04 10:42:45.000000000 +0200
-+++ gnome-settings-daemon-2.27.1.new/aclocal.m4	2009-05-11 17:33:35.000000000 +0200
+diff -Nur -x '*.orig' -x '*~' gnome-settings-daemon-2.27.4/aclocal.m4 gnome-settings-daemon-2.27.4.new/aclocal.m4
+--- gnome-settings-daemon-2.27.4/aclocal.m4	2009-07-14 12:46:18.000000000 +0100
++++ gnome-settings-daemon-2.27.4.new/aclocal.m4	2009-07-20 00:10:55.236824730 +0100
 @@ -1,4 +1,4 @@
 -# generated automatically by aclocal 1.10.1 -*- Autoconf -*-
 +# generated automatically by aclocal 1.10.2 -*- Autoconf -*-
@@ -18341,51 +18341,10 @@ diff -Nur -x '*.orig' -x '*~' gnome-settings-daemon-2.27.1/aclocal.m4 gnome-sett
 +]) # _AM_PROG_TAR
  
  m4_include([acinclude.m4])
-diff -Nur -x '*.orig' -x '*~' gnome-settings-daemon-2.27.1/configure gnome-settings-daemon-2.27.1.new/configure
---- gnome-settings-daemon-2.27.1/configure	2009-05-04 10:42:47.000000000 +0200
-+++ gnome-settings-daemon-2.27.1.new/configure	2009-05-11 17:33:40.000000000 +0200
-@@ -790,8 +790,16 @@
- LIBOBJS
- DEBUG_CFLAGS
- plugindir
--HAVE_PULSE_FALSE
--HAVE_PULSE_TRUE
-+HAVE_ALSA_FALSE
-+HAVE_ALSA_TRUE
-+ALSA_LIBS
-+ALSA_CFLAGS
-+HAVE_OSS_FALSE
-+HAVE_OSS_TRUE
-+HAVE_GSTREAMER_FALSE
-+HAVE_GSTREAMER_TRUE
-+GST_LIBS
-+GST_CFLAGS
- PULSE_LIBS
- PULSE_CFLAGS
- GIOUNIX_LIBS
-@@ -1005,6 +1013,8 @@
- with_dbus_services
- with_x
- enable_pulse
-+enable_gstreamer
-+enable_alsa
- enable_profiling
- enable_more_warnings
- enable_debug
-@@ -1037,7 +1047,11 @@
- GIOUNIX_CFLAGS
- GIOUNIX_LIBS
- PULSE_CFLAGS
--PULSE_LIBS'
-+PULSE_LIBS
-+GST_CFLAGS
-+GST_LIBS
-+ALSA_CFLAGS
-+ALSA_LIBS'
- 
- 
- # Initialize some variables set by options.
-@@ -1684,9 +1698,11 @@
+diff -Nur -x '*.orig' -x '*~' gnome-settings-daemon-2.27.4/configure gnome-settings-daemon-2.27.4.new/configure
+--- gnome-settings-daemon-2.27.4/configure	2009-07-14 12:46:21.000000000 +0100
++++ gnome-settings-daemon-2.27.4.new/configure	2009-07-20 00:11:02.393823005 +0100
+@@ -1684,8 +1684,7 @@
    --enable-compile-warnings=[no/minimum/yes/maximum/error]
                            Turn on compiler warnings
    --enable-iso-c          Try to warn if code is not ISO C
@@ -18393,24 +18352,9 @@ diff -Nur -x '*.orig' -x '*~' gnome-settings-daemon-2.27.1/configure gnome-setti
 -                          Disable the schemas installation
 +  --disable-schemas-install	Disable the schemas installation
    --disable-pulse         turn off PulseAudio support
-+  --enable-gstreamer      use gstreamer if available (and optionally specify a
-+                          version)
-+  --disable-alsa          turn off ALSA audio support
    --enable-profiling      turn on profiling
    --enable-more-warnings  Maximum compiler warnings
-   --enable-debug          turn on debugging
-@@ -1748,6 +1764,10 @@
-   PULSE_CFLAGS
-               C compiler flags for PULSE, overriding pkg-config
-   PULSE_LIBS  linker flags for PULSE, overriding pkg-config
-+  GST_CFLAGS  C compiler flags for GST, overriding pkg-config
-+  GST_LIBS    linker flags for GST, overriding pkg-config
-+  ALSA_CFLAGS C compiler flags for ALSA, overriding pkg-config
-+  ALSA_LIBS   linker flags for ALSA, overriding pkg-config
- 
- Use these variables to override the choices made by `configure' or to help
- it to find libraries and programs with nonstandard names/locations.
-@@ -5025,8 +5045,9 @@
+@@ -5025,8 +5024,9 @@
  # FIXME: we rely on the cache variable name because
  # there is no other way.
  set dummy $CC
@@ -18422,24 +18366,7 @@ diff -Nur -x '*.orig' -x '*~' gnome-settings-daemon-2.27.1/configure gnome-setti
     # Losing compiler, so override with the script.
     # FIXME: It is wrong to rewrite CC.
     # But if we don't then we get into trouble of one sort or another.
-@@ -5604,13 +5625,13 @@
- else
-   lt_cv_nm_interface="BSD nm"
-   echo "int some_variable = 0;" > conftest.$ac_ext
--  (eval echo "\"\$as_me:5607: $ac_compile\"" >&5)
-+  (eval echo "\"\$as_me:5628: $ac_compile\"" >&5)
-   (eval "$ac_compile" 2>conftest.err)
-   cat conftest.err >&5
--  (eval echo "\"\$as_me:5610: $NM \\\"conftest.$ac_objext\\\"\"" >&5)
-+  (eval echo "\"\$as_me:5631: $NM \\\"conftest.$ac_objext\\\"\"" >&5)
-   (eval "$NM \"conftest.$ac_objext\"" 2>conftest.err > conftest.out)
-   cat conftest.err >&5
--  (eval echo "\"\$as_me:5613: output\"" >&5)
-+  (eval echo "\"\$as_me:5634: output\"" >&5)
-   cat conftest.out >&5
-   if $GREP 'External.*some_variable' conftest.out > /dev/null; then
-     lt_cv_nm_interface="MS dumpbin"
-@@ -6080,7 +6101,7 @@
+@@ -6080,7 +6080,7 @@
    lt_cv_deplibs_check_method=pass_all
    ;;
  
@@ -18448,72 +18375,7 @@ diff -Nur -x '*.orig' -x '*~' gnome-settings-daemon-2.27.1/configure gnome-setti
    if echo __ELF__ | $CC -E - | $GREP __ELF__ > /dev/null; then
      lt_cv_deplibs_check_method='match_pattern /lib[^/]+(\.so\.[0-9]+\.[0-9]+|_pic\.a)$'
    else
-@@ -6815,7 +6836,7 @@
-   ;;
- *-*-irix6*)
-   # Find out which ABI we are using.
--  echo '#line 6818 "configure"' > conftest.$ac_ext
-+  echo '#line 6839 "configure"' > conftest.$ac_ext
-   if { (eval echo "$as_me:$LINENO: \"$ac_compile\"") >&5
-   (eval $ac_compile) 2>&5
-   ac_status=$?
-@@ -8972,11 +8993,11 @@
-    -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
-    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
-    -e 's:$: $lt_compiler_flag:'`
--   (eval echo "\"\$as_me:8975: $lt_compile\"" >&5)
-+   (eval echo "\"\$as_me:8996: $lt_compile\"" >&5)
-    (eval "$lt_compile" 2>conftest.err)
-    ac_status=$?
-    cat conftest.err >&5
--   echo "$as_me:8979: \$? = $ac_status" >&5
-+   echo "$as_me:9000: \$? = $ac_status" >&5
-    if (exit $ac_status) && test -s "$ac_outfile"; then
-      # The compiler can only warn and ignore the option if not recognized
-      # So say no if there are warnings other than the usual output.
-@@ -9311,11 +9332,11 @@
-    -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
-    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
-    -e 's:$: $lt_compiler_flag:'`
--   (eval echo "\"\$as_me:9314: $lt_compile\"" >&5)
-+   (eval echo "\"\$as_me:9335: $lt_compile\"" >&5)
-    (eval "$lt_compile" 2>conftest.err)
-    ac_status=$?
-    cat conftest.err >&5
--   echo "$as_me:9318: \$? = $ac_status" >&5
-+   echo "$as_me:9339: \$? = $ac_status" >&5
-    if (exit $ac_status) && test -s "$ac_outfile"; then
-      # The compiler can only warn and ignore the option if not recognized
-      # So say no if there are warnings other than the usual output.
-@@ -9416,11 +9437,11 @@
-    -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
-    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
-    -e 's:$: $lt_compiler_flag:'`
--   (eval echo "\"\$as_me:9419: $lt_compile\"" >&5)
-+   (eval echo "\"\$as_me:9440: $lt_compile\"" >&5)
-    (eval "$lt_compile" 2>out/conftest.err)
-    ac_status=$?
-    cat out/conftest.err >&5
--   echo "$as_me:9423: \$? = $ac_status" >&5
-+   echo "$as_me:9444: \$? = $ac_status" >&5
-    if (exit $ac_status) && test -s out/conftest2.$ac_objext
-    then
-      # The compiler can only warn and ignore the option if not recognized
-@@ -9471,11 +9492,11 @@
-    -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
-    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
-    -e 's:$: $lt_compiler_flag:'`
--   (eval echo "\"\$as_me:9474: $lt_compile\"" >&5)
-+   (eval echo "\"\$as_me:9495: $lt_compile\"" >&5)
-    (eval "$lt_compile" 2>out/conftest.err)
-    ac_status=$?
-    cat out/conftest.err >&5
--   echo "$as_me:9478: \$? = $ac_status" >&5
-+   echo "$as_me:9499: \$? = $ac_status" >&5
-    if (exit $ac_status) && test -s out/conftest2.$ac_objext
-    then
-      # The compiler can only warn and ignore the option if not recognized
-@@ -9772,7 +9793,7 @@
+@@ -9772,7 +9772,7 @@
        fi
        ;;
  
@@ -18522,7 +18384,7 @@ diff -Nur -x '*.orig' -x '*~' gnome-settings-daemon-2.27.1/configure gnome-setti
        if echo __ELF__ | $CC -E - | $GREP __ELF__ >/dev/null; then
  	archive_cmds='$LD -Bshareable $libobjs $deplibs $linker_flags -o $lib'
  	wlarc=
-@@ -9947,6 +9968,7 @@
+@@ -9947,6 +9947,7 @@
  	if test "$aix_use_runtimelinking" = yes; then
  	  shared_flag="$shared_flag "'${wl}-G'
  	fi
@@ -18530,7 +18392,7 @@ diff -Nur -x '*.orig' -x '*~' gnome-settings-daemon-2.27.1/configure gnome-setti
        else
  	# not using gcc
  	if test "$host_cpu" = ia64; then
-@@ -10361,7 +10383,7 @@
+@@ -10361,7 +10362,7 @@
        link_all_deplibs=yes
        ;;
  
@@ -18539,7 +18401,7 @@ diff -Nur -x '*.orig' -x '*~' gnome-settings-daemon-2.27.1/configure gnome-setti
        if echo __ELF__ | $CC -E - | $GREP __ELF__ >/dev/null; then
  	archive_cmds='$LD -Bshareable -o $lib $libobjs $deplibs $linker_flags'  # a.out
        else
-@@ -11338,6 +11360,18 @@
+@@ -11338,6 +11339,18 @@
    dynamic_linker='GNU/Linux ld.so'
    ;;
  
@@ -18558,25 +18420,25 @@ diff -Nur -x '*.orig' -x '*~' gnome-settings-daemon-2.27.1/configure gnome-setti
  netbsd*)
    version_type=sunos
    need_lib_prefix=no
-@@ -12271,7 +12305,7 @@
+@@ -12271,7 +12284,7 @@
    lt_dlunknown=0; lt_dlno_uscore=1; lt_dlneed_uscore=2
    lt_status=$lt_dlunknown
    cat > conftest.$ac_ext <<_LT_EOF
 -#line 12274 "configure"
-+#line 12308 "configure"
++#line 12287 "configure"
  #include "confdefs.h"
  
  #if HAVE_DLFCN_H
-@@ -12367,7 +12401,7 @@
+@@ -12367,7 +12380,7 @@
    lt_dlunknown=0; lt_dlno_uscore=1; lt_dlneed_uscore=2
    lt_status=$lt_dlunknown
    cat > conftest.$ac_ext <<_LT_EOF
 -#line 12370 "configure"
-+#line 12404 "configure"
++#line 12383 "configure"
  #include "confdefs.h"
  
  #if HAVE_DLFCN_H
-@@ -14263,7 +14297,7 @@
+@@ -14263,7 +14276,7 @@
  	    ;;
  	esac
  	;;
@@ -18585,49 +18447,49 @@ diff -Nur -x '*.orig' -x '*~' gnome-settings-daemon-2.27.1/configure gnome-setti
  	;;
        *qnx* | *nto*)
          # QNX uses GNU C++, but need to define -shared option too, otherwise
-@@ -14387,11 +14421,11 @@
+@@ -14387,11 +14400,11 @@
     -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
     -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
     -e 's:$: $lt_compiler_flag:'`
 -   (eval echo "\"\$as_me:14390: $lt_compile\"" >&5)
-+   (eval echo "\"\$as_me:14424: $lt_compile\"" >&5)
++   (eval echo "\"\$as_me:14403: $lt_compile\"" >&5)
     (eval "$lt_compile" 2>conftest.err)
     ac_status=$?
     cat conftest.err >&5
 -   echo "$as_me:14394: \$? = $ac_status" >&5
-+   echo "$as_me:14428: \$? = $ac_status" >&5
++   echo "$as_me:14407: \$? = $ac_status" >&5
     if (exit $ac_status) && test -s "$ac_outfile"; then
       # The compiler can only warn and ignore the option if not recognized
       # So say no if there are warnings other than the usual output.
-@@ -14486,11 +14520,11 @@
+@@ -14486,11 +14499,11 @@
     -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
     -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
     -e 's:$: $lt_compiler_flag:'`
 -   (eval echo "\"\$as_me:14489: $lt_compile\"" >&5)
-+   (eval echo "\"\$as_me:14523: $lt_compile\"" >&5)
++   (eval echo "\"\$as_me:14502: $lt_compile\"" >&5)
     (eval "$lt_compile" 2>out/conftest.err)
     ac_status=$?
     cat out/conftest.err >&5
 -   echo "$as_me:14493: \$? = $ac_status" >&5
-+   echo "$as_me:14527: \$? = $ac_status" >&5
++   echo "$as_me:14506: \$? = $ac_status" >&5
     if (exit $ac_status) && test -s out/conftest2.$ac_objext
     then
       # The compiler can only warn and ignore the option if not recognized
-@@ -14538,11 +14572,11 @@
+@@ -14538,11 +14551,11 @@
     -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
     -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
     -e 's:$: $lt_compiler_flag:'`
 -   (eval echo "\"\$as_me:14541: $lt_compile\"" >&5)
-+   (eval echo "\"\$as_me:14575: $lt_compile\"" >&5)
++   (eval echo "\"\$as_me:14554: $lt_compile\"" >&5)
     (eval "$lt_compile" 2>out/conftest.err)
     ac_status=$?
     cat out/conftest.err >&5
 -   echo "$as_me:14545: \$? = $ac_status" >&5
-+   echo "$as_me:14579: \$? = $ac_status" >&5
++   echo "$as_me:14558: \$? = $ac_status" >&5
     if (exit $ac_status) && test -s out/conftest2.$ac_objext
     then
       # The compiler can only warn and ignore the option if not recognized
-@@ -14614,6 +14648,9 @@
+@@ -14614,6 +14627,9 @@
    cygwin* | mingw* | cegcc*)
      export_symbols_cmds_CXX='$NM $libobjs $convenience | $global_symbol_pipe | $SED -e '\''/^[BCDGRS][ ]/s/.*[ ]\([^ ]*\)/\1 DATA/;/^.*[ ]__nm__/s/^.*[ ]__nm__\([^ ]*\)[ ][^ ]*/\1 DATA/;/^I[ ]/d;/^[AITW][ ]/s/.* //'\'' | sort | uniq > $export_symbols'
    ;;
@@ -18637,7 +18499,7 @@ diff -Nur -x '*.orig' -x '*~' gnome-settings-daemon-2.27.1/configure gnome-setti
    *)
      export_symbols_cmds_CXX='$NM $libobjs $convenience | $global_symbol_pipe | $SED '\''s/.* //'\'' | sort | uniq > $export_symbols'
    ;;
-@@ -15200,6 +15237,18 @@
+@@ -15200,6 +15216,18 @@
    dynamic_linker='GNU/Linux ld.so'
    ;;
  
@@ -18656,7 +18518,7 @@ diff -Nur -x '*.orig' -x '*~' gnome-settings-daemon-2.27.1/configure gnome-setti
  netbsd*)
    version_type=sunos
    need_lib_prefix=no
-@@ -18298,10 +18347,11 @@
+@@ -18298,10 +18326,11 @@
  { $as_echo "$as_me:$LINENO: checking for SETTINGS_DAEMON" >&5
  $as_echo_n "checking for SETTINGS_DAEMON... " >&6; }
  
@@ -18672,7 +18534,7 @@ diff -Nur -x '*.orig' -x '*~' gnome-settings-daemon-2.27.1/configure gnome-setti
      { ($as_echo "$as_me:$LINENO: \$PKG_CONFIG --exists --print-errors \"glib-2.0 >= \$GLIB_REQUIRED_VERSION
          gtk+-2.0 >= \$GTK_REQUIRED_VERSION
          gconf-2.0 >= \$GCONF_REQUIRED_VERSION
-@@ -18326,13 +18376,15 @@
+@@ -18326,13 +18355,15 @@
  else
    pkg_failed=yes
  fi
@@ -18694,7 +18556,7 @@ diff -Nur -x '*.orig' -x '*~' gnome-settings-daemon-2.27.1/configure gnome-setti
      { ($as_echo "$as_me:$LINENO: \$PKG_CONFIG --exists --print-errors \"glib-2.0 >= \$GLIB_REQUIRED_VERSION
          gtk+-2.0 >= \$GTK_REQUIRED_VERSION
          gconf-2.0 >= \$GCONF_REQUIRED_VERSION
-@@ -18357,8 +18409,9 @@
+@@ -18357,8 +18388,9 @@
  else
    pkg_failed=yes
  fi
@@ -18706,7 +18568,7 @@ diff -Nur -x '*.orig' -x '*~' gnome-settings-daemon-2.27.1/configure gnome-setti
  fi
  
  
-@@ -18371,19 +18424,19 @@
+@@ -18371,19 +18403,19 @@
          _pkg_short_errors_supported=no
  fi
          if test $_pkg_short_errors_supported = yes; then
@@ -18730,7 +18592,7 @@ diff -Nur -x '*.orig' -x '*~' gnome-settings-daemon-2.27.1/configure gnome-setti
          fi
  	# Put the nasty error message in config.log where it belongs
  	echo "$SETTINGS_DAEMON_PKG_ERRORS" >&5
-@@ -18458,16 +18511,18 @@
+@@ -18458,16 +18490,18 @@
  { $as_echo "$as_me:$LINENO: checking for SETTINGS_PLUGIN" >&5
  $as_echo_n "checking for SETTINGS_PLUGIN... " >&6; }
  
@@ -18753,7 +18615,7 @@ diff -Nur -x '*.orig' -x '*~' gnome-settings-daemon-2.27.1/configure gnome-setti
  \"") >&5
    ($PKG_CONFIG --exists --print-errors "gtk+-2.0 >= $GTK_REQUIRED_VERSION
          gconf-2.0 >= $GCONF_REQUIRED_VERSION
-@@ -18475,6 +18530,7 @@
+@@ -18475,6 +18509,7 @@
          gio-2.0 >= $GIO_REQUIRED_VERSION
          libglade-2.0 >= 2.0.0
          dbus-glib-1 >= $DBUS_GLIB_REQUIRED_VERSION
@@ -18761,7 +18623,7 @@ diff -Nur -x '*.orig' -x '*~' gnome-settings-daemon-2.27.1/configure gnome-setti
  ") 2>&5
    ac_status=$?
    $as_echo "$as_me:$LINENO: \$? = $ac_status" >&5
-@@ -18485,23 +18541,27 @@
+@@ -18485,23 +18520,27 @@
          gio-2.0 >= $GIO_REQUIRED_VERSION
          libglade-2.0 >= 2.0.0
          dbus-glib-1 >= $DBUS_GLIB_REQUIRED_VERSION
@@ -18795,7 +18657,7 @@ diff -Nur -x '*.orig' -x '*~' gnome-settings-daemon-2.27.1/configure gnome-setti
  \"") >&5
    ($PKG_CONFIG --exists --print-errors "gtk+-2.0 >= $GTK_REQUIRED_VERSION
          gconf-2.0 >= $GCONF_REQUIRED_VERSION
-@@ -18509,6 +18569,7 @@
+@@ -18509,6 +18548,7 @@
          gio-2.0 >= $GIO_REQUIRED_VERSION
          libglade-2.0 >= 2.0.0
          dbus-glib-1 >= $DBUS_GLIB_REQUIRED_VERSION
@@ -18803,7 +18665,7 @@ diff -Nur -x '*.orig' -x '*~' gnome-settings-daemon-2.27.1/configure gnome-setti
  ") 2>&5
    ac_status=$?
    $as_echo "$as_me:$LINENO: \$? = $ac_status" >&5
-@@ -18519,12 +18580,14 @@
+@@ -18519,12 +18559,14 @@
          gio-2.0 >= $GIO_REQUIRED_VERSION
          libglade-2.0 >= 2.0.0
          dbus-glib-1 >= $DBUS_GLIB_REQUIRED_VERSION
@@ -18820,7 +18682,7 @@ diff -Nur -x '*.orig' -x '*~' gnome-settings-daemon-2.27.1/configure gnome-setti
  fi
  
  
-@@ -18537,21 +18600,23 @@
+@@ -18537,21 +18579,23 @@
          _pkg_short_errors_supported=no
  fi
          if test $_pkg_short_errors_supported = yes; then
@@ -18848,7 +18710,7 @@ diff -Nur -x '*.orig' -x '*~' gnome-settings-daemon-2.27.1/configure gnome-setti
          fi
  	# Put the nasty error message in config.log where it belongs
  	echo "$SETTINGS_PLUGIN_PKG_ERRORS" >&5
-@@ -18562,6 +18627,7 @@
+@@ -18562,6 +18606,7 @@
          gio-2.0 >= $GIO_REQUIRED_VERSION
          libglade-2.0 >= 2.0.0
          dbus-glib-1 >= $DBUS_GLIB_REQUIRED_VERSION
@@ -18856,7 +18718,7 @@ diff -Nur -x '*.orig' -x '*~' gnome-settings-daemon-2.27.1/configure gnome-setti
  ) were not met:
  
  $SETTINGS_PLUGIN_PKG_ERRORS
-@@ -18579,6 +18645,7 @@
+@@ -18579,6 +18624,7 @@
          gio-2.0 >= $GIO_REQUIRED_VERSION
          libglade-2.0 >= 2.0.0
          dbus-glib-1 >= $DBUS_GLIB_REQUIRED_VERSION
@@ -18864,7 +18726,7 @@ diff -Nur -x '*.orig' -x '*~' gnome-settings-daemon-2.27.1/configure gnome-setti
  ) were not met:
  
  $SETTINGS_PLUGIN_PKG_ERRORS
-@@ -18783,10 +18850,11 @@
+@@ -18783,10 +18829,11 @@
  { $as_echo "$as_me:$LINENO: checking for LIBNOTIFY" >&5
  $as_echo_n "checking for LIBNOTIFY... " >&6; }
  
@@ -18880,7 +18742,7 @@ diff -Nur -x '*.orig' -x '*~' gnome-settings-daemon-2.27.1/configure gnome-setti
      { ($as_echo "$as_me:$LINENO: \$PKG_CONFIG --exists --print-errors \"libnotify >= \$LIBNOTIFY_REQUIRED_VERSION\"") >&5
    ($PKG_CONFIG --exists --print-errors "libnotify >= $LIBNOTIFY_REQUIRED_VERSION") 2>&5
    ac_status=$?
-@@ -18796,13 +18864,15 @@
+@@ -18796,13 +18843,15 @@
  else
    pkg_failed=yes
  fi
@@ -18902,7 +18764,7 @@ diff -Nur -x '*.orig' -x '*~' gnome-settings-daemon-2.27.1/configure gnome-setti
      { ($as_echo "$as_me:$LINENO: \$PKG_CONFIG --exists --print-errors \"libnotify >= \$LIBNOTIFY_REQUIRED_VERSION\"") >&5
    ($PKG_CONFIG --exists --print-errors "libnotify >= $LIBNOTIFY_REQUIRED_VERSION") 2>&5
    ac_status=$?
-@@ -18812,8 +18882,9 @@
+@@ -18812,8 +18861,9 @@
  else
    pkg_failed=yes
  fi
@@ -18914,7 +18776,7 @@ diff -Nur -x '*.orig' -x '*~' gnome-settings-daemon-2.27.1/configure gnome-setti
  fi
  
  
-@@ -18826,9 +18897,9 @@
+@@ -18826,9 +18876,9 @@
          _pkg_short_errors_supported=no
  fi
          if test $_pkg_short_errors_supported = yes; then
@@ -18926,7 +18788,7 @@ diff -Nur -x '*.orig' -x '*~' gnome-settings-daemon-2.27.1/configure gnome-setti
          fi
  	# Put the nasty error message in config.log where it belongs
  	echo "$LIBNOTIFY_PKG_ERRORS" >&5
-@@ -20620,10 +20691,11 @@
+@@ -20620,10 +20670,11 @@
  { $as_echo "$as_me:$LINENO: checking for FONTCONFIG" >&5
  $as_echo_n "checking for FONTCONFIG... " >&6; }
  
@@ -18942,7 +18804,7 @@ diff -Nur -x '*.orig' -x '*~' gnome-settings-daemon-2.27.1/configure gnome-setti
      { ($as_echo "$as_me:$LINENO: \$PKG_CONFIG --exists --print-errors \"fontconfig\"") >&5
    ($PKG_CONFIG --exists --print-errors "fontconfig") 2>&5
    ac_status=$?
-@@ -20633,13 +20705,15 @@
+@@ -20633,13 +20684,15 @@
  else
    pkg_failed=yes
  fi
@@ -18964,7 +18826,7 @@ diff -Nur -x '*.orig' -x '*~' gnome-settings-daemon-2.27.1/configure gnome-setti
      { ($as_echo "$as_me:$LINENO: \$PKG_CONFIG --exists --print-errors \"fontconfig\"") >&5
    ($PKG_CONFIG --exists --print-errors "fontconfig") 2>&5
    ac_status=$?
-@@ -20649,8 +20723,9 @@
+@@ -20649,8 +20702,9 @@
  else
    pkg_failed=yes
  fi
@@ -18976,7 +18838,7 @@ diff -Nur -x '*.orig' -x '*~' gnome-settings-daemon-2.27.1/configure gnome-setti
  fi
  
  
-@@ -20663,9 +20738,9 @@
+@@ -20663,9 +20717,9 @@
          _pkg_short_errors_supported=no
  fi
          if test $_pkg_short_errors_supported = yes; then
@@ -18988,7 +18850,7 @@ diff -Nur -x '*.orig' -x '*~' gnome-settings-daemon-2.27.1/configure gnome-setti
          fi
  	# Put the nasty error message in config.log where it belongs
  	echo "$FONTCONFIG_PKG_ERRORS" >&5
-@@ -21025,10 +21100,11 @@
+@@ -21025,10 +21079,11 @@
  { $as_echo "$as_me:$LINENO: checking for LIBGNOMEKBD" >&5
  $as_echo_n "checking for LIBGNOMEKBD... " >&6; }
  
@@ -19001,10 +18863,10 @@ diff -Nur -x '*.orig' -x '*~' gnome-settings-daemon-2.27.1/configure gnome-setti
 +        pkg_cv_LIBGNOMEKBD_CFLAGS="$LIBGNOMEKBD_CFLAGS"
 +    else
 +        if test -n "$PKG_CONFIG" && \
-     { ($as_echo "$as_me:$LINENO: \$PKG_CONFIG --exists --print-errors \"libgnomekbd >= 2.21.4 libxklavier >= 3.8\"") >&5
-   ($PKG_CONFIG --exists --print-errors "libgnomekbd >= 2.21.4 libxklavier >= 3.8") 2>&5
+     { ($as_echo "$as_me:$LINENO: \$PKG_CONFIG --exists --print-errors \"libgnomekbd >= 2.21.4 libxklavier >= 4.0\"") >&5
+   ($PKG_CONFIG --exists --print-errors "libgnomekbd >= 2.21.4 libxklavier >= 4.0") 2>&5
    ac_status=$?
-@@ -21038,13 +21114,15 @@
+@@ -21038,13 +21093,15 @@
  else
    pkg_failed=yes
  fi
@@ -19023,10 +18885,10 @@ diff -Nur -x '*.orig' -x '*~' gnome-settings-daemon-2.27.1/configure gnome-setti
 +        pkg_cv_LIBGNOMEKBD_LIBS="$LIBGNOMEKBD_LIBS"
 +    else
 +        if test -n "$PKG_CONFIG" && \
-     { ($as_echo "$as_me:$LINENO: \$PKG_CONFIG --exists --print-errors \"libgnomekbd >= 2.21.4 libxklavier >= 3.8\"") >&5
-   ($PKG_CONFIG --exists --print-errors "libgnomekbd >= 2.21.4 libxklavier >= 3.8") 2>&5
+     { ($as_echo "$as_me:$LINENO: \$PKG_CONFIG --exists --print-errors \"libgnomekbd >= 2.21.4 libxklavier >= 4.0\"") >&5
+   ($PKG_CONFIG --exists --print-errors "libgnomekbd >= 2.21.4 libxklavier >= 4.0") 2>&5
    ac_status=$?
-@@ -21054,8 +21132,9 @@
+@@ -21054,8 +21111,9 @@
  else
    pkg_failed=yes
  fi
@@ -19038,19 +18900,19 @@ diff -Nur -x '*.orig' -x '*~' gnome-settings-daemon-2.27.1/configure gnome-setti
  fi
  
  
-@@ -21068,9 +21147,9 @@
+@@ -21068,9 +21126,9 @@
          _pkg_short_errors_supported=no
  fi
          if test $_pkg_short_errors_supported = yes; then
--	        LIBGNOMEKBD_PKG_ERRORS=`$PKG_CONFIG --short-errors --print-errors "libgnomekbd >= 2.21.4 libxklavier >= 3.8" 2>&1`
-+	        LIBGNOMEKBD_PKG_ERRORS=`$PKG_CONFIG --short-errors --errors-to-stdout --print-errors "libgnomekbd >= 2.21.4 libxklavier >= 3.8"`
+-	        LIBGNOMEKBD_PKG_ERRORS=`$PKG_CONFIG --short-errors --print-errors "libgnomekbd >= 2.21.4 libxklavier >= 4.0" 2>&1`
++	        LIBGNOMEKBD_PKG_ERRORS=`$PKG_CONFIG --short-errors --errors-to-stdout --print-errors "libgnomekbd >= 2.21.4 libxklavier >= 4.0"`
          else
--	        LIBGNOMEKBD_PKG_ERRORS=`$PKG_CONFIG --print-errors "libgnomekbd >= 2.21.4 libxklavier >= 3.8" 2>&1`
-+	        LIBGNOMEKBD_PKG_ERRORS=`$PKG_CONFIG --errors-to-stdout --print-errors "libgnomekbd >= 2.21.4 libxklavier >= 3.8"`
+-	        LIBGNOMEKBD_PKG_ERRORS=`$PKG_CONFIG --print-errors "libgnomekbd >= 2.21.4 libxklavier >= 4.0" 2>&1`
++	        LIBGNOMEKBD_PKG_ERRORS=`$PKG_CONFIG --errors-to-stdout --print-errors "libgnomekbd >= 2.21.4 libxklavier >= 4.0"`
          fi
  	# Put the nasty error message in config.log where it belongs
  	echo "$LIBGNOMEKBD_PKG_ERRORS" >&5
-@@ -21138,10 +21217,11 @@
+@@ -21138,10 +21196,11 @@
  { $as_echo "$as_me:$LINENO: checking for GIOUNIX" >&5
  $as_echo_n "checking for GIOUNIX... " >&6; }
  
@@ -19066,7 +18928,7 @@ diff -Nur -x '*.orig' -x '*~' gnome-settings-daemon-2.27.1/configure gnome-setti
      { ($as_echo "$as_me:$LINENO: \$PKG_CONFIG --exists --print-errors \"gio-unix-2.0\"") >&5
    ($PKG_CONFIG --exists --print-errors "gio-unix-2.0") 2>&5
    ac_status=$?
-@@ -21151,13 +21231,15 @@
+@@ -21151,13 +21210,15 @@
  else
    pkg_failed=yes
  fi
@@ -19088,7 +18950,7 @@ diff -Nur -x '*.orig' -x '*~' gnome-settings-daemon-2.27.1/configure gnome-setti
      { ($as_echo "$as_me:$LINENO: \$PKG_CONFIG --exists --print-errors \"gio-unix-2.0\"") >&5
    ($PKG_CONFIG --exists --print-errors "gio-unix-2.0") 2>&5
    ac_status=$?
-@@ -21167,8 +21249,9 @@
+@@ -21167,8 +21228,9 @@
  else
    pkg_failed=yes
  fi
@@ -19100,7 +18962,7 @@ diff -Nur -x '*.orig' -x '*~' gnome-settings-daemon-2.27.1/configure gnome-setti
  fi
  
  
-@@ -21181,9 +21264,9 @@
+@@ -21181,9 +21243,9 @@
          _pkg_short_errors_supported=no
  fi
          if test $_pkg_short_errors_supported = yes; then
@@ -19112,22 +18974,7 @@ diff -Nur -x '*.orig' -x '*~' gnome-settings-daemon-2.27.1/configure gnome-setti
          fi
  	# Put the nasty error message in config.log where it belongs
  	echo "$GIOUNIX_PKG_ERRORS" >&5
-@@ -21246,8 +21329,6 @@
- 
- 
- 
--
--have_pulse=false
- # Check whether --enable-pulse was given.
- if test "${enable_pulse+set}" = set; then
-   enableval=$enable_pulse; case "${enableval}" in
-@@ -21262,43 +21343,46 @@
- fi
- 
- if test x$WANT_PULSE = xyes ; then
--       PA_REQUIRED_VERSION=0.9.12
- 
- pkg_failed=no
+@@ -21268,10 +21330,11 @@
  { $as_echo "$as_me:$LINENO: checking for PULSE" >&5
  $as_echo_n "checking for PULSE... " >&6; }
  
@@ -19135,20 +18982,15 @@ diff -Nur -x '*.orig' -x '*~' gnome-settings-daemon-2.27.1/configure gnome-setti
 -    pkg_cv_PULSE_CFLAGS="$PULSE_CFLAGS"
 - elif test -n "$PKG_CONFIG"; then
 -    if test -n "$PKG_CONFIG" && \
--    { ($as_echo "$as_me:$LINENO: \$PKG_CONFIG --exists --print-errors \"glib-2.0 libpulse >= \$PA_REQUIRED_VERSION libpulse-mainloop-glib >= \$PA_REQUIRED_VERSION\"") >&5
--  ($PKG_CONFIG --exists --print-errors "glib-2.0 libpulse >= $PA_REQUIRED_VERSION libpulse-mainloop-glib >= $PA_REQUIRED_VERSION") 2>&5
 +if test -n "$PKG_CONFIG"; then
 +    if test -n "$PULSE_CFLAGS"; then
 +        pkg_cv_PULSE_CFLAGS="$PULSE_CFLAGS"
 +    else
 +        if test -n "$PKG_CONFIG" && \
-+    { ($as_echo "$as_me:$LINENO: \$PKG_CONFIG --exists --print-errors \"libpulse >= 0.9.11\"") >&5
-+  ($PKG_CONFIG --exists --print-errors "libpulse >= 0.9.11") 2>&5
+     { ($as_echo "$as_me:$LINENO: \$PKG_CONFIG --exists --print-errors \"glib-2.0 libpulse >= \$PA_REQUIRED_VERSION libpulse-mainloop-glib >= \$PA_REQUIRED_VERSION\"") >&5
+   ($PKG_CONFIG --exists --print-errors "glib-2.0 libpulse >= $PA_REQUIRED_VERSION libpulse-mainloop-glib >= $PA_REQUIRED_VERSION") 2>&5
    ac_status=$?
-   $as_echo "$as_me:$LINENO: \$? = $ac_status" >&5
-   (exit $ac_status); }; then
--  pkg_cv_PULSE_CFLAGS=`$PKG_CONFIG --cflags "glib-2.0 libpulse >= $PA_REQUIRED_VERSION libpulse-mainloop-glib >= $PA_REQUIRED_VERSION" 2>/dev/null`
-+  pkg_cv_PULSE_CFLAGS=`$PKG_CONFIG --cflags "libpulse >= 0.9.11" 2>/dev/null`
+@@ -21281,13 +21344,15 @@
  else
    pkg_failed=yes
  fi
@@ -19162,20 +19004,15 @@ diff -Nur -x '*.orig' -x '*~' gnome-settings-daemon-2.27.1/configure gnome-setti
 -    pkg_cv_PULSE_LIBS="$PULSE_LIBS"
 - elif test -n "$PKG_CONFIG"; then
 -    if test -n "$PKG_CONFIG" && \
--    { ($as_echo "$as_me:$LINENO: \$PKG_CONFIG --exists --print-errors \"glib-2.0 libpulse >= \$PA_REQUIRED_VERSION libpulse-mainloop-glib >= \$PA_REQUIRED_VERSION\"") >&5
--  ($PKG_CONFIG --exists --print-errors "glib-2.0 libpulse >= $PA_REQUIRED_VERSION libpulse-mainloop-glib >= $PA_REQUIRED_VERSION") 2>&5
 +if test -n "$PKG_CONFIG"; then
 +    if test -n "$PULSE_LIBS"; then
 +        pkg_cv_PULSE_LIBS="$PULSE_LIBS"
 +    else
 +        if test -n "$PKG_CONFIG" && \
-+    { ($as_echo "$as_me:$LINENO: \$PKG_CONFIG --exists --print-errors \"libpulse >= 0.9.11\"") >&5
-+  ($PKG_CONFIG --exists --print-errors "libpulse >= 0.9.11") 2>&5
+     { ($as_echo "$as_me:$LINENO: \$PKG_CONFIG --exists --print-errors \"glib-2.0 libpulse >= \$PA_REQUIRED_VERSION libpulse-mainloop-glib >= \$PA_REQUIRED_VERSION\"") >&5
+   ($PKG_CONFIG --exists --print-errors "glib-2.0 libpulse >= $PA_REQUIRED_VERSION libpulse-mainloop-glib >= $PA_REQUIRED_VERSION") 2>&5
    ac_status=$?
-   $as_echo "$as_me:$LINENO: \$? = $ac_status" >&5
-   (exit $ac_status); }; then
--  pkg_cv_PULSE_LIBS=`$PKG_CONFIG --libs "glib-2.0 libpulse >= $PA_REQUIRED_VERSION libpulse-mainloop-glib >= $PA_REQUIRED_VERSION" 2>/dev/null`
-+  pkg_cv_PULSE_LIBS=`$PKG_CONFIG --libs "libpulse >= 0.9.11" 2>/dev/null`
+@@ -21297,8 +21362,9 @@
  else
    pkg_failed=yes
  fi
@@ -19187,385 +19024,19 @@ diff -Nur -x '*.orig' -x '*~' gnome-settings-daemon-2.27.1/configure gnome-setti
  fi
  
  
-@@ -21311,9 +21395,9 @@
+@@ -21311,9 +21377,9 @@
          _pkg_short_errors_supported=no
  fi
          if test $_pkg_short_errors_supported = yes; then
 -	        PULSE_PKG_ERRORS=`$PKG_CONFIG --short-errors --print-errors "glib-2.0 libpulse >= $PA_REQUIRED_VERSION libpulse-mainloop-glib >= $PA_REQUIRED_VERSION" 2>&1`
-+	        PULSE_PKG_ERRORS=`$PKG_CONFIG --short-errors --errors-to-stdout --print-errors "libpulse >= 0.9.11"`
++	        PULSE_PKG_ERRORS=`$PKG_CONFIG --short-errors --errors-to-stdout --print-errors "glib-2.0 libpulse >= $PA_REQUIRED_VERSION libpulse-mainloop-glib >= $PA_REQUIRED_VERSION"`
          else
 -	        PULSE_PKG_ERRORS=`$PKG_CONFIG --print-errors "glib-2.0 libpulse >= $PA_REQUIRED_VERSION libpulse-mainloop-glib >= $PA_REQUIRED_VERSION" 2>&1`
-+	        PULSE_PKG_ERRORS=`$PKG_CONFIG --errors-to-stdout --print-errors "libpulse >= 0.9.11"`
++	        PULSE_PKG_ERRORS=`$PKG_CONFIG --errors-to-stdout --print-errors "glib-2.0 libpulse >= $PA_REQUIRED_VERSION libpulse-mainloop-glib >= $PA_REQUIRED_VERSION"`
          fi
  	# Put the nasty error message in config.log where it belongs
  	echo "$PULSE_PKG_ERRORS" >&5
-@@ -21328,7 +21412,6 @@
- 	PULSE_LIBS=$pkg_cv_PULSE_LIBS
-         { $as_echo "$as_me:$LINENO: result: yes" >&5
- $as_echo "yes" >&6; }
--	have_pulse=true
- 
- cat >>confdefs.h <<\_ACEOF
- #define HAVE_PULSE 1
-@@ -21336,16 +21419,306 @@
- 
- fi
- fi
-- if test "x$have_pulse" = "xtrue"; then
--  HAVE_PULSE_TRUE=
--  HAVE_PULSE_FALSE='#'
-+
-+
-+
-+
-+GST_MAJORMINOR=auto
-+
-+# Check whether --enable-gstreamer was given.
-+if test "${enable_gstreamer+set}" = set; then
-+  enableval=$enable_gstreamer; case "${enableval}" in
-+ yes) ENABLE_GSTREAMER=yes ;;
-+ 0.10) ENABLE_GSTREAMER=yes && GST_MAJORMINOR=0.10 ;;
-+ no)  ENABLE_GSTREAMER=no ;;
-+ *) { { $as_echo "$as_me:$LINENO: error:
-+                  *** Bad value ${enableval} for --enable-gstreamer
-+                  *** Please use one of the following:
-+                  ***    --enable-gstreamer=0.10
-+               " >&5
-+$as_echo "$as_me: error:
-+                  *** Bad value ${enableval} for --enable-gstreamer
-+                  *** Please use one of the following:
-+                  ***    --enable-gstreamer=0.10
-+               " >&2;}
-+   { (exit 1); exit 1; }; } ;;
-+esac
-+else
-+  ENABLE_GSTREAMER=yes
-+fi
-+
-+have_gstreamer=no
-+if test "x$ENABLE_GSTREAMER" = "xyes"; then
-+   GST_REQS=0.10.1.2
-+   PKGS="gstreamer-0.10 >= $GST_REQS gstreamer-plugins-base-0.10 >= $GST_REQS"
-+
-+
-+pkg_failed=no
-+{ $as_echo "$as_me:$LINENO: checking for GST" >&5
-+$as_echo_n "checking for GST... " >&6; }
-+
-+if test -n "$PKG_CONFIG"; then
-+    if test -n "$GST_CFLAGS"; then
-+        pkg_cv_GST_CFLAGS="$GST_CFLAGS"
-+    else
-+        if test -n "$PKG_CONFIG" && \
-+    { ($as_echo "$as_me:$LINENO: \$PKG_CONFIG --exists --print-errors \"\$PKGS\"") >&5
-+  ($PKG_CONFIG --exists --print-errors "$PKGS") 2>&5
-+  ac_status=$?
-+  $as_echo "$as_me:$LINENO: \$? = $ac_status" >&5
-+  (exit $ac_status); }; then
-+  pkg_cv_GST_CFLAGS=`$PKG_CONFIG --cflags "$PKGS" 2>/dev/null`
-+else
-+  pkg_failed=yes
-+fi
-+    fi
-+else
-+	pkg_failed=untried
-+fi
-+if test -n "$PKG_CONFIG"; then
-+    if test -n "$GST_LIBS"; then
-+        pkg_cv_GST_LIBS="$GST_LIBS"
-+    else
-+        if test -n "$PKG_CONFIG" && \
-+    { ($as_echo "$as_me:$LINENO: \$PKG_CONFIG --exists --print-errors \"\$PKGS\"") >&5
-+  ($PKG_CONFIG --exists --print-errors "$PKGS") 2>&5
-+  ac_status=$?
-+  $as_echo "$as_me:$LINENO: \$? = $ac_status" >&5
-+  (exit $ac_status); }; then
-+  pkg_cv_GST_LIBS=`$PKG_CONFIG --libs "$PKGS" 2>/dev/null`
-+else
-+  pkg_failed=yes
-+fi
-+    fi
- else
--  HAVE_PULSE_TRUE='#'
--  HAVE_PULSE_FALSE=
-+	pkg_failed=untried
- fi
- 
- 
- 
-+if test $pkg_failed = yes; then
-+
-+if $PKG_CONFIG --atleast-pkgconfig-version 0.20; then
-+        _pkg_short_errors_supported=yes
-+else
-+        _pkg_short_errors_supported=no
-+fi
-+        if test $_pkg_short_errors_supported = yes; then
-+	        GST_PKG_ERRORS=`$PKG_CONFIG --short-errors --errors-to-stdout --print-errors "$PKGS"`
-+        else
-+	        GST_PKG_ERRORS=`$PKG_CONFIG --errors-to-stdout --print-errors "$PKGS"`
-+        fi
-+	# Put the nasty error message in config.log where it belongs
-+	echo "$GST_PKG_ERRORS" >&5
-+
-+	{ $as_echo "$as_me:$LINENO: result: no" >&5
-+$as_echo "no" >&6; }
-+                { $as_echo "$as_me:$LINENO: result: no" >&5
-+$as_echo "no" >&6; }
-+elif test $pkg_failed = untried; then
-+	{ $as_echo "$as_me:$LINENO: result: no" >&5
-+$as_echo "no" >&6; }
-+else
-+	GST_CFLAGS=$pkg_cv_GST_CFLAGS
-+	GST_LIBS=$pkg_cv_GST_LIBS
-+        { $as_echo "$as_me:$LINENO: result: yes" >&5
-+$as_echo "yes" >&6; }
-+	have_gstreamer=yes
-+fi
-+
-+   if test "x$have_gstreamer" = "xyes"; then
-+      GST_LIBS="$GST_LIBS -lgstinterfaces-0.10 -lgstaudio-0.10"
-+   fi
-+else
-+   { $as_echo "$as_me:$LINENO: *** GStreamer support disabled ***" >&5
-+$as_echo "$as_me: *** GStreamer support disabled ***" >&6;}
-+fi
-+ if test "x$have_gstreamer" = "xyes"; then
-+  HAVE_GSTREAMER_TRUE=
-+  HAVE_GSTREAMER_FALSE='#'
-+else
-+  HAVE_GSTREAMER_TRUE='#'
-+  HAVE_GSTREAMER_FALSE=
-+fi
-+
-+
-+
-+
-+
-+have_oss=no
-+if test "x$have_gstreamer" != "xyes"; then
-+  cat >conftest.$ac_ext <<_ACEOF
-+/* confdefs.h.  */
-+_ACEOF
-+cat confdefs.h >>conftest.$ac_ext
-+cat >>conftest.$ac_ext <<_ACEOF
-+/* end confdefs.h.  */
-+
-+		  #ifdef __NetBSD__
-+		  #include <sys/param.h>
-+		  #include <sys/sysctl.h>
-+		  #include <soundcard.h>
-+		  #else
-+		  #include <sys/soundcard.h>
-+		  #endif
-+
-+int
-+main ()
-+{
-+
-+		     int arg = SNDCTL_DSP_SETFRAGMENT;
-+
-+  ;
-+  return 0;
-+}
-+_ACEOF
-+rm -f conftest.$ac_objext
-+if { (ac_try="$ac_compile"
-+case "(($ac_try" in
-+  *\"* | *\`* | *\\*) ac_try_echo=\$ac_try;;
-+  *) ac_try_echo=$ac_try;;
-+esac
-+eval ac_try_echo="\"\$as_me:$LINENO: $ac_try_echo\""
-+$as_echo "$ac_try_echo") >&5
-+  (eval "$ac_compile") 2>conftest.er1
-+  ac_status=$?
-+  grep -v '^ *+' conftest.er1 >conftest.err
-+  rm -f conftest.er1
-+  cat conftest.err >&5
-+  $as_echo "$as_me:$LINENO: \$? = $ac_status" >&5
-+  (exit $ac_status); } && {
-+	 test -z "$ac_c_werror_flag" ||
-+	 test ! -s conftest.err
-+       } && test -s conftest.$ac_objext; then
-+
-+			have_oss=yes
-+
-+else
-+  $as_echo "$as_me: failed program was:" >&5
-+sed 's/^/| /' conftest.$ac_ext >&5
-+
-+
-+fi
-+
-+rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
-+  { $as_echo "$as_me:$LINENO: checking for OSS audio support" >&5
-+$as_echo_n "checking for OSS audio support... " >&6; }
-+  { $as_echo "$as_me:$LINENO: result: $have_oss" >&5
-+$as_echo "$have_oss" >&6; }
-+fi
-+
-+ if test x"$have_oss" = "xyes"; then
-+  HAVE_OSS_TRUE=
-+  HAVE_OSS_FALSE='#'
-+else
-+  HAVE_OSS_TRUE='#'
-+  HAVE_OSS_FALSE=
-+fi
-+
-+
-+
-+have_alsa=no
-+if test "x$have_gstreamer" != "xyes"; then
-+  # Check whether --enable-alsa was given.
-+if test "${enable_alsa+set}" = set; then
-+  enableval=$enable_alsa; case "${enableval}" in
-+				yes) WANT_ALSA=yes ;;
-+				no)  WANT_ALSA=no ;;
-+				*) { { $as_echo "$as_me:$LINENO: error: bad value ${enableval} for --disable-alsa" >&5
-+$as_echo "$as_me: error: bad value ${enableval} for --disable-alsa" >&2;}
-+   { (exit 1); exit 1; }; } ;;
-+			esac
-+else
-+  WANT_ALSA=yes
-+fi
-+
-+  if test x$WANT_ALSA = xyes ; then
-+
-+pkg_failed=no
-+{ $as_echo "$as_me:$LINENO: checking for ALSA" >&5
-+$as_echo_n "checking for ALSA... " >&6; }
-+
-+if test -n "$PKG_CONFIG"; then
-+    if test -n "$ALSA_CFLAGS"; then
-+        pkg_cv_ALSA_CFLAGS="$ALSA_CFLAGS"
-+    else
-+        if test -n "$PKG_CONFIG" && \
-+    { ($as_echo "$as_me:$LINENO: \$PKG_CONFIG --exists --print-errors \"alsa >= 0.9.0\"") >&5
-+  ($PKG_CONFIG --exists --print-errors "alsa >= 0.9.0") 2>&5
-+  ac_status=$?
-+  $as_echo "$as_me:$LINENO: \$? = $ac_status" >&5
-+  (exit $ac_status); }; then
-+  pkg_cv_ALSA_CFLAGS=`$PKG_CONFIG --cflags "alsa >= 0.9.0" 2>/dev/null`
-+else
-+  pkg_failed=yes
-+fi
-+    fi
-+else
-+	pkg_failed=untried
-+fi
-+if test -n "$PKG_CONFIG"; then
-+    if test -n "$ALSA_LIBS"; then
-+        pkg_cv_ALSA_LIBS="$ALSA_LIBS"
-+    else
-+        if test -n "$PKG_CONFIG" && \
-+    { ($as_echo "$as_me:$LINENO: \$PKG_CONFIG --exists --print-errors \"alsa >= 0.9.0\"") >&5
-+  ($PKG_CONFIG --exists --print-errors "alsa >= 0.9.0") 2>&5
-+  ac_status=$?
-+  $as_echo "$as_me:$LINENO: \$? = $ac_status" >&5
-+  (exit $ac_status); }; then
-+  pkg_cv_ALSA_LIBS=`$PKG_CONFIG --libs "alsa >= 0.9.0" 2>/dev/null`
-+else
-+  pkg_failed=yes
-+fi
-+    fi
-+else
-+	pkg_failed=untried
-+fi
-+
-+
-+
-+if test $pkg_failed = yes; then
-+
-+if $PKG_CONFIG --atleast-pkgconfig-version 0.20; then
-+        _pkg_short_errors_supported=yes
-+else
-+        _pkg_short_errors_supported=no
-+fi
-+        if test $_pkg_short_errors_supported = yes; then
-+	        ALSA_PKG_ERRORS=`$PKG_CONFIG --short-errors --errors-to-stdout --print-errors "alsa >= 0.9.0"`
-+        else
-+	        ALSA_PKG_ERRORS=`$PKG_CONFIG --errors-to-stdout --print-errors "alsa >= 0.9.0"`
-+        fi
-+	# Put the nasty error message in config.log where it belongs
-+	echo "$ALSA_PKG_ERRORS" >&5
-+
-+	{ $as_echo "$as_me:$LINENO: result: no" >&5
-+$as_echo "no" >&6; }
-+                { $as_echo "$as_me:$LINENO: result: disabled" >&5
-+$as_echo "disabled" >&6; }
-+elif test $pkg_failed = untried; then
-+	{ $as_echo "$as_me:$LINENO: result: disabled" >&5
-+$as_echo "disabled" >&6; }
-+else
-+	ALSA_CFLAGS=$pkg_cv_ALSA_CFLAGS
-+	ALSA_LIBS=$pkg_cv_ALSA_LIBS
-+        { $as_echo "$as_me:$LINENO: result: yes" >&5
-+$as_echo "yes" >&6; }
-+	have_alsa=yes
-+fi
-+  fi
-+
-+
-+
-+fi
-+
-+ if test x"$have_alsa" = "xyes"; then
-+  HAVE_ALSA_TRUE=
-+  HAVE_ALSA_FALSE='#'
-+else
-+  HAVE_ALSA_TRUE='#'
-+  HAVE_ALSA_FALSE=
-+fi
- 
- 
- # ---------------------------------------------------------------------------
-@@ -21485,7 +21858,7 @@
- fi
- 
- 
--ac_config_files="$ac_config_files Makefile gnome-settings-daemon/Makefile plugins/Makefile plugins/a11y-keyboard/Makefile plugins/background/Makefile plugins/clipboard/Makefile plugins/common/Makefile plugins/dummy/Makefile plugins/font/Makefile plugins/housekeeping/Makefile plugins/keybindings/Makefile plugins/keyboard/Makefile plugins/media-keys/Makefile plugins/media-keys/cut-n-paste/Makefile plugins/mouse/Makefile plugins/screensaver/Makefile plugins/sound/Makefile plugins/typing-break/Makefile plugins/xrandr/Makefile plugins/xrdb/Makefile plugins/xrdb/data/Makefile plugins/xsettings/Makefile data/Makefile data/gnome-settings-daemon.desktop.in data/gnome-settings-daemon.pc data/gnome-settings-daemon-uninstalled.pc po/Makefile.in"
-+ac_config_files="$ac_config_files Makefile gnome-settings-daemon/Makefile plugins/Makefile plugins/a11y-keyboard/Makefile plugins/background/Makefile plugins/clipboard/Makefile plugins/common/Makefile plugins/dummy/Makefile plugins/font/Makefile plugins/housekeeping/Makefile plugins/keybindings/Makefile plugins/keyboard/Makefile plugins/media-keys/Makefile plugins/media-keys/actions/Makefile plugins/mouse/Makefile plugins/screensaver/Makefile plugins/sound/Makefile plugins/typing-break/Makefile plugins/xrandr/Makefile plugins/xrdb/Makefile plugins/xrdb/data/Makefile plugins/xsettings/Makefile data/Makefile data/gnome-settings-daemon.desktop.in data/gnome-settings-daemon.pc data/gnome-settings-daemon-uninstalled.pc po/Makefile.in"
- 
- cat >confcache <<\_ACEOF
- # This file is a shell script that caches the results of configure
-@@ -21637,10 +22010,24 @@
- Usually this means the macro was only invoked conditionally." >&2;}
-    { (exit 1); exit 1; }; }
- fi
--if test -z "${HAVE_PULSE_TRUE}" && test -z "${HAVE_PULSE_FALSE}"; then
--  { { $as_echo "$as_me:$LINENO: error: conditional \"HAVE_PULSE\" was never defined.
-+if test -z "${HAVE_GSTREAMER_TRUE}" && test -z "${HAVE_GSTREAMER_FALSE}"; then
-+  { { $as_echo "$as_me:$LINENO: error: conditional \"HAVE_GSTREAMER\" was never defined.
-+Usually this means the macro was only invoked conditionally." >&5
-+$as_echo "$as_me: error: conditional \"HAVE_GSTREAMER\" was never defined.
-+Usually this means the macro was only invoked conditionally." >&2;}
-+   { (exit 1); exit 1; }; }
-+fi
-+if test -z "${HAVE_OSS_TRUE}" && test -z "${HAVE_OSS_FALSE}"; then
-+  { { $as_echo "$as_me:$LINENO: error: conditional \"HAVE_OSS\" was never defined.
-+Usually this means the macro was only invoked conditionally." >&5
-+$as_echo "$as_me: error: conditional \"HAVE_OSS\" was never defined.
-+Usually this means the macro was only invoked conditionally." >&2;}
-+   { (exit 1); exit 1; }; }
-+fi
-+if test -z "${HAVE_ALSA_TRUE}" && test -z "${HAVE_ALSA_FALSE}"; then
-+  { { $as_echo "$as_me:$LINENO: error: conditional \"HAVE_ALSA\" was never defined.
- Usually this means the macro was only invoked conditionally." >&5
--$as_echo "$as_me: error: conditional \"HAVE_PULSE\" was never defined.
-+$as_echo "$as_me: error: conditional \"HAVE_ALSA\" was never defined.
- Usually this means the macro was only invoked conditionally." >&2;}
-    { (exit 1); exit 1; }; }
- fi
-@@ -22521,7 +22908,7 @@
-     "plugins/keybindings/Makefile") CONFIG_FILES="$CONFIG_FILES plugins/keybindings/Makefile" ;;
-     "plugins/keyboard/Makefile") CONFIG_FILES="$CONFIG_FILES plugins/keyboard/Makefile" ;;
-     "plugins/media-keys/Makefile") CONFIG_FILES="$CONFIG_FILES plugins/media-keys/Makefile" ;;
--    "plugins/media-keys/cut-n-paste/Makefile") CONFIG_FILES="$CONFIG_FILES plugins/media-keys/cut-n-paste/Makefile" ;;
-+    "plugins/media-keys/actions/Makefile") CONFIG_FILES="$CONFIG_FILES plugins/media-keys/actions/Makefile" ;;
-     "plugins/mouse/Makefile") CONFIG_FILES="$CONFIG_FILES plugins/mouse/Makefile" ;;
-     "plugins/screensaver/Makefile") CONFIG_FILES="$CONFIG_FILES plugins/screensaver/Makefile" ;;
-     "plugins/sound/Makefile") CONFIG_FILES="$CONFIG_FILES plugins/sound/Makefile" ;;
-@@ -23190,18 +23577,28 @@
+@@ -23189,18 +23255,28 @@
  
  
    case $ac_file$ac_mode in
@@ -19606,7 +19077,7 @@ diff -Nur -x '*.orig' -x '*~' gnome-settings-daemon-2.27.1/configure gnome-setti
  $as_expr X"$mf" : 'X\(.*[^/]\)//*[^/][^/]*/*$' \| \
  	 X"$mf" : 'X\(//\)[^/]' \| \
  	 X"$mf" : 'X\(//\)$' \| \
-@@ -23224,28 +23621,28 @@
+@@ -23223,28 +23299,28 @@
  	    q
  	  }
  	  s/.*/./; q'`
@@ -19657,7 +19128,7 @@ diff -Nur -x '*.orig' -x '*~' gnome-settings-daemon-2.27.1/configure gnome-setti
  $as_expr X"$file" : 'X\(.*[^/]\)//*[^/][^/]*/*$' \| \
  	 X"$file" : 'X\(//\)[^/]' \| \
  	 X"$file" : 'X\(//\)$' \| \
-@@ -23268,7 +23665,7 @@
+@@ -23267,7 +23343,7 @@
  	    q
  	  }
  	  s/.*/./; q'`
@@ -19666,7 +19137,7 @@ diff -Nur -x '*.orig' -x '*~' gnome-settings-daemon-2.27.1/configure gnome-setti
    case $as_dir in #(
    -*) as_dir=./$as_dir;;
    esac
-@@ -23309,10 +23706,11 @@
+@@ -23308,10 +23384,11 @@
    } || test -d "$as_dir" || { { $as_echo "$as_me:$LINENO: error: cannot create directory $as_dir" >&5
  $as_echo "$as_me: error: cannot create directory $as_dir" >&2;}
     { (exit 1); exit 1; }; }; }
@@ -19681,34 +19152,16 @@ diff -Nur -x '*.orig' -x '*~' gnome-settings-daemon-2.27.1/configure gnome-setti
   ;;
      "libtool":C)
  
-diff -Nur -x '*.orig' -x '*~' gnome-settings-daemon-2.27.1/data/Makefile.in gnome-settings-daemon-2.27.1.new/data/Makefile.in
---- gnome-settings-daemon-2.27.1/data/Makefile.in	2009-05-04 10:42:48.000000000 +0200
-+++ gnome-settings-daemon-2.27.1.new/data/Makefile.in	2009-05-11 17:33:41.000000000 +0200
+diff -Nur -x '*.orig' -x '*~' gnome-settings-daemon-2.27.4/data/Makefile.in gnome-settings-daemon-2.27.4.new/data/Makefile.in
+--- gnome-settings-daemon-2.27.4/data/Makefile.in	2009-07-14 12:46:26.000000000 +0100
++++ gnome-settings-daemon-2.27.4.new/data/Makefile.in	2009-07-20 00:11:03.660823797 +0100
 @@ -1,4 +1,4 @@
 -# Makefile.in generated by automake 1.10.1 from Makefile.am.
 +# Makefile.in generated by automake 1.10.2 from Makefile.am.
  # @configure_input@
  
  # Copyright (C) 1994, 1995, 1996, 1997, 1998, 1999, 2000, 2001, 2002,
-@@ -67,6 +67,8 @@
- DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
- ACLOCAL = @ACLOCAL@
- ALL_LINGUAS = @ALL_LINGUAS@
-+ALSA_CFLAGS = @ALSA_CFLAGS@
-+ALSA_LIBS = @ALSA_LIBS@
- AMTAR = @AMTAR@
- AR = @AR@
- AUTOCONF = @AUTOCONF@
-@@ -113,6 +115,8 @@
- GREP = @GREP@
- GSD_INTLTOOL_PLUGIN_RULE = @GSD_INTLTOOL_PLUGIN_RULE@
- GSD_PLUGIN_LDFLAGS = @GSD_PLUGIN_LDFLAGS@
-+GST_CFLAGS = @GST_CFLAGS@
-+GST_LIBS = @GST_LIBS@
- INSTALL = @INSTALL@
- INSTALL_DATA = @INSTALL_DATA@
- INSTALL_PROGRAM = @INSTALL_PROGRAM@
-@@ -287,8 +291,8 @@
+@@ -287,8 +287,8 @@
  	@for dep in $?; do \
  	  case '$(am__configure_deps)' in \
  	    *$$dep*) \
@@ -19719,34 +19172,16 @@ diff -Nur -x '*.orig' -x '*~' gnome-settings-daemon-2.27.1/data/Makefile.in gnom
  	      exit 1;; \
  	  esac; \
  	done; \
-diff -Nur -x '*.orig' -x '*~' gnome-settings-daemon-2.27.1/gnome-settings-daemon/Makefile.in gnome-settings-daemon-2.27.1.new/gnome-settings-daemon/Makefile.in
---- gnome-settings-daemon-2.27.1/gnome-settings-daemon/Makefile.in	2009-05-04 10:42:49.000000000 +0200
-+++ gnome-settings-daemon-2.27.1.new/gnome-settings-daemon/Makefile.in	2009-05-11 17:33:41.000000000 +0200
+diff -Nur -x '*.orig' -x '*~' gnome-settings-daemon-2.27.4/gnome-settings-daemon/Makefile.in gnome-settings-daemon-2.27.4.new/gnome-settings-daemon/Makefile.in
+--- gnome-settings-daemon-2.27.4/gnome-settings-daemon/Makefile.in	2009-07-14 12:46:27.000000000 +0100
++++ gnome-settings-daemon-2.27.4.new/gnome-settings-daemon/Makefile.in	2009-07-20 00:11:03.828824470 +0100
 @@ -1,4 +1,4 @@
 -# Makefile.in generated by automake 1.10.1 from Makefile.am.
 +# Makefile.in generated by automake 1.10.2 from Makefile.am.
  # @configure_input@
  
  # Copyright (C) 1994, 1995, 1996, 1997, 1998, 1999, 2000, 2001, 2002,
-@@ -102,6 +102,8 @@
- DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
- ACLOCAL = @ACLOCAL@
- ALL_LINGUAS = @ALL_LINGUAS@
-+ALSA_CFLAGS = @ALSA_CFLAGS@
-+ALSA_LIBS = @ALSA_LIBS@
- AMTAR = @AMTAR@
- AR = @AR@
- AUTOCONF = @AUTOCONF@
-@@ -148,6 +150,8 @@
- GREP = @GREP@
- GSD_INTLTOOL_PLUGIN_RULE = @GSD_INTLTOOL_PLUGIN_RULE@
- GSD_PLUGIN_LDFLAGS = @GSD_PLUGIN_LDFLAGS@
-+GST_CFLAGS = @GST_CFLAGS@
-+GST_LIBS = @GST_LIBS@
- INSTALL = @INSTALL@
- INSTALL_DATA = @INSTALL_DATA@
- INSTALL_PROGRAM = @INSTALL_PROGRAM@
-@@ -362,8 +366,8 @@
+@@ -362,8 +362,8 @@
  	@for dep in $?; do \
  	  case '$(am__configure_deps)' in \
  	    *$$dep*) \
@@ -19757,7 +19192,7 @@ diff -Nur -x '*.orig' -x '*~' gnome-settings-daemon-2.27.1/gnome-settings-daemon
  	      exit 1;; \
  	  esac; \
  	done; \
-@@ -569,7 +573,7 @@
+@@ -569,7 +569,7 @@
  	unique=`for i in $$list; do \
  	    if test -f "$$i"; then echo $$i; else echo $(srcdir)/$$i; fi; \
  	  done | \
@@ -19766,34 +19201,16 @@ diff -Nur -x '*.orig' -x '*~' gnome-settings-daemon-2.27.1/gnome-settings-daemon
  	      END { if (nonempty) { for (i in files) print i; }; }'`; \
  	mkid -fID $$unique
  tags: TAGS
-diff -Nur -x '*.orig' -x '*~' gnome-settings-daemon-2.27.1/Makefile.in gnome-settings-daemon-2.27.1.new/Makefile.in
---- gnome-settings-daemon-2.27.1/Makefile.in	2009-05-04 10:42:52.000000000 +0200
-+++ gnome-settings-daemon-2.27.1.new/Makefile.in	2009-05-11 17:33:43.000000000 +0200
+diff -Nur -x '*.orig' -x '*~' gnome-settings-daemon-2.27.4/Makefile.in gnome-settings-daemon-2.27.4.new/Makefile.in
+--- gnome-settings-daemon-2.27.4/Makefile.in	2009-07-14 12:46:33.000000000 +0100
++++ gnome-settings-daemon-2.27.4.new/Makefile.in	2009-07-20 00:11:06.004822346 +0100
 @@ -1,4 +1,4 @@
 -# Makefile.in generated by automake 1.10.1 from Makefile.am.
 +# Makefile.in generated by automake 1.10.2 from Makefile.am.
  # @configure_input@
  
  # Copyright (C) 1994, 1995, 1996, 1997, 1998, 1999, 2000, 2001, 2002,
-@@ -74,6 +74,8 @@
- distcleancheck_listfiles = find . -type f -print
- ACLOCAL = @ACLOCAL@
- ALL_LINGUAS = @ALL_LINGUAS@
-+ALSA_CFLAGS = @ALSA_CFLAGS@
-+ALSA_LIBS = @ALSA_LIBS@
- AMTAR = @AMTAR@
- AR = @AR@
- AUTOCONF = @AUTOCONF@
-@@ -120,6 +122,8 @@
- GREP = @GREP@
- GSD_INTLTOOL_PLUGIN_RULE = @GSD_INTLTOOL_PLUGIN_RULE@
- GSD_PLUGIN_LDFLAGS = @GSD_PLUGIN_LDFLAGS@
-+GST_CFLAGS = @GST_CFLAGS@
-+GST_LIBS = @GST_LIBS@
- INSTALL = @INSTALL@
- INSTALL_DATA = @INSTALL_DATA@
- INSTALL_PROGRAM = @INSTALL_PROGRAM@
-@@ -324,7 +328,7 @@
+@@ -324,7 +324,7 @@
  	-rm -rf .libs _libs
  
  distclean-libtool:
@@ -19802,7 +19219,7 @@ diff -Nur -x '*.orig' -x '*~' gnome-settings-daemon-2.27.1/Makefile.in gnome-set
  
  # This directory's subdirectories are mostly independent; you can cd
  # into them and run `make' without going through this Makefile.
-@@ -401,7 +405,7 @@
+@@ -401,7 +401,7 @@
  	unique=`for i in $$list; do \
  	    if test -f "$$i"; then echo $$i; else echo $(srcdir)/$$i; fi; \
  	  done | \
@@ -19811,34 +19228,16 @@ diff -Nur -x '*.orig' -x '*~' gnome-settings-daemon-2.27.1/Makefile.in gnome-set
  	      END { if (nonempty) { for (i in files) print i; }; }'`; \
  	mkid -fID $$unique
  tags: TAGS
-diff -Nur -x '*.orig' -x '*~' gnome-settings-daemon-2.27.1/plugins/a11y-keyboard/Makefile.in gnome-settings-daemon-2.27.1.new/plugins/a11y-keyboard/Makefile.in
---- gnome-settings-daemon-2.27.1/plugins/a11y-keyboard/Makefile.in	2009-05-04 10:42:49.000000000 +0200
-+++ gnome-settings-daemon-2.27.1.new/plugins/a11y-keyboard/Makefile.in	2009-05-11 17:33:41.000000000 +0200
+diff -Nur -x '*.orig' -x '*~' gnome-settings-daemon-2.27.4/plugins/a11y-keyboard/Makefile.in gnome-settings-daemon-2.27.4.new/plugins/a11y-keyboard/Makefile.in
+--- gnome-settings-daemon-2.27.4/plugins/a11y-keyboard/Makefile.in	2009-07-14 12:46:27.000000000 +0100
++++ gnome-settings-daemon-2.27.4.new/plugins/a11y-keyboard/Makefile.in	2009-07-20 00:11:04.068824728 +0100
 @@ -1,4 +1,4 @@
 -# Makefile.in generated by automake 1.10.1 from Makefile.am.
 +# Makefile.in generated by automake 1.10.2 from Makefile.am.
  # @configure_input@
  
  # Copyright (C) 1994, 1995, 1996, 1997, 1998, 1999, 2000, 2001, 2002,
-@@ -108,6 +108,8 @@
- DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
- ACLOCAL = @ACLOCAL@
- ALL_LINGUAS = @ALL_LINGUAS@
-+ALSA_CFLAGS = @ALSA_CFLAGS@
-+ALSA_LIBS = @ALSA_LIBS@
- AMTAR = @AMTAR@
- AR = @AR@
- AUTOCONF = @AUTOCONF@
-@@ -154,6 +156,8 @@
- GREP = @GREP@
- GSD_INTLTOOL_PLUGIN_RULE = @GSD_INTLTOOL_PLUGIN_RULE@
- GSD_PLUGIN_LDFLAGS = @GSD_PLUGIN_LDFLAGS@
-+GST_CFLAGS = @GST_CFLAGS@
-+GST_LIBS = @GST_LIBS@
- INSTALL = @INSTALL@
- INSTALL_DATA = @INSTALL_DATA@
- INSTALL_PROGRAM = @INSTALL_PROGRAM@
-@@ -367,8 +371,8 @@
+@@ -367,8 +367,8 @@
  	@for dep in $?; do \
  	  case '$(am__configure_deps)' in \
  	    *$$dep*) \
@@ -19849,7 +19248,7 @@ diff -Nur -x '*.orig' -x '*~' gnome-settings-daemon-2.27.1/plugins/a11y-keyboard
  	      exit 1;; \
  	  esac; \
  	done; \
-@@ -559,7 +563,7 @@
+@@ -559,7 +559,7 @@
  	unique=`for i in $$list; do \
  	    if test -f "$$i"; then echo $$i; else echo $(srcdir)/$$i; fi; \
  	  done | \
@@ -19858,34 +19257,16 @@ diff -Nur -x '*.orig' -x '*~' gnome-settings-daemon-2.27.1/plugins/a11y-keyboard
  	      END { if (nonempty) { for (i in files) print i; }; }'`; \
  	mkid -fID $$unique
  tags: TAGS
-diff -Nur -x '*.orig' -x '*~' gnome-settings-daemon-2.27.1/plugins/background/Makefile.in gnome-settings-daemon-2.27.1.new/plugins/background/Makefile.in
---- gnome-settings-daemon-2.27.1/plugins/background/Makefile.in	2009-05-04 10:42:49.000000000 +0200
-+++ gnome-settings-daemon-2.27.1.new/plugins/background/Makefile.in	2009-05-11 17:33:41.000000000 +0200
+diff -Nur -x '*.orig' -x '*~' gnome-settings-daemon-2.27.4/plugins/background/Makefile.in gnome-settings-daemon-2.27.4.new/plugins/background/Makefile.in
+--- gnome-settings-daemon-2.27.4/plugins/background/Makefile.in	2009-07-14 12:46:28.000000000 +0100
++++ gnome-settings-daemon-2.27.4.new/plugins/background/Makefile.in	2009-07-20 00:11:04.188822488 +0100
 @@ -1,4 +1,4 @@
 -# Makefile.in generated by automake 1.10.1 from Makefile.am.
 +# Makefile.in generated by automake 1.10.2 from Makefile.am.
  # @configure_input@
  
  # Copyright (C) 1994, 1995, 1996, 1997, 1998, 1999, 2000, 2001, 2002,
-@@ -99,6 +99,8 @@
- DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
- ACLOCAL = @ACLOCAL@
- ALL_LINGUAS = @ALL_LINGUAS@
-+ALSA_CFLAGS = @ALSA_CFLAGS@
-+ALSA_LIBS = @ALSA_LIBS@
- AMTAR = @AMTAR@
- AR = @AR@
- AUTOCONF = @AUTOCONF@
-@@ -145,6 +147,8 @@
- GREP = @GREP@
- GSD_INTLTOOL_PLUGIN_RULE = @GSD_INTLTOOL_PLUGIN_RULE@
- GSD_PLUGIN_LDFLAGS = @GSD_PLUGIN_LDFLAGS@
-+GST_CFLAGS = @GST_CFLAGS@
-+GST_LIBS = @GST_LIBS@
- INSTALL = @INSTALL@
- INSTALL_DATA = @INSTALL_DATA@
- INSTALL_PROGRAM = @INSTALL_PROGRAM@
-@@ -345,8 +349,8 @@
+@@ -345,8 +345,8 @@
  	@for dep in $?; do \
  	  case '$(am__configure_deps)' in \
  	    *$$dep*) \
@@ -19896,7 +19277,7 @@ diff -Nur -x '*.orig' -x '*~' gnome-settings-daemon-2.27.1/plugins/background/Ma
  	      exit 1;; \
  	  esac; \
  	done; \
-@@ -512,7 +516,7 @@
+@@ -512,7 +512,7 @@
  	unique=`for i in $$list; do \
  	    if test -f "$$i"; then echo $$i; else echo $(srcdir)/$$i; fi; \
  	  done | \
@@ -19905,34 +19286,16 @@ diff -Nur -x '*.orig' -x '*~' gnome-settings-daemon-2.27.1/plugins/background/Ma
  	      END { if (nonempty) { for (i in files) print i; }; }'`; \
  	mkid -fID $$unique
  tags: TAGS
-diff -Nur -x '*.orig' -x '*~' gnome-settings-daemon-2.27.1/plugins/clipboard/Makefile.in gnome-settings-daemon-2.27.1.new/plugins/clipboard/Makefile.in
---- gnome-settings-daemon-2.27.1/plugins/clipboard/Makefile.in	2009-05-04 10:42:49.000000000 +0200
-+++ gnome-settings-daemon-2.27.1.new/plugins/clipboard/Makefile.in	2009-05-11 17:33:41.000000000 +0200
+diff -Nur -x '*.orig' -x '*~' gnome-settings-daemon-2.27.4/plugins/clipboard/Makefile.in gnome-settings-daemon-2.27.4.new/plugins/clipboard/Makefile.in
+--- gnome-settings-daemon-2.27.4/plugins/clipboard/Makefile.in	2009-07-14 12:46:28.000000000 +0100
++++ gnome-settings-daemon-2.27.4.new/plugins/clipboard/Makefile.in	2009-07-20 00:11:04.296825115 +0100
 @@ -1,4 +1,4 @@
 -# Makefile.in generated by automake 1.10.1 from Makefile.am.
 +# Makefile.in generated by automake 1.10.2 from Makefile.am.
  # @configure_input@
  
  # Copyright (C) 1994, 1995, 1996, 1997, 1998, 1999, 2000, 2001, 2002,
-@@ -85,6 +85,8 @@
- DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
- ACLOCAL = @ACLOCAL@
- ALL_LINGUAS = @ALL_LINGUAS@
-+ALSA_CFLAGS = @ALSA_CFLAGS@
-+ALSA_LIBS = @ALSA_LIBS@
- AMTAR = @AMTAR@
- AR = @AR@
- AUTOCONF = @AUTOCONF@
-@@ -131,6 +133,8 @@
- GREP = @GREP@
- GSD_INTLTOOL_PLUGIN_RULE = @GSD_INTLTOOL_PLUGIN_RULE@
- GSD_PLUGIN_LDFLAGS = @GSD_PLUGIN_LDFLAGS@
-+GST_CFLAGS = @GST_CFLAGS@
-+GST_LIBS = @GST_LIBS@
- INSTALL = @INSTALL@
- INSTALL_DATA = @INSTALL_DATA@
- INSTALL_PROGRAM = @INSTALL_PROGRAM@
-@@ -314,8 +318,8 @@
+@@ -314,8 +314,8 @@
  	@for dep in $?; do \
  	  case '$(am__configure_deps)' in \
  	    *$$dep*) \
@@ -19943,7 +19306,7 @@ diff -Nur -x '*.orig' -x '*~' gnome-settings-daemon-2.27.1/plugins/clipboard/Mak
  	      exit 1;; \
  	  esac; \
  	done; \
-@@ -457,7 +461,7 @@
+@@ -457,7 +457,7 @@
  	unique=`for i in $$list; do \
  	    if test -f "$$i"; then echo $$i; else echo $(srcdir)/$$i; fi; \
  	  done | \
@@ -19952,34 +19315,16 @@ diff -Nur -x '*.orig' -x '*~' gnome-settings-daemon-2.27.1/plugins/clipboard/Mak
  	      END { if (nonempty) { for (i in files) print i; }; }'`; \
  	mkid -fID $$unique
  tags: TAGS
-diff -Nur -x '*.orig' -x '*~' gnome-settings-daemon-2.27.1/plugins/common/Makefile.in gnome-settings-daemon-2.27.1.new/plugins/common/Makefile.in
---- gnome-settings-daemon-2.27.1/plugins/common/Makefile.in	2009-05-04 10:42:49.000000000 +0200
-+++ gnome-settings-daemon-2.27.1.new/plugins/common/Makefile.in	2009-05-11 17:33:42.000000000 +0200
+diff -Nur -x '*.orig' -x '*~' gnome-settings-daemon-2.27.4/plugins/common/Makefile.in gnome-settings-daemon-2.27.4.new/plugins/common/Makefile.in
+--- gnome-settings-daemon-2.27.4/plugins/common/Makefile.in	2009-07-14 12:46:28.000000000 +0100
++++ gnome-settings-daemon-2.27.4.new/plugins/common/Makefile.in	2009-07-20 00:11:04.392824497 +0100
 @@ -1,4 +1,4 @@
 -# Makefile.in generated by automake 1.10.1 from Makefile.am.
 +# Makefile.in generated by automake 1.10.2 from Makefile.am.
  # @configure_input@
  
  # Copyright (C) 1994, 1995, 1996, 1997, 1998, 1999, 2000, 2001, 2002,
-@@ -70,6 +70,8 @@
- DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
- ACLOCAL = @ACLOCAL@
- ALL_LINGUAS = @ALL_LINGUAS@
-+ALSA_CFLAGS = @ALSA_CFLAGS@
-+ALSA_LIBS = @ALSA_LIBS@
- AMTAR = @AMTAR@
- AR = @AR@
- AUTOCONF = @AUTOCONF@
-@@ -116,6 +118,8 @@
- GREP = @GREP@
- GSD_INTLTOOL_PLUGIN_RULE = @GSD_INTLTOOL_PLUGIN_RULE@
- GSD_PLUGIN_LDFLAGS = @GSD_PLUGIN_LDFLAGS@
-+GST_CFLAGS = @GST_CFLAGS@
-+GST_LIBS = @GST_LIBS@
- INSTALL = @INSTALL@
- INSTALL_DATA = @INSTALL_DATA@
- INSTALL_PROGRAM = @INSTALL_PROGRAM@
-@@ -269,8 +273,8 @@
+@@ -269,8 +269,8 @@
  	@for dep in $?; do \
  	  case '$(am__configure_deps)' in \
  	    *$$dep*) \
@@ -19990,7 +19335,7 @@ diff -Nur -x '*.orig' -x '*~' gnome-settings-daemon-2.27.1/plugins/common/Makefi
  	      exit 1;; \
  	  esac; \
  	done; \
-@@ -361,7 +365,7 @@
+@@ -361,7 +361,7 @@
  	unique=`for i in $$list; do \
  	    if test -f "$$i"; then echo $$i; else echo $(srcdir)/$$i; fi; \
  	  done | \
@@ -19999,34 +19344,16 @@ diff -Nur -x '*.orig' -x '*~' gnome-settings-daemon-2.27.1/plugins/common/Makefi
  	      END { if (nonempty) { for (i in files) print i; }; }'`; \
  	mkid -fID $$unique
  tags: TAGS
-diff -Nur -x '*.orig' -x '*~' gnome-settings-daemon-2.27.1/plugins/dummy/Makefile.in gnome-settings-daemon-2.27.1.new/plugins/dummy/Makefile.in
---- gnome-settings-daemon-2.27.1/plugins/dummy/Makefile.in	2009-05-04 10:42:50.000000000 +0200
-+++ gnome-settings-daemon-2.27.1.new/plugins/dummy/Makefile.in	2009-05-11 17:33:42.000000000 +0200
+diff -Nur -x '*.orig' -x '*~' gnome-settings-daemon-2.27.4/plugins/dummy/Makefile.in gnome-settings-daemon-2.27.4.new/plugins/dummy/Makefile.in
+--- gnome-settings-daemon-2.27.4/plugins/dummy/Makefile.in	2009-07-14 12:46:29.000000000 +0100
++++ gnome-settings-daemon-2.27.4.new/plugins/dummy/Makefile.in	2009-07-20 00:11:04.492824489 +0100
 @@ -1,4 +1,4 @@
 -# Makefile.in generated by automake 1.10.1 from Makefile.am.
 +# Makefile.in generated by automake 1.10.2 from Makefile.am.
  # @configure_input@
  
  # Copyright (C) 1994, 1995, 1996, 1997, 1998, 1999, 2000, 2001, 2002,
-@@ -81,6 +81,8 @@
- DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
- ACLOCAL = @ACLOCAL@
- ALL_LINGUAS = @ALL_LINGUAS@
-+ALSA_CFLAGS = @ALSA_CFLAGS@
-+ALSA_LIBS = @ALSA_LIBS@
- AMTAR = @AMTAR@
- AR = @AR@
- AUTOCONF = @AUTOCONF@
-@@ -127,6 +129,8 @@
- GREP = @GREP@
- GSD_INTLTOOL_PLUGIN_RULE = @GSD_INTLTOOL_PLUGIN_RULE@
- GSD_PLUGIN_LDFLAGS = @GSD_PLUGIN_LDFLAGS@
-+GST_CFLAGS = @GST_CFLAGS@
-+GST_LIBS = @GST_LIBS@
- INSTALL = @INSTALL@
- INSTALL_DATA = @INSTALL_DATA@
- INSTALL_PROGRAM = @INSTALL_PROGRAM@
-@@ -297,8 +301,8 @@
+@@ -297,8 +297,8 @@
  	@for dep in $?; do \
  	  case '$(am__configure_deps)' in \
  	    *$$dep*) \
@@ -20037,7 +19364,7 @@ diff -Nur -x '*.orig' -x '*~' gnome-settings-daemon-2.27.1/plugins/dummy/Makefil
  	      exit 1;; \
  	  esac; \
  	done; \
-@@ -424,7 +428,7 @@
+@@ -424,7 +424,7 @@
  	unique=`for i in $$list; do \
  	    if test -f "$$i"; then echo $$i; else echo $(srcdir)/$$i; fi; \
  	  done | \
@@ -20046,34 +19373,16 @@ diff -Nur -x '*.orig' -x '*~' gnome-settings-daemon-2.27.1/plugins/dummy/Makefil
  	      END { if (nonempty) { for (i in files) print i; }; }'`; \
  	mkid -fID $$unique
  tags: TAGS
-diff -Nur -x '*.orig' -x '*~' gnome-settings-daemon-2.27.1/plugins/font/Makefile.in gnome-settings-daemon-2.27.1.new/plugins/font/Makefile.in
---- gnome-settings-daemon-2.27.1/plugins/font/Makefile.in	2009-05-04 10:42:50.000000000 +0200
-+++ gnome-settings-daemon-2.27.1.new/plugins/font/Makefile.in	2009-05-11 17:33:42.000000000 +0200
+diff -Nur -x '*.orig' -x '*~' gnome-settings-daemon-2.27.4/plugins/font/Makefile.in gnome-settings-daemon-2.27.4.new/plugins/font/Makefile.in
+--- gnome-settings-daemon-2.27.4/plugins/font/Makefile.in	2009-07-14 12:46:29.000000000 +0100
++++ gnome-settings-daemon-2.27.4.new/plugins/font/Makefile.in	2009-07-20 00:11:04.600824586 +0100
 @@ -1,4 +1,4 @@
 -# Makefile.in generated by automake 1.10.1 from Makefile.am.
 +# Makefile.in generated by automake 1.10.2 from Makefile.am.
  # @configure_input@
  
  # Copyright (C) 1994, 1995, 1996, 1997, 1998, 1999, 2000, 2001, 2002,
-@@ -83,6 +83,8 @@
- DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
- ACLOCAL = @ACLOCAL@
- ALL_LINGUAS = @ALL_LINGUAS@
-+ALSA_CFLAGS = @ALSA_CFLAGS@
-+ALSA_LIBS = @ALSA_LIBS@
- AMTAR = @AMTAR@
- AR = @AR@
- AUTOCONF = @AUTOCONF@
-@@ -129,6 +131,8 @@
- GREP = @GREP@
- GSD_INTLTOOL_PLUGIN_RULE = @GSD_INTLTOOL_PLUGIN_RULE@
- GSD_PLUGIN_LDFLAGS = @GSD_PLUGIN_LDFLAGS@
-+GST_CFLAGS = @GST_CFLAGS@
-+GST_LIBS = @GST_LIBS@
- INSTALL = @INSTALL@
- INSTALL_DATA = @INSTALL_DATA@
- INSTALL_PROGRAM = @INSTALL_PROGRAM@
-@@ -310,8 +314,8 @@
+@@ -310,8 +310,8 @@
  	@for dep in $?; do \
  	  case '$(am__configure_deps)' in \
  	    *$$dep*) \
@@ -20084,7 +19393,7 @@ diff -Nur -x '*.orig' -x '*~' gnome-settings-daemon-2.27.1/plugins/font/Makefile
  	      exit 1;; \
  	  esac; \
  	done; \
-@@ -445,7 +449,7 @@
+@@ -445,7 +445,7 @@
  	unique=`for i in $$list; do \
  	    if test -f "$$i"; then echo $$i; else echo $(srcdir)/$$i; fi; \
  	  done | \
@@ -20093,34 +19402,16 @@ diff -Nur -x '*.orig' -x '*~' gnome-settings-daemon-2.27.1/plugins/font/Makefile
  	      END { if (nonempty) { for (i in files) print i; }; }'`; \
  	mkid -fID $$unique
  tags: TAGS
-diff -Nur -x '*.orig' -x '*~' gnome-settings-daemon-2.27.1/plugins/housekeeping/Makefile.in gnome-settings-daemon-2.27.1.new/plugins/housekeeping/Makefile.in
---- gnome-settings-daemon-2.27.1/plugins/housekeeping/Makefile.in	2009-05-04 10:42:50.000000000 +0200
-+++ gnome-settings-daemon-2.27.1.new/plugins/housekeeping/Makefile.in	2009-05-11 17:33:42.000000000 +0200
+diff -Nur -x '*.orig' -x '*~' gnome-settings-daemon-2.27.4/plugins/housekeeping/Makefile.in gnome-settings-daemon-2.27.4.new/plugins/housekeeping/Makefile.in
+--- gnome-settings-daemon-2.27.4/plugins/housekeeping/Makefile.in	2009-07-14 12:46:29.000000000 +0100
++++ gnome-settings-daemon-2.27.4.new/plugins/housekeeping/Makefile.in	2009-07-20 00:11:04.704824642 +0100
 @@ -1,4 +1,4 @@
 -# Makefile.in generated by automake 1.10.1 from Makefile.am.
 +# Makefile.in generated by automake 1.10.2 from Makefile.am.
  # @configure_input@
  
  # Copyright (C) 1994, 1995, 1996, 1997, 1998, 1999, 2000, 2001, 2002,
-@@ -84,6 +84,8 @@
- DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
- ACLOCAL = @ACLOCAL@
- ALL_LINGUAS = @ALL_LINGUAS@
-+ALSA_CFLAGS = @ALSA_CFLAGS@
-+ALSA_LIBS = @ALSA_LIBS@
- AMTAR = @AMTAR@
- AR = @AR@
- AUTOCONF = @AUTOCONF@
-@@ -130,6 +132,8 @@
- GREP = @GREP@
- GSD_INTLTOOL_PLUGIN_RULE = @GSD_INTLTOOL_PLUGIN_RULE@
- GSD_PLUGIN_LDFLAGS = @GSD_PLUGIN_LDFLAGS@
-+GST_CFLAGS = @GST_CFLAGS@
-+GST_LIBS = @GST_LIBS@
- INSTALL = @INSTALL@
- INSTALL_DATA = @INSTALL_DATA@
- INSTALL_PROGRAM = @INSTALL_PROGRAM@
-@@ -290,8 +294,8 @@
+@@ -290,8 +290,8 @@
  	@for dep in $?; do \
  	  case '$(am__configure_deps)' in \
  	    *$$dep*) \
@@ -20131,7 +19422,7 @@ diff -Nur -x '*.orig' -x '*~' gnome-settings-daemon-2.27.1/plugins/housekeeping/
  	      exit 1;; \
  	  esac; \
  	done; \
-@@ -425,7 +429,7 @@
+@@ -425,7 +425,7 @@
  	unique=`for i in $$list; do \
  	    if test -f "$$i"; then echo $$i; else echo $(srcdir)/$$i; fi; \
  	  done | \
@@ -20140,34 +19431,16 @@ diff -Nur -x '*.orig' -x '*~' gnome-settings-daemon-2.27.1/plugins/housekeeping/
  	      END { if (nonempty) { for (i in files) print i; }; }'`; \
  	mkid -fID $$unique
  tags: TAGS
-diff -Nur -x '*.orig' -x '*~' gnome-settings-daemon-2.27.1/plugins/keybindings/Makefile.in gnome-settings-daemon-2.27.1.new/plugins/keybindings/Makefile.in
---- gnome-settings-daemon-2.27.1/plugins/keybindings/Makefile.in	2009-05-04 10:42:50.000000000 +0200
-+++ gnome-settings-daemon-2.27.1.new/plugins/keybindings/Makefile.in	2009-05-11 17:33:42.000000000 +0200
+diff -Nur -x '*.orig' -x '*~' gnome-settings-daemon-2.27.4/plugins/keybindings/Makefile.in gnome-settings-daemon-2.27.4.new/plugins/keybindings/Makefile.in
+--- gnome-settings-daemon-2.27.4/plugins/keybindings/Makefile.in	2009-07-14 12:46:29.000000000 +0100
++++ gnome-settings-daemon-2.27.4.new/plugins/keybindings/Makefile.in	2009-07-20 00:11:04.804824922 +0100
 @@ -1,4 +1,4 @@
 -# Makefile.in generated by automake 1.10.1 from Makefile.am.
 +# Makefile.in generated by automake 1.10.2 from Makefile.am.
  # @configure_input@
  
  # Copyright (C) 1994, 1995, 1996, 1997, 1998, 1999, 2000, 2001, 2002,
-@@ -86,6 +86,8 @@
- DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
- ACLOCAL = @ACLOCAL@
- ALL_LINGUAS = @ALL_LINGUAS@
-+ALSA_CFLAGS = @ALSA_CFLAGS@
-+ALSA_LIBS = @ALSA_LIBS@
- AMTAR = @AMTAR@
- AR = @AR@
- AUTOCONF = @AUTOCONF@
-@@ -132,6 +134,8 @@
- GREP = @GREP@
- GSD_INTLTOOL_PLUGIN_RULE = @GSD_INTLTOOL_PLUGIN_RULE@
- GSD_PLUGIN_LDFLAGS = @GSD_PLUGIN_LDFLAGS@
-+GST_CFLAGS = @GST_CFLAGS@
-+GST_LIBS = @GST_LIBS@
- INSTALL = @INSTALL@
- INSTALL_DATA = @INSTALL_DATA@
- INSTALL_PROGRAM = @INSTALL_PROGRAM@
-@@ -313,8 +317,8 @@
+@@ -313,8 +313,8 @@
  	@for dep in $?; do \
  	  case '$(am__configure_deps)' in \
  	    *$$dep*) \
@@ -20178,7 +19451,7 @@ diff -Nur -x '*.orig' -x '*~' gnome-settings-daemon-2.27.1/plugins/keybindings/M
  	      exit 1;; \
  	  esac; \
  	done; \
-@@ -440,7 +444,7 @@
+@@ -440,7 +440,7 @@
  	unique=`for i in $$list; do \
  	    if test -f "$$i"; then echo $$i; else echo $(srcdir)/$$i; fi; \
  	  done | \
@@ -20187,34 +19460,16 @@ diff -Nur -x '*.orig' -x '*~' gnome-settings-daemon-2.27.1/plugins/keybindings/M
  	      END { if (nonempty) { for (i in files) print i; }; }'`; \
  	mkid -fID $$unique
  tags: TAGS
-diff -Nur -x '*.orig' -x '*~' gnome-settings-daemon-2.27.1/plugins/keyboard/Makefile.in gnome-settings-daemon-2.27.1.new/plugins/keyboard/Makefile.in
---- gnome-settings-daemon-2.27.1/plugins/keyboard/Makefile.in	2009-05-04 10:42:50.000000000 +0200
-+++ gnome-settings-daemon-2.27.1.new/plugins/keyboard/Makefile.in	2009-05-11 17:33:42.000000000 +0200
+diff -Nur -x '*.orig' -x '*~' gnome-settings-daemon-2.27.4/plugins/keyboard/Makefile.in gnome-settings-daemon-2.27.4.new/plugins/keyboard/Makefile.in
+--- gnome-settings-daemon-2.27.4/plugins/keyboard/Makefile.in	2009-07-14 12:46:30.000000000 +0100
++++ gnome-settings-daemon-2.27.4.new/plugins/keyboard/Makefile.in	2009-07-20 00:11:04.924824637 +0100
 @@ -1,4 +1,4 @@
 -# Makefile.in generated by automake 1.10.1 from Makefile.am.
 +# Makefile.in generated by automake 1.10.2 from Makefile.am.
  # @configure_input@
  
  # Copyright (C) 1994, 1995, 1996, 1997, 1998, 1999, 2000, 2001, 2002,
-@@ -89,6 +89,8 @@
- DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
- ACLOCAL = @ACLOCAL@
- ALL_LINGUAS = @ALL_LINGUAS@
-+ALSA_CFLAGS = @ALSA_CFLAGS@
-+ALSA_LIBS = @ALSA_LIBS@
- AMTAR = @AMTAR@
- AR = @AR@
- AUTOCONF = @AUTOCONF@
-@@ -135,6 +137,8 @@
- GREP = @GREP@
- GSD_INTLTOOL_PLUGIN_RULE = @GSD_INTLTOOL_PLUGIN_RULE@
- GSD_PLUGIN_LDFLAGS = @GSD_PLUGIN_LDFLAGS@
-+GST_CFLAGS = @GST_CFLAGS@
-+GST_LIBS = @GST_LIBS@
- INSTALL = @INSTALL@
- INSTALL_DATA = @INSTALL_DATA@
- INSTALL_PROGRAM = @INSTALL_PROGRAM@
-@@ -327,8 +331,8 @@
+@@ -327,8 +327,8 @@
  	@for dep in $?; do \
  	  case '$(am__configure_deps)' in \
  	    *$$dep*) \
@@ -20225,7 +19480,7 @@ diff -Nur -x '*.orig' -x '*~' gnome-settings-daemon-2.27.1/plugins/keyboard/Make
  	      exit 1;; \
  	  esac; \
  	done; \
-@@ -495,7 +499,7 @@
+@@ -495,7 +495,7 @@
  	unique=`for i in $$list; do \
  	    if test -f "$$i"; then echo $$i; else echo $(srcdir)/$$i; fi; \
  	  done | \
@@ -20234,34 +19489,16 @@ diff -Nur -x '*.orig' -x '*~' gnome-settings-daemon-2.27.1/plugins/keyboard/Make
  	      END { if (nonempty) { for (i in files) print i; }; }'`; \
  	mkid -fID $$unique
  tags: TAGS
-diff -Nur -x '*.orig' -x '*~' gnome-settings-daemon-2.27.1/plugins/Makefile.in gnome-settings-daemon-2.27.1.new/plugins/Makefile.in
---- gnome-settings-daemon-2.27.1/plugins/Makefile.in	2009-05-04 10:42:49.000000000 +0200
-+++ gnome-settings-daemon-2.27.1.new/plugins/Makefile.in	2009-05-11 17:33:41.000000000 +0200
+diff -Nur -x '*.orig' -x '*~' gnome-settings-daemon-2.27.4/plugins/Makefile.in gnome-settings-daemon-2.27.4.new/plugins/Makefile.in
+--- gnome-settings-daemon-2.27.4/plugins/Makefile.in	2009-07-14 12:46:27.000000000 +0100
++++ gnome-settings-daemon-2.27.4.new/plugins/Makefile.in	2009-07-20 00:11:03.916824298 +0100
 @@ -1,4 +1,4 @@
 -# Makefile.in generated by automake 1.10.1 from Makefile.am.
 +# Makefile.in generated by automake 1.10.2 from Makefile.am.
  # @configure_input@
  
  # Copyright (C) 1994, 1995, 1996, 1997, 1998, 1999, 2000, 2001, 2002,
-@@ -58,6 +58,8 @@
- DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
- ACLOCAL = @ACLOCAL@
- ALL_LINGUAS = @ALL_LINGUAS@
-+ALSA_CFLAGS = @ALSA_CFLAGS@
-+ALSA_LIBS = @ALSA_LIBS@
- AMTAR = @AMTAR@
- AR = @AR@
- AUTOCONF = @AUTOCONF@
-@@ -104,6 +106,8 @@
- GREP = @GREP@
- GSD_INTLTOOL_PLUGIN_RULE = @GSD_INTLTOOL_PLUGIN_RULE@
- GSD_PLUGIN_LDFLAGS = @GSD_PLUGIN_LDFLAGS@
-+GST_CFLAGS = @GST_CFLAGS@
-+GST_LIBS = @GST_LIBS@
- INSTALL = @INSTALL@
- INSTALL_DATA = @INSTALL_DATA@
- INSTALL_PROGRAM = @INSTALL_PROGRAM@
-@@ -257,8 +261,8 @@
+@@ -256,8 +256,8 @@
  	@for dep in $?; do \
  	  case '$(am__configure_deps)' in \
  	    *$$dep*) \
@@ -20272,7 +19509,7 @@ diff -Nur -x '*.orig' -x '*~' gnome-settings-daemon-2.27.1/plugins/Makefile.in g
  	      exit 1;; \
  	  esac; \
  	done; \
-@@ -364,7 +368,7 @@
+@@ -363,7 +363,7 @@
  	unique=`for i in $$list; do \
  	    if test -f "$$i"; then echo $$i; else echo $(srcdir)/$$i; fi; \
  	  done | \
@@ -20281,687 +19518,45 @@ diff -Nur -x '*.orig' -x '*~' gnome-settings-daemon-2.27.1/plugins/Makefile.in g
  	      END { if (nonempty) { for (i in files) print i; }; }'`; \
  	mkid -fID $$unique
  tags: TAGS
-diff -Nur -x '*.orig' -x '*~' gnome-settings-daemon-2.27.1/plugins/media-keys/actions/Makefile.in gnome-settings-daemon-2.27.1.new/plugins/media-keys/actions/Makefile.in
---- gnome-settings-daemon-2.27.1/plugins/media-keys/actions/Makefile.in	1970-01-01 01:00:00.000000000 +0100
-+++ gnome-settings-daemon-2.27.1.new/plugins/media-keys/actions/Makefile.in	2009-05-11 17:33:42.000000000 +0200
-@@ -0,0 +1,636 @@
-+# Makefile.in generated by automake 1.10.2 from Makefile.am.
-+# @configure_input@
-+
-+# Copyright (C) 1994, 1995, 1996, 1997, 1998, 1999, 2000, 2001, 2002,
-+# 2003, 2004, 2005, 2006, 2007, 2008  Free Software Foundation, Inc.
-+# This Makefile.in is free software; the Free Software Foundation
-+# gives unlimited permission to copy and/or distribute it,
-+# with or without modifications, as long as this notice is preserved.
-+
-+# This program is distributed in the hope that it will be useful,
-+# but WITHOUT ANY WARRANTY, to the extent permitted by law; without
-+# even the implied warranty of MERCHANTABILITY or FITNESS FOR A
-+# PARTICULAR PURPOSE.
-+
-+@SET_MAKE@
-+
-+
-+VPATH = @srcdir@
-+pkgdatadir = $(datadir)/@PACKAGE@
-+pkglibdir = $(libdir)/@PACKAGE@
-+pkgincludedir = $(includedir)/@PACKAGE@
-+am__cd = CDPATH="$${ZSH_VERSION+.}$(PATH_SEPARATOR)" && cd
-+install_sh_DATA = $(install_sh) -c -m 644
-+install_sh_PROGRAM = $(install_sh) -c
-+install_sh_SCRIPT = $(install_sh) -c
-+INSTALL_HEADER = $(INSTALL_DATA)
-+transform = $(program_transform_name)
-+NORMAL_INSTALL = :
-+PRE_INSTALL = :
-+POST_INSTALL = :
-+NORMAL_UNINSTALL = :
-+PRE_UNINSTALL = :
-+POST_UNINSTALL = :
-+build_triplet = @build@
-+host_triplet = @host@
-+@HAVE_GSTREAMER_TRUE@am__append_1 = \
-+@HAVE_GSTREAMER_TRUE@	acme-volume-gstreamer.c \
-+@HAVE_GSTREAMER_TRUE@	acme-volume-gstreamer.h \
-+@HAVE_GSTREAMER_TRUE@	$(NULL)
-+
-+@HAVE_GSTREAMER_TRUE@am__append_2 = -DHAVE_GSTREAMER
-+@HAVE_GSTREAMER_TRUE@am__append_3 = $(GST_LIBS)
-+@HAVE_ALSA_TRUE@@HAVE_GSTREAMER_FALSE@am__append_4 = \
-+@HAVE_ALSA_TRUE@@HAVE_GSTREAMER_FALSE@	acme-volume-alsa.c \
-+@HAVE_ALSA_TRUE@@HAVE_GSTREAMER_FALSE@	acme-volume-alsa.h \
-+@HAVE_ALSA_TRUE@@HAVE_GSTREAMER_FALSE@	$(NULL)
-+
-+@HAVE_ALSA_TRUE@@HAVE_GSTREAMER_FALSE@am__append_5 = -DHAVE_ALSA
-+@HAVE_ALSA_TRUE@@HAVE_GSTREAMER_FALSE@am__append_6 = $(ALSA_LIBS)
-+@HAVE_ALSA_FALSE@@HAVE_GSTREAMER_FALSE@@HAVE_OSS_TRUE@am__append_7 = acme-volume-oss.c \
-+@HAVE_ALSA_FALSE@@HAVE_GSTREAMER_FALSE@@HAVE_OSS_TRUE@	acme-volume-oss.h \
-+@HAVE_ALSA_FALSE@@HAVE_GSTREAMER_FALSE@@HAVE_OSS_TRUE@	$(NULL) \
-+@HAVE_ALSA_FALSE@@HAVE_GSTREAMER_FALSE@@HAVE_OSS_TRUE@	$(OSS_SOURCES)
-+@HAVE_ALSA_FALSE@@HAVE_GSTREAMER_FALSE@@HAVE_OSS_TRUE@am__append_8 = -DHAVE_OSS
-+subdir = plugins/media-keys/actions
-+DIST_COMMON = $(srcdir)/Makefile.am $(srcdir)/Makefile.in
-+ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
-+am__aclocal_m4_deps = $(top_srcdir)/acinclude.m4 \
-+	$(top_srcdir)/configure.ac
-+am__configure_deps = $(am__aclocal_m4_deps) $(CONFIGURE_DEPENDENCIES) \
-+	$(ACLOCAL_M4)
-+mkinstalldirs = $(SHELL) $(top_srcdir)/mkinstalldirs
-+CONFIG_HEADER = $(top_builddir)/config.h
-+CONFIG_CLEAN_FILES =
-+LTLIBRARIES = $(noinst_LTLIBRARIES)
-+am__DEPENDENCIES_1 =
-+@HAVE_GSTREAMER_TRUE@am__DEPENDENCIES_2 = $(am__DEPENDENCIES_1)
-+@HAVE_ALSA_TRUE@@HAVE_GSTREAMER_FALSE@am__DEPENDENCIES_3 =  \
-+@HAVE_ALSA_TRUE@@HAVE_GSTREAMER_FALSE@	$(am__DEPENDENCIES_1)
-+libacme_la_DEPENDENCIES = $(am__DEPENDENCIES_1) $(am__DEPENDENCIES_2) \
-+	$(am__DEPENDENCIES_3)
-+am__libacme_la_SOURCES_DIST = acme.h acme-volume.c acme-volume.h \
-+	acme-volume-dummy.c acme-volume-dummy.h \
-+	acme-volume-gstreamer.c acme-volume-gstreamer.h \
-+	acme-volume-alsa.c acme-volume-alsa.h acme-volume-oss.c \
-+	acme-volume-oss.h
-+am__objects_1 =
-+@HAVE_GSTREAMER_TRUE@am__objects_2 =  \
-+@HAVE_GSTREAMER_TRUE@	libacme_la-acme-volume-gstreamer.lo \
-+@HAVE_GSTREAMER_TRUE@	$(am__objects_1)
-+@HAVE_ALSA_TRUE@@HAVE_GSTREAMER_FALSE@am__objects_3 = libacme_la-acme-volume-alsa.lo \
-+@HAVE_ALSA_TRUE@@HAVE_GSTREAMER_FALSE@	$(am__objects_1)
-+@HAVE_ALSA_FALSE@@HAVE_GSTREAMER_FALSE@@HAVE_OSS_TRUE@am__objects_4 = libacme_la-acme-volume-oss.lo \
-+@HAVE_ALSA_FALSE@@HAVE_GSTREAMER_FALSE@@HAVE_OSS_TRUE@	$(am__objects_1)
-+am_libacme_la_OBJECTS = libacme_la-acme-volume.lo \
-+	libacme_la-acme-volume-dummy.lo $(am__objects_1) \
-+	$(am__objects_2) $(am__objects_3) $(am__objects_4)
-+libacme_la_OBJECTS = $(am_libacme_la_OBJECTS)
-+libacme_la_LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) \
-+	$(LIBTOOLFLAGS) --mode=link $(CCLD) $(libacme_la_CFLAGS) \
-+	$(CFLAGS) $(AM_LDFLAGS) $(LDFLAGS) -o $@
-+DEFAULT_INCLUDES = -I.@am__isrc@ -I$(top_builddir)
-+depcomp = $(SHELL) $(top_srcdir)/depcomp
-+am__depfiles_maybe = depfiles
-+COMPILE = $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) \
-+	$(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
-+LTCOMPILE = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) \
-+	--mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) \
-+	$(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
-+CCLD = $(CC)
-+LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) \
-+	--mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) $(AM_LDFLAGS) \
-+	$(LDFLAGS) -o $@
-+SOURCES = $(libacme_la_SOURCES)
-+DIST_SOURCES = $(am__libacme_la_SOURCES_DIST)
-+am__vpath_adj_setup = srcdirstrip=`echo "$(srcdir)" | sed 's|.|.|g'`;
-+am__vpath_adj = case $$p in \
-+    $(srcdir)/*) f=`echo "$$p" | sed "s|^$$srcdirstrip/||"`;; \
-+    *) f=$$p;; \
-+  esac;
-+am__strip_dir = `echo $$p | sed -e 's|^.*/||'`;
-+am__installdirs = "$(DESTDIR)$(gladedir)"
-+gladeDATA_INSTALL = $(INSTALL_DATA)
-+DATA = $(glade_DATA)
-+ETAGS = etags
-+CTAGS = ctags
-+DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
-+ACLOCAL = @ACLOCAL@
-+ALL_LINGUAS = @ALL_LINGUAS@
-+ALSA_CFLAGS = @ALSA_CFLAGS@
-+ALSA_LIBS = @ALSA_LIBS@
-+AMTAR = @AMTAR@
-+AR = @AR@
-+AUTOCONF = @AUTOCONF@
-+AUTOHEADER = @AUTOHEADER@
-+AUTOMAKE = @AUTOMAKE@
-+AWK = @AWK@
-+CATALOGS = @CATALOGS@
-+CATOBJEXT = @CATOBJEXT@
-+CC = @CC@
-+CCDEPMODE = @CCDEPMODE@
-+CFLAGS = @CFLAGS@
-+CPP = @CPP@
-+CPPFLAGS = @CPPFLAGS@
-+CXX = @CXX@
-+CXXCPP = @CXXCPP@
-+CXXDEPMODE = @CXXDEPMODE@
-+CXXFLAGS = @CXXFLAGS@
-+CYGPATH_W = @CYGPATH_W@
-+DATADIRNAME = @DATADIRNAME@
-+DBUS_SYS_DIR = @DBUS_SYS_DIR@
-+DEBUG_CFLAGS = @DEBUG_CFLAGS@
-+DEFS = @DEFS@
-+DEPDIR = @DEPDIR@
-+DSYMUTIL = @DSYMUTIL@
-+DUMPBIN = @DUMPBIN@
-+ECHO_C = @ECHO_C@
-+ECHO_N = @ECHO_N@
-+ECHO_T = @ECHO_T@
-+EGREP = @EGREP@
-+EXEEXT = @EXEEXT@
-+FGREP = @FGREP@
-+FONTCONFIG_CFLAGS = @FONTCONFIG_CFLAGS@
-+FONTCONFIG_LIBS = @FONTCONFIG_LIBS@
-+GCONFTOOL = @GCONFTOOL@
-+GCONF_SCHEMA_CONFIG_SOURCE = @GCONF_SCHEMA_CONFIG_SOURCE@
-+GCONF_SCHEMA_FILE_DIR = @GCONF_SCHEMA_FILE_DIR@
-+GETTEXT_PACKAGE = @GETTEXT_PACKAGE@
-+GIOUNIX_CFLAGS = @GIOUNIX_CFLAGS@
-+GIOUNIX_LIBS = @GIOUNIX_LIBS@
-+GLIB_GENMARSHAL = @GLIB_GENMARSHAL@
-+GMOFILES = @GMOFILES@
-+GMSGFMT = @GMSGFMT@
-+GNOME_KEYBINDINGS_KEYSDIR = @GNOME_KEYBINDINGS_KEYSDIR@
-+GREP = @GREP@
-+GSD_INTLTOOL_PLUGIN_RULE = @GSD_INTLTOOL_PLUGIN_RULE@
-+GSD_PLUGIN_LDFLAGS = @GSD_PLUGIN_LDFLAGS@
-+GST_CFLAGS = @GST_CFLAGS@
-+GST_LIBS = @GST_LIBS@
-+INSTALL = @INSTALL@
-+INSTALL_DATA = @INSTALL_DATA@
-+INSTALL_PROGRAM = @INSTALL_PROGRAM@
-+INSTALL_SCRIPT = @INSTALL_SCRIPT@
-+INSTALL_STRIP_PROGRAM = @INSTALL_STRIP_PROGRAM@
-+INSTOBJEXT = @INSTOBJEXT@
-+INTLLIBS = @INTLLIBS@
-+INTLTOOL_EXTRACT = @INTLTOOL_EXTRACT@
-+INTLTOOL_MERGE = @INTLTOOL_MERGE@
-+INTLTOOL_PERL = @INTLTOOL_PERL@
-+INTLTOOL_UPDATE = @INTLTOOL_UPDATE@
-+LD = @LD@
-+LDFLAGS = @LDFLAGS@
-+LIBEXECDIR = @LIBEXECDIR@
-+LIBGNOMEKBD_CFLAGS = @LIBGNOMEKBD_CFLAGS@
-+LIBGNOMEKBD_LIBS = @LIBGNOMEKBD_LIBS@
-+LIBNOTIFY_CFLAGS = @LIBNOTIFY_CFLAGS@
-+LIBNOTIFY_LIBS = @LIBNOTIFY_LIBS@
-+LIBOBJS = @LIBOBJS@
-+LIBS = @LIBS@
-+LIBTOOL = @LIBTOOL@
-+LIPO = @LIPO@
-+LN_S = @LN_S@
-+LTLIBOBJS = @LTLIBOBJS@
-+MAKEINFO = @MAKEINFO@
-+MKDIR_P = @MKDIR_P@
-+MKINSTALLDIRS = @MKINSTALLDIRS@
-+MSGFMT = @MSGFMT@
-+MSGFMT_OPTS = @MSGFMT_OPTS@
-+MSGMERGE = @MSGMERGE@
-+NM = @NM@
-+NMEDIT = @NMEDIT@
-+OBJDUMP = @OBJDUMP@
-+OBJEXT = @OBJEXT@
-+OTOOL = @OTOOL@
-+OTOOL64 = @OTOOL64@
-+PACKAGE = @PACKAGE@
-+PACKAGE_BUGREPORT = @PACKAGE_BUGREPORT@
-+PACKAGE_NAME = @PACKAGE_NAME@
-+PACKAGE_STRING = @PACKAGE_STRING@
-+PACKAGE_TARNAME = @PACKAGE_TARNAME@
-+PACKAGE_VERSION = @PACKAGE_VERSION@
-+PATH_SEPARATOR = @PATH_SEPARATOR@
-+PKG_CONFIG = @PKG_CONFIG@
-+POFILES = @POFILES@
-+POSUB = @POSUB@
-+PO_IN_DATADIR_FALSE = @PO_IN_DATADIR_FALSE@
-+PO_IN_DATADIR_TRUE = @PO_IN_DATADIR_TRUE@
-+PULSE_CFLAGS = @PULSE_CFLAGS@
-+PULSE_LIBS = @PULSE_LIBS@
-+RANDR_LIBS = @RANDR_LIBS@
-+RANLIB = @RANLIB@
-+SED = @SED@
-+SETTINGS_DAEMON_CFLAGS = @SETTINGS_DAEMON_CFLAGS@
-+SETTINGS_DAEMON_LIBS = @SETTINGS_DAEMON_LIBS@
-+SETTINGS_PLUGIN_CFLAGS = @SETTINGS_PLUGIN_CFLAGS@
-+SETTINGS_PLUGIN_LIBS = @SETTINGS_PLUGIN_LIBS@
-+SET_MAKE = @SET_MAKE@
-+SHELL = @SHELL@
-+STRIP = @STRIP@
-+USE_NLS = @USE_NLS@
-+VERSION = @VERSION@
-+WARN_CFLAGS = @WARN_CFLAGS@
-+XF86MISC_LIBS = @XF86MISC_LIBS@
-+XGETTEXT = @XGETTEXT@
-+XINPUT_LIBS = @XINPUT_LIBS@
-+XMKMF = @XMKMF@
-+X_CFLAGS = @X_CFLAGS@
-+X_EXTRA_LIBS = @X_EXTRA_LIBS@
-+X_LIBS = @X_LIBS@
-+X_PRE_LIBS = @X_PRE_LIBS@
-+abs_builddir = @abs_builddir@
-+abs_srcdir = @abs_srcdir@
-+abs_top_builddir = @abs_top_builddir@
-+abs_top_srcdir = @abs_top_srcdir@
-+ac_ct_CC = @ac_ct_CC@
-+ac_ct_CXX = @ac_ct_CXX@
-+ac_ct_DUMPBIN = @ac_ct_DUMPBIN@
-+am__include = @am__include@
-+am__leading_dot = @am__leading_dot@
-+am__quote = @am__quote@
-+am__tar = @am__tar@
-+am__untar = @am__untar@
-+bindir = @bindir@
-+build = @build@
-+build_alias = @build_alias@
-+build_cpu = @build_cpu@
-+build_os = @build_os@
-+build_vendor = @build_vendor@
-+builddir = @builddir@
-+datadir = @datadir@
-+datarootdir = @datarootdir@
-+docdir = @docdir@
-+dvidir = @dvidir@
-+exec_prefix = @exec_prefix@
-+host = @host@
-+host_alias = @host_alias@
-+host_cpu = @host_cpu@
-+host_os = @host_os@
-+host_vendor = @host_vendor@
-+htmldir = @htmldir@
-+includedir = @includedir@
-+infodir = @infodir@
-+install_sh = @install_sh@
-+libdir = @libdir@
-+libexecdir = @libexecdir@
-+localedir = @localedir@
-+localstatedir = @localstatedir@
-+lt_ECHO = @lt_ECHO@
-+mandir = @mandir@
-+mkdir_p = @mkdir_p@
-+oldincludedir = @oldincludedir@
-+pdfdir = @pdfdir@
-+plugindir = @plugindir@
-+prefix = @prefix@
-+program_transform_name = @program_transform_name@
-+psdir = @psdir@
-+sbindir = @sbindir@
-+sharedstatedir = @sharedstatedir@
-+srcdir = @srcdir@
-+sysconfdir = @sysconfdir@
-+target_alias = @target_alias@
-+top_build_prefix = @top_build_prefix@
-+top_builddir = @top_builddir@
-+top_srcdir = @top_srcdir@
-+NULL = 
-+noinst_LTLIBRARIES = libacme.la
-+libacme_la_SOURCES = acme.h acme-volume.c acme-volume.h \
-+	acme-volume-dummy.c acme-volume-dummy.h $(NULL) \
-+	$(am__append_1) $(am__append_4) $(am__append_7)
-+libacme_la_CPPFLAGS = -I$(top_srcdir)/gnome-settings-daemon \
-+	-I$(top_srcdir)/plugins/common \
-+	-DGNOME_SETTINGS_LOCALEDIR=\""$(datadir)/locale"\" \
-+	$(AM_CPPFLAGS) $(am__append_2) $(am__append_5) $(am__append_8)
-+libacme_la_CFLAGS = \
-+	$(SETTINGS_PLUGIN_CFLAGS)	\
-+	$(GST_CFLAGS)			\
-+	$(AM_CFLAGS)
-+
-+libacme_la_LIBADD = $(NULL) $(am__append_3) $(am__append_6)
-+gladedir = $(pkgdatadir)
-+glade_DATA = \
-+	acme.glade	\
-+	$(NULL)
-+
-+EXTRA_DIST = \
-+	$(glade_DATA)		\
-+	$(NULL)
-+
-+all: all-am
-+
-+.SUFFIXES:
-+.SUFFIXES: .c .lo .o .obj
-+$(srcdir)/Makefile.in:  $(srcdir)/Makefile.am  $(am__configure_deps)
-+	@for dep in $?; do \
-+	  case '$(am__configure_deps)' in \
-+	    *$$dep*) \
-+	      ( cd $(top_builddir) && $(MAKE) $(AM_MAKEFLAGS) am--refresh ) \
-+	        && { if test -f $@; then exit 0; else break; fi; }; \
-+	      exit 1;; \
-+	  esac; \
-+	done; \
-+	echo ' cd $(top_srcdir) && $(AUTOMAKE) --gnu  plugins/media-keys/actions/Makefile'; \
-+	cd $(top_srcdir) && \
-+	  $(AUTOMAKE) --gnu  plugins/media-keys/actions/Makefile
-+.PRECIOUS: Makefile
-+Makefile: $(srcdir)/Makefile.in $(top_builddir)/config.status
-+	@case '$?' in \
-+	  *config.status*) \
-+	    cd $(top_builddir) && $(MAKE) $(AM_MAKEFLAGS) am--refresh;; \
-+	  *) \
-+	    echo ' cd $(top_builddir) && $(SHELL) ./config.status $(subdir)/$@ $(am__depfiles_maybe)'; \
-+	    cd $(top_builddir) && $(SHELL) ./config.status $(subdir)/$@ $(am__depfiles_maybe);; \
-+	esac;
-+
-+$(top_builddir)/config.status: $(top_srcdir)/configure $(CONFIG_STATUS_DEPENDENCIES)
-+	cd $(top_builddir) && $(MAKE) $(AM_MAKEFLAGS) am--refresh
-+
-+$(top_srcdir)/configure:  $(am__configure_deps)
-+	cd $(top_builddir) && $(MAKE) $(AM_MAKEFLAGS) am--refresh
-+$(ACLOCAL_M4):  $(am__aclocal_m4_deps)
-+	cd $(top_builddir) && $(MAKE) $(AM_MAKEFLAGS) am--refresh
-+
-+clean-noinstLTLIBRARIES:
-+	-test -z "$(noinst_LTLIBRARIES)" || rm -f $(noinst_LTLIBRARIES)
-+	@list='$(noinst_LTLIBRARIES)'; for p in $$list; do \
-+	  dir="`echo $$p | sed -e 's|/[^/]*$$||'`"; \
-+	  test "$$dir" != "$$p" || dir=.; \
-+	  echo "rm -f \"$${dir}/so_locations\""; \
-+	  rm -f "$${dir}/so_locations"; \
-+	done
-+libacme.la: $(libacme_la_OBJECTS) $(libacme_la_DEPENDENCIES) 
-+	$(libacme_la_LINK)  $(libacme_la_OBJECTS) $(libacme_la_LIBADD) $(LIBS)
-+
-+mostlyclean-compile:
-+	-rm -f *.$(OBJEXT)
-+
-+distclean-compile:
-+	-rm -f *.tab.c
-+
-+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libacme_la-acme-volume-alsa.Plo@am__quote@
-+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libacme_la-acme-volume-dummy.Plo@am__quote@
-+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libacme_la-acme-volume-gstreamer.Plo@am__quote@
-+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libacme_la-acme-volume-oss.Plo@am__quote@
-+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libacme_la-acme-volume.Plo@am__quote@
-+
-+.c.o:
-+@am__fastdepCC_TRUE@	$(COMPILE) -MT $@ -MD -MP -MF $(DEPDIR)/$*.Tpo -c -o $@ $<
-+@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/$*.Tpo $(DEPDIR)/$*.Po
-+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='$<' object='$@' libtool=no @AMDEPBACKSLASH@
-+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-+@am__fastdepCC_FALSE@	$(COMPILE) -c $<
-+
-+.c.obj:
-+@am__fastdepCC_TRUE@	$(COMPILE) -MT $@ -MD -MP -MF $(DEPDIR)/$*.Tpo -c -o $@ `$(CYGPATH_W) '$<'`
-+@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/$*.Tpo $(DEPDIR)/$*.Po
-+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='$<' object='$@' libtool=no @AMDEPBACKSLASH@
-+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-+@am__fastdepCC_FALSE@	$(COMPILE) -c `$(CYGPATH_W) '$<'`
-+
-+.c.lo:
-+@am__fastdepCC_TRUE@	$(LTCOMPILE) -MT $@ -MD -MP -MF $(DEPDIR)/$*.Tpo -c -o $@ $<
-+@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/$*.Tpo $(DEPDIR)/$*.Plo
-+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='$<' object='$@' libtool=yes @AMDEPBACKSLASH@
-+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-+@am__fastdepCC_FALSE@	$(LTCOMPILE) -c -o $@ $<
-+
-+libacme_la-acme-volume.lo: acme-volume.c
-+@am__fastdepCC_TRUE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libacme_la_CPPFLAGS) $(CPPFLAGS) $(libacme_la_CFLAGS) $(CFLAGS) -MT libacme_la-acme-volume.lo -MD -MP -MF $(DEPDIR)/libacme_la-acme-volume.Tpo -c -o libacme_la-acme-volume.lo `test -f 'acme-volume.c' || echo '$(srcdir)/'`acme-volume.c
-+@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/libacme_la-acme-volume.Tpo $(DEPDIR)/libacme_la-acme-volume.Plo
-+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='acme-volume.c' object='libacme_la-acme-volume.lo' libtool=yes @AMDEPBACKSLASH@
-+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-+@am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libacme_la_CPPFLAGS) $(CPPFLAGS) $(libacme_la_CFLAGS) $(CFLAGS) -c -o libacme_la-acme-volume.lo `test -f 'acme-volume.c' || echo '$(srcdir)/'`acme-volume.c
-+
-+libacme_la-acme-volume-dummy.lo: acme-volume-dummy.c
-+@am__fastdepCC_TRUE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libacme_la_CPPFLAGS) $(CPPFLAGS) $(libacme_la_CFLAGS) $(CFLAGS) -MT libacme_la-acme-volume-dummy.lo -MD -MP -MF $(DEPDIR)/libacme_la-acme-volume-dummy.Tpo -c -o libacme_la-acme-volume-dummy.lo `test -f 'acme-volume-dummy.c' || echo '$(srcdir)/'`acme-volume-dummy.c
-+@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/libacme_la-acme-volume-dummy.Tpo $(DEPDIR)/libacme_la-acme-volume-dummy.Plo
-+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='acme-volume-dummy.c' object='libacme_la-acme-volume-dummy.lo' libtool=yes @AMDEPBACKSLASH@
-+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-+@am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libacme_la_CPPFLAGS) $(CPPFLAGS) $(libacme_la_CFLAGS) $(CFLAGS) -c -o libacme_la-acme-volume-dummy.lo `test -f 'acme-volume-dummy.c' || echo '$(srcdir)/'`acme-volume-dummy.c
-+
-+libacme_la-acme-volume-gstreamer.lo: acme-volume-gstreamer.c
-+@am__fastdepCC_TRUE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libacme_la_CPPFLAGS) $(CPPFLAGS) $(libacme_la_CFLAGS) $(CFLAGS) -MT libacme_la-acme-volume-gstreamer.lo -MD -MP -MF $(DEPDIR)/libacme_la-acme-volume-gstreamer.Tpo -c -o libacme_la-acme-volume-gstreamer.lo `test -f 'acme-volume-gstreamer.c' || echo '$(srcdir)/'`acme-volume-gstreamer.c
-+@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/libacme_la-acme-volume-gstreamer.Tpo $(DEPDIR)/libacme_la-acme-volume-gstreamer.Plo
-+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='acme-volume-gstreamer.c' object='libacme_la-acme-volume-gstreamer.lo' libtool=yes @AMDEPBACKSLASH@
-+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-+@am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libacme_la_CPPFLAGS) $(CPPFLAGS) $(libacme_la_CFLAGS) $(CFLAGS) -c -o libacme_la-acme-volume-gstreamer.lo `test -f 'acme-volume-gstreamer.c' || echo '$(srcdir)/'`acme-volume-gstreamer.c
-+
-+libacme_la-acme-volume-alsa.lo: acme-volume-alsa.c
-+@am__fastdepCC_TRUE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libacme_la_CPPFLAGS) $(CPPFLAGS) $(libacme_la_CFLAGS) $(CFLAGS) -MT libacme_la-acme-volume-alsa.lo -MD -MP -MF $(DEPDIR)/libacme_la-acme-volume-alsa.Tpo -c -o libacme_la-acme-volume-alsa.lo `test -f 'acme-volume-alsa.c' || echo '$(srcdir)/'`acme-volume-alsa.c
-+@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/libacme_la-acme-volume-alsa.Tpo $(DEPDIR)/libacme_la-acme-volume-alsa.Plo
-+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='acme-volume-alsa.c' object='libacme_la-acme-volume-alsa.lo' libtool=yes @AMDEPBACKSLASH@
-+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-+@am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libacme_la_CPPFLAGS) $(CPPFLAGS) $(libacme_la_CFLAGS) $(CFLAGS) -c -o libacme_la-acme-volume-alsa.lo `test -f 'acme-volume-alsa.c' || echo '$(srcdir)/'`acme-volume-alsa.c
-+
-+libacme_la-acme-volume-oss.lo: acme-volume-oss.c
-+@am__fastdepCC_TRUE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libacme_la_CPPFLAGS) $(CPPFLAGS) $(libacme_la_CFLAGS) $(CFLAGS) -MT libacme_la-acme-volume-oss.lo -MD -MP -MF $(DEPDIR)/libacme_la-acme-volume-oss.Tpo -c -o libacme_la-acme-volume-oss.lo `test -f 'acme-volume-oss.c' || echo '$(srcdir)/'`acme-volume-oss.c
-+@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/libacme_la-acme-volume-oss.Tpo $(DEPDIR)/libacme_la-acme-volume-oss.Plo
-+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='acme-volume-oss.c' object='libacme_la-acme-volume-oss.lo' libtool=yes @AMDEPBACKSLASH@
-+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-+@am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libacme_la_CPPFLAGS) $(CPPFLAGS) $(libacme_la_CFLAGS) $(CFLAGS) -c -o libacme_la-acme-volume-oss.lo `test -f 'acme-volume-oss.c' || echo '$(srcdir)/'`acme-volume-oss.c
-+
-+mostlyclean-libtool:
-+	-rm -f *.lo
-+
-+clean-libtool:
-+	-rm -rf .libs _libs
-+install-gladeDATA: $(glade_DATA)
-+	@$(NORMAL_INSTALL)
-+	test -z "$(gladedir)" || $(MKDIR_P) "$(DESTDIR)$(gladedir)"
-+	@list='$(glade_DATA)'; for p in $$list; do \
-+	  if test -f "$$p"; then d=; else d="$(srcdir)/"; fi; \
-+	  f=$(am__strip_dir) \
-+	  echo " $(gladeDATA_INSTALL) '$$d$$p' '$(DESTDIR)$(gladedir)/$$f'"; \
-+	  $(gladeDATA_INSTALL) "$$d$$p" "$(DESTDIR)$(gladedir)/$$f"; \
-+	done
-+
-+uninstall-gladeDATA:
-+	@$(NORMAL_UNINSTALL)
-+	@list='$(glade_DATA)'; for p in $$list; do \
-+	  f=$(am__strip_dir) \
-+	  echo " rm -f '$(DESTDIR)$(gladedir)/$$f'"; \
-+	  rm -f "$(DESTDIR)$(gladedir)/$$f"; \
-+	done
-+
-+ID: $(HEADERS) $(SOURCES) $(LISP) $(TAGS_FILES)
-+	list='$(SOURCES) $(HEADERS) $(LISP) $(TAGS_FILES)'; \
-+	unique=`for i in $$list; do \
-+	    if test -f "$$i"; then echo $$i; else echo $(srcdir)/$$i; fi; \
-+	  done | \
-+	  $(AWK) '{ files[$$0] = 1; nonempty = 1; } \
-+	      END { if (nonempty) { for (i in files) print i; }; }'`; \
-+	mkid -fID $$unique
-+tags: TAGS
-+
-+TAGS:  $(HEADERS) $(SOURCES)  $(TAGS_DEPENDENCIES) \
-+		$(TAGS_FILES) $(LISP)
-+	tags=; \
-+	here=`pwd`; \
-+	list='$(SOURCES) $(HEADERS)  $(LISP) $(TAGS_FILES)'; \
-+	unique=`for i in $$list; do \
-+	    if test -f "$$i"; then echo $$i; else echo $(srcdir)/$$i; fi; \
-+	  done | \
-+	  $(AWK) '{ files[$$0] = 1; nonempty = 1; } \
-+	      END { if (nonempty) { for (i in files) print i; }; }'`; \
-+	if test -z "$(ETAGS_ARGS)$$tags$$unique"; then :; else \
-+	  test -n "$$unique" || unique=$$empty_fix; \
-+	  $(ETAGS) $(ETAGSFLAGS) $(AM_ETAGSFLAGS) $(ETAGS_ARGS) \
-+	    $$tags $$unique; \
-+	fi
-+ctags: CTAGS
-+CTAGS:  $(HEADERS) $(SOURCES)  $(TAGS_DEPENDENCIES) \
-+		$(TAGS_FILES) $(LISP)
-+	tags=; \
-+	list='$(SOURCES) $(HEADERS)  $(LISP) $(TAGS_FILES)'; \
-+	unique=`for i in $$list; do \
-+	    if test -f "$$i"; then echo $$i; else echo $(srcdir)/$$i; fi; \
-+	  done | \
-+	  $(AWK) '{ files[$$0] = 1; nonempty = 1; } \
-+	      END { if (nonempty) { for (i in files) print i; }; }'`; \
-+	test -z "$(CTAGS_ARGS)$$tags$$unique" \
-+	  || $(CTAGS) $(CTAGSFLAGS) $(AM_CTAGSFLAGS) $(CTAGS_ARGS) \
-+	     $$tags $$unique
-+
-+GTAGS:
-+	here=`$(am__cd) $(top_builddir) && pwd` \
-+	  && cd $(top_srcdir) \
-+	  && gtags -i $(GTAGS_ARGS) $$here
-+
-+distclean-tags:
-+	-rm -f TAGS ID GTAGS GRTAGS GSYMS GPATH tags
-+
-+distdir: $(DISTFILES)
-+	@srcdirstrip=`echo "$(srcdir)" | sed 's/[].[^$$\\*]/\\\\&/g'`; \
-+	topsrcdirstrip=`echo "$(top_srcdir)" | sed 's/[].[^$$\\*]/\\\\&/g'`; \
-+	list='$(DISTFILES)'; \
-+	  dist_files=`for file in $$list; do echo $$file; done | \
-+	  sed -e "s|^$$srcdirstrip/||;t" \
-+	      -e "s|^$$topsrcdirstrip/|$(top_builddir)/|;t"`; \
-+	case $$dist_files in \
-+	  */*) $(MKDIR_P) `echo "$$dist_files" | \
-+			   sed '/\//!d;s|^|$(distdir)/|;s,/[^/]*$$,,' | \
-+			   sort -u` ;; \
-+	esac; \
-+	for file in $$dist_files; do \
-+	  if test -f $$file || test -d $$file; then d=.; else d=$(srcdir); fi; \
-+	  if test -d $$d/$$file; then \
-+	    dir=`echo "/$$file" | sed -e 's,/[^/]*$$,,'`; \
-+	    if test -d $(srcdir)/$$file && test $$d != $(srcdir); then \
-+	      cp -pR $(srcdir)/$$file $(distdir)$$dir || exit 1; \
-+	    fi; \
-+	    cp -pR $$d/$$file $(distdir)$$dir || exit 1; \
-+	  else \
-+	    test -f $(distdir)/$$file \
-+	    || cp -p $$d/$$file $(distdir)/$$file \
-+	    || exit 1; \
-+	  fi; \
-+	done
-+check-am: all-am
-+check: check-am
-+all-am: Makefile $(LTLIBRARIES) $(DATA)
-+installdirs:
-+	for dir in "$(DESTDIR)$(gladedir)"; do \
-+	  test -z "$$dir" || $(MKDIR_P) "$$dir"; \
-+	done
-+install: install-am
-+install-exec: install-exec-am
-+install-data: install-data-am
-+uninstall: uninstall-am
-+
-+install-am: all-am
-+	@$(MAKE) $(AM_MAKEFLAGS) install-exec-am install-data-am
-+
-+installcheck: installcheck-am
-+install-strip:
-+	$(MAKE) $(AM_MAKEFLAGS) INSTALL_PROGRAM="$(INSTALL_STRIP_PROGRAM)" \
-+	  install_sh_PROGRAM="$(INSTALL_STRIP_PROGRAM)" INSTALL_STRIP_FLAG=-s \
-+	  `test -z '$(STRIP)' || \
-+	    echo "INSTALL_PROGRAM_ENV=STRIPPROG='$(STRIP)'"` install
-+mostlyclean-generic:
-+
-+clean-generic:
-+
-+distclean-generic:
-+	-test -z "$(CONFIG_CLEAN_FILES)" || rm -f $(CONFIG_CLEAN_FILES)
-+
-+maintainer-clean-generic:
-+	@echo "This command is intended for maintainers to use"
-+	@echo "it deletes files that may require special tools to rebuild."
-+clean: clean-am
-+
-+clean-am: clean-generic clean-libtool clean-noinstLTLIBRARIES \
-+	mostlyclean-am
-+
-+distclean: distclean-am
-+	-rm -rf ./$(DEPDIR)
-+	-rm -f Makefile
-+distclean-am: clean-am distclean-compile distclean-generic \
-+	distclean-tags
-+
-+dvi: dvi-am
-+
-+dvi-am:
-+
-+html: html-am
-+
-+info: info-am
-+
-+info-am:
-+
-+install-data-am: install-gladeDATA
-+
-+install-dvi: install-dvi-am
-+
-+install-exec-am:
-+
-+install-html: install-html-am
-+
-+install-info: install-info-am
-+
-+install-man:
-+
-+install-pdf: install-pdf-am
-+
-+install-ps: install-ps-am
-+
-+installcheck-am:
-+
-+maintainer-clean: maintainer-clean-am
-+	-rm -rf ./$(DEPDIR)
-+	-rm -f Makefile
-+maintainer-clean-am: distclean-am maintainer-clean-generic
-+
-+mostlyclean: mostlyclean-am
-+
-+mostlyclean-am: mostlyclean-compile mostlyclean-generic \
-+	mostlyclean-libtool
-+
-+pdf: pdf-am
-+
-+pdf-am:
-+
-+ps: ps-am
-+
-+ps-am:
-+
-+uninstall-am: uninstall-gladeDATA
-+
-+.MAKE: install-am install-strip
-+
-+.PHONY: CTAGS GTAGS all all-am check check-am clean clean-generic \
-+	clean-libtool clean-noinstLTLIBRARIES ctags distclean \
-+	distclean-compile distclean-generic distclean-libtool \
-+	distclean-tags distdir dvi dvi-am html html-am info info-am \
-+	install install-am install-data install-data-am install-dvi \
-+	install-dvi-am install-exec install-exec-am install-gladeDATA \
-+	install-html install-html-am install-info install-info-am \
-+	install-man install-pdf install-pdf-am install-ps \
-+	install-ps-am install-strip installcheck installcheck-am \
-+	installdirs maintainer-clean maintainer-clean-generic \
-+	mostlyclean mostlyclean-compile mostlyclean-generic \
-+	mostlyclean-libtool pdf pdf-am ps ps-am tags uninstall \
-+	uninstall-am uninstall-gladeDATA
-+
-+# Tell versions [3.59,3.63) of GNU make to not export all variables.
-+# Otherwise a system limit (for SysV at least) may be exceeded.
-+.NOEXPORT:
-diff -Nur -x '*.orig' -x '*~' gnome-settings-daemon-2.27.1/plugins/media-keys/Makefile.in gnome-settings-daemon-2.27.1.new/plugins/media-keys/Makefile.in
---- gnome-settings-daemon-2.27.1/plugins/media-keys/Makefile.in	2009-05-04 10:42:50.000000000 +0200
-+++ gnome-settings-daemon-2.27.1.new/plugins/media-keys/Makefile.in	2009-05-11 17:33:42.000000000 +0200
+diff -Nur -x '*.orig' -x '*~' gnome-settings-daemon-2.27.4/plugins/media-keys/cut-n-paste/Makefile.in gnome-settings-daemon-2.27.4.new/plugins/media-keys/cut-n-paste/Makefile.in
+--- gnome-settings-daemon-2.27.4/plugins/media-keys/cut-n-paste/Makefile.in	2009-07-14 12:46:30.000000000 +0100
++++ gnome-settings-daemon-2.27.4.new/plugins/media-keys/cut-n-paste/Makefile.in	2009-07-20 00:11:05.192824450 +0100
 @@ -1,4 +1,4 @@
 -# Makefile.in generated by automake 1.10.1 from Makefile.am.
 +# Makefile.in generated by automake 1.10.2 from Makefile.am.
  # @configure_input@
  
  # Copyright (C) 1994, 1995, 1996, 1997, 1998, 1999, 2000, 2001, 2002,
-@@ -34,11 +34,8 @@
- POST_UNINSTALL = :
- build_triplet = @build@
- host_triplet = @host@
--@HAVE_PULSE_TRUE@am__append_1 = cut-n-paste
--@HAVE_PULSE_TRUE@am__append_2 = libmedia-keys.la
- noinst_PROGRAMS = test-media-keys$(EXEEXT) test-media-window$(EXEEXT) \
- 	$(am__EXEEXT_1)
--@HAVE_PULSE_TRUE@am__append_3 = $(top_builddir)/plugins/media-keys/cut-n-paste/libgvc.la
- subdir = plugins/media-keys
- DIST_COMMON = $(srcdir)/Makefile.am $(srcdir)/Makefile.in
- ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
-@@ -55,32 +52,34 @@
-     *) f=$$p;; \
-   esac;
- am__strip_dir = `echo $$p | sed -e 's|^.*/||'`;
--am__installdirs = "$(DESTDIR)$(plugindir)" "$(DESTDIR)$(gladedir)" \
--	"$(DESTDIR)$(pixmapsdir)" "$(DESTDIR)$(plugindir)"
-+am__installdirs = "$(DESTDIR)$(plugindir)" "$(DESTDIR)$(pixmapsdir)" \
-+	"$(DESTDIR)$(plugindir)"
- pluginLTLIBRARIES_INSTALL = $(INSTALL)
- LTLIBRARIES = $(plugin_LTLIBRARIES)
- am__DEPENDENCIES_1 =
- libmedia_keys_la_DEPENDENCIES =  \
- 	$(top_builddir)/plugins/common/libcommon.la \
--	$(top_builddir)/plugins/media-keys/cut-n-paste/libgvc.la \
--	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1)
-+	$(top_builddir)/plugins/media-keys/actions/libacme.la \
-+	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
-+	$(am__DEPENDENCIES_1)
- am__objects_1 =
- am__objects_2 = libmedia_keys_la-gsd-marshal.lo $(am__objects_1)
+@@ -285,8 +285,8 @@
+ 	@for dep in $?; do \
+ 	  case '$(am__configure_deps)' in \
+ 	    *$$dep*) \
+-	      cd $(top_builddir) && $(MAKE) $(AM_MAKEFLAGS) am--refresh \
+-		&& exit 0; \
++	      ( cd $(top_builddir) && $(MAKE) $(AM_MAKEFLAGS) am--refresh ) \
++	        && { if test -f $@; then exit 0; else break; fi; }; \
+ 	      exit 1;; \
+ 	  esac; \
+ 	done; \
+@@ -369,7 +369,7 @@
+ 	unique=`for i in $$list; do \
+ 	    if test -f "$$i"; then echo $$i; else echo $(srcdir)/$$i; fi; \
+ 	  done | \
+-	  $(AWK) '{ files[$$0] = 1; nonemtpy = 1; } \
++	  $(AWK) '{ files[$$0] = 1; nonempty = 1; } \
+ 	      END { if (nonempty) { for (i in files) print i; }; }'`; \
+ 	mkid -fID $$unique
+ tags: TAGS
+diff -Nur -x '*.orig' -x '*~' gnome-settings-daemon-2.27.4/plugins/media-keys/Makefile.in gnome-settings-daemon-2.27.4.new/plugins/media-keys/Makefile.in
+--- gnome-settings-daemon-2.27.4/plugins/media-keys/Makefile.in	2009-07-14 12:46:30.000000000 +0100
++++ gnome-settings-daemon-2.27.4.new/plugins/media-keys/Makefile.in	2009-07-20 00:11:05.100825120 +0100
+@@ -1,4 +1,4 @@
+-# Makefile.in generated by automake 1.10.1 from Makefile.am.
++# Makefile.in generated by automake 1.10.2 from Makefile.am.
+ # @configure_input@
+ 
+ # Copyright (C) 1994, 1995, 1996, 1997, 1998, 1999, 2000, 2001, 2002,
+@@ -70,8 +70,9 @@
  am_libmedia_keys_la_OBJECTS =  \
  	libmedia_keys_la-gsd-media-keys-plugin.lo \
  	libmedia_keys_la-gsd-media-keys-manager.lo \
@@ -20973,10 +19568,7 @@ diff -Nur -x '*.orig' -x '*~' gnome-settings-daemon-2.27.1/plugins/media-keys/Ma
  libmedia_keys_la_OBJECTS = $(am_libmedia_keys_la_OBJECTS)
  libmedia_keys_la_LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) \
  	$(LIBTOOLFLAGS) --mode=link $(CCLD) $(libmedia_keys_la_CFLAGS) \
- 	$(CFLAGS) $(libmedia_keys_la_LDFLAGS) $(LDFLAGS) -o $@
--@HAVE_PULSE_TRUE@am_libmedia_keys_la_rpath = -rpath $(plugindir)
- am__EXEEXT_1 =
- PROGRAMS = $(noinst_PROGRAMS)
+@@ -82,6 +83,7 @@
  am__objects_3 = test_media_keys-gsd-marshal.$(OBJEXT) $(am__objects_1)
  am_test_media_keys_OBJECTS =  \
  	test_media_keys-gsd-media-keys-manager.$(OBJEXT) \
@@ -20984,88 +19576,15 @@ diff -Nur -x '*.orig' -x '*~' gnome-settings-daemon-2.27.1/plugins/media-keys/Ma
  	test_media_keys-gsd-media-keys-window.$(OBJEXT) \
  	test_media_keys-test-media-keys.$(OBJEXT) $(am__objects_3) \
  	$(am__objects_1)
-@@ -88,8 +87,9 @@
- test_media_keys_DEPENDENCIES =  \
- 	$(top_builddir)/gnome-settings-daemon/libgsd-profile.la \
- 	$(top_builddir)/plugins/common/libcommon.la \
-+	$(top_builddir)/plugins/media-keys/actions/libacme.la \
- 	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
--	$(am__DEPENDENCIES_1) $(am__append_3)
-+	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1)
- test_media_keys_LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) \
- 	$(LIBTOOLFLAGS) --mode=link $(CCLD) $(test_media_keys_CFLAGS) \
- 	$(CFLAGS) $(AM_LDFLAGS) $(LDFLAGS) -o $@
-@@ -98,7 +98,8 @@
- 	test_media_window-test-media-window.$(OBJEXT) $(am__objects_1)
- test_media_window_OBJECTS = $(am_test_media_window_OBJECTS)
- test_media_window_DEPENDENCIES = $(am__DEPENDENCIES_1) \
--	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1)
-+	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
-+	$(am__DEPENDENCIES_1)
- test_media_window_LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) \
- 	$(LIBTOOLFLAGS) --mode=link $(CCLD) \
- 	$(test_media_window_CFLAGS) $(CFLAGS) $(AM_LDFLAGS) $(LDFLAGS) \
-@@ -126,17 +127,19 @@
- 	install-pdf-recursive install-ps-recursive install-recursive \
- 	installcheck-recursive installdirs-recursive pdf-recursive \
- 	ps-recursive uninstall-recursive
--gladeDATA_INSTALL = $(INSTALL_DATA)
- pixmapsDATA_INSTALL = $(INSTALL_DATA)
- pluginDATA_INSTALL = $(INSTALL_DATA)
--DATA = $(glade_DATA) $(pixmaps_DATA) $(plugin_DATA)
-+DATA = $(pixmaps_DATA) $(plugin_DATA)
- RECURSIVE_CLEAN_TARGETS = mostlyclean-recursive clean-recursive	\
-   distclean-recursive maintainer-clean-recursive
- ETAGS = etags
- CTAGS = ctags
-+DIST_SUBDIRS = $(SUBDIRS)
- DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
- ACLOCAL = @ACLOCAL@
- ALL_LINGUAS = @ALL_LINGUAS@
-+ALSA_CFLAGS = @ALSA_CFLAGS@
-+ALSA_LIBS = @ALSA_LIBS@
- AMTAR = @AMTAR@
- AR = @AR@
- AUTOCONF = @AUTOCONF@
-@@ -183,6 +186,8 @@
- GREP = @GREP@
- GSD_INTLTOOL_PLUGIN_RULE = @GSD_INTLTOOL_PLUGIN_RULE@
- GSD_PLUGIN_LDFLAGS = @GSD_PLUGIN_LDFLAGS@
-+GST_CFLAGS = @GST_CFLAGS@
-+GST_LIBS = @GST_LIBS@
- INSTALL = @INSTALL@
- INSTALL_DATA = @INSTALL_DATA@
- INSTALL_PROGRAM = @INSTALL_PROGRAM@
-@@ -309,8 +314,10 @@
- top_builddir = @top_builddir@
- top_srcdir = @top_srcdir@
- NULL = 
--SUBDIRS = $(am__append_1)
--plugin_LTLIBRARIES = $(am__append_2)
-+SUBDIRS = actions
-+plugin_LTLIBRARIES = \
-+	libmedia-keys.la
-+
- BUILT_SOURCES = \
- 	gsd-media-keys-manager-glue.h	\
- 	gsd-marshal.h			\
-@@ -324,36 +331,39 @@
+@@ -325,6 +327,7 @@
  	gsd-media-keys-manager.c	\
  	gsd-media-keys-window.h		\
  	gsd-media-keys-window.c		\
--	acme.h				\
 +	gsd-media-keys-notification.c	\
+ 	acme.h				\
  	$(BUILT_SOURCES)		\
  	$(NULL)
- 
- libmedia_keys_la_CPPFLAGS = \
- 	-I$(top_srcdir)/gnome-settings-daemon			\
- 	-I$(top_srcdir)/plugins/common				\
--	-I$(top_srcdir)/plugins/media-keys/cut-n-paste		\
-+	-I$(top_builddir)/plugins/media-keys/actions		\
- 	-DPIXMAPDIR=\""$(pkgdatadir)"\"				\
- 	-DGLADEDIR=\""$(pkgdatadir)"\"				\
- 	-DGNOME_SETTINGS_LOCALEDIR=\""$(datadir)/locale"\"	\
+@@ -339,10 +342,12 @@
  	$(AM_CPPFLAGS)
  
  libmedia_keys_la_CFLAGS = \
@@ -21078,34 +19597,7 @@ diff -Nur -x '*.orig' -x '*~' gnome-settings-daemon-2.27.1/plugins/media-keys/Ma
  	$(GSD_PLUGIN_LDFLAGS)
  
  libmedia_keys_la_LIBADD = \
--	$(top_builddir)/plugins/common/libcommon.la			\
--	$(top_builddir)/plugins/media-keys/cut-n-paste/libgvc.la	\
--	$(SETTINGS_PLUGIN_LIBS)						\
--	$(XF86MISC_LIBS)
-+	$(top_builddir)/plugins/common/libcommon.la		\
-+	$(top_builddir)/plugins/media-keys/actions/libacme.la	\
-+	$(SETTINGS_PLUGIN_LIBS)		\
-+	$(XF86MISC_LIBS)		\
-+	$(GST_LIBS)
- 
- plugin_in_files = \
- 	media-keys.gnome-settings-plugin.in
- 
--@HAVE_PULSE_TRUE@plugin_DATA = $(plugin_in_files:.gnome-settings-plugin.in=.gnome-settings-plugin)
-+plugin_DATA = $(plugin_in_files:.gnome-settings-plugin.in=.gnome-settings-plugin)
- test_media_window_SOURCES = \
- 	gsd-media-keys-window.c			\
- 	gsd-media-keys-window.h			\
-@@ -362,7 +372,7 @@
- 
- test_media_window_CPPFLAGS = \
- 	-I$(top_srcdir)/gnome-settings-daemon			\
--	-I$(top_srcdir)/plugins/media-keys/cut-n-paste		\
-+	-I$(top_builddir)/plugins/media-keys/actions		\
- 	-DPIXMAPDIR=\""$(pkgdatadir)"\"				\
- 	-DGLADEDIR=\""$(pkgdatadir)"\"				\
- 	-DGNOME_SETTINGS_LOCALEDIR=\""$(datadir)/locale"\"	\
-@@ -381,6 +391,7 @@
+@@ -382,6 +387,7 @@
  test_media_keys_SOURCES = \
  	gsd-media-keys-manager.c		\
  	gsd-media-keys-manager.h		\
@@ -21113,55 +19605,7 @@ diff -Nur -x '*.orig' -x '*~' gnome-settings-daemon-2.27.1/plugins/media-keys/Ma
  	gsd-media-keys-window.h			\
  	gsd-media-keys-window.c			\
  	test-media-keys.c			\
-@@ -390,7 +401,7 @@
- test_media_keys_CPPFLAGS = \
- 	-I$(top_srcdir)/gnome-settings-daemon			\
- 	-I$(top_srcdir)/plugins/common				\
--	-I$(top_srcdir)/plugins/media-keys/cut-n-paste		\
-+	-I$(top_builddir)/plugins/media-keys/actions		\
- 	-DPIXMAPDIR=\""$(pkgdatadir)"\"				\
- 	-DGLADEDIR=\""$(pkgdatadir)"\"				\
- 	-DGNOME_SETTINGS_LOCALEDIR=\""$(datadir)/locale"\"	\
-@@ -400,28 +411,25 @@
- 	$(SETTINGS_PLUGIN_CFLAGS)	\
- 	$(AM_CFLAGS)
- 
--test_media_keys_LDADD =  \
--	$(top_builddir)/gnome-settings-daemon/libgsd-profile.la \
--	$(top_builddir)/plugins/common/libcommon.la \
--	$(SETTINGS_DAEMON_LIBS) $(SETTINGS_PLUGIN_LIBS) \
--	$(XF86MISC_LIBS) $(GST_LIBS) $(am__append_3)
--gladedir = $(pkgdatadir)
--glade_DATA = \
--	acme.glade	\
--	$(NULL)
-+test_media_keys_LDADD = \
-+	$(top_builddir)/gnome-settings-daemon/libgsd-profile.la	\
-+	$(top_builddir)/plugins/common/libcommon.la		\
-+	$(top_builddir)/plugins/media-keys/actions/libacme.la	\
-+	$(SETTINGS_DAEMON_LIBS)			\
-+	$(SETTINGS_PLUGIN_LIBS)			\
-+	$(XF86MISC_LIBS)			\
-+	$(GST_LIBS)
- 
- pixmapsdir = $(pkgdatadir)
- pixmaps_DATA = \
- 	acme-eject.png	\
- 	$(NULL)
- 
--DIST_SUBDIRS = cut-n-paste
- EXTRA_DIST = \
- 	gsd-media-keys-manager.xml	\
- 	gsd-marshal.list		\
--	$(plugin_in_files)		\
--	$(glade_DATA)			\
--	$(pixmaps_DATA)
-+	$(pixmaps_DATA)		\
-+	$(plugin_in_files)
- 
- CLEANFILES = \
- 	$(BUILT_SOURCES)	\
-@@ -439,8 +447,8 @@
+@@ -440,8 +446,8 @@
  	@for dep in $?; do \
  	  case '$(am__configure_deps)' in \
  	    *$$dep*) \
@@ -21172,16 +19616,7 @@ diff -Nur -x '*.orig' -x '*~' gnome-settings-daemon-2.27.1/plugins/media-keys/Ma
  	      exit 1;; \
  	  esac; \
  	done; \
-@@ -492,7 +500,7 @@
- 	  rm -f "$${dir}/so_locations"; \
- 	done
- libmedia-keys.la: $(libmedia_keys_la_OBJECTS) $(libmedia_keys_la_DEPENDENCIES) 
--	$(libmedia_keys_la_LINK) $(am_libmedia_keys_la_rpath) $(libmedia_keys_la_OBJECTS) $(libmedia_keys_la_LIBADD) $(LIBS)
-+	$(libmedia_keys_la_LINK) -rpath $(plugindir) $(libmedia_keys_la_OBJECTS) $(libmedia_keys_la_LIBADD) $(LIBS)
- 
- clean-noinstPROGRAMS:
- 	@list='$(noinst_PROGRAMS)'; for p in $$list; do \
-@@ -515,10 +523,12 @@
+@@ -516,10 +522,12 @@
  
  @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libmedia_keys_la-gsd-marshal.Plo@am__quote@
  @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libmedia_keys_la-gsd-media-keys-manager.Plo@am__quote@
@@ -21194,7 +19629,7 @@ diff -Nur -x '*.orig' -x '*~' gnome-settings-daemon-2.27.1/plugins/media-keys/Ma
  @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/test_media_keys-gsd-media-keys-window.Po@am__quote@
  @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/test_media_keys-test-media-keys.Po@am__quote@
  @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/test_media_window-gsd-media-keys-window.Po@am__quote@
-@@ -566,6 +576,13 @@
+@@ -567,6 +575,13 @@
  @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
  @am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmedia_keys_la_CPPFLAGS) $(CPPFLAGS) $(libmedia_keys_la_CFLAGS) $(CFLAGS) -c -o libmedia_keys_la-gsd-media-keys-window.lo `test -f 'gsd-media-keys-window.c' || echo '$(srcdir)/'`gsd-media-keys-window.c
  
@@ -21208,7 +19643,7 @@ diff -Nur -x '*.orig' -x '*~' gnome-settings-daemon-2.27.1/plugins/media-keys/Ma
  libmedia_keys_la-gsd-marshal.lo: gsd-marshal.c
  @am__fastdepCC_TRUE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmedia_keys_la_CPPFLAGS) $(CPPFLAGS) $(libmedia_keys_la_CFLAGS) $(CFLAGS) -MT libmedia_keys_la-gsd-marshal.lo -MD -MP -MF $(DEPDIR)/libmedia_keys_la-gsd-marshal.Tpo -c -o libmedia_keys_la-gsd-marshal.lo `test -f 'gsd-marshal.c' || echo '$(srcdir)/'`gsd-marshal.c
  @am__fastdepCC_TRUE@	mv -f $(DEPDIR)/libmedia_keys_la-gsd-marshal.Tpo $(DEPDIR)/libmedia_keys_la-gsd-marshal.Plo
-@@ -587,6 +604,20 @@
+@@ -588,6 +603,20 @@
  @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
  @am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(test_media_keys_CPPFLAGS) $(CPPFLAGS) $(test_media_keys_CFLAGS) $(CFLAGS) -c -o test_media_keys-gsd-media-keys-manager.obj `if test -f 'gsd-media-keys-manager.c'; then $(CYGPATH_W) 'gsd-media-keys-manager.c'; else $(CYGPATH_W) '$(srcdir)/gsd-media-keys-manager.c'; fi`
  
@@ -21229,31 +19664,7 @@ diff -Nur -x '*.orig' -x '*~' gnome-settings-daemon-2.27.1/plugins/media-keys/Ma
  test_media_keys-gsd-media-keys-window.o: gsd-media-keys-window.c
  @am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(test_media_keys_CPPFLAGS) $(CPPFLAGS) $(test_media_keys_CFLAGS) $(CFLAGS) -MT test_media_keys-gsd-media-keys-window.o -MD -MP -MF $(DEPDIR)/test_media_keys-gsd-media-keys-window.Tpo -c -o test_media_keys-gsd-media-keys-window.o `test -f 'gsd-media-keys-window.c' || echo '$(srcdir)/'`gsd-media-keys-window.c
  @am__fastdepCC_TRUE@	mv -f $(DEPDIR)/test_media_keys-gsd-media-keys-window.Tpo $(DEPDIR)/test_media_keys-gsd-media-keys-window.Po
-@@ -662,23 +693,6 @@
- 
- clean-libtool:
- 	-rm -rf .libs _libs
--install-gladeDATA: $(glade_DATA)
--	@$(NORMAL_INSTALL)
--	test -z "$(gladedir)" || $(MKDIR_P) "$(DESTDIR)$(gladedir)"
--	@list='$(glade_DATA)'; for p in $$list; do \
--	  if test -f "$$p"; then d=; else d="$(srcdir)/"; fi; \
--	  f=$(am__strip_dir) \
--	  echo " $(gladeDATA_INSTALL) '$$d$$p' '$(DESTDIR)$(gladedir)/$$f'"; \
--	  $(gladeDATA_INSTALL) "$$d$$p" "$(DESTDIR)$(gladedir)/$$f"; \
--	done
--
--uninstall-gladeDATA:
--	@$(NORMAL_UNINSTALL)
--	@list='$(glade_DATA)'; for p in $$list; do \
--	  f=$(am__strip_dir) \
--	  echo " rm -f '$(DESTDIR)$(gladedir)/$$f'"; \
--	  rm -f "$(DESTDIR)$(gladedir)/$$f"; \
--	done
- install-pixmapsDATA: $(pixmaps_DATA)
- 	@$(NORMAL_INSTALL)
- 	test -z "$(pixmapsdir)" || $(MKDIR_P) "$(DESTDIR)$(pixmapsdir)"
-@@ -789,7 +803,7 @@
+@@ -790,7 +819,7 @@
  	unique=`for i in $$list; do \
  	    if test -f "$$i"; then echo $$i; else echo $(srcdir)/$$i; fi; \
  	  done | \
@@ -21262,88 +19673,16 @@ diff -Nur -x '*.orig' -x '*~' gnome-settings-daemon-2.27.1/plugins/media-keys/Ma
  	      END { if (nonempty) { for (i in files) print i; }; }'`; \
  	mkid -fID $$unique
  tags: TAGS
-@@ -893,7 +907,7 @@
- all-am: Makefile $(LTLIBRARIES) $(PROGRAMS) $(DATA)
- installdirs: installdirs-recursive
- installdirs-am:
--	for dir in "$(DESTDIR)$(plugindir)" "$(DESTDIR)$(gladedir)" "$(DESTDIR)$(pixmapsdir)" "$(DESTDIR)$(plugindir)"; do \
-+	for dir in "$(DESTDIR)$(plugindir)" "$(DESTDIR)$(pixmapsdir)" "$(DESTDIR)$(plugindir)"; do \
- 	  test -z "$$dir" || $(MKDIR_P) "$$dir"; \
- 	done
- install: $(BUILT_SOURCES)
-@@ -945,8 +959,8 @@
- 
- info-am:
- 
--install-data-am: install-gladeDATA install-pixmapsDATA \
--	install-pluginDATA install-pluginLTLIBRARIES
-+install-data-am: install-pixmapsDATA install-pluginDATA \
-+	install-pluginLTLIBRARIES
- 
- install-dvi: install-dvi-recursive
- 
-@@ -982,8 +996,8 @@
- 
- ps-am:
- 
--uninstall-am: uninstall-gladeDATA uninstall-pixmapsDATA \
--	uninstall-pluginDATA uninstall-pluginLTLIBRARIES
-+uninstall-am: uninstall-pixmapsDATA uninstall-pluginDATA \
-+	uninstall-pluginLTLIBRARIES
- 
- .MAKE: $(RECURSIVE_CLEAN_TARGETS) $(RECURSIVE_TARGETS) install-am \
- 	install-strip
-@@ -995,17 +1009,16 @@
- 	distclean-libtool distclean-tags distdir dvi dvi-am html \
- 	html-am info info-am install install-am install-data \
- 	install-data-am install-dvi install-dvi-am install-exec \
--	install-exec-am install-gladeDATA install-html install-html-am \
--	install-info install-info-am install-man install-pdf \
--	install-pdf-am install-pixmapsDATA install-pluginDATA \
-+	install-exec-am install-html install-html-am install-info \
-+	install-info-am install-man install-pdf install-pdf-am \
-+	install-pixmapsDATA install-pluginDATA \
- 	install-pluginLTLIBRARIES install-ps install-ps-am \
- 	install-strip installcheck installcheck-am installdirs \
- 	installdirs-am maintainer-clean maintainer-clean-generic \
- 	mostlyclean mostlyclean-compile mostlyclean-generic \
- 	mostlyclean-libtool pdf pdf-am ps ps-am tags tags-recursive \
--	uninstall uninstall-am uninstall-gladeDATA \
--	uninstall-pixmapsDATA uninstall-pluginDATA \
--	uninstall-pluginLTLIBRARIES
-+	uninstall uninstall-am uninstall-pixmapsDATA \
-+	uninstall-pluginDATA uninstall-pluginLTLIBRARIES
- 
- 
- gsd-media-keys-manager-glue.h: gsd-media-keys-manager.xml Makefile
-diff -Nur -x '*.orig' -x '*~' gnome-settings-daemon-2.27.1/plugins/mouse/Makefile.in gnome-settings-daemon-2.27.1.new/plugins/mouse/Makefile.in
---- gnome-settings-daemon-2.27.1/plugins/mouse/Makefile.in	2009-05-04 10:42:51.000000000 +0200
-+++ gnome-settings-daemon-2.27.1.new/plugins/mouse/Makefile.in	2009-05-11 17:33:42.000000000 +0200
+diff -Nur -x '*.orig' -x '*~' gnome-settings-daemon-2.27.4/plugins/mouse/Makefile.in gnome-settings-daemon-2.27.4.new/plugins/mouse/Makefile.in
+--- gnome-settings-daemon-2.27.4/plugins/mouse/Makefile.in	2009-07-14 12:46:31.000000000 +0100
++++ gnome-settings-daemon-2.27.4.new/plugins/mouse/Makefile.in	2009-07-20 00:11:05.304824061 +0100
 @@ -1,4 +1,4 @@
 -# Makefile.in generated by automake 1.10.1 from Makefile.am.
 +# Makefile.in generated by automake 1.10.2 from Makefile.am.
  # @configure_input@
  
  # Copyright (C) 1994, 1995, 1996, 1997, 1998, 1999, 2000, 2001, 2002,
-@@ -82,6 +82,8 @@
- DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
- ACLOCAL = @ACLOCAL@
- ALL_LINGUAS = @ALL_LINGUAS@
-+ALSA_CFLAGS = @ALSA_CFLAGS@
-+ALSA_LIBS = @ALSA_LIBS@
- AMTAR = @AMTAR@
- AR = @AR@
- AUTOCONF = @AUTOCONF@
-@@ -128,6 +130,8 @@
- GREP = @GREP@
- GSD_INTLTOOL_PLUGIN_RULE = @GSD_INTLTOOL_PLUGIN_RULE@
- GSD_PLUGIN_LDFLAGS = @GSD_PLUGIN_LDFLAGS@
-+GST_CFLAGS = @GST_CFLAGS@
-+GST_LIBS = @GST_LIBS@
- INSTALL = @INSTALL@
- INSTALL_DATA = @INSTALL_DATA@
- INSTALL_PROGRAM = @INSTALL_PROGRAM@
-@@ -293,8 +297,8 @@
+@@ -293,8 +293,8 @@
  	@for dep in $?; do \
  	  case '$(am__configure_deps)' in \
  	    *$$dep*) \
@@ -21354,7 +19693,7 @@ diff -Nur -x '*.orig' -x '*~' gnome-settings-daemon-2.27.1/plugins/mouse/Makefil
  	      exit 1;; \
  	  esac; \
  	done; \
-@@ -436,7 +440,7 @@
+@@ -436,7 +436,7 @@
  	unique=`for i in $$list; do \
  	    if test -f "$$i"; then echo $$i; else echo $(srcdir)/$$i; fi; \
  	  done | \
@@ -21363,34 +19702,16 @@ diff -Nur -x '*.orig' -x '*~' gnome-settings-daemon-2.27.1/plugins/mouse/Makefil
  	      END { if (nonempty) { for (i in files) print i; }; }'`; \
  	mkid -fID $$unique
  tags: TAGS
-diff -Nur -x '*.orig' -x '*~' gnome-settings-daemon-2.27.1/plugins/screensaver/Makefile.in gnome-settings-daemon-2.27.1.new/plugins/screensaver/Makefile.in
---- gnome-settings-daemon-2.27.1/plugins/screensaver/Makefile.in	2009-05-04 10:42:51.000000000 +0200
-+++ gnome-settings-daemon-2.27.1.new/plugins/screensaver/Makefile.in	2009-05-11 17:33:43.000000000 +0200
+diff -Nur -x '*.orig' -x '*~' gnome-settings-daemon-2.27.4/plugins/sound/Makefile.in gnome-settings-daemon-2.27.4.new/plugins/sound/Makefile.in
+--- gnome-settings-daemon-2.27.4/plugins/sound/Makefile.in	2009-07-14 12:46:31.000000000 +0100
++++ gnome-settings-daemon-2.27.4.new/plugins/sound/Makefile.in	2009-07-20 00:11:05.408824671 +0100
 @@ -1,4 +1,4 @@
 -# Makefile.in generated by automake 1.10.1 from Makefile.am.
 +# Makefile.in generated by automake 1.10.2 from Makefile.am.
  # @configure_input@
  
  # Copyright (C) 1994, 1995, 1996, 1997, 1998, 1999, 2000, 2001, 2002,
-@@ -85,6 +85,8 @@
- DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
- ACLOCAL = @ACLOCAL@
- ALL_LINGUAS = @ALL_LINGUAS@
-+ALSA_CFLAGS = @ALSA_CFLAGS@
-+ALSA_LIBS = @ALSA_LIBS@
- AMTAR = @AMTAR@
- AR = @AR@
- AUTOCONF = @AUTOCONF@
-@@ -131,6 +133,8 @@
- GREP = @GREP@
- GSD_INTLTOOL_PLUGIN_RULE = @GSD_INTLTOOL_PLUGIN_RULE@
- GSD_PLUGIN_LDFLAGS = @GSD_PLUGIN_LDFLAGS@
-+GST_CFLAGS = @GST_CFLAGS@
-+GST_LIBS = @GST_LIBS@
- INSTALL = @INSTALL@
- INSTALL_DATA = @INSTALL_DATA@
- INSTALL_PROGRAM = @INSTALL_PROGRAM@
-@@ -310,8 +314,8 @@
+@@ -300,8 +300,8 @@
  	@for dep in $?; do \
  	  case '$(am__configure_deps)' in \
  	    *$$dep*) \
@@ -21401,7 +19722,7 @@ diff -Nur -x '*.orig' -x '*~' gnome-settings-daemon-2.27.1/plugins/screensaver/M
  	      exit 1;; \
  	  esac; \
  	done; \
-@@ -437,7 +441,7 @@
+@@ -427,7 +427,7 @@
  	unique=`for i in $$list; do \
  	    if test -f "$$i"; then echo $$i; else echo $(srcdir)/$$i; fi; \
  	  done | \
@@ -21410,34 +19731,16 @@ diff -Nur -x '*.orig' -x '*~' gnome-settings-daemon-2.27.1/plugins/screensaver/M
  	      END { if (nonempty) { for (i in files) print i; }; }'`; \
  	mkid -fID $$unique
  tags: TAGS
-diff -Nur -x '*.orig' -x '*~' gnome-settings-daemon-2.27.1/plugins/sound/Makefile.in gnome-settings-daemon-2.27.1.new/plugins/sound/Makefile.in
---- gnome-settings-daemon-2.27.1/plugins/sound/Makefile.in	2009-05-04 10:42:51.000000000 +0200
-+++ gnome-settings-daemon-2.27.1.new/plugins/sound/Makefile.in	2009-05-11 17:33:43.000000000 +0200
+diff -Nur -x '*.orig' -x '*~' gnome-settings-daemon-2.27.4/plugins/typing-break/Makefile.in gnome-settings-daemon-2.27.4.new/plugins/typing-break/Makefile.in
+--- gnome-settings-daemon-2.27.4/plugins/typing-break/Makefile.in	2009-07-14 12:46:31.000000000 +0100
++++ gnome-settings-daemon-2.27.4.new/plugins/typing-break/Makefile.in	2009-07-20 00:11:05.508825220 +0100
 @@ -1,4 +1,4 @@
 -# Makefile.in generated by automake 1.10.1 from Makefile.am.
 +# Makefile.in generated by automake 1.10.2 from Makefile.am.
  # @configure_input@
  
  # Copyright (C) 1994, 1995, 1996, 1997, 1998, 1999, 2000, 2001, 2002,
-@@ -81,6 +81,8 @@
- DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
- ACLOCAL = @ACLOCAL@
- ALL_LINGUAS = @ALL_LINGUAS@
-+ALSA_CFLAGS = @ALSA_CFLAGS@
-+ALSA_LIBS = @ALSA_LIBS@
- AMTAR = @AMTAR@
- AR = @AR@
- AUTOCONF = @AUTOCONF@
-@@ -127,6 +129,8 @@
- GREP = @GREP@
- GSD_INTLTOOL_PLUGIN_RULE = @GSD_INTLTOOL_PLUGIN_RULE@
- GSD_PLUGIN_LDFLAGS = @GSD_PLUGIN_LDFLAGS@
-+GST_CFLAGS = @GST_CFLAGS@
-+GST_LIBS = @GST_LIBS@
- INSTALL = @INSTALL@
- INSTALL_DATA = @INSTALL_DATA@
- INSTALL_PROGRAM = @INSTALL_PROGRAM@
-@@ -300,8 +304,8 @@
+@@ -311,8 +311,8 @@
  	@for dep in $?; do \
  	  case '$(am__configure_deps)' in \
  	    *$$dep*) \
@@ -21448,7 +19751,7 @@ diff -Nur -x '*.orig' -x '*~' gnome-settings-daemon-2.27.1/plugins/sound/Makefil
  	      exit 1;; \
  	  esac; \
  	done; \
-@@ -427,7 +431,7 @@
+@@ -438,7 +438,7 @@
  	unique=`for i in $$list; do \
  	    if test -f "$$i"; then echo $$i; else echo $(srcdir)/$$i; fi; \
  	  done | \
@@ -21457,34 +19760,16 @@ diff -Nur -x '*.orig' -x '*~' gnome-settings-daemon-2.27.1/plugins/sound/Makefil
  	      END { if (nonempty) { for (i in files) print i; }; }'`; \
  	mkid -fID $$unique
  tags: TAGS
-diff -Nur -x '*.orig' -x '*~' gnome-settings-daemon-2.27.1/plugins/typing-break/Makefile.in gnome-settings-daemon-2.27.1.new/plugins/typing-break/Makefile.in
---- gnome-settings-daemon-2.27.1/plugins/typing-break/Makefile.in	2009-05-04 10:42:51.000000000 +0200
-+++ gnome-settings-daemon-2.27.1.new/plugins/typing-break/Makefile.in	2009-05-11 17:33:43.000000000 +0200
+diff -Nur -x '*.orig' -x '*~' gnome-settings-daemon-2.27.4/plugins/xrandr/Makefile.in gnome-settings-daemon-2.27.4.new/plugins/xrandr/Makefile.in
+--- gnome-settings-daemon-2.27.4/plugins/xrandr/Makefile.in	2009-07-14 12:46:32.000000000 +0100
++++ gnome-settings-daemon-2.27.4.new/plugins/xrandr/Makefile.in	2009-07-20 00:11:05.612824982 +0100
 @@ -1,4 +1,4 @@
 -# Makefile.in generated by automake 1.10.1 from Makefile.am.
 +# Makefile.in generated by automake 1.10.2 from Makefile.am.
  # @configure_input@
  
  # Copyright (C) 1994, 1995, 1996, 1997, 1998, 1999, 2000, 2001, 2002,
-@@ -86,6 +86,8 @@
- DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
- ACLOCAL = @ACLOCAL@
- ALL_LINGUAS = @ALL_LINGUAS@
-+ALSA_CFLAGS = @ALSA_CFLAGS@
-+ALSA_LIBS = @ALSA_LIBS@
- AMTAR = @AMTAR@
- AR = @AR@
- AUTOCONF = @AUTOCONF@
-@@ -132,6 +134,8 @@
- GREP = @GREP@
- GSD_INTLTOOL_PLUGIN_RULE = @GSD_INTLTOOL_PLUGIN_RULE@
- GSD_PLUGIN_LDFLAGS = @GSD_PLUGIN_LDFLAGS@
-+GST_CFLAGS = @GST_CFLAGS@
-+GST_LIBS = @GST_LIBS@
- INSTALL = @INSTALL@
- INSTALL_DATA = @INSTALL_DATA@
- INSTALL_PROGRAM = @INSTALL_PROGRAM@
-@@ -311,8 +315,8 @@
+@@ -311,8 +311,8 @@
  	@for dep in $?; do \
  	  case '$(am__configure_deps)' in \
  	    *$$dep*) \
@@ -21495,7 +19780,7 @@ diff -Nur -x '*.orig' -x '*~' gnome-settings-daemon-2.27.1/plugins/typing-break/
  	      exit 1;; \
  	  esac; \
  	done; \
-@@ -438,7 +442,7 @@
+@@ -438,7 +438,7 @@
  	unique=`for i in $$list; do \
  	    if test -f "$$i"; then echo $$i; else echo $(srcdir)/$$i; fi; \
  	  done | \
@@ -21504,34 +19789,16 @@ diff -Nur -x '*.orig' -x '*~' gnome-settings-daemon-2.27.1/plugins/typing-break/
  	      END { if (nonempty) { for (i in files) print i; }; }'`; \
  	mkid -fID $$unique
  tags: TAGS
-diff -Nur -x '*.orig' -x '*~' gnome-settings-daemon-2.27.1/plugins/xrandr/Makefile.in gnome-settings-daemon-2.27.1.new/plugins/xrandr/Makefile.in
---- gnome-settings-daemon-2.27.1/plugins/xrandr/Makefile.in	2009-05-04 10:42:51.000000000 +0200
-+++ gnome-settings-daemon-2.27.1.new/plugins/xrandr/Makefile.in	2009-05-11 17:33:43.000000000 +0200
+diff -Nur -x '*.orig' -x '*~' gnome-settings-daemon-2.27.4/plugins/xrdb/data/Makefile.in gnome-settings-daemon-2.27.4.new/plugins/xrdb/data/Makefile.in
+--- gnome-settings-daemon-2.27.4/plugins/xrdb/data/Makefile.in	2009-07-14 12:46:32.000000000 +0100
++++ gnome-settings-daemon-2.27.4.new/plugins/xrdb/data/Makefile.in	2009-07-20 00:11:05.788824371 +0100
 @@ -1,4 +1,4 @@
 -# Makefile.in generated by automake 1.10.1 from Makefile.am.
 +# Makefile.in generated by automake 1.10.2 from Makefile.am.
  # @configure_input@
  
  # Copyright (C) 1994, 1995, 1996, 1997, 1998, 1999, 2000, 2001, 2002,
-@@ -84,6 +84,8 @@
- DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
- ACLOCAL = @ACLOCAL@
- ALL_LINGUAS = @ALL_LINGUAS@
-+ALSA_CFLAGS = @ALSA_CFLAGS@
-+ALSA_LIBS = @ALSA_LIBS@
- AMTAR = @AMTAR@
- AR = @AR@
- AUTOCONF = @AUTOCONF@
-@@ -130,6 +132,8 @@
- GREP = @GREP@
- GSD_INTLTOOL_PLUGIN_RULE = @GSD_INTLTOOL_PLUGIN_RULE@
- GSD_PLUGIN_LDFLAGS = @GSD_PLUGIN_LDFLAGS@
-+GST_CFLAGS = @GST_CFLAGS@
-+GST_LIBS = @GST_LIBS@
- INSTALL = @INSTALL@
- INSTALL_DATA = @INSTALL_DATA@
- INSTALL_PROGRAM = @INSTALL_PROGRAM@
-@@ -311,8 +315,8 @@
+@@ -249,8 +249,8 @@
  	@for dep in $?; do \
  	  case '$(am__configure_deps)' in \
  	    *$$dep*) \
@@ -21542,7 +19809,27 @@ diff -Nur -x '*.orig' -x '*~' gnome-settings-daemon-2.27.1/plugins/xrandr/Makefi
  	      exit 1;; \
  	  esac; \
  	done; \
-@@ -438,7 +442,7 @@
+diff -Nur -x '*.orig' -x '*~' gnome-settings-daemon-2.27.4/plugins/xrdb/Makefile.in gnome-settings-daemon-2.27.4.new/plugins/xrdb/Makefile.in
+--- gnome-settings-daemon-2.27.4/plugins/xrdb/Makefile.in	2009-07-14 12:46:32.000000000 +0100
++++ gnome-settings-daemon-2.27.4.new/plugins/xrdb/Makefile.in	2009-07-20 00:11:05.716824482 +0100
+@@ -1,4 +1,4 @@
+-# Makefile.in generated by automake 1.10.1 from Makefile.am.
++# Makefile.in generated by automake 1.10.2 from Makefile.am.
+ # @configure_input@
+ 
+ # Copyright (C) 1994, 1995, 1996, 1997, 1998, 1999, 2000, 2001, 2002,
+@@ -322,8 +322,8 @@
+ 	@for dep in $?; do \
+ 	  case '$(am__configure_deps)' in \
+ 	    *$$dep*) \
+-	      cd $(top_builddir) && $(MAKE) $(AM_MAKEFLAGS) am--refresh \
+-		&& exit 0; \
++	      ( cd $(top_builddir) && $(MAKE) $(AM_MAKEFLAGS) am--refresh ) \
++	        && { if test -f $@; then exit 0; else break; fi; }; \
+ 	      exit 1;; \
+ 	  esac; \
+ 	done; \
+@@ -519,7 +519,7 @@
  	unique=`for i in $$list; do \
  	    if test -f "$$i"; then echo $$i; else echo $(srcdir)/$$i; fi; \
  	  done | \
@@ -21551,34 +19838,16 @@ diff -Nur -x '*.orig' -x '*~' gnome-settings-daemon-2.27.1/plugins/xrandr/Makefi
  	      END { if (nonempty) { for (i in files) print i; }; }'`; \
  	mkid -fID $$unique
  tags: TAGS
-diff -Nur -x '*.orig' -x '*~' gnome-settings-daemon-2.27.1/plugins/xrdb/data/Makefile.in gnome-settings-daemon-2.27.1.new/plugins/xrdb/data/Makefile.in
---- gnome-settings-daemon-2.27.1/plugins/xrdb/data/Makefile.in	2009-05-04 10:42:52.000000000 +0200
-+++ gnome-settings-daemon-2.27.1.new/plugins/xrdb/data/Makefile.in	2009-05-11 17:33:43.000000000 +0200
+diff -Nur -x '*.orig' -x '*~' gnome-settings-daemon-2.27.4/plugins/xsettings/Makefile.in gnome-settings-daemon-2.27.4.new/plugins/xsettings/Makefile.in
+--- gnome-settings-daemon-2.27.4/plugins/xsettings/Makefile.in	2009-07-14 12:46:32.000000000 +0100
++++ gnome-settings-daemon-2.27.4.new/plugins/xsettings/Makefile.in	2009-07-20 00:11:05.904824869 +0100
 @@ -1,4 +1,4 @@
 -# Makefile.in generated by automake 1.10.1 from Makefile.am.
 +# Makefile.in generated by automake 1.10.2 from Makefile.am.
  # @configure_input@
  
  # Copyright (C) 1994, 1995, 1996, 1997, 1998, 1999, 2000, 2001, 2002,
-@@ -56,6 +56,8 @@
- DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
- ACLOCAL = @ACLOCAL@
- ALL_LINGUAS = @ALL_LINGUAS@
-+ALSA_CFLAGS = @ALSA_CFLAGS@
-+ALSA_LIBS = @ALSA_LIBS@
- AMTAR = @AMTAR@
- AR = @AR@
- AUTOCONF = @AUTOCONF@
-@@ -102,6 +104,8 @@
- GREP = @GREP@
- GSD_INTLTOOL_PLUGIN_RULE = @GSD_INTLTOOL_PLUGIN_RULE@
- GSD_PLUGIN_LDFLAGS = @GSD_PLUGIN_LDFLAGS@
-+GST_CFLAGS = @GST_CFLAGS@
-+GST_LIBS = @GST_LIBS@
- INSTALL = @INSTALL@
- INSTALL_DATA = @INSTALL_DATA@
- INSTALL_PROGRAM = @INSTALL_PROGRAM@
-@@ -249,8 +253,8 @@
+@@ -325,8 +325,8 @@
  	@for dep in $?; do \
  	  case '$(am__configure_deps)' in \
  	    *$$dep*) \
@@ -21589,92 +19858,7 @@ diff -Nur -x '*.orig' -x '*~' gnome-settings-daemon-2.27.1/plugins/xrdb/data/Mak
  	      exit 1;; \
  	  esac; \
  	done; \
-diff -Nur -x '*.orig' -x '*~' gnome-settings-daemon-2.27.1/plugins/xrdb/Makefile.in gnome-settings-daemon-2.27.1.new/plugins/xrdb/Makefile.in
---- gnome-settings-daemon-2.27.1/plugins/xrdb/Makefile.in	2009-05-04 10:42:52.000000000 +0200
-+++ gnome-settings-daemon-2.27.1.new/plugins/xrdb/Makefile.in	2009-05-11 17:33:43.000000000 +0200
-@@ -1,4 +1,4 @@
--# Makefile.in generated by automake 1.10.1 from Makefile.am.
-+# Makefile.in generated by automake 1.10.2 from Makefile.am.
- # @configure_input@
- 
- # Copyright (C) 1994, 1995, 1996, 1997, 1998, 1999, 2000, 2001, 2002,
-@@ -92,6 +92,8 @@
- DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
- ACLOCAL = @ACLOCAL@
- ALL_LINGUAS = @ALL_LINGUAS@
-+ALSA_CFLAGS = @ALSA_CFLAGS@
-+ALSA_LIBS = @ALSA_LIBS@
- AMTAR = @AMTAR@
- AR = @AR@
- AUTOCONF = @AUTOCONF@
-@@ -138,6 +140,8 @@
- GREP = @GREP@
- GSD_INTLTOOL_PLUGIN_RULE = @GSD_INTLTOOL_PLUGIN_RULE@
- GSD_PLUGIN_LDFLAGS = @GSD_PLUGIN_LDFLAGS@
-+GST_CFLAGS = @GST_CFLAGS@
-+GST_LIBS = @GST_LIBS@
- INSTALL = @INSTALL@
- INSTALL_DATA = @INSTALL_DATA@
- INSTALL_PROGRAM = @INSTALL_PROGRAM@
-@@ -322,8 +326,8 @@
- 	@for dep in $?; do \
- 	  case '$(am__configure_deps)' in \
- 	    *$$dep*) \
--	      cd $(top_builddir) && $(MAKE) $(AM_MAKEFLAGS) am--refresh \
--		&& exit 0; \
-+	      ( cd $(top_builddir) && $(MAKE) $(AM_MAKEFLAGS) am--refresh ) \
-+	        && { if test -f $@; then exit 0; else break; fi; }; \
- 	      exit 1;; \
- 	  esac; \
- 	done; \
-@@ -519,7 +523,7 @@
- 	unique=`for i in $$list; do \
- 	    if test -f "$$i"; then echo $$i; else echo $(srcdir)/$$i; fi; \
- 	  done | \
--	  $(AWK) '{ files[$$0] = 1; nonemtpy = 1; } \
-+	  $(AWK) '{ files[$$0] = 1; nonempty = 1; } \
- 	      END { if (nonempty) { for (i in files) print i; }; }'`; \
- 	mkid -fID $$unique
- tags: TAGS
-diff -Nur -x '*.orig' -x '*~' gnome-settings-daemon-2.27.1/plugins/xsettings/Makefile.in gnome-settings-daemon-2.27.1.new/plugins/xsettings/Makefile.in
---- gnome-settings-daemon-2.27.1/plugins/xsettings/Makefile.in	2009-05-04 10:42:52.000000000 +0200
-+++ gnome-settings-daemon-2.27.1.new/plugins/xsettings/Makefile.in	2009-05-11 17:33:43.000000000 +0200
-@@ -1,4 +1,4 @@
--# Makefile.in generated by automake 1.10.1 from Makefile.am.
-+# Makefile.in generated by automake 1.10.2 from Makefile.am.
- # @configure_input@
- 
- # Copyright (C) 1994, 1995, 1996, 1997, 1998, 1999, 2000, 2001, 2002,
-@@ -106,6 +106,8 @@
- DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
- ACLOCAL = @ACLOCAL@
- ALL_LINGUAS = @ALL_LINGUAS@
-+ALSA_CFLAGS = @ALSA_CFLAGS@
-+ALSA_LIBS = @ALSA_LIBS@
- AMTAR = @AMTAR@
- AR = @AR@
- AUTOCONF = @AUTOCONF@
-@@ -152,6 +154,8 @@
- GREP = @GREP@
- GSD_INTLTOOL_PLUGIN_RULE = @GSD_INTLTOOL_PLUGIN_RULE@
- GSD_PLUGIN_LDFLAGS = @GSD_PLUGIN_LDFLAGS@
-+GST_CFLAGS = @GST_CFLAGS@
-+GST_LIBS = @GST_LIBS@
- INSTALL = @INSTALL@
- INSTALL_DATA = @INSTALL_DATA@
- INSTALL_PROGRAM = @INSTALL_PROGRAM@
-@@ -325,8 +329,8 @@
- 	@for dep in $?; do \
- 	  case '$(am__configure_deps)' in \
- 	    *$$dep*) \
--	      cd $(top_builddir) && $(MAKE) $(AM_MAKEFLAGS) am--refresh \
--		&& exit 0; \
-+	      ( cd $(top_builddir) && $(MAKE) $(AM_MAKEFLAGS) am--refresh ) \
-+	        && { if test -f $@; then exit 0; else break; fi; }; \
- 	      exit 1;; \
- 	  esac; \
- 	done; \
-@@ -476,7 +480,7 @@
+@@ -476,7 +476,7 @@
  	unique=`for i in $$list; do \
  	    if test -f "$$i"; then echo $$i; else echo $(srcdir)/$$i; fi; \
  	  done | \

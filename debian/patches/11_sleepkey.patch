@@ -1,7 +1,7 @@
-diff -Nur -x '*.orig' -x '*~' gnome-settings-daemon-2.25.90/plugins/media-keys/gsd-media-keys-manager.c gnome-settings-daemon-2.25.90.new/plugins/media-keys/gsd-media-keys-manager.c
---- gnome-settings-daemon-2.25.90/plugins/media-keys/gsd-media-keys-manager.c	2009-02-11 14:31:10.000000000 +0100
-+++ gnome-settings-daemon-2.25.90.new/plugins/media-keys/gsd-media-keys-manager.c	2009-02-11 14:31:22.000000000 +0100
-@@ -67,7 +67,7 @@
+diff -Nur -x '*.orig' -x '*~' gnome-settings-daemon-2.27.4/plugins/media-keys/gsd-media-keys-manager.c gnome-settings-daemon-2.27.4.new/plugins/media-keys/gsd-media-keys-manager.c
+--- gnome-settings-daemon-2.27.4/plugins/media-keys/gsd-media-keys-manager.c	2009-06-29 13:24:44.000000000 +0100
++++ gnome-settings-daemon-2.27.4.new/plugins/media-keys/gsd-media-keys-manager.c	2009-07-19 23:07:59.593826692 +0100
+@@ -71,7 +71,7 @@
  #if defined(__OpenBSD__) || defined(__FreeBSD__)
  # define SLEEP_COMMAND "zzz"
  #else

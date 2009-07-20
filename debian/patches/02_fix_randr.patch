@@ -1,10 +1,10 @@
 # Description: Fix application of ~/.config/monitors.xml
 # Ubuntu: https://launchpad.net/bugs/329410
 # Upstream: http://bugzilla.gnome.org/show_bug.cgi?id=572876
-diff -Nur -x '*.orig' -x '*~' gnome-settings-daemon-2.27.3/plugins/xrandr/gsd-xrandr-manager.c gnome-settings-daemon-2.27.3.new/plugins/xrandr/gsd-xrandr-manager.c
---- gnome-settings-daemon-2.27.3/plugins/xrandr/gsd-xrandr-manager.c	2009-06-15 11:09:35.000000000 +0200
-+++ gnome-settings-daemon-2.27.3.new/plugins/xrandr/gsd-xrandr-manager.c	2009-06-15 13:51:00.000000000 +0200
-@@ -1718,7 +1718,6 @@
+diff -Nur -x '*.orig' -x '*~' gnome-settings-daemon-2.27.4/plugins/xrandr/gsd-xrandr-manager.c gnome-settings-daemon-2.27.4.new/plugins/xrandr/gsd-xrandr-manager.c
+--- gnome-settings-daemon-2.27.4/plugins/xrandr/gsd-xrandr-manager.c	2009-06-29 13:24:44.000000000 +0100
++++ gnome-settings-daemon-2.27.4.new/plugins/xrandr/gsd-xrandr-manager.c	2009-07-19 23:03:46.713824087 +0100
+@@ -1757,7 +1757,6 @@
                   */
  
                  unlink (backup_filename);
@@ -12,7 +12,7 @@ diff -Nur -x '*.orig' -x '*~' gnome-settings-daemon-2.27.3/plugins/xrandr/gsd-xr
          }
  
          /* 2. There was no backup configuration!  This means we are
-@@ -1726,6 +1725,7 @@
+@@ -1765,6 +1764,7 @@
           */
  
          apply_intended_configuration (manager, intended_filename, timestamp);

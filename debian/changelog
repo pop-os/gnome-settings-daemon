@@ -1,3 +1,30 @@
+gnome-settings-daemon (2.27.4-0ubuntu1) UNRELEASED; urgency=low
+
+  * New upstream version (LP: #401510):
+    - Remove screensaver plugin, it's autostarted now 
+      (Matthias Clasen)
+    - Don't take too long in RANDR D-Bus method implementation 
+      (Federico Mena Quintero)
+    - Add support for Synaptics touchpads (Matthias Clasen)
+    - Don't spawn more than one syncdaemon (Matthias Clasen)
+    - Depend on gnome-desktop >= 2.26.3 (Rodrigo Moya)
+    - Update gnome-volume-control code from master (Bastien Nocera)
+    - Fix order of arguments to strstr (Federico Mena Quintero)
+    - Depend on libxklavier 4.0 (Sergey V. Udaltsov)
+    - Remove libglade dependency from media-keys and keyboard plugins 
+      (Felix Riemann)
+  * debian/control{.in}:
+    - Bump libgnome-desktop-dev build-dependency.
+    - Migrate libxklavier12-dev build-dep to libxklavier-dev and bump
+      version requirement.
+    - Build-depend on libpulse-dev.
+  * Refreshed patches to apply cleanly again.
+  * Dropped 07_use_gstreamer_volume.patch to use the Pulseaudio
+    volume control rather than the old GstMixer interface.
+  * Dropped 08_extra_touchpad_options.patch - fixed upstream now.
+
+ -- Chris Coulson <chrisccoulson@ubuntu.com>  Sun, 19 Jul 2009 22:54:21 +0100
+
 gnome-settings-daemon (2.27.3-0ubuntu2) karmic; urgency=low
 
   * debian/patches/16_use_synchronous_notifications.patch:
