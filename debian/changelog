@@ -22,6 +22,11 @@ gnome-settings-daemon (2.27.4-0ubuntu1) UNRELEASED; urgency=low
   * Dropped 07_use_gstreamer_volume.patch to use the Pulseaudio
     volume control rather than the old GstMixer interface.
   * Dropped 08_extra_touchpad_options.patch - fixed upstream now.
+  * debian/gnome-settings-daemon.install:
+    - Updated to correctly install *.ui files.
+  * debian/patches/50_ldsm_notification.patch:
+    - Upstream change to implement the new low disk space warning
+      (Fixes LP: #337441, LP: #390504 and LP: #396864).
 
  -- Chris Coulson <chrisccoulson@ubuntu.com>  Sun, 19 Jul 2009 22:54:21 +0100
 

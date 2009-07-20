@@ -1,0 +1,1899 @@
+From 8f1e770acb92682d1a5a4b7dd16049155cad2902 Mon Sep 17 00:00:00 2001
+From: Chris Coulson <chriscoulson@googlemail.com>
+Date: Sun, 19 Jul 2009 13:56:14 +0000
+Subject: Bug 573980 - Improved low disk space warning
+
+This implements the http://live.gnome.org/LowDiskSpaceWarning specification.
+
+Add several gconf keys for controlling the warning threshold and appearance
+frequency.
+
+We now support emptying trash.
+
+Gather information about free disk space on mount points.
+
+Signed-off-by: Colin Walters <walters@verbum.org>
+---
+diff --git a/data/Makefile.am b/data/Makefile.am
+index e12c204..3615d06 100644
+--- a/data/Makefile.am
++++ b/data/Makefile.am
+@@ -5,6 +5,7 @@ NULL =
+ schemasdir = $(GCONF_SCHEMA_FILE_DIR)
+ schemas_in_files = 						\
+ 	gnome-settings-daemon.schemas.in			\
++	apps_gnome_settings_daemon_housekeeping.schemas.in	\
+ 	apps_gnome_settings_daemon_keybindings.schemas.in	\
+ 	desktop_gnome_font_rendering.schemas.in			\
+ 	desktop_gnome_keybindings.schemas.in			\
+diff --git a/data/apps_gnome_settings_daemon_housekeeping.schemas.in b/data/apps_gnome_settings_daemon_housekeeping.schemas.in
+new file mode 100644
+index 0000000..8f9697a
+--- a/dev/null
++++ b/data/apps_gnome_settings_daemon_housekeeping.schemas.in
+@@ -0,0 +1,61 @@
++<?xml version="1.0"?>
++<gconfschemafile>
++    <schemalist>
++		<schema>
++		<key>/schemas/apps/gnome_settings_daemon/plugins/housekeeping/free_percent_notify</key>
++	    <applyto>/apps/gnome_settings_daemon/plugins/housekeeping/free_percent_notify</applyto>
++	    <type>float</type>
++	    <default>0.05</default>
++	    <locale name="C">
++	        <short>Free percentage notify threshold</short>
++		<long>Percentage free space threshold for initial warning of low disk space.
++				If the percentage free space drops below this, a warning will be shown</long>
++	    </locale>
++		</schema>
++		
++		<schema>
++		<key>/schemas/apps/gnome_settings_daemon/plugins/housekeeping/free_percent_notify_again</key>
++	    <applyto>/apps/gnome_settings_daemon/plugins/housekeeping/free_percent_notify_again</applyto>
++	    <type>float</type>
++	    <default>0.01</default>
++	    <locale name="C">
++	        <short>Subsequent free percentage notify threshold</short>
++		<long>Specify the percentage that the free disk space should reduce by before issuing a subsequent warning</long>
++	    </locale>
++		</schema>
++		
++		<schema>
++		<key>/schemas/apps/gnome_settings_daemon/plugins/housekeeping/free_size_gb_no_notify</key>
++	    <applyto>/apps/gnome_settings_daemon/plugins/housekeeping/free_size_gb_no_notify</applyto>
++	    <type>int</type>
++	    <default>2</default>
++	    <locale name="C">
++	        <short>Free space no notify threshold</short>
++		<long>Specify an amount in GB. If the amount of free space is more than this, no warning will be shown</long>
++	    </locale>
++		</schema>
++		
++		<schema>
++		<key>/schemas/apps/gnome_settings_daemon/plugins/housekeeping/min_notify_period</key>
++	    <applyto>/apps/gnome_settings_daemon/plugins/housekeeping/min_notify_period</applyto>
++	    <type>int</type>
++	    <default>10</default>
++	    <locale name="C">
++	        <short>Minimum notify period for repeated warnings</short>
++		<long>Specify a time in minutes. Subsequent warnings for a volume will not appear more often than this period.</long>
++	    </locale>
++		</schema>
++		
++		<schema>
++		<key>/schemas/apps/gnome_settings_daemon/plugins/housekeeping/ignore_paths</key>
++	    <applyto>/apps/gnome_settings_daemon/plugins/housekeeping/ignore_paths</applyto>
++	    <type>list</type>
++	    <list_type>string</list_type>
++	    <default>[]</default>
++	    <locale name="C">
++	        <short>Mount paths to ignore</short>
++		<long>Specify a list of mount paths to ignore when they run low on space.</long>
++	    </locale>
++		</schema>
++    </schemalist>
++</gconfschemafile>
+diff --git a/plugins/housekeeping/Makefile.am b/plugins/housekeeping/Makefile.am
+index 211b34e..532c588 100644
+--- a/plugins/housekeeping/Makefile.am
++++ b/plugins/housekeeping/Makefile.am
+@@ -1,6 +1,10 @@
+ plugin_LTLIBRARIES = libhousekeeping.la
+ 
+ libhousekeeping_la_SOURCES = 		\
++	gsd-ldsm-dialog.c	\
++	gsd-ldsm-dialog.h	\
++	gsd-ldsm-trash-empty.c	\
++	gsd-ldsm-trash-empty.h	\
+ 	gsd-disk-space.c		\
+ 	gsd-disk-space.h		\
+ 	gsd-housekeeping-manager.c	\
+diff --git a/plugins/housekeeping/gsd-disk-space.c b/plugins/housekeeping/gsd-disk-space.c
+index e46fbbb..a91940c 100644
+--- a/plugins/housekeeping/gsd-disk-space.c
++++ b/plugins/housekeeping/gsd-disk-space.c
+@@ -26,235 +26,431 @@
+ #include "config.h"
+ 
+ #include <sys/statvfs.h>
++#include <time.h>
++#include <unistd.h>
+ 
+ #include <glib.h>
+ #include <glib/gi18n.h>
+ #include <glib-object.h>
+ #include <gio/gunixmounts.h>
++#include <gio/gio.h>
+ #include <gtk/gtk.h>
+-
+-#ifdef HAVE_LIBNOTIFY
+-
+-#include <libnotify/notify.h>
++#include <gconf/gconf-client.h>
+ 
+ #include "gsd-disk-space.h"
++#include "gsd-ldsm-dialog.h"
++#include "gsd-ldsm-trash-empty.h"
+ 
+-/*
+- * TODO:
+- *  + gconf to make it possible to customize the define below (?)
+- */
+ 
+-#define FREE_PERCENT_NOTIFY        0.05
+-#define FREE_PERCENT_NOTIFY_AGAIN  0.01
+-/* No notification if there's more than 2 GB */
+-#define FREE_SIZE_GB_NO_NOTIFY     2
+ #define GIGABYTE                   1024 * 1024 * 1024
+ 
+-#ifdef TEST
+-#undef  FREE_PERCENT_NOTIFY
+-#define FREE_PERCENT_NOTIFY        0.95
+-#undef  FREE_SIZE_GB_NO_NOTIFY
+-#define FREE_SIZE_GB_NO_NOTIFY     200
+-#endif
+-
+ #define CHECK_EVERY_X_SECONDS      60
+ 
+ #define DISK_SPACE_ANALYZER        "baobab"
+ 
++#define GCONF_HOUSEKEEPING_DIR     "/apps/gnome_settings_daemon/plugins/housekeeping"
++#define GCONF_FREE_PC_NOTIFY_KEY   "free_percent_notify"
++#define GCONF_FREE_PC_NOTIFY_AGAIN_KEY "free_percent_notify_again"
++#define GCONF_FREE_SIZE_NO_NOTIFY  "free_size_gb_no_notify"
++#define GCONF_MIN_NOTIFY_PERIOD    "min_notify_period"
++#define GCONF_IGNORE_PATHS         "ignore_paths"
++
++typedef struct
++{
++        GUnixMountEntry *mount;
++        struct statvfs buf;
++        time_t notify_time;
++} LdsmMountInfo;
++
+ static GHashTable        *ldsm_notified_hash = NULL;
+ static unsigned int       ldsm_timeout_id = 0;
+ static GUnixMountMonitor *ldsm_monitor = NULL;
+-
+-static void
+-ldsm_hash_free_slice_gdouble (gpointer data)
++static double             free_percent_notify = 0.05;
++static double             free_percent_notify_again = 0.01;
++static unsigned int       free_size_gb_no_notify = 2;
++static unsigned int       min_notify_period = 10;
++static GSList            *ignore_paths = NULL;
++static unsigned int       gconf_notify_id;
++static GConfClient       *client = NULL;
++static GsdLdsmDialog     *dialog = NULL;
++static guint64           *time_read;
++
++static gchar*
++ldsm_get_fs_id_for_path (const gchar *path)
+ {
+-        g_slice_free (gdouble, data);
++        GFile *file;
++        GFileInfo *fileinfo;
++        gchar *attr_id_fs;
++        
++        file = g_file_new_for_path (path);
++        fileinfo = g_file_query_info (file, G_FILE_ATTRIBUTE_ID_FILESYSTEM, G_FILE_QUERY_INFO_NOFOLLOW_SYMLINKS, NULL, NULL);
++        if (fileinfo) {
++                attr_id_fs = g_strdup (g_file_info_get_attribute_string (fileinfo, G_FILE_ATTRIBUTE_ID_FILESYSTEM));
++                g_object_unref (fileinfo);
++        } else {
++                attr_id_fs = NULL;
++        }
++        
++        g_object_unref (file);
++        
++        return attr_id_fs;
+ }
+ 
+-static char *
+-ldsm_get_icon_name_from_g_icon (GIcon *gicon)
++static gboolean 
++ldsm_mount_has_trash (LdsmMountInfo *mount)
+ {
+-        const char * const *names;
+-        GtkIconTheme *icon_theme;
+-        int i;
+-
+-        if (!G_IS_THEMED_ICON (gicon))
+-                return NULL;
+-
+-        names = g_themed_icon_get_names (G_THEMED_ICON (gicon));
+-        icon_theme = gtk_icon_theme_get_default ();
+-
+-        for (i = 0; names[i] != NULL; i++) {
+-                if (gtk_icon_theme_has_icon (icon_theme, names[i]))
+-                        return g_strdup (names[i]);
++        const gchar *user_data_dir;
++        gchar *user_data_attr_id_fs;
++        gchar *path_attr_id_fs;
++        gboolean mount_uses_user_trash = FALSE;
++        gchar *trash_files_dir;
++        gboolean has_trash = FALSE;
++        GDir *dir;
++        const gchar *path;
++        
++        user_data_dir = g_get_user_data_dir ();
++        user_data_attr_id_fs = ldsm_get_fs_id_for_path (user_data_dir);
++        
++        path = g_unix_mount_get_mount_path (mount->mount);
++        path_attr_id_fs = ldsm_get_fs_id_for_path (path);
++        
++        if (g_strcmp0 (user_data_attr_id_fs, path_attr_id_fs) == 0) {
++                /* The volume that is low on space is on the same volume as our home
++                 * directory. This means the trash is at $XDG_DATA_HOME/Trash,
++                 * not at the root of the volume which is full.
++                 */
++                mount_uses_user_trash = TRUE;
+         }
+-
+-        return NULL;
++        
++        g_free (user_data_attr_id_fs);
++        g_free (path_attr_id_fs);
++        
++        /* I can't think of a better way to find out if a volume has any trash. Any suggestions? */
++        if (mount_uses_user_trash) {
++                trash_files_dir = g_build_filename (g_get_user_data_dir (), "Trash", "files", NULL);
++        } else {
++                gchar *uid;
++                
++                uid = g_strdup_printf ("%d", getuid ());
++                trash_files_dir = g_build_filename (path, ".Trash", uid, "files", NULL);
++                if (!g_file_test (trash_files_dir, G_FILE_TEST_IS_DIR)) {
++                        gchar *trash_dir;
++                        
++                        g_free (trash_files_dir);
++                        trash_dir = g_strdup_printf (".Trash-%s", uid);
++                        trash_files_dir = g_build_filename (path, trash_dir, "files", NULL);
++                        g_free (trash_dir);
++                        if (!g_file_test (trash_files_dir, G_FILE_TEST_IS_DIR)) {
++                                g_free (trash_files_dir);
++                                g_free (uid);
++                                return has_trash;
++                        }
++                }
++                g_free (uid);
++        }
++        
++        dir = g_dir_open (trash_files_dir, 0, NULL);
++        if (dir) {
++                if (g_dir_read_name (dir))
++                        has_trash = TRUE;
++                g_dir_close (dir);
++        }
++        
++        g_free (trash_files_dir);      
++                
++        return has_trash;  
+ }
+ 
+ static void
+-ldsm_notification_clicked (NotifyNotification *notification,
+-                           const char         *action,
+-                           const char         *path)
++ldsm_analyze_path (const gchar *path)
+ {
+-        const char *argv[] = { DISK_SPACE_ANALYZER, path, NULL };
+-
+-        if (strcmp (action, "analyze") != 0) {
+-                return;
+-        }
+-
+-        g_spawn_async (NULL, (char **) argv, NULL, G_SPAWN_SEARCH_PATH,
+-                       NULL, NULL, NULL, NULL);
++        const gchar *argv[] = { DISK_SPACE_ANALYZER, path, NULL };
++        
++        g_spawn_async (NULL, (gchar **) argv, NULL, G_SPAWN_SEARCH_PATH,
++                        NULL, NULL, NULL, NULL);
+ }
+ 
+-static void
+-ldsm_notify_for_mount (GUnixMountEntry *mount,
+-                       double           free_space,
+-                       gboolean         has_disk_analyzer)
++static gboolean
++ldsm_notify_for_mount (LdsmMountInfo *mount,
++                       gboolean       has_disk_analyzer,
++                       gboolean       multiple_volumes,
++                       gboolean       other_usable_volumes)
+ {
+-        char  *name;
+-        char  *msg;
+-        GIcon *gicon;
+-        char  *icon;
+-        int    in_use;
+-        NotifyNotification *notif;
+-
+-        name = g_unix_mount_guess_name (mount);
+-        in_use = 100 - (free_space * 100);
+-        msg = g_strdup_printf (_("%d%% of the disk space on `%s' is in use"),
+-                               in_use, name);
++        gchar  *name;
++        gint64 free_space;
++        gint response;
++        gboolean has_trash;
++        gboolean retval = TRUE;
++        const gchar *path;
++        
++        /* Don't show a dialog if one is already displayed */
++        if (dialog)
++                return retval;
++        
++        name = g_unix_mount_guess_name (mount->mount);
++        free_space = (mount->buf.f_frsize * mount->buf.f_bavail);
++        has_trash = ldsm_mount_has_trash (mount);
++        path = g_unix_mount_get_mount_path (mount->mount);
++        
++        dialog = gsd_ldsm_dialog_new (other_usable_volumes,
++                                      multiple_volumes,
++                                      has_disk_analyzer,
++                                      has_trash,
++                                      free_space,
++                                      name,
++                                      path);
++                                        
+         g_free (name);
+-
+-        gicon = g_unix_mount_guess_icon (mount);
+-        icon = ldsm_get_icon_name_from_g_icon (gicon);
+-        g_object_unref (gicon);
+-
+-        notif = notify_notification_new (_("Low Disk Space"), msg, icon, NULL);
+-        g_free (msg);
+-        g_free (icon);
+-
+-        notify_notification_set_urgency (notif, NOTIFY_URGENCY_CRITICAL);
+-
+-        if (has_disk_analyzer) {
+-                const char *path;
+-
+-                path = g_unix_mount_get_mount_path (mount);
+-
+-                notify_notification_add_action (notif, "analyze", _("Analyze"),
+-                                                (NotifyActionCallback) ldsm_notification_clicked,
+-                                                g_strdup (path), g_free);
++        
++        g_object_ref (G_OBJECT (dialog));        
++        response = gtk_dialog_run (GTK_DIALOG (dialog));
++        
++        gtk_object_destroy (GTK_OBJECT (dialog));
++        dialog = NULL;
++        
++        switch (response) {
++        case GTK_RESPONSE_CANCEL:
++                retval = FALSE;
++                break;
++        case GSD_LDSM_DIALOG_RESPONSE_ANALYZE:
++                retval = FALSE;
++                ldsm_analyze_path (g_unix_mount_get_mount_path (mount->mount));
++                break;
++        case GSD_LDSM_DIALOG_RESPONSE_EMPTY_TRASH:
++                retval = TRUE;
++                gsd_ldsm_trash_empty ();
++                break;
++        case GTK_RESPONSE_NONE:
++        case GTK_RESPONSE_DELETE_EVENT:
++                retval = TRUE;
++                break;
++        default:
++                g_assert_not_reached ();
+         }
+-
+-        g_signal_connect (notif, "closed", G_CALLBACK (g_object_unref), NULL);
+-
+-        notify_notification_show (notif, NULL);
++        
++        return retval;      
+ }
+ 
+-static void
+-ldsm_check_mount (GUnixMountEntry *mount,
+-                  gboolean         has_disk_analyzer)
++static gboolean
++ldsm_mount_has_space (LdsmMountInfo *mount)
+ {
+-        const char *path;
+-        struct statvfs buf;
+-        unsigned long threshold_blocks;
+-        double free_space;
+-        double previous_free_space;
+-        double *previous_free_space_p;
+-
+-        path = g_unix_mount_get_mount_path (mount);
+-
+-        /* get the old stats we saved for this mount in case we notified */
+-        previous_free_space_p = g_hash_table_lookup (ldsm_notified_hash, path);
+-        if (previous_free_space_p != NULL)
+-                previous_free_space = *previous_free_space_p;
+-        else
+-                previous_free_space = 0;
+-
+-        if (statvfs (path, &buf) != 0) {
+-                g_hash_table_remove (ldsm_notified_hash, path);
+-                return;
+-        }
++        gdouble free_space;
++        
++        free_space = (double) mount->buf.f_bavail / (double) mount->buf.f_blocks;
++        /* enough free space, nothing to do */
++        if (free_space > free_percent_notify)
++                return TRUE;
++        
++        /* If we got here, then this volume is low on space */
++        return FALSE;
++}
+ 
+-        /* not a real filesystem, but a virtual one. Skip it */
+-        if (buf.f_blocks == 0) {
+-                g_hash_table_remove (ldsm_notified_hash, path);
+-                return;
++static gboolean
++ldsm_mount_is_virtual (LdsmMountInfo *mount)
++{
++        const gchar *dev_path;
++        
++        if (mount->buf.f_blocks == 0) {
++                /* Filesystems with zero blocks are virtual */
++                return TRUE;
+         }
+ 
+-        free_space = (double) buf.f_bavail / (double) buf.f_blocks;
+-        /* enough free space, nothing to do */
+-        if (free_space > FREE_PERCENT_NOTIFY) {
+-                g_hash_table_remove (ldsm_notified_hash, path);
+-                return;
+-        }
++        dev_path = g_unix_mount_get_device_path (mount->mount);
++        if (!g_str_has_prefix (dev_path, "/dev")) {
++                /* If the device path doesn't begin with /dev, then it's
++                 * likely to be virtual eg devpts, varrun, tmpfs etc.
++                 */
++                return TRUE;
++         }
++        
++        return FALSE;
++}
+ 
+-        /* note that we try to avoid doing an overflow */
+-        threshold_blocks = FREE_SIZE_GB_NO_NOTIFY * (GIGABYTE / buf.f_bsize);
+-        /* more than enough space, nothing to do */
+-        if (buf.f_bavail > threshold_blocks) {
+-                g_hash_table_remove (ldsm_notified_hash, path);
+-                return;
+-        }
++static void
++ldsm_free_mount_info (gpointer data)
++{
++        LdsmMountInfo *mount = data;
++        
++        g_return_if_fail (mount != NULL);
++        
++        g_unix_mount_free (mount->mount);
++        g_free (mount);
++}
+ 
+-        /* did we already notify the user? If yes, we only notify if the disk
+-         * is getting more and more filled */
+-        if (previous_free_space != 0 &&
+-            previous_free_space - free_space < FREE_PERCENT_NOTIFY_AGAIN) {
+-                return;
++static void
++ldsm_maybe_warn_mounts (GList *mounts,
++                        gboolean has_disk_analyzer,
++                        gboolean multiple_volumes,
++                        gboolean other_usable_volumes)
++{
++        GList *l;
++        gboolean done = FALSE;
++        
++        for (l = mounts; l != NULL; l = l->next) {
++                LdsmMountInfo *mount_info = l->data;
++                LdsmMountInfo *previous_mount_info;
++                gdouble free_space;
++                gdouble previous_free_space;
++                time_t previous_notify_time;
++                time_t curr_time;
++                const gchar *path;
++                gboolean show_notify;
++                
++                if (done) {
++                        /* Don't show any more dialogs if the user took action with the last one. The user action
++                         * might free up space on multiple volumes, making the next dialog redundant.
++                         */
++                        ldsm_free_mount_info (mount_info);
++                        continue;
++                }
++                
++                path = g_unix_mount_get_mount_path (mount_info->mount);
++                
++                previous_mount_info = g_hash_table_lookup (ldsm_notified_hash, path);
++                if (previous_mount_info != NULL)
++                        previous_free_space = (gdouble) previous_mount_info->buf.f_bavail / (gdouble) previous_mount_info->buf.f_blocks;
++ 
++                free_space = (gdouble) mount_info->buf.f_bavail / (gdouble) mount_info->buf.f_blocks;
++                
++                if (previous_mount_info == NULL) {
++                        /* We haven't notified for this mount yet */
++                        show_notify = TRUE;
++                        mount_info->notify_time = time (NULL);
++                        g_hash_table_replace (ldsm_notified_hash, g_strdup (path), mount_info);
++                } else if ((previous_free_space - free_space) > free_percent_notify_again) {
++                        /* We've notified for this mount before and free space has decreased sufficiently since last time to notify again */
++                        curr_time = time (NULL);
++                        if (difftime (curr_time, previous_mount_info->notify_time) > (gdouble)(min_notify_period * 60)) {
++                                show_notify = TRUE;
++                                mount_info->notify_time = curr_time;
++                        } else {
++                                /* It's too soon to show the dialog again. However, we still replace the LdsmMountInfo
++                                 * struct in the hash table, but give it the notfiy time from the previous dialog.
++                                 * This will stop the notification from reappearing unnecessarily as soon as the timeout expires.
++                                 */
++                                show_notify = FALSE;
++                                mount_info->notify_time = previous_mount_info->notify_time;
++                        }
++                        g_hash_table_replace (ldsm_notified_hash, g_strdup (path), mount_info);
++                } else {
++                        /* We've notified for this mount before, but the free space hasn't decreased sufficiently to notify again */
++                        ldsm_free_mount_info (mount_info);
++                        show_notify = FALSE;
++                }
++               
++                if (show_notify) {
++                        if (ldsm_notify_for_mount (mount_info, has_disk_analyzer, multiple_volumes, other_usable_volumes))
++                                done = TRUE;
++                }
+         }
++}
+ 
+-        ldsm_notify_for_mount (mount, free_space, has_disk_analyzer);
+-
+-        /* replace the information about the latest notification */
+-        previous_free_space_p = g_slice_new (gdouble);
+-        *previous_free_space_p = free_space;
+-        g_hash_table_replace (ldsm_notified_hash,
+-                              g_strdup (path), previous_free_space_p);
++static gint
++ldsm_ignore_path_compare (gconstpointer a,
++                          gconstpointer b)
++{
++        return g_strcmp0 ((const gchar *)a, (const gchar *)b);
+ }
+ 
+ static gboolean
++ldsm_mount_should_ignore (const gchar *path)
++{
++        if (g_slist_find_custom (ignore_paths, path, (GCompareFunc) ldsm_ignore_path_compare) != NULL)
++                return TRUE;
++        else
++                return FALSE;
++}                
++
++static gboolean
+ ldsm_check_all_mounts (gpointer data)
+ {
+         GList *mounts;
+         GList *l;
+-        GHashTable *seen;
++        GList *check_mounts = NULL;
++        GList *full_mounts = NULL;
+         char *program;
+         gboolean has_disk_analyzer;
++        guint number_of_mounts;
++        guint number_of_full_mounts;
++        gboolean multiple_volumes = FALSE;
++        gboolean other_usable_volumes = FALSE;
+ 
+         program = g_find_program_in_path (DISK_SPACE_ANALYZER);
+         has_disk_analyzer = (program != NULL);
+         g_free (program);
+-
+-        /* it's possible to get duplicate mounts, and we don't want duplicate
+-         * notifications */
+-        seen = g_hash_table_new_full (g_str_hash, g_str_equal, g_free, NULL);
+-        mounts = g_unix_mounts_get (NULL);
+-
++        
++        /* We iterate through the static mounts in /etc/fstab first, seeing if
++         * they're mounted by checking if the GUnixMountPoint has a corresponding GUnixMountEntry.
++         * Iterating through the static mounts means we automatically ignore dynamically mounted media.
++         */
++        mounts = g_unix_mount_points_get (time_read);
++                
+         for (l = mounts; l != NULL; l = l->next) {
+-                GUnixMountEntry *mount = l->data;
+-                const char *path;
+-
+-                if (g_unix_mount_is_readonly (mount)) {
+-                        g_unix_mount_free (mount);
++                GUnixMountPoint *mount_point = l->data;
++                GUnixMountEntry *mount;
++                LdsmMountInfo *mount_info;
++                const gchar *path;
++
++                path = g_unix_mount_point_get_mount_path (mount_point);
++                mount = g_unix_mount_at (path, time_read);
++                g_unix_mount_point_free (mount_point);
++                if (mount == NULL) {
++                        /* The GUnixMountPoint is not mounted */
+                         continue;
+                 }
+-
++                
++                mount_info = g_new0 (LdsmMountInfo, 1);
++                mount_info->mount = mount;
++                
+                 path = g_unix_mount_get_mount_path (mount);
+-
+-                if (g_hash_table_lookup_extended (seen, path, NULL, NULL)) {
+-                        g_unix_mount_free (mount);
++                                
++                if (g_unix_mount_is_readonly (mount)) {
++                        ldsm_free_mount_info (mount_info);
+                         continue;
+                 }
++                
++                if (ldsm_mount_should_ignore (path)) {
++                        ldsm_free_mount_info (mount_info);
++                        continue;                
++                }
++                
++                if (statvfs (path, &mount_info->buf) != 0) {
++                        ldsm_free_mount_info (mount_info);
++                        continue;
++                }
++                
++                if (ldsm_mount_is_virtual (mount_info)) {
++                        ldsm_free_mount_info (mount_info);
++                        continue;
++                }                        
+ 
+-                g_hash_table_insert (seen,
+-                                     g_strdup (path), GINT_TO_POINTER(1));
+-
+-                ldsm_check_mount (mount, has_disk_analyzer);
+-
+-                g_unix_mount_free (mount);
++                check_mounts = g_list_prepend (check_mounts, mount_info);
+         }
+-
+-        g_hash_table_destroy (seen);
++        
++        number_of_mounts = g_list_length (check_mounts);
++        if (number_of_mounts > 1)
++                multiple_volumes = TRUE;
++
++        for (l = check_mounts; l != NULL; l = l->next) {
++                LdsmMountInfo *mount_info = l->data;
++
++                if (!ldsm_mount_has_space (mount_info)) {
++                        full_mounts = g_list_prepend (full_mounts, mount_info);
++                } else {
++                        g_hash_table_remove (ldsm_notified_hash, g_unix_mount_get_mount_path (mount_info->mount));
++                        ldsm_free_mount_info (mount_info);
++                }
++        }
++        
++        number_of_full_mounts = g_list_length (full_mounts);
++        if (number_of_mounts > number_of_full_mounts)
++                other_usable_volumes = TRUE;
++                
++        ldsm_maybe_warn_mounts (full_mounts, has_disk_analyzer, multiple_volumes,
++                                other_usable_volumes);
++                
++        g_list_free (check_mounts);
++        g_list_free (full_mounts);
+ 
+         return TRUE;
+ }
+@@ -286,7 +482,7 @@ ldsm_mounts_changed (GObject  *monitor,
+         GList *mounts;
+ 
+         /* remove the saved data for mounts that got removed */
+-        mounts = g_unix_mounts_get (NULL);
++        mounts = g_unix_mounts_get (time_read);
+         g_hash_table_foreach_remove (ldsm_notified_hash,
+                                      ldsm_is_hash_item_not_in_mounts, mounts);
+         g_list_foreach (mounts, (GFunc) g_unix_mount_free, NULL);
+@@ -301,22 +497,114 @@ ldsm_mounts_changed (GObject  *monitor,
+                                                  ldsm_check_all_mounts, NULL);
+ }
+ 
++static gboolean
++ldsm_is_hash_item_in_ignore_paths (gpointer key,
++                                   gpointer value,
++                                   gpointer user_data)
++{
++        return ldsm_mount_should_ignore (key);   
++}
++
++static void
++gsd_ldsm_get_config ()
++{
++        GError *error = NULL;
++       
++        free_percent_notify = gconf_client_get_float (client,
++                                                      GCONF_HOUSEKEEPING_DIR "/" GCONF_FREE_PC_NOTIFY_KEY,
++                                                      &error);
++        if (error != NULL) {
++                g_warning ("Error reading configuration from GConf: %s", error->message ? error->message : "Unknown error");
++                g_clear_error (&error);
++        }
++        if (free_percent_notify >= 1 || free_percent_notify < 0) {
++                g_warning ("Invalid configuration of free_percent_notify: %f\n" \
++                           "Using sensible default", free_percent_notify);
++                free_percent_notify = 0.05;
++        }
++        
++        free_percent_notify_again = gconf_client_get_float (client,
++                                                            GCONF_HOUSEKEEPING_DIR "/" GCONF_FREE_PC_NOTIFY_AGAIN_KEY,
++                                                            &error);
++        if (error != NULL) {
++                g_warning ("Error reading configuration from GConf: %s", error->message ? error->message : "Unknown error");
++                g_clear_error (&error);
++        }
++        if (free_percent_notify_again >= 1 || free_percent_notify_again < 0) {
++                g_warning ("Invalid configuration of free_percent_notify_again: %f\n" \
++                           "Using sensible default\n", free_percent_notify_again);
++                free_percent_notify_again = 0.01;
++        }
++        
++        free_size_gb_no_notify = gconf_client_get_int (client,
++                                                       GCONF_HOUSEKEEPING_DIR "/" GCONF_FREE_SIZE_NO_NOTIFY,
++                                                       &error);
++        if (error != NULL) {
++                g_warning ("Error reading configuration from GConf: %s", error->message ? error->message : "Unknown error");
++                g_clear_error (&error);
++        }
++         min_notify_period = gconf_client_get_int (client,
++                                                   GCONF_HOUSEKEEPING_DIR "/" GCONF_MIN_NOTIFY_PERIOD,
++                                                   &error);
++         if (error != NULL) {
++                 g_warning ("Error reading configuration from GConf: %s", error->message ? error->message : "Unkown error");
++                 g_clear_error (&error);
++         }
++         
++         if (ignore_paths != NULL) {
++                g_slist_foreach (ignore_paths, (GFunc) g_free, NULL);
++                g_slist_free (ignore_paths);
++         }
++         ignore_paths = gconf_client_get_list (client,
++                                               GCONF_HOUSEKEEPING_DIR "/" GCONF_IGNORE_PATHS,
++                                               GCONF_VALUE_STRING, &error);
++         if (error != NULL) {
++                 g_warning ("Error reading configuration from GConf: %s", error->message ? error->message : "Unkown error");
++                 g_clear_error (&error);
++         } else {
++                /* Make sure we dont leave stale entries in ldsm_notified_hash */
++                 g_hash_table_foreach_remove (ldsm_notified_hash,
++                                              ldsm_is_hash_item_in_ignore_paths, NULL);
++         }
++}
++
++static void
++gsd_ldsm_update_config (GConfClient *client,
++                        guint cnxn_id,
++                        GConfEntry *entry,
++                        gpointer user_data)
++{
++        gsd_ldsm_get_config ();
++}
++
+ void
+ gsd_ldsm_setup (gboolean check_now)
+ {
++        GError          *error = NULL;
++        
+         if (ldsm_notified_hash || ldsm_timeout_id || ldsm_monitor) {
+                 g_warning ("Low disk space monitor already initialized.");
+                 return;
+         }
+ 
+-        if (!notify_is_initted ()) {
+-                if (!notify_init ("Low Disk Space Monitor"))
+-                        return;
+-        }
+-
+         ldsm_notified_hash = g_hash_table_new_full (g_str_hash, g_str_equal,
+                                                     g_free,
+-                                                    ldsm_hash_free_slice_gdouble);
++                                                    ldsm_free_mount_info);
++                                                    
++        client = gconf_client_get_default ();
++        if (client != NULL) {
++                gsd_ldsm_get_config ();
++                gconf_notify_id = gconf_client_notify_add (client,
++                                                           GCONF_HOUSEKEEPING_DIR,
++                                                           (GConfClientNotifyFunc) gsd_ldsm_update_config,
++                                                           NULL, NULL, &error);
++                if (error != NULL) {
++                        g_warning ("Cannot register callback for GConf notification");
++                        g_clear_error (&error);
++                }
++        } else {
++                g_warning ("Failed to get default client");
++        }
+ 
+         ldsm_monitor = g_unix_mount_monitor_new ();
+         g_unix_mount_monitor_set_rate_limit (ldsm_monitor, 1000);
+@@ -328,6 +616,7 @@ gsd_ldsm_setup (gboolean check_now)
+ 
+         ldsm_timeout_id = g_timeout_add_seconds (CHECK_EVERY_X_SECONDS,
+                                                  ldsm_check_all_mounts, NULL);
++                                                 
+ }
+ 
+ void
+@@ -344,22 +633,23 @@ gsd_ldsm_clean (void)
+         if (ldsm_monitor)
+                 g_object_unref (ldsm_monitor);
+         ldsm_monitor = NULL;
++        
++        if (client) {
++                gconf_client_notify_remove (client, gconf_notify_id);
++                g_object_unref (client);
++        }
++        
++        if (dialog) {
++                gtk_widget_destroy (GTK_WIDGET (dialog));
++                dialog = NULL;
++        }
++        
++        if (ignore_paths) {
++                g_slist_foreach (ignore_paths, (GFunc) g_free, NULL);
++                g_slist_free (ignore_paths);
++        }
+ }
+ 
+-#else  /* HAVE_LIBNOTIFY */
+-
+-void
+-gsd_ldsm_setup (gboolean check_now)
+-{
+-}
+-
+-void
+-gsd_ldsm_clean (void)
+-{
+-}
+-
+-#endif /* HAVE_LIBNOTIFY */
+-
+ #ifdef TEST
+ int
+ main (int    argc,
+diff --git a/plugins/housekeeping/gsd-ldsm-dialog.c b/plugins/housekeeping/gsd-ldsm-dialog.c
+new file mode 100644
+index 0000000..fbab022
+--- a/dev/null
++++ b/plugins/housekeeping/gsd-ldsm-dialog.c
+@@ -0,0 +1,476 @@
++/* -*- Mode: C; tab-width: 8; indent-tabs-mode: nil; c-basic-offset: 8 -*-
++ *
++ * gsd-ldsm-dialog.c
++ * Copyright (C) Chris Coulson 2009 <chrisccoulson@googlemail.com>
++ * 
++ * gsd-ldsm-dialog.c is free software: you can redistribute it and/or modify it
++ * under the terms of the GNU General Public License as published by the
++ * Free Software Foundation, either version 3 of the License, or
++ * (at your option) any later version.
++ * 
++ * gsd-ldsm-dialog.c is distributed in the hope that it will be useful, but
++ * WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
++ * See the GNU General Public License for more details.
++ * 
++ * You should have received a copy of the GNU General Public License along
++ * with this program.  If not, see <http://www.gnu.org/licenses/>.
++ */
++
++#include <glib/gi18n.h>
++#include <gconf/gconf-client.h>
++
++#include "gsd-ldsm-dialog.h"
++
++#define GCONF_CLIENT_IGNORE_PATHS "/apps/gnome_settings_daemon/plugins/housekeeping/ignore_paths"
++
++enum
++{
++        PROP_0,
++        PROP_OTHER_USABLE_PARTITIONS,
++        PROP_OTHER_PARTITIONS,
++        PROP_HAS_TRASH,
++        PROP_SPACE_REMAINING,
++        PROP_PARTITION_NAME,
++        PROP_MOUNT_PATH
++};
++
++struct GsdLdsmDialogPrivate
++{
++        GtkWidget *primary_label;
++        GtkWidget *secondary_label;
++        GtkWidget *ignore_check_button;
++        gboolean other_usable_partitions;
++        gboolean other_partitions;
++        gboolean has_trash;
++        gint64 space_remaining;
++        gchar *partition_name;
++        gchar *mount_path;
++};
++
++#define GSD_LDSM_DIALOG_GET_PRIVATE(o) (G_TYPE_INSTANCE_GET_PRIVATE ((o), GSD_TYPE_LDSM_DIALOG, GsdLdsmDialogPrivate))
++
++static void     gsd_ldsm_dialog_class_init  (GsdLdsmDialogClass *klass);
++static void     gsd_ldsm_dialog_init        (GsdLdsmDialog      *dialog);
++
++G_DEFINE_TYPE (GsdLdsmDialog, gsd_ldsm_dialog, GTK_TYPE_DIALOG);
++
++static const gchar*
++gsd_ldsm_dialog_get_checkbutton_text (GsdLdsmDialog *dialog)
++{
++        g_return_val_if_fail (GSD_IS_LDSM_DIALOG (dialog), NULL);
++        
++        if (dialog->priv->other_partitions)
++                return _("Don't show any warnings again for this filesystem");
++        else
++                return _("Don't show any warnings again");
++}
++
++static gchar*
++gsd_ldsm_dialog_get_primary_text (GsdLdsmDialog *dialog)
++{
++        gchar *primary_text, *free_space;
++	
++        g_return_val_if_fail (GSD_IS_LDSM_DIALOG (dialog), NULL);
++	
++        free_space = g_format_size_for_display (dialog->priv->space_remaining);
++	
++        if (dialog->priv->other_partitions) {
++                primary_text = g_strdup_printf (_("The volume \"%s\" has only %s disk space remaining."),
++                                                dialog->priv->partition_name, free_space);
++        } else {
++                primary_text = g_strdup_printf (_("This computer has only %s disk space remaining."),
++                                                free_space);
++        }
++	
++        g_free (free_space);
++	
++        return primary_text;	
++}
++
++static const gchar*
++gsd_ldsm_dialog_get_secondary_text (GsdLdsmDialog *dialog)
++{
++        g_return_val_if_fail (GSD_IS_LDSM_DIALOG (dialog), NULL);
++	
++        if (dialog->priv->other_usable_partitions) {
++                if (dialog->priv->has_trash) {
++                        return _("You can free up disk space by emptying the Trash, removing " \
++                                 "unused programs or files, or moving files to another disk or partition.");
++                } else {
++                        return _("You can free up disk space by removing unused programs or files, " \
++                                 "or by moving files to another disk or partition.");
++                }
++        } else {
++                if (dialog->priv->has_trash) {
++                        return _("You can free up disk space by emptying the Trash, removing unused " \
++                                 "programs or files, or moving files to an external disk.");
++                } else {
++                        return _("You can free up disk space by removing unused programs or files, " \
++                                 "or by moving files to an external disk.");
++                }
++        }
++}
++
++static gint
++ignore_path_compare (gconstpointer a,
++                     gconstpointer b)
++{
++        return g_strcmp0 ((const gchar *)a, (const gchar *)b);
++}
++
++static gboolean
++update_ignore_paths (GSList **ignore_paths,
++                     const gchar *mount_path,
++                     gboolean ignore)
++{
++        GSList *found;
++        gchar *path_to_remove;
++        
++        found = g_slist_find_custom (*ignore_paths, mount_path, (GCompareFunc) ignore_path_compare);
++        
++        if (ignore && (found == NULL)) {
++                *ignore_paths = g_slist_prepend (*ignore_paths, g_strdup (mount_path));
++                return TRUE;
++        }
++        
++        if (!ignore && (found != NULL)) {
++                path_to_remove = found->data;
++                *ignore_paths = g_slist_remove (*ignore_paths, path_to_remove);
++                g_free (path_to_remove);
++                return TRUE;
++        }
++                
++        return FALSE;
++}
++
++static void
++ignore_check_button_toggled_cb (GtkToggleButton *button,
++                                gpointer user_data)
++{
++        GsdLdsmDialog *dialog = (GsdLdsmDialog *)user_data;
++        GConfClient *client;
++        GSList *ignore_paths;
++        GError *error = NULL;
++        gboolean ignore, ret, updated;
++        
++        client = gconf_client_get_default ();
++        if (client != NULL) {
++                ignore_paths = gconf_client_get_list (client,
++                                                      GCONF_CLIENT_IGNORE_PATHS,
++                                                      GCONF_VALUE_STRING, &error);
++                if (error != NULL) {
++                        g_warning ("Cannot change ignore preference - failed to read existing configuration: %s",
++                                   error->message ? error->message : "Unkown error");
++                        g_clear_error (&error);
++                        return;
++                } else {
++                        ignore = gtk_toggle_button_get_active (button);
++                        updated = update_ignore_paths (&ignore_paths, dialog->priv->mount_path, ignore); 
++                }
++                
++                if (!updated)
++                        return;
++                
++                ret = gconf_client_set_list (client,
++                                             GCONF_CLIENT_IGNORE_PATHS,
++                                             GCONF_VALUE_STRING,
++                                             ignore_paths, &error);
++                if (!ret || error != NULL) {
++                        g_warning ("Cannot change ignore preference - failed to commit changes: %s",
++                                   error->message ? error->message : "Unkown error");
++                        g_clear_error (&error);
++                }
++                
++                g_slist_foreach (ignore_paths, (GFunc) g_free, NULL);
++                g_slist_free (ignore_paths);
++                g_object_unref (client);
++        } else {
++                g_warning ("Cannot change ignore preference - failed to get GConfClient");
++        }     
++}
++
++static void
++gsd_ldsm_dialog_init (GsdLdsmDialog *dialog)
++{
++        GtkWidget *main_vbox, *text_vbox, *hbox;
++        GtkWidget *image;
++	
++        dialog->priv = GSD_LDSM_DIALOG_GET_PRIVATE (dialog);
++        
++        main_vbox = gtk_dialog_get_content_area (GTK_DIALOG (dialog));
++
++        /* Set up all the window stuff here */
++        gtk_window_set_title (GTK_WINDOW (dialog), _("Low Disk Space"));
++        gtk_window_set_icon_name (GTK_WINDOW (dialog), 
++                                  GTK_STOCK_DIALOG_WARNING);
++        gtk_window_set_resizable (GTK_WINDOW (dialog), FALSE);
++        gtk_window_set_position (GTK_WINDOW (dialog), GTK_WIN_POS_CENTER);
++        gtk_window_set_urgency_hint (GTK_WINDOW (dialog), TRUE);
++        gtk_window_set_focus_on_map (GTK_WINDOW (dialog), FALSE);
++        gtk_container_set_border_width (GTK_CONTAINER (dialog), 5);
++
++        /* We don't want a separator - they're really ugly */
++        gtk_dialog_set_has_separator (GTK_DIALOG (dialog), FALSE);
++
++        /* Create the image */
++        image = gtk_image_new_from_stock (GTK_STOCK_DIALOG_WARNING, GTK_ICON_SIZE_DIALOG);
++        gtk_misc_set_alignment (GTK_MISC (image), 0.5, 0.0);
++
++        /* Create the labels */
++        dialog->priv->primary_label = gtk_label_new (NULL);	
++        gtk_label_set_line_wrap (GTK_LABEL (dialog->priv->primary_label), TRUE);
++        gtk_label_set_single_line_mode (GTK_LABEL (dialog->priv->primary_label), FALSE);
++        gtk_misc_set_alignment (GTK_MISC (dialog->priv->primary_label), 0.0, 0.0);
++	
++        dialog->priv->secondary_label = gtk_label_new (NULL);
++        gtk_label_set_line_wrap (GTK_LABEL (dialog->priv->secondary_label), TRUE);
++        gtk_label_set_single_line_mode (GTK_LABEL (dialog->priv->secondary_label), FALSE);
++        gtk_misc_set_alignment (GTK_MISC (dialog->priv->secondary_label), 0.0, 0.0);
++
++        /* Create the check button to ignore future warnings */
++        dialog->priv->ignore_check_button = gtk_check_button_new ();
++        /* The button should be inactive if the dialog was just called.
++         * I suppose it could be possible for the user to manually edit the GConf key between
++         * the mount being checked and the dialog appearing, but I don't think it matters
++         * too much */
++        gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (dialog->priv->ignore_check_button), FALSE);
++        g_signal_connect (dialog->priv->ignore_check_button, "toggled",
++                          G_CALLBACK (ignore_check_button_toggled_cb), dialog);
++        
++        /* Now set up the dialog's GtkBox's' */
++        gtk_box_set_spacing (GTK_BOX (main_vbox), 14);
++	
++        hbox = gtk_hbox_new (FALSE, 12);
++        gtk_container_set_border_width (GTK_CONTAINER (hbox), 5);
++	
++        text_vbox = gtk_vbox_new (FALSE, 12);
++        
++        gtk_box_pack_start (GTK_BOX (text_vbox), dialog->priv->primary_label, FALSE, FALSE, 0);
++        gtk_box_pack_start (GTK_BOX (text_vbox), dialog->priv->secondary_label, TRUE, TRUE, 0);
++        gtk_box_pack_start (GTK_BOX (text_vbox), dialog->priv->ignore_check_button, FALSE, FALSE, 0);
++        gtk_box_pack_start (GTK_BOX (hbox), image, FALSE, FALSE, 0);
++        gtk_box_pack_start (GTK_BOX (hbox), text_vbox, TRUE, TRUE, 0);	
++        gtk_box_pack_start (GTK_BOX (main_vbox), hbox, FALSE, FALSE, 0);
++						
++        /* Set up the action area */
++        gtk_box_set_spacing (GTK_BOX (GTK_DIALOG (dialog)->action_area), 6);
++        gtk_container_set_border_width (GTK_CONTAINER (GTK_DIALOG (dialog)->action_area), 5);
++	
++        gtk_widget_show_all (hbox);
++}
++
++static void
++gsd_ldsm_dialog_finalize (GObject *object)
++{
++        GsdLdsmDialog *self;
++	
++        g_return_if_fail (object != NULL);
++        g_return_if_fail (GSD_IS_LDSM_DIALOG (object));
++
++        self = GSD_LDSM_DIALOG (object);
++	
++        if (self->priv->partition_name)
++                g_free (self->priv->partition_name);
++	
++        if (self->priv->mount_path)
++                g_free (self->priv->mount_path);
++	
++        G_OBJECT_CLASS (gsd_ldsm_dialog_parent_class)->finalize (object);
++}
++
++static void
++gsd_ldsm_dialog_set_property (GObject *object, guint prop_id, const GValue *value, GParamSpec *pspec)
++{
++        GsdLdsmDialog *self;
++	
++        g_return_if_fail (GSD_IS_LDSM_DIALOG (object));
++	
++        self = GSD_LDSM_DIALOG (object);
++
++        switch (prop_id)
++        {
++        case PROP_OTHER_USABLE_PARTITIONS:
++                self->priv->other_usable_partitions = g_value_get_boolean (value);
++                break;
++        case PROP_OTHER_PARTITIONS:
++                self->priv->other_partitions = g_value_get_boolean (value);
++                break;
++        case PROP_HAS_TRASH:
++                self->priv->has_trash = g_value_get_boolean (value);
++                break;
++        case PROP_SPACE_REMAINING:
++                self->priv->space_remaining = g_value_get_int64 (value);
++                break;
++        case PROP_PARTITION_NAME:
++                self->priv->partition_name = g_value_dup_string (value);
++                break;
++        case PROP_MOUNT_PATH:
++                self->priv->mount_path = g_value_dup_string (value);
++                break;
++        default:
++                G_OBJECT_WARN_INVALID_PROPERTY_ID (object, prop_id, pspec);
++                break;
++        }
++}
++
++static void
++gsd_ldsm_dialog_get_property (GObject *object, guint prop_id, GValue *value, GParamSpec *pspec)
++{
++        GsdLdsmDialog *self;
++	
++        g_return_if_fail (GSD_IS_LDSM_DIALOG (object));
++	
++        self = GSD_LDSM_DIALOG (object);
++
++        switch (prop_id)
++        {
++        case PROP_OTHER_USABLE_PARTITIONS:
++                g_value_set_boolean (value, self->priv->other_usable_partitions);
++                break;
++        case PROP_OTHER_PARTITIONS:
++                g_value_set_boolean (value, self->priv->other_partitions);
++                break;
++        case PROP_HAS_TRASH:
++                g_value_set_boolean (value, self->priv->has_trash);
++                break;
++        case PROP_SPACE_REMAINING:
++                g_value_set_int64 (value, self->priv->space_remaining);
++                break;
++        case PROP_PARTITION_NAME:
++                g_value_set_string (value, self->priv->partition_name);
++                break;
++        case PROP_MOUNT_PATH:
++                g_value_set_string (value, self->priv->mount_path);
++                break;
++        default:
++                G_OBJECT_WARN_INVALID_PROPERTY_ID (object, prop_id, pspec);
++                break;
++        }
++}
++
++static void
++gsd_ldsm_dialog_class_init (GsdLdsmDialogClass *klass)
++{
++        GObjectClass* object_class = G_OBJECT_CLASS (klass);
++
++        object_class->finalize = gsd_ldsm_dialog_finalize;
++        object_class->set_property = gsd_ldsm_dialog_set_property;
++        object_class->get_property = gsd_ldsm_dialog_get_property;
++
++        g_object_class_install_property (object_class,
++                                         PROP_OTHER_USABLE_PARTITIONS,
++                                         g_param_spec_boolean ("other-usable-partitions",
++                                                               "other-usable-partitions",
++                                                               "Set to TRUE if there are other usable partitions on the system",
++                                                               FALSE,
++                                                               G_PARAM_WRITABLE | G_PARAM_CONSTRUCT_ONLY));
++
++        g_object_class_install_property (object_class,
++                                         PROP_OTHER_PARTITIONS,
++                                         g_param_spec_boolean ("other-partitions",
++                                                               "other-partitions",
++                                                               "Set to TRUE if there are other partitions on the system",
++                                                               FALSE,
++                                                               G_PARAM_WRITABLE | G_PARAM_CONSTRUCT_ONLY));
++
++        g_object_class_install_property (object_class,
++                                         PROP_HAS_TRASH,
++                                         g_param_spec_boolean ("has-trash",
++                                                               "has-trash",
++                                                               "Set to TRUE if the partition has files in it's trash folder that can be deleted",
++                                                               FALSE,
++                                                               G_PARAM_WRITABLE | G_PARAM_CONSTRUCT_ONLY));
++	                                                       	                                                       
++        g_object_class_install_property (object_class,
++                                         PROP_SPACE_REMAINING,
++                                         g_param_spec_int64 ("space-remaining",
++                                                             "space-remaining",
++                                                             "Specify how much space is remaining in bytes",
++                                                             G_MININT64, G_MAXINT64, 0,
++                                                             G_PARAM_WRITABLE | G_PARAM_CONSTRUCT_ONLY));
++	                                                   
++        g_object_class_install_property (object_class,
++                                         PROP_PARTITION_NAME,
++                                         g_param_spec_string ("partition-name",
++                                                              "partition-name",
++                                                              "Specify the name of the partition",
++                                                              "Unknown",
++                                                              G_PARAM_WRITABLE | G_PARAM_CONSTRUCT_ONLY));
++	                                                      
++        g_object_class_install_property (object_class,
++                                         PROP_MOUNT_PATH,
++                                         g_param_spec_string ("mount-path",
++                                                              "mount-path",
++                                                              "Specify the mount path for the partition",
++                                                              "Unknown",
++                                                              G_PARAM_WRITABLE | G_PARAM_CONSTRUCT_ONLY));
++
++        g_type_class_add_private (klass, sizeof (GsdLdsmDialogPrivate));
++}
++
++GsdLdsmDialog*
++gsd_ldsm_dialog_new (gboolean     other_usable_partitions,
++                     gboolean     other_partitions,
++                     gboolean     display_baobab,
++                     gboolean     display_empty_trash,
++                     gint64       space_remaining,
++                     const gchar *partition_name,
++                     const gchar *mount_path)
++{
++        GsdLdsmDialog *dialog;
++        GtkWidget *button_empty_trash, *button_ignore, *button_analyze;
++        GtkWidget *empty_trash_image, *analyze_image, *ignore_image;
++        gchar *primary_text, *primary_text_markup;
++        const gchar *secondary_text, *checkbutton_text;
++	
++        dialog = GSD_LDSM_DIALOG (g_object_new (GSD_TYPE_LDSM_DIALOG,
++                                                "other-usable-partitions", other_usable_partitions,
++                                                "other-partitions", other_partitions,
++                                                "has-trash", display_empty_trash,
++                                                "space-remaining", space_remaining,
++                                                "partition-name", partition_name,
++                                                "mount-path", mount_path,
++                                                NULL));
++	
++        /* Add some buttons */
++        if (dialog->priv->has_trash) {
++                button_empty_trash = gtk_dialog_add_button (GTK_DIALOG (dialog),
++                                                            _("Empty Trash"),
++                                                            GSD_LDSM_DIALOG_RESPONSE_EMPTY_TRASH);
++                empty_trash_image = gtk_image_new_from_stock (GTK_STOCK_CLEAR, GTK_ICON_SIZE_BUTTON);
++                gtk_button_set_image (GTK_BUTTON (button_empty_trash), empty_trash_image);
++        }
++	
++        if (display_baobab) {
++                button_analyze = gtk_dialog_add_button (GTK_DIALOG (dialog),
++                                                        _("Examine..."),
++                                                        GSD_LDSM_DIALOG_RESPONSE_ANALYZE);
++                analyze_image = gtk_image_new_from_icon_name ("baobab", GTK_ICON_SIZE_BUTTON);
++                gtk_button_set_image (GTK_BUTTON (button_analyze), analyze_image);
++        }
++			
++        button_ignore = gtk_dialog_add_button (GTK_DIALOG (dialog), 
++                                               _("Ignore"), 
++                                               GTK_RESPONSE_CANCEL);
++        ignore_image = gtk_image_new_from_stock (GTK_STOCK_CANCEL, GTK_ICON_SIZE_BUTTON);
++        gtk_button_set_image (GTK_BUTTON (button_ignore), ignore_image);
++	
++        gtk_widget_grab_default (button_ignore);
++	
++        /* Set the label text */	
++        primary_text = gsd_ldsm_dialog_get_primary_text (dialog);
++        primary_text_markup = g_markup_printf_escaped ("<big><b>%s</b></big>", primary_text);
++        gtk_label_set_markup (GTK_LABEL (dialog->priv->primary_label), primary_text_markup);
++
++        secondary_text = gsd_ldsm_dialog_get_secondary_text (dialog);
++        gtk_label_set_text (GTK_LABEL (dialog->priv->secondary_label), secondary_text);
++        
++        checkbutton_text = gsd_ldsm_dialog_get_checkbutton_text (dialog);
++        gtk_button_set_label (GTK_BUTTON (dialog->priv->ignore_check_button), checkbutton_text);
++        
++        g_free (primary_text);
++        g_free (primary_text_markup);
++	
++        return dialog;
++} 
+diff --git a/plugins/housekeeping/gsd-ldsm-dialog.h b/plugins/housekeeping/gsd-ldsm-dialog.h
+new file mode 100644
+index 0000000..9452dfa
+--- a/dev/null
++++ b/plugins/housekeeping/gsd-ldsm-dialog.h
+@@ -0,0 +1,68 @@
++/* -*- Mode: C; tab-width: 8; indent-tabs-mode: nil; c-basic-offset: 8 -*-
++ *
++ * gsd-ldsm-dialog.c
++ * Copyright (C) Chris Coulson 2009 <chrisccoulson@googlemail.com>
++ * 
++ * gsd-ldsm-dialog.c is free software: you can redistribute it and/or modify it
++ * under the terms of the GNU General Public License as published by the
++ * Free Software Foundation, either version 3 of the License, or
++ * (at your option) any later version.
++ * 
++ * gsd-ldsm-dialog.c is distributed in the hope that it will be useful, but
++ * WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
++ * See the GNU General Public License for more details.
++ * 
++ * You should have received a copy of the GNU General Public License along
++ * with this program.  If not, see <http://www.gnu.org/licenses/>.
++ */
++
++#ifndef _GSD_LDSM_DIALOG_H_
++#define _GSD_LDSM_DIALOG_H_
++
++#include <glib-object.h>
++#include <gtk/gtk.h>
++
++G_BEGIN_DECLS
++
++#define GSD_TYPE_LDSM_DIALOG             (gsd_ldsm_dialog_get_type ())
++#define GSD_LDSM_DIALOG(obj)             (G_TYPE_CHECK_INSTANCE_CAST ((obj), GSD_TYPE_LDSM_DIALOG, GsdLdsmDialog))
++#define GSD_LDSM_DIALOG_CLASS(klass)     (G_TYPE_CHECK_CLASS_CAST ((klass), GSD_TYPE_LDSM_DIALOG, GsdLdsmDialogClass))
++#define GSD_IS_LDSM_DIALOG(obj)          (G_TYPE_CHECK_INSTANCE_TYPE ((obj), GSD_TYPE_LDSM_DIALOG))
++#define GSD_IS_LDSM_DIALOG_CLASS(klass)  (G_TYPE_CHECK_CLASS_TYPE ((klass), GSD_TYPE_LDSM_DIALOG))
++#define GSD_LDSM_DIALOG_GET_CLASS(obj)   (G_TYPE_INSTANCE_GET_CLASS ((obj), GSD_TYPE_LDSM_DIALOG, GsdLdsmDialogClass))
++
++enum
++{
++        GSD_LDSM_DIALOG_RESPONSE_EMPTY_TRASH = -20,
++        GSD_LDSM_DIALOG_RESPONSE_ANALYZE = -21
++};
++
++typedef struct GsdLdsmDialogPrivate GsdLdsmDialogPrivate;
++typedef struct _GsdLdsmDialogClass GsdLdsmDialogClass;
++typedef struct _GsdLdsmDialog GsdLdsmDialog;
++
++struct _GsdLdsmDialogClass
++{
++        GtkDialogClass parent_class;
++};
++
++struct _GsdLdsmDialog
++{
++        GtkDialog parent_instance;
++        GsdLdsmDialogPrivate *priv;
++};
++
++GType gsd_ldsm_dialog_get_type (void) G_GNUC_CONST;
++
++GsdLdsmDialog * gsd_ldsm_dialog_new (gboolean other_usable_partitions,
++                                     gboolean other_partitions,
++                                     gboolean display_baobab,
++                                     gboolean display_empty_trash,
++                                     gint64 space_remaining,
++                                     const gchar *partition_name,
++                                     const gchar *mount_path);
++
++G_END_DECLS
++
++#endif /* _GSD_LDSM_DIALOG_H_ */
+diff --git a/plugins/housekeeping/gsd-ldsm-trash-empty.c b/plugins/housekeeping/gsd-ldsm-trash-empty.c
+new file mode 100644
+index 0000000..581929a
+--- a/dev/null
++++ b/plugins/housekeeping/gsd-ldsm-trash-empty.c
+@@ -0,0 +1,394 @@
++/* -*- Mode: C; tab-width: 8; indent-tabs-mode: nil; c-basic-offset: 8 -*-
++ *
++ * gsd-ldsm-trash-empty.c
++ * Copyright (C) Chris Coulson 2009 <chrisccoulson@googlemail.com>
++ *	     (C) Ryan Lortie 2008
++ * 
++ * gsd-ldsm-trash-empty.c is free software: you can redistribute it and/or modify it
++ * under the terms of the GNU General Public License as published by the
++ * Free Software Foundation, either version 3 of the License, or
++ * (at your option) any later version.
++ * 
++ * gsd-ldsm-trash-empty.c is distributed in the hope that it will be useful, but
++ * WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
++ * See the GNU General Public License for more details.
++ * 
++ * You should have received a copy of the GNU General Public License along
++ * with this program.  If not, see <http://www.gnu.org/licenses/>.
++ */
++
++#include <gconf/gconf-client.h>
++#include <glib/gi18n.h>
++#include <gio/gio.h>
++
++#include "gsd-ldsm-trash-empty.h"
++
++#define NAUTILUS_CONFIRM_TRASH_KEY "/apps/nautilus/preferences/confirm_trash"
++
++/* Some of this code has been borrowed from the trash-applet, courtesy of Ryan Lortie */
++
++static GtkWidget *trash_empty_confirm_dialog = NULL;
++static GtkWidget *trash_empty_dialog = NULL;
++static GtkWidget *location_label;
++static GtkWidget *file_label;
++static GtkWidget *progressbar;
++
++static gsize trash_empty_total_files;
++static gboolean trash_empty_update_pending = FALSE;
++static GFile *trash_empty_current_file = NULL;
++static gsize trash_empty_deleted_files;
++static GTimer *timer = NULL;
++static gboolean trash_empty_actually_deleting;
++
++static gboolean
++trash_empty_done (gpointer data)
++{
++        gtk_widget_destroy (trash_empty_dialog);
++        trash_empty_dialog = NULL;
++        if (timer) {
++                g_timer_destroy (timer);
++                timer = NULL;
++        }
++	
++        return FALSE;
++}
++
++static gboolean
++trash_empty_update_dialog (gpointer user_data)
++{
++        gsize deleted, total;
++        GFile *file;
++        gboolean actually_deleting;
++
++        g_assert (trash_empty_update_pending);
++
++        deleted = trash_empty_deleted_files;
++        total = trash_empty_total_files;
++        file = trash_empty_current_file;
++        actually_deleting = trash_empty_actually_deleting;
++
++        /* maybe the done() got processed first. */
++        if (!trash_empty_dialog)
++                goto out;
++
++        if (!actually_deleting) {
++                /* If we havent finished counting yet, then pulse the progressbar every 100ms.
++                 * This stops the user from thinking the dialog has frozen if there are
++                 * a lot of files to delete. We don't pulse it every time we are called from the
++                 * worker thread, otherwise it moves to fast and looks hideous
++                 */
++                if (timer) {
++                        if (g_timer_elapsed (timer, NULL) > 0.1) {
++                                gtk_progress_bar_pulse (GTK_PROGRESS_BAR (progressbar));
++                                g_timer_start (timer);
++                        }
++                } else {
++                        timer = g_timer_new ();
++                        g_timer_start (timer);
++                        gtk_progress_bar_pulse (GTK_PROGRESS_BAR (progressbar));
++                }	
++        } else {
++                gchar *text;
++                gchar *tmp;
++                GFile *parent;
++
++                text = g_strdup_printf (_("Removing item %lu of %lu"),
++                                        deleted, total);
++                gtk_progress_bar_set_text (GTK_PROGRESS_BAR (progressbar), text);
++
++                g_free (text);
++
++                if (deleted > total)
++                        gtk_progress_bar_set_fraction (GTK_PROGRESS_BAR (progressbar), 1.0);
++                else
++                        gtk_progress_bar_set_fraction (GTK_PROGRESS_BAR (progressbar),
++                                                       (gdouble) deleted / (gdouble) total);
++
++                parent = g_file_get_parent (file);
++                text = g_file_get_uri (parent);
++                g_object_unref (parent);
++	
++                gtk_label_set_text (GTK_LABEL (location_label), text);
++                g_free (text);
++
++                tmp = g_file_get_basename (file);
++                text = g_markup_printf_escaped (_("<i>Removing: %s</i>"), tmp);
++                gtk_label_set_markup (GTK_LABEL (file_label), text);
++                g_free (text);
++                g_free (tmp);
++                
++                /* unhide the labels */
++                gtk_widget_show_all (GTK_WIDGET (trash_empty_dialog));
++        }
++
++out:
++        trash_empty_current_file = NULL;
++        g_object_unref (file);
++
++        trash_empty_update_pending = FALSE;
++
++        return FALSE;
++}
++
++/* Worker thread begin */
++
++static void
++trash_empty_maybe_schedule_update (GIOSchedulerJob *job,
++                                   GFile           *file,
++                                   gsize            deleted,
++                                   gboolean         actually_deleting)
++{
++        if (!trash_empty_update_pending) {
++                g_assert (trash_empty_current_file == NULL);
++		
++                trash_empty_current_file = g_object_ref (file);
++                trash_empty_deleted_files = deleted;
++                trash_empty_actually_deleting = actually_deleting;
++
++                trash_empty_update_pending = TRUE;
++                g_io_scheduler_job_send_to_mainloop_async (job,
++                                                           trash_empty_update_dialog,
++                                                           NULL, NULL);
++        }
++}
++
++static void
++trash_empty_delete_contents (GIOSchedulerJob *job,
++                             GCancellable *cancellable,
++                             GFile *file,
++                             gboolean actually_delete,
++                             gsize *deleted)
++{
++        GFileEnumerator *enumerator;
++        GFileInfo *info;
++        GFile *child;
++
++        if (g_cancellable_is_cancelled (cancellable))
++                return;
++
++        enumerator = g_file_enumerate_children (file,
++                                                G_FILE_ATTRIBUTE_STANDARD_NAME ","
++                                                G_FILE_ATTRIBUTE_STANDARD_TYPE,
++                                                G_FILE_QUERY_INFO_NOFOLLOW_SYMLINKS,
++                                                cancellable, NULL);
++
++        if (enumerator) {
++                while ((info = g_file_enumerator_next_file (enumerator,
++                                                            cancellable, NULL)) != NULL) {
++                        child = g_file_get_child (file, g_file_info_get_name (info));
++
++                        if (g_file_info_get_file_type (info) == G_FILE_TYPE_DIRECTORY)
++                                trash_empty_delete_contents (job, cancellable, child,
++                                                             actually_delete, deleted);
++
++                        trash_empty_maybe_schedule_update (job, child, *deleted, actually_delete);
++                        if (actually_delete)
++                                g_file_delete (child, cancellable, NULL);
++
++                        (*deleted)++;
++
++                        g_object_unref (child);
++                        g_object_unref (info);
++
++                        if (g_cancellable_is_cancelled (cancellable))
++                                break;
++                }
++
++                g_object_unref (enumerator);
++        }
++}
++
++static gboolean
++trash_empty_job (GIOSchedulerJob *job,
++                 GCancellable *cancellable,
++                 gpointer user_data)
++{
++        gsize deleted;
++        GFile *trash;
++
++        trash = g_file_new_for_uri ("trash:///");
++
++        /* first do a dry run to count the number of files */
++        deleted = 0;
++        trash_empty_delete_contents (job, cancellable, trash, FALSE, &deleted);
++        trash_empty_total_files = deleted;
++ 
++        /* now do the real thing */ 
++        deleted = 0;
++        trash_empty_delete_contents (job, cancellable, trash, TRUE, &deleted);
++
++        /* done */
++        g_object_unref (trash);
++        g_io_scheduler_job_send_to_mainloop_async (job,
++                                                   trash_empty_done,
++                                                   NULL, NULL);
++
++        return FALSE;
++}
++
++/* Worker thread end */
++
++static void 
++trash_empty_start ()
++{	
++        GtkWidget *vbox1, *vbox2, *hbox;
++        GtkWidget *label1, *label3;
++        gchar *markup;
++        GCancellable *cancellable;	
++	
++        trash_empty_dialog = gtk_dialog_new ();
++        gtk_window_set_default_size (GTK_WINDOW (trash_empty_dialog), 400, -1);
++        gtk_window_set_icon_name (GTK_WINDOW (trash_empty_dialog), "user-trash");
++        gtk_window_set_title (GTK_WINDOW (trash_empty_dialog),
++                              _("Emptying the trash"));
++	
++        vbox1 = gtk_vbox_new (FALSE, 12);
++        vbox2 = gtk_vbox_new (FALSE, 0);
++        hbox = gtk_hbox_new (FALSE, 0);
++	
++        label1 = gtk_label_new (NULL);
++        gtk_label_set_line_wrap (GTK_LABEL (label1), TRUE);
++        gtk_misc_set_alignment (GTK_MISC (label1), 0.0, 0.5);
++
++        label3 = gtk_label_new (NULL);
++        gtk_label_set_line_wrap (GTK_LABEL (label3), TRUE);
++        gtk_misc_set_alignment (GTK_MISC (label3), 0.0, 0.5);
++        gtk_widget_hide (label3);
++	
++        location_label = gtk_label_new (NULL);
++        gtk_label_set_line_wrap (GTK_LABEL (location_label), TRUE);
++        gtk_misc_set_alignment (GTK_MISC (location_label), 0.0, 0.5);
++	
++        file_label = gtk_label_new (NULL);
++        gtk_label_set_line_wrap (GTK_LABEL (file_label), TRUE);
++        gtk_misc_set_alignment (GTK_MISC (file_label), 0.0, 0.5);
++	
++        progressbar = gtk_progress_bar_new ();
++        gtk_progress_bar_set_pulse_step (progressbar, 0.1);
++        gtk_progress_bar_set_text (progressbar, _("Preparing to empty trash..."));
++	
++        gtk_box_pack_start (GTK_BOX (GTK_DIALOG (trash_empty_dialog)->vbox), vbox1, TRUE, TRUE, 0);
++        gtk_box_pack_start (GTK_BOX (vbox1), label1, TRUE, TRUE, 0);
++        gtk_box_pack_start (GTK_BOX (hbox), label3, FALSE, TRUE, 0);
++        gtk_box_pack_start (GTK_BOX (hbox), location_label, TRUE, TRUE, 0);
++        gtk_box_pack_start (GTK_BOX (vbox1), hbox, TRUE, TRUE, 0);
++        gtk_box_pack_start (GTK_BOX (vbox2), progressbar, TRUE, TRUE, 0);
++        gtk_box_pack_start (GTK_BOX (vbox2), file_label, TRUE, TRUE, 0);
++        gtk_box_pack_start (GTK_BOX (vbox1), vbox2, TRUE, TRUE, 0);
++	
++        gtk_widget_show (label1);
++        gtk_widget_show (vbox1);
++        gtk_widget_show_all (vbox2);
++        gtk_widget_show (hbox);
++        gtk_widget_show (location_label);
++	
++        gtk_container_set_border_width (GTK_CONTAINER (GTK_DIALOG (trash_empty_dialog)->vbox), 6);
++        gtk_container_set_border_width (GTK_CONTAINER (vbox1), 6);
++	
++        gtk_dialog_add_button (GTK_DIALOG (trash_empty_dialog),
++                               GTK_STOCK_CANCEL,
++                               GTK_RESPONSE_CANCEL);
++	
++        markup = g_markup_printf_escaped ("<big><b>%s</b></big>", _("Emptying the trash"));
++        gtk_label_set_markup (GTK_LABEL (label1), markup);
++        gtk_label_set_text (GTK_LABEL (label3), _("From: "));
++	
++        cancellable = g_cancellable_new ();
++        g_signal_connect_object (trash_empty_dialog, "response",
++                                 G_CALLBACK (g_cancellable_cancel),
++                                 cancellable, G_CONNECT_SWAPPED);
++        g_io_scheduler_push_job (trash_empty_job, NULL, NULL, 0, cancellable);
++	
++        gtk_widget_show (trash_empty_dialog);
++	
++        g_free (markup);
++        g_object_unref (cancellable);
++}
++
++static void
++trash_empty_confirmation_response (GtkDialog *dialog,
++                                   gint       response_id,
++                                   gpointer   user_data)
++{
++        if (response_id == GTK_RESPONSE_YES)
++                trash_empty_start ();
++
++        gtk_object_destroy (GTK_OBJECT (dialog));
++        trash_empty_confirm_dialog = NULL;
++}
++
++static gboolean
++trash_empty_require_confirmation ()
++{
++        GConfClient *client;
++        gboolean require_confirmation = TRUE;
++        GError *error = NULL;
++	
++        client = gconf_client_get_default ();
++        if (client) {
++                require_confirmation = gconf_client_get_bool (client, NAUTILUS_CONFIRM_TRASH_KEY, &error);
++                if (error) {
++                        g_warning ("Failed to read confirm_trash key from GConf: %s", error->message ? error->message : "Unknown error");
++                        /* It's safest to assume that confirmation is required here */
++                        require_confirmation = TRUE;
++                        g_error_free (error);
++                }
++                g_object_unref (client);
++        }
++	
++        return require_confirmation;	
++}
++
++static void
++trash_empty_show_confirmation_dialog ()
++{
++        GtkWidget *button;
++	
++        if (!trash_empty_require_confirmation ()) {
++                trash_empty_start ();
++                return;
++        }
++	
++        trash_empty_confirm_dialog = gtk_message_dialog_new (NULL, 0,
++                                                             GTK_MESSAGE_WARNING, 
++                                                             GTK_BUTTONS_NONE,
++                                                             _("Empty all of the items from the trash?"));
++
++        gtk_message_dialog_format_secondary_text (GTK_MESSAGE_DIALOG (trash_empty_confirm_dialog),
++                                                  _("If you choose to empty the trash, all items in "
++                                                  "it will be permanently lost. Please note that "
++                                                  "you can also delete them separately."));
++												
++        gtk_dialog_add_button (GTK_DIALOG (trash_empty_confirm_dialog), GTK_STOCK_CANCEL,
++                               GTK_RESPONSE_CANCEL);
++
++        button = gtk_button_new_with_mnemonic (_("_Empty Trash"));
++        gtk_widget_show (button);
++        GTK_WIDGET_SET_FLAGS (button, GTK_CAN_DEFAULT);
++
++        gtk_dialog_add_action_widget (GTK_DIALOG (trash_empty_confirm_dialog), 
++                                      button, GTK_RESPONSE_YES);
++
++        gtk_dialog_set_default_response (GTK_DIALOG (trash_empty_confirm_dialog),
++                                         GTK_RESPONSE_YES);
++	
++        gtk_window_set_icon_name (GTK_WINDOW (trash_empty_confirm_dialog),
++                                  "user-trash");
++
++        gtk_widget_show (trash_empty_confirm_dialog);
++
++        g_signal_connect (trash_empty_confirm_dialog, "response",
++                          G_CALLBACK (trash_empty_confirmation_response), NULL);
++}
++
++void
++gsd_ldsm_trash_empty ()
++{
++        if (trash_empty_confirm_dialog)
++                gtk_window_present (GTK_WINDOW (trash_empty_confirm_dialog));
++        else if (trash_empty_dialog)
++                gtk_window_present (GTK_WINDOW (trash_empty_dialog));
++        else
++                trash_empty_show_confirmation_dialog ();
++}
+diff --git a/plugins/housekeeping/gsd-ldsm-trash-empty.h b/plugins/housekeeping/gsd-ldsm-trash-empty.h
+new file mode 100644
+index 0000000..4d46a5b
+--- a/dev/null
++++ b/plugins/housekeeping/gsd-ldsm-trash-empty.h
+@@ -0,0 +1,27 @@
++/* -*- Mode: C; tab-width: 8; indent-tabs-mode: nil; c-basic-offset: 8 -*-
++ *
++ * gsd-ldsm-trash-empty.h
++ * Copyright (C) Chris Coulson 2009 <chrisccoulson@googlemail.com>
++ * 
++ * gsd-ldsm-trash-empty.h is free software: you can redistribute it and/or modify it
++ * under the terms of the GNU General Public License as published by the
++ * Free Software Foundation, either version 3 of the License, or
++ * (at your option) any later version.
++ * 
++ * gsd-ldsm-trash-empty.h is distributed in the hope that it will be useful, but
++ * WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
++ * See the GNU General Public License for more details.
++ * 
++ * You should have received a copy of the GNU General Public License along
++ * with this program.  If not, see <http://www.gnu.org/licenses/>.
++ */
++
++#ifndef _gsd_ldsm_trash_empty_h_
++#define _gsd_ldsm_trash_empty_h_
++
++#include <gtk/gtk.h>
++
++void gsd_ldsm_trash_empty ();
++
++#endif /* _gsd_ldsm_trash_empty_h_ */ 
+diff --git a/po/POTFILES.in b/po/POTFILES.in
+index eb5c6fd..7d281b3 100644
+--- a/po/POTFILES.in
++++ b/po/POTFILES.in
+@@ -1,6 +1,7 @@
+ # Files with translatable strings.
+ # Please keep this file in alphabetical order.
+ data/50-accessibility.xml.in
++data/apps_gnome_settings_daemon_housekeeping.schemas.in
+ data/apps_gnome_settings_daemon_keybindings.schemas.in
+ data/apps_gnome_settings_daemon_xrandr.schemas.in
+ data/desktop_gnome_font_rendering.schemas.in
+@@ -19,6 +20,8 @@ plugins/a11y-keyboard/gsd-a11y-preferences-dialog.c
+ [type: gettext/ini]plugins/font/font.gnome-settings-plugin.in
+ plugins/font/gsd-font-manager.c
+ plugins/housekeeping/gsd-disk-space.c
++plugins/housekeeping/gsd-ldsm-dialog.c
++plugins/housekeeping/gsd-ldsm-trash-empty.c
+ plugins/keybindings/gsd-keybindings-manager.c
+ [type: gettext/ini]plugins/keybindings/keybindings.gnome-settings-plugin.in
+ [type: gettext/ini]plugins/keyboard/keyboard.gnome-settings-plugin.in
+--
+cgit v0.8.2
