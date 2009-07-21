@@ -27,6 +27,15 @@ gnome-settings-daemon (2.27.4-0ubuntu1) UNRELEASED; urgency=low
   * debian/patches/50_ldsm_notification.patch:
     - Upstream change to implement the new low disk space warning
       (Fixes LP: #337441, LP: #390504 and LP: #396864).
+  * debian/patches/60_ldsm_notification_fixup.patch:
+    - Fix some bugs in the upstream implementation of the last patch,
+      eg, I made the assumption that all mounts with a device node
+      not beginning with /dev could be ignored as a way of filtering out
+      uninteresting volumes. This is not so, as the GUnixMountEntry for
+      the root filesystem can have "rootfs" as the device node, and
+      we don't want to filter the root filesystem out.
+    - Make sure that no warning is shown for volumes with more than 2GB
+      free space by default.
 
  -- Chris Coulson <chrisccoulson@ubuntu.com>  Sun, 19 Jul 2009 22:54:21 +0100
 
