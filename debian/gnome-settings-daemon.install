@@ -4,6 +4,8 @@ debian/tmp/usr/lib/gnome-settings-daemon*
 debian/tmp/usr/share/locale
 debian/tmp/usr/share/icons/hicolor
 debian/tmp/usr/share/dbus-1/services
+debian/tmp/usr/share/gnome-control-center
+debian/tmp/usr/share/gnome-settings-daemon/*.glade
 debian/tmp/usr/share/gnome-settings-daemon/*.ui
 debian/tmp/usr/share/gnome-settings-daemon/*.png
 debian/tmp/usr/share/gnome-settings-daemon/xrdb/* /etc/gnome/config
