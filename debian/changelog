@@ -1,4 +1,4 @@
-gnome-settings-daemon (2.27.4-0ubuntu1) UNRELEASED; urgency=low
+gnome-settings-daemon (2.27.4-0ubuntu1) karmic; urgency=low
 
   * New upstream version (LP: #401510):
     - Remove screensaver plugin, it's autostarted now 
