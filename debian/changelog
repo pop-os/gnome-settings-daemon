@@ -1,3 +1,12 @@
+gnome-settings-daemon (2.27.4-0ubuntu2) UNRELEASED; urgency=low
+
+  * debian/patches/70_migrate_touchpad_config.patch,
+    debian/gnome-settings-daemon.gconf-defaults:
+    - Ensure that touchpad settings are migrated to the new
+      config where appropriate (LP: #404219).
+
+ -- Chris Coulson <chrisccoulson@ubuntu.com>  Sun, 26 Jul 2009 21:00:40 +0100
+
 gnome-settings-daemon (2.27.4-0ubuntu1) karmic; urgency=low
 
   * New upstream version (LP: #401510):
