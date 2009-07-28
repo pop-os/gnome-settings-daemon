@@ -1,6 +1,6 @@
-diff -Nur -x '*.orig' -x '*~' gnome-settings-daemon-2.27.4/aclocal.m4 gnome-settings-daemon-2.27.4.new/aclocal.m4
---- gnome-settings-daemon-2.27.4/aclocal.m4	2009-07-14 12:46:18.000000000 +0100
-+++ gnome-settings-daemon-2.27.4.new/aclocal.m4	2009-07-20 21:40:22.241874974 +0100
+diff -Nur -x '*.orig' -x '*~' gnome-settings-daemon-2.27.5/aclocal.m4 gnome-settings-daemon-2.27.5.new/aclocal.m4
+--- gnome-settings-daemon-2.27.5/aclocal.m4	2009-07-27 23:26:56.000000000 +0100
++++ gnome-settings-daemon-2.27.5.new/aclocal.m4	2009-07-28 22:40:46.864839950 +0100
 @@ -1,4 +1,4 @@
 -# generated automatically by aclocal 1.10.1 -*- Autoconf -*-
 +# generated automatically by aclocal 1.10.2 -*- Autoconf -*-
@@ -18341,9 +18341,9 @@ diff -Nur -x '*.orig' -x '*~' gnome-settings-daemon-2.27.4/aclocal.m4 gnome-sett
 +]) # _AM_PROG_TAR
  
  m4_include([acinclude.m4])
-diff -Nur -x '*.orig' -x '*~' gnome-settings-daemon-2.27.4/configure gnome-settings-daemon-2.27.4.new/configure
---- gnome-settings-daemon-2.27.4/configure	2009-07-14 12:46:21.000000000 +0100
-+++ gnome-settings-daemon-2.27.4.new/configure	2009-07-20 21:41:34.405876497 +0100
+diff -Nur -x '*.orig' -x '*~' gnome-settings-daemon-2.27.5/configure gnome-settings-daemon-2.27.5.new/configure
+--- gnome-settings-daemon-2.27.5/configure	2009-07-27 23:26:58.000000000 +0100
++++ gnome-settings-daemon-2.27.5.new/configure	2009-07-28 22:40:52.885834850 +0100
 @@ -1684,8 +1684,7 @@
    --enable-compile-warnings=[no/minimum/yes/maximum/error]
                            Turn on compiler warnings
@@ -18592,7 +18592,7 @@ diff -Nur -x '*.orig' -x '*~' gnome-settings-daemon-2.27.4/configure gnome-setti
          fi
  	# Put the nasty error message in config.log where it belongs
  	echo "$SETTINGS_DAEMON_PKG_ERRORS" >&5
-@@ -18458,16 +18490,18 @@
+@@ -18458,21 +18490,24 @@
  { $as_echo "$as_me:$LINENO: checking for SETTINGS_PLUGIN" >&5
  $as_echo_n "checking for SETTINGS_PLUGIN... " >&6; }
  
@@ -18609,23 +18609,21 @@ diff -Nur -x '*.orig' -x '*~' gnome-settings-daemon-2.27.4/configure gnome-setti
          gconf-2.0 >= \$GCONF_REQUIRED_VERSION
          gnome-desktop-2.0 >= \$GNOME_DESKTOP_REQUIRED_VERSION
          gio-2.0 >= \$GIO_REQUIRED_VERSION
-         libglade-2.0 >= 2.0.0
          dbus-glib-1 >= \$DBUS_GLIB_REQUIRED_VERSION
 +	libnotify >= \$LIBNOTIFY_REQUIRED_VERSION
  \"") >&5
    ($PKG_CONFIG --exists --print-errors "gtk+-2.0 >= $GTK_REQUIRED_VERSION
          gconf-2.0 >= $GCONF_REQUIRED_VERSION
-@@ -18475,6 +18509,7 @@
+         gnome-desktop-2.0 >= $GNOME_DESKTOP_REQUIRED_VERSION
          gio-2.0 >= $GIO_REQUIRED_VERSION
-         libglade-2.0 >= 2.0.0
          dbus-glib-1 >= $DBUS_GLIB_REQUIRED_VERSION
 +	libnotify >= $LIBNOTIFY_REQUIRED_VERSION
  ") 2>&5
    ac_status=$?
    $as_echo "$as_me:$LINENO: \$? = $ac_status" >&5
-@@ -18485,23 +18520,27 @@
+@@ -18482,28 +18517,33 @@
+         gnome-desktop-2.0 >= $GNOME_DESKTOP_REQUIRED_VERSION
          gio-2.0 >= $GIO_REQUIRED_VERSION
-         libglade-2.0 >= 2.0.0
          dbus-glib-1 >= $DBUS_GLIB_REQUIRED_VERSION
 +	libnotify >= $LIBNOTIFY_REQUIRED_VERSION
  " 2>/dev/null`
@@ -18651,23 +18649,21 @@ diff -Nur -x '*.orig' -x '*~' gnome-settings-daemon-2.27.4/configure gnome-setti
          gconf-2.0 >= \$GCONF_REQUIRED_VERSION
          gnome-desktop-2.0 >= \$GNOME_DESKTOP_REQUIRED_VERSION
          gio-2.0 >= \$GIO_REQUIRED_VERSION
-         libglade-2.0 >= 2.0.0
          dbus-glib-1 >= \$DBUS_GLIB_REQUIRED_VERSION
 +	libnotify >= \$LIBNOTIFY_REQUIRED_VERSION
  \"") >&5
    ($PKG_CONFIG --exists --print-errors "gtk+-2.0 >= $GTK_REQUIRED_VERSION
          gconf-2.0 >= $GCONF_REQUIRED_VERSION
-@@ -18509,6 +18548,7 @@
+         gnome-desktop-2.0 >= $GNOME_DESKTOP_REQUIRED_VERSION
          gio-2.0 >= $GIO_REQUIRED_VERSION
-         libglade-2.0 >= 2.0.0
          dbus-glib-1 >= $DBUS_GLIB_REQUIRED_VERSION
 +	libnotify >= $LIBNOTIFY_REQUIRED_VERSION
  ") 2>&5
    ac_status=$?
    $as_echo "$as_me:$LINENO: \$? = $ac_status" >&5
-@@ -18519,12 +18559,14 @@
+@@ -18513,12 +18553,14 @@
+         gnome-desktop-2.0 >= $GNOME_DESKTOP_REQUIRED_VERSION
          gio-2.0 >= $GIO_REQUIRED_VERSION
-         libglade-2.0 >= 2.0.0
          dbus-glib-1 >= $DBUS_GLIB_REQUIRED_VERSION
 +	libnotify >= $LIBNOTIFY_REQUIRED_VERSION
  " 2>/dev/null`
@@ -18682,7 +18678,7 @@ diff -Nur -x '*.orig' -x '*~' gnome-settings-daemon-2.27.4/configure gnome-setti
  fi
  
  
-@@ -18537,21 +18579,23 @@
+@@ -18531,19 +18573,21 @@
          _pkg_short_errors_supported=no
  fi
          if test $_pkg_short_errors_supported = yes; then
@@ -18691,7 +18687,6 @@ diff -Nur -x '*.orig' -x '*~' gnome-settings-daemon-2.27.4/configure gnome-setti
          gconf-2.0 >= $GCONF_REQUIRED_VERSION
          gnome-desktop-2.0 >= $GNOME_DESKTOP_REQUIRED_VERSION
          gio-2.0 >= $GIO_REQUIRED_VERSION
-         libglade-2.0 >= 2.0.0
          dbus-glib-1 >= $DBUS_GLIB_REQUIRED_VERSION
 -" 2>&1`
 +	libnotify >= $LIBNOTIFY_REQUIRED_VERSION
@@ -18702,7 +18697,6 @@ diff -Nur -x '*.orig' -x '*~' gnome-settings-daemon-2.27.4/configure gnome-setti
          gconf-2.0 >= $GCONF_REQUIRED_VERSION
          gnome-desktop-2.0 >= $GNOME_DESKTOP_REQUIRED_VERSION
          gio-2.0 >= $GIO_REQUIRED_VERSION
-         libglade-2.0 >= 2.0.0
          dbus-glib-1 >= $DBUS_GLIB_REQUIRED_VERSION
 -" 2>&1`
 +	libnotify >= $LIBNOTIFY_REQUIRED_VERSION
@@ -18710,23 +18704,23 @@ diff -Nur -x '*.orig' -x '*~' gnome-settings-daemon-2.27.4/configure gnome-setti
          fi
  	# Put the nasty error message in config.log where it belongs
  	echo "$SETTINGS_PLUGIN_PKG_ERRORS" >&5
-@@ -18562,6 +18606,7 @@
+@@ -18553,6 +18597,7 @@
+         gnome-desktop-2.0 >= $GNOME_DESKTOP_REQUIRED_VERSION
          gio-2.0 >= $GIO_REQUIRED_VERSION
-         libglade-2.0 >= 2.0.0
          dbus-glib-1 >= $DBUS_GLIB_REQUIRED_VERSION
 +	libnotify >= $LIBNOTIFY_REQUIRED_VERSION
  ) were not met:
  
  $SETTINGS_PLUGIN_PKG_ERRORS
-@@ -18579,6 +18624,7 @@
+@@ -18569,6 +18614,7 @@
+         gnome-desktop-2.0 >= $GNOME_DESKTOP_REQUIRED_VERSION
          gio-2.0 >= $GIO_REQUIRED_VERSION
-         libglade-2.0 >= 2.0.0
          dbus-glib-1 >= $DBUS_GLIB_REQUIRED_VERSION
 +	libnotify >= $LIBNOTIFY_REQUIRED_VERSION
  ) were not met:
  
  $SETTINGS_PLUGIN_PKG_ERRORS
-@@ -18783,10 +18829,11 @@
+@@ -18773,10 +18819,11 @@
  { $as_echo "$as_me:$LINENO: checking for LIBNOTIFY" >&5
  $as_echo_n "checking for LIBNOTIFY... " >&6; }
  
@@ -18742,7 +18736,7 @@ diff -Nur -x '*.orig' -x '*~' gnome-settings-daemon-2.27.4/configure gnome-setti
      { ($as_echo "$as_me:$LINENO: \$PKG_CONFIG --exists --print-errors \"libnotify >= \$LIBNOTIFY_REQUIRED_VERSION\"") >&5
    ($PKG_CONFIG --exists --print-errors "libnotify >= $LIBNOTIFY_REQUIRED_VERSION") 2>&5
    ac_status=$?
-@@ -18796,13 +18843,15 @@
+@@ -18786,13 +18833,15 @@
  else
    pkg_failed=yes
  fi
@@ -18764,7 +18758,7 @@ diff -Nur -x '*.orig' -x '*~' gnome-settings-daemon-2.27.4/configure gnome-setti
      { ($as_echo "$as_me:$LINENO: \$PKG_CONFIG --exists --print-errors \"libnotify >= \$LIBNOTIFY_REQUIRED_VERSION\"") >&5
    ($PKG_CONFIG --exists --print-errors "libnotify >= $LIBNOTIFY_REQUIRED_VERSION") 2>&5
    ac_status=$?
-@@ -18812,8 +18861,9 @@
+@@ -18802,8 +18851,9 @@
  else
    pkg_failed=yes
  fi
@@ -18776,7 +18770,7 @@ diff -Nur -x '*.orig' -x '*~' gnome-settings-daemon-2.27.4/configure gnome-setti
  fi
  
  
-@@ -18826,9 +18876,9 @@
+@@ -18816,9 +18866,9 @@
          _pkg_short_errors_supported=no
  fi
          if test $_pkg_short_errors_supported = yes; then
@@ -18788,7 +18782,7 @@ diff -Nur -x '*.orig' -x '*~' gnome-settings-daemon-2.27.4/configure gnome-setti
          fi
  	# Put the nasty error message in config.log where it belongs
  	echo "$LIBNOTIFY_PKG_ERRORS" >&5
-@@ -20620,10 +20670,11 @@
+@@ -20610,10 +20660,11 @@
  { $as_echo "$as_me:$LINENO: checking for FONTCONFIG" >&5
  $as_echo_n "checking for FONTCONFIG... " >&6; }
  
@@ -18804,7 +18798,7 @@ diff -Nur -x '*.orig' -x '*~' gnome-settings-daemon-2.27.4/configure gnome-setti
      { ($as_echo "$as_me:$LINENO: \$PKG_CONFIG --exists --print-errors \"fontconfig\"") >&5
    ($PKG_CONFIG --exists --print-errors "fontconfig") 2>&5
    ac_status=$?
-@@ -20633,13 +20684,15 @@
+@@ -20623,13 +20674,15 @@
  else
    pkg_failed=yes
  fi
@@ -18826,7 +18820,7 @@ diff -Nur -x '*.orig' -x '*~' gnome-settings-daemon-2.27.4/configure gnome-setti
      { ($as_echo "$as_me:$LINENO: \$PKG_CONFIG --exists --print-errors \"fontconfig\"") >&5
    ($PKG_CONFIG --exists --print-errors "fontconfig") 2>&5
    ac_status=$?
-@@ -20649,8 +20702,9 @@
+@@ -20639,8 +20692,9 @@
  else
    pkg_failed=yes
  fi
@@ -18838,7 +18832,7 @@ diff -Nur -x '*.orig' -x '*~' gnome-settings-daemon-2.27.4/configure gnome-setti
  fi
  
  
-@@ -20663,9 +20717,9 @@
+@@ -20653,9 +20707,9 @@
          _pkg_short_errors_supported=no
  fi
          if test $_pkg_short_errors_supported = yes; then
@@ -18850,7 +18844,7 @@ diff -Nur -x '*.orig' -x '*~' gnome-settings-daemon-2.27.4/configure gnome-setti
          fi
  	# Put the nasty error message in config.log where it belongs
  	echo "$FONTCONFIG_PKG_ERRORS" >&5
-@@ -21025,10 +21079,11 @@
+@@ -21015,10 +21069,11 @@
  { $as_echo "$as_me:$LINENO: checking for LIBGNOMEKBD" >&5
  $as_echo_n "checking for LIBGNOMEKBD... " >&6; }
  
@@ -18866,7 +18860,7 @@ diff -Nur -x '*.orig' -x '*~' gnome-settings-daemon-2.27.4/configure gnome-setti
      { ($as_echo "$as_me:$LINENO: \$PKG_CONFIG --exists --print-errors \"libgnomekbd >= 2.21.4 libxklavier >= 4.0\"") >&5
    ($PKG_CONFIG --exists --print-errors "libgnomekbd >= 2.21.4 libxklavier >= 4.0") 2>&5
    ac_status=$?
-@@ -21038,13 +21093,15 @@
+@@ -21028,13 +21083,15 @@
  else
    pkg_failed=yes
  fi
@@ -18888,7 +18882,7 @@ diff -Nur -x '*.orig' -x '*~' gnome-settings-daemon-2.27.4/configure gnome-setti
      { ($as_echo "$as_me:$LINENO: \$PKG_CONFIG --exists --print-errors \"libgnomekbd >= 2.21.4 libxklavier >= 4.0\"") >&5
    ($PKG_CONFIG --exists --print-errors "libgnomekbd >= 2.21.4 libxklavier >= 4.0") 2>&5
    ac_status=$?
-@@ -21054,8 +21111,9 @@
+@@ -21044,8 +21101,9 @@
  else
    pkg_failed=yes
  fi
@@ -18900,7 +18894,7 @@ diff -Nur -x '*.orig' -x '*~' gnome-settings-daemon-2.27.4/configure gnome-setti
  fi
  
  
-@@ -21068,9 +21126,9 @@
+@@ -21058,9 +21116,9 @@
          _pkg_short_errors_supported=no
  fi
          if test $_pkg_short_errors_supported = yes; then
@@ -18912,7 +18906,7 @@ diff -Nur -x '*.orig' -x '*~' gnome-settings-daemon-2.27.4/configure gnome-setti
          fi
  	# Put the nasty error message in config.log where it belongs
  	echo "$LIBGNOMEKBD_PKG_ERRORS" >&5
-@@ -21138,10 +21196,11 @@
+@@ -21128,10 +21186,11 @@
  { $as_echo "$as_me:$LINENO: checking for GIOUNIX" >&5
  $as_echo_n "checking for GIOUNIX... " >&6; }
  
@@ -18928,7 +18922,7 @@ diff -Nur -x '*.orig' -x '*~' gnome-settings-daemon-2.27.4/configure gnome-setti
      { ($as_echo "$as_me:$LINENO: \$PKG_CONFIG --exists --print-errors \"gio-unix-2.0\"") >&5
    ($PKG_CONFIG --exists --print-errors "gio-unix-2.0") 2>&5
    ac_status=$?
-@@ -21151,13 +21210,15 @@
+@@ -21141,13 +21200,15 @@
  else
    pkg_failed=yes
  fi
@@ -18950,7 +18944,7 @@ diff -Nur -x '*.orig' -x '*~' gnome-settings-daemon-2.27.4/configure gnome-setti
      { ($as_echo "$as_me:$LINENO: \$PKG_CONFIG --exists --print-errors \"gio-unix-2.0\"") >&5
    ($PKG_CONFIG --exists --print-errors "gio-unix-2.0") 2>&5
    ac_status=$?
-@@ -21167,8 +21228,9 @@
+@@ -21157,8 +21218,9 @@
  else
    pkg_failed=yes
  fi
@@ -18962,7 +18956,7 @@ diff -Nur -x '*.orig' -x '*~' gnome-settings-daemon-2.27.4/configure gnome-setti
  fi
  
  
-@@ -21181,9 +21243,9 @@
+@@ -21171,9 +21233,9 @@
          _pkg_short_errors_supported=no
  fi
          if test $_pkg_short_errors_supported = yes; then
@@ -18974,7 +18968,7 @@ diff -Nur -x '*.orig' -x '*~' gnome-settings-daemon-2.27.4/configure gnome-setti
          fi
  	# Put the nasty error message in config.log where it belongs
  	echo "$GIOUNIX_PKG_ERRORS" >&5
-@@ -21268,10 +21330,11 @@
+@@ -21258,10 +21320,11 @@
  { $as_echo "$as_me:$LINENO: checking for PULSE" >&5
  $as_echo_n "checking for PULSE... " >&6; }
  
@@ -18990,7 +18984,7 @@ diff -Nur -x '*.orig' -x '*~' gnome-settings-daemon-2.27.4/configure gnome-setti
      { ($as_echo "$as_me:$LINENO: \$PKG_CONFIG --exists --print-errors \"glib-2.0 libpulse >= \$PA_REQUIRED_VERSION libpulse-mainloop-glib >= \$PA_REQUIRED_VERSION\"") >&5
    ($PKG_CONFIG --exists --print-errors "glib-2.0 libpulse >= $PA_REQUIRED_VERSION libpulse-mainloop-glib >= $PA_REQUIRED_VERSION") 2>&5
    ac_status=$?
-@@ -21281,13 +21344,15 @@
+@@ -21271,13 +21334,15 @@
  else
    pkg_failed=yes
  fi
@@ -19012,7 +19006,7 @@ diff -Nur -x '*.orig' -x '*~' gnome-settings-daemon-2.27.4/configure gnome-setti
      { ($as_echo "$as_me:$LINENO: \$PKG_CONFIG --exists --print-errors \"glib-2.0 libpulse >= \$PA_REQUIRED_VERSION libpulse-mainloop-glib >= \$PA_REQUIRED_VERSION\"") >&5
    ($PKG_CONFIG --exists --print-errors "glib-2.0 libpulse >= $PA_REQUIRED_VERSION libpulse-mainloop-glib >= $PA_REQUIRED_VERSION") 2>&5
    ac_status=$?
-@@ -21297,8 +21362,9 @@
+@@ -21287,8 +21352,9 @@
  else
    pkg_failed=yes
  fi
@@ -19024,7 +19018,7 @@ diff -Nur -x '*.orig' -x '*~' gnome-settings-daemon-2.27.4/configure gnome-setti
  fi
  
  
-@@ -21311,9 +21377,9 @@
+@@ -21301,9 +21367,9 @@
          _pkg_short_errors_supported=no
  fi
          if test $_pkg_short_errors_supported = yes; then
@@ -19036,7 +19030,7 @@ diff -Nur -x '*.orig' -x '*~' gnome-settings-daemon-2.27.4/configure gnome-setti
          fi
  	# Put the nasty error message in config.log where it belongs
  	echo "$PULSE_PKG_ERRORS" >&5
-@@ -23189,18 +23255,28 @@
+@@ -23179,18 +23245,28 @@
  
  
    case $ac_file$ac_mode in
@@ -19077,7 +19071,7 @@ diff -Nur -x '*.orig' -x '*~' gnome-settings-daemon-2.27.4/configure gnome-setti
  $as_expr X"$mf" : 'X\(.*[^/]\)//*[^/][^/]*/*$' \| \
  	 X"$mf" : 'X\(//\)[^/]' \| \
  	 X"$mf" : 'X\(//\)$' \| \
-@@ -23223,28 +23299,28 @@
+@@ -23213,28 +23289,28 @@
  	    q
  	  }
  	  s/.*/./; q'`
@@ -19128,7 +19122,7 @@ diff -Nur -x '*.orig' -x '*~' gnome-settings-daemon-2.27.4/configure gnome-setti
  $as_expr X"$file" : 'X\(.*[^/]\)//*[^/][^/]*/*$' \| \
  	 X"$file" : 'X\(//\)[^/]' \| \
  	 X"$file" : 'X\(//\)$' \| \
-@@ -23267,7 +23343,7 @@
+@@ -23257,7 +23333,7 @@
  	    q
  	  }
  	  s/.*/./; q'`
@@ -19137,7 +19131,7 @@ diff -Nur -x '*.orig' -x '*~' gnome-settings-daemon-2.27.4/configure gnome-setti
    case $as_dir in #(
    -*) as_dir=./$as_dir;;
    esac
-@@ -23308,10 +23384,11 @@
+@@ -23298,10 +23374,11 @@
    } || test -d "$as_dir" || { { $as_echo "$as_me:$LINENO: error: cannot create directory $as_dir" >&5
  $as_echo "$as_me: error: cannot create directory $as_dir" >&2;}
     { (exit 1); exit 1; }; }; }
@@ -19152,24 +19146,16 @@ diff -Nur -x '*.orig' -x '*~' gnome-settings-daemon-2.27.4/configure gnome-setti
   ;;
      "libtool":C)
  
-diff -Nur -x '*.orig' -x '*~' gnome-settings-daemon-2.27.4/data/Makefile.in gnome-settings-daemon-2.27.4.new/data/Makefile.in
---- gnome-settings-daemon-2.27.4/data/Makefile.in	2009-07-14 12:46:26.000000000 +0100
-+++ gnome-settings-daemon-2.27.4.new/data/Makefile.in	2009-07-20 21:41:35.460876013 +0100
+diff -Nur -x '*.orig' -x '*~' gnome-settings-daemon-2.27.5/data/Makefile.in gnome-settings-daemon-2.27.5.new/data/Makefile.in
+--- gnome-settings-daemon-2.27.5/data/Makefile.in	2009-07-27 23:27:00.000000000 +0100
++++ gnome-settings-daemon-2.27.5.new/data/Makefile.in	2009-07-28 22:40:53.892837318 +0100
 @@ -1,4 +1,4 @@
 -# Makefile.in generated by automake 1.10.1 from Makefile.am.
 +# Makefile.in generated by automake 1.10.2 from Makefile.am.
  # @configure_input@
  
  # Copyright (C) 1994, 1995, 1996, 1997, 1998, 1999, 2000, 2001, 2002,
-@@ -242,6 +242,7 @@
- schemasdir = $(GCONF_SCHEMA_FILE_DIR)
- schemas_in_files = \
- 	gnome-settings-daemon.schemas.in			\
-+	apps_gnome_settings_daemon_housekeeping.schemas.in	\
- 	apps_gnome_settings_daemon_keybindings.schemas.in	\
- 	desktop_gnome_font_rendering.schemas.in			\
- 	desktop_gnome_keybindings.schemas.in			\
-@@ -287,8 +288,8 @@
+@@ -288,8 +288,8 @@
  	@for dep in $?; do \
  	  case '$(am__configure_deps)' in \
  	    *$$dep*) \
@@ -19180,9 +19166,9 @@ diff -Nur -x '*.orig' -x '*~' gnome-settings-daemon-2.27.4/data/Makefile.in gnom
  	      exit 1;; \
  	  esac; \
  	done; \
-diff -Nur -x '*.orig' -x '*~' gnome-settings-daemon-2.27.4/gnome-settings-daemon/Makefile.in gnome-settings-daemon-2.27.4.new/gnome-settings-daemon/Makefile.in
---- gnome-settings-daemon-2.27.4/gnome-settings-daemon/Makefile.in	2009-07-14 12:46:27.000000000 +0100
-+++ gnome-settings-daemon-2.27.4.new/gnome-settings-daemon/Makefile.in	2009-07-20 21:41:35.625873823 +0100
+diff -Nur -x '*.orig' -x '*~' gnome-settings-daemon-2.27.5/gnome-settings-daemon/Makefile.in gnome-settings-daemon-2.27.5.new/gnome-settings-daemon/Makefile.in
+--- gnome-settings-daemon-2.27.5/gnome-settings-daemon/Makefile.in	2009-07-27 23:27:00.000000000 +0100
++++ gnome-settings-daemon-2.27.5.new/gnome-settings-daemon/Makefile.in	2009-07-28 22:40:54.080835349 +0100
 @@ -1,4 +1,4 @@
 -# Makefile.in generated by automake 1.10.1 from Makefile.am.
 +# Makefile.in generated by automake 1.10.2 from Makefile.am.
@@ -19209,9 +19195,9 @@ diff -Nur -x '*.orig' -x '*~' gnome-settings-daemon-2.27.4/gnome-settings-daemon
  	      END { if (nonempty) { for (i in files) print i; }; }'`; \
  	mkid -fID $$unique
  tags: TAGS
-diff -Nur -x '*.orig' -x '*~' gnome-settings-daemon-2.27.4/Makefile.in gnome-settings-daemon-2.27.4.new/Makefile.in
---- gnome-settings-daemon-2.27.4/Makefile.in	2009-07-14 12:46:33.000000000 +0100
-+++ gnome-settings-daemon-2.27.4.new/Makefile.in	2009-07-20 21:41:38.093873601 +0100
+diff -Nur -x '*.orig' -x '*~' gnome-settings-daemon-2.27.5/Makefile.in gnome-settings-daemon-2.27.5.new/Makefile.in
+--- gnome-settings-daemon-2.27.5/Makefile.in	2009-07-27 23:27:02.000000000 +0100
++++ gnome-settings-daemon-2.27.5.new/Makefile.in	2009-07-28 22:40:56.784837618 +0100
 @@ -1,4 +1,4 @@
 -# Makefile.in generated by automake 1.10.1 from Makefile.am.
 +# Makefile.in generated by automake 1.10.2 from Makefile.am.
@@ -19236,9 +19222,9 @@ diff -Nur -x '*.orig' -x '*~' gnome-settings-daemon-2.27.4/Makefile.in gnome-set
  	      END { if (nonempty) { for (i in files) print i; }; }'`; \
  	mkid -fID $$unique
  tags: TAGS
-diff -Nur -x '*.orig' -x '*~' gnome-settings-daemon-2.27.4/plugins/a11y-keyboard/Makefile.in gnome-settings-daemon-2.27.4.new/plugins/a11y-keyboard/Makefile.in
---- gnome-settings-daemon-2.27.4/plugins/a11y-keyboard/Makefile.in	2009-07-14 12:46:27.000000000 +0100
-+++ gnome-settings-daemon-2.27.4.new/plugins/a11y-keyboard/Makefile.in	2009-07-20 21:41:35.881873619 +0100
+diff -Nur -x '*.orig' -x '*~' gnome-settings-daemon-2.27.5/plugins/a11y-keyboard/Makefile.in gnome-settings-daemon-2.27.5.new/plugins/a11y-keyboard/Makefile.in
+--- gnome-settings-daemon-2.27.5/plugins/a11y-keyboard/Makefile.in	2009-07-27 23:27:00.000000000 +0100
++++ gnome-settings-daemon-2.27.5.new/plugins/a11y-keyboard/Makefile.in	2009-07-28 22:40:54.333835167 +0100
 @@ -1,4 +1,4 @@
 -# Makefile.in generated by automake 1.10.1 from Makefile.am.
 +# Makefile.in generated by automake 1.10.2 from Makefile.am.
@@ -19265,9 +19251,9 @@ diff -Nur -x '*.orig' -x '*~' gnome-settings-daemon-2.27.4/plugins/a11y-keyboard
  	      END { if (nonempty) { for (i in files) print i; }; }'`; \
  	mkid -fID $$unique
  tags: TAGS
-diff -Nur -x '*.orig' -x '*~' gnome-settings-daemon-2.27.4/plugins/background/Makefile.in gnome-settings-daemon-2.27.4.new/plugins/background/Makefile.in
---- gnome-settings-daemon-2.27.4/plugins/background/Makefile.in	2009-07-14 12:46:28.000000000 +0100
-+++ gnome-settings-daemon-2.27.4.new/plugins/background/Makefile.in	2009-07-20 21:41:36.037874579 +0100
+diff -Nur -x '*.orig' -x '*~' gnome-settings-daemon-2.27.5/plugins/background/Makefile.in gnome-settings-daemon-2.27.5.new/plugins/background/Makefile.in
+--- gnome-settings-daemon-2.27.5/plugins/background/Makefile.in	2009-07-27 23:27:00.000000000 +0100
++++ gnome-settings-daemon-2.27.5.new/plugins/background/Makefile.in	2009-07-28 22:40:54.481836863 +0100
 @@ -1,4 +1,4 @@
 -# Makefile.in generated by automake 1.10.1 from Makefile.am.
 +# Makefile.in generated by automake 1.10.2 from Makefile.am.
@@ -19294,9 +19280,9 @@ diff -Nur -x '*.orig' -x '*~' gnome-settings-daemon-2.27.4/plugins/background/Ma
  	      END { if (nonempty) { for (i in files) print i; }; }'`; \
  	mkid -fID $$unique
  tags: TAGS
-diff -Nur -x '*.orig' -x '*~' gnome-settings-daemon-2.27.4/plugins/clipboard/Makefile.in gnome-settings-daemon-2.27.4.new/plugins/clipboard/Makefile.in
---- gnome-settings-daemon-2.27.4/plugins/clipboard/Makefile.in	2009-07-14 12:46:28.000000000 +0100
-+++ gnome-settings-daemon-2.27.4.new/plugins/clipboard/Makefile.in	2009-07-20 21:41:36.177874229 +0100
+diff -Nur -x '*.orig' -x '*~' gnome-settings-daemon-2.27.5/plugins/clipboard/Makefile.in gnome-settings-daemon-2.27.5.new/plugins/clipboard/Makefile.in
+--- gnome-settings-daemon-2.27.5/plugins/clipboard/Makefile.in	2009-07-27 23:27:00.000000000 +0100
++++ gnome-settings-daemon-2.27.5.new/plugins/clipboard/Makefile.in	2009-07-28 22:40:54.617835315 +0100
 @@ -1,4 +1,4 @@
 -# Makefile.in generated by automake 1.10.1 from Makefile.am.
 +# Makefile.in generated by automake 1.10.2 from Makefile.am.
@@ -19323,9 +19309,9 @@ diff -Nur -x '*.orig' -x '*~' gnome-settings-daemon-2.27.4/plugins/clipboard/Mak
  	      END { if (nonempty) { for (i in files) print i; }; }'`; \
  	mkid -fID $$unique
  tags: TAGS
-diff -Nur -x '*.orig' -x '*~' gnome-settings-daemon-2.27.4/plugins/common/Makefile.in gnome-settings-daemon-2.27.4.new/plugins/common/Makefile.in
---- gnome-settings-daemon-2.27.4/plugins/common/Makefile.in	2009-07-14 12:46:28.000000000 +0100
-+++ gnome-settings-daemon-2.27.4.new/plugins/common/Makefile.in	2009-07-20 21:41:36.297874719 +0100
+diff -Nur -x '*.orig' -x '*~' gnome-settings-daemon-2.27.5/plugins/common/Makefile.in gnome-settings-daemon-2.27.5.new/plugins/common/Makefile.in
+--- gnome-settings-daemon-2.27.5/plugins/common/Makefile.in	2009-07-27 23:27:00.000000000 +0100
++++ gnome-settings-daemon-2.27.5.new/plugins/common/Makefile.in	2009-07-28 22:40:54.737835521 +0100
 @@ -1,4 +1,4 @@
 -# Makefile.in generated by automake 1.10.1 from Makefile.am.
 +# Makefile.in generated by automake 1.10.2 from Makefile.am.
@@ -19352,9 +19338,9 @@ diff -Nur -x '*.orig' -x '*~' gnome-settings-daemon-2.27.4/plugins/common/Makefi
  	      END { if (nonempty) { for (i in files) print i; }; }'`; \
  	mkid -fID $$unique
  tags: TAGS
-diff -Nur -x '*.orig' -x '*~' gnome-settings-daemon-2.27.4/plugins/dummy/Makefile.in gnome-settings-daemon-2.27.4.new/plugins/dummy/Makefile.in
---- gnome-settings-daemon-2.27.4/plugins/dummy/Makefile.in	2009-07-14 12:46:29.000000000 +0100
-+++ gnome-settings-daemon-2.27.4.new/plugins/dummy/Makefile.in	2009-07-20 21:41:36.425873912 +0100
+diff -Nur -x '*.orig' -x '*~' gnome-settings-daemon-2.27.5/plugins/dummy/Makefile.in gnome-settings-daemon-2.27.5.new/plugins/dummy/Makefile.in
+--- gnome-settings-daemon-2.27.5/plugins/dummy/Makefile.in	2009-07-27 23:27:01.000000000 +0100
++++ gnome-settings-daemon-2.27.5.new/plugins/dummy/Makefile.in	2009-07-28 22:40:54.917835136 +0100
 @@ -1,4 +1,4 @@
 -# Makefile.in generated by automake 1.10.1 from Makefile.am.
 +# Makefile.in generated by automake 1.10.2 from Makefile.am.
@@ -19381,9 +19367,9 @@ diff -Nur -x '*.orig' -x '*~' gnome-settings-daemon-2.27.4/plugins/dummy/Makefil
  	      END { if (nonempty) { for (i in files) print i; }; }'`; \
  	mkid -fID $$unique
  tags: TAGS
-diff -Nur -x '*.orig' -x '*~' gnome-settings-daemon-2.27.4/plugins/font/Makefile.in gnome-settings-daemon-2.27.4.new/plugins/font/Makefile.in
---- gnome-settings-daemon-2.27.4/plugins/font/Makefile.in	2009-07-14 12:46:29.000000000 +0100
-+++ gnome-settings-daemon-2.27.4.new/plugins/font/Makefile.in	2009-07-20 21:41:36.573873933 +0100
+diff -Nur -x '*.orig' -x '*~' gnome-settings-daemon-2.27.5/plugins/font/Makefile.in gnome-settings-daemon-2.27.5.new/plugins/font/Makefile.in
+--- gnome-settings-daemon-2.27.5/plugins/font/Makefile.in	2009-07-27 23:27:01.000000000 +0100
++++ gnome-settings-daemon-2.27.5.new/plugins/font/Makefile.in	2009-07-28 22:40:55.049835216 +0100
 @@ -1,4 +1,4 @@
 -# Makefile.in generated by automake 1.10.1 from Makefile.am.
 +# Makefile.in generated by automake 1.10.2 from Makefile.am.
@@ -19410,38 +19396,16 @@ diff -Nur -x '*.orig' -x '*~' gnome-settings-daemon-2.27.4/plugins/font/Makefile
  	      END { if (nonempty) { for (i in files) print i; }; }'`; \
  	mkid -fID $$unique
  tags: TAGS
-diff -Nur -x '*.orig' -x '*~' gnome-settings-daemon-2.27.4/plugins/housekeeping/Makefile.in gnome-settings-daemon-2.27.4.new/plugins/housekeeping/Makefile.in
---- gnome-settings-daemon-2.27.4/plugins/housekeeping/Makefile.in	2009-07-14 12:46:29.000000000 +0100
-+++ gnome-settings-daemon-2.27.4.new/plugins/housekeeping/Makefile.in	2009-07-20 21:41:36.721873967 +0100
+diff -Nur -x '*.orig' -x '*~' gnome-settings-daemon-2.27.5/plugins/housekeeping/Makefile.in gnome-settings-daemon-2.27.5.new/plugins/housekeeping/Makefile.in
+--- gnome-settings-daemon-2.27.5/plugins/housekeeping/Makefile.in	2009-07-27 23:27:01.000000000 +0100
++++ gnome-settings-daemon-2.27.5.new/plugins/housekeeping/Makefile.in	2009-07-28 22:40:55.201837516 +0100
 @@ -1,4 +1,4 @@
 -# Makefile.in generated by automake 1.10.1 from Makefile.am.
 +# Makefile.in generated by automake 1.10.2 from Makefile.am.
  # @configure_input@
  
  # Copyright (C) 1994, 1995, 1996, 1997, 1998, 1999, 2000, 2001, 2002,
-@@ -55,7 +55,9 @@
- am__DEPENDENCIES_1 =
- libhousekeeping_la_DEPENDENCIES = $(am__DEPENDENCIES_1) \
- 	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1)
--am_libhousekeeping_la_OBJECTS = libhousekeeping_la-gsd-disk-space.lo \
-+am_libhousekeeping_la_OBJECTS = libhousekeeping_la-gsd-ldsm-dialog.lo \
-+	libhousekeeping_la-gsd-ldsm-trash-empty.lo \
-+	libhousekeeping_la-gsd-disk-space.lo \
- 	libhousekeeping_la-gsd-housekeeping-manager.lo \
- 	libhousekeeping_la-gsd-housekeeping-plugin.lo
- libhousekeeping_la_OBJECTS = $(am_libhousekeeping_la_OBJECTS)
-@@ -257,6 +259,10 @@
- top_srcdir = @top_srcdir@
- plugin_LTLIBRARIES = libhousekeeping.la
- libhousekeeping_la_SOURCES = \
-+	gsd-ldsm-dialog.c	\
-+	gsd-ldsm-dialog.h	\
-+	gsd-ldsm-trash-empty.c	\
-+	gsd-ldsm-trash-empty.h	\
- 	gsd-disk-space.c		\
- 	gsd-disk-space.h		\
- 	gsd-housekeeping-manager.c	\
-@@ -290,8 +296,8 @@
+@@ -296,8 +296,8 @@
  	@for dep in $?; do \
  	  case '$(am__configure_deps)' in \
  	    *$$dep*) \
@@ -19452,37 +19416,7 @@ diff -Nur -x '*.orig' -x '*~' gnome-settings-daemon-2.27.4/plugins/housekeeping/
  	      exit 1;; \
  	  esac; \
  	done; \
-@@ -354,6 +360,8 @@
- @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libhousekeeping_la-gsd-disk-space.Plo@am__quote@
- @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libhousekeeping_la-gsd-housekeeping-manager.Plo@am__quote@
- @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libhousekeeping_la-gsd-housekeeping-plugin.Plo@am__quote@
-+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libhousekeeping_la-gsd-ldsm-dialog.Plo@am__quote@
-+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libhousekeeping_la-gsd-ldsm-trash-empty.Plo@am__quote@
- 
- .c.o:
- @am__fastdepCC_TRUE@	$(COMPILE) -MT $@ -MD -MP -MF $(DEPDIR)/$*.Tpo -c -o $@ $<
-@@ -376,6 +384,20 @@
- @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
- @am__fastdepCC_FALSE@	$(LTCOMPILE) -c -o $@ $<
- 
-+libhousekeeping_la-gsd-ldsm-dialog.lo: gsd-ldsm-dialog.c
-+@am__fastdepCC_TRUE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libhousekeeping_la_CPPFLAGS) $(CPPFLAGS) $(libhousekeeping_la_CFLAGS) $(CFLAGS) -MT libhousekeeping_la-gsd-ldsm-dialog.lo -MD -MP -MF $(DEPDIR)/libhousekeeping_la-gsd-ldsm-dialog.Tpo -c -o libhousekeeping_la-gsd-ldsm-dialog.lo `test -f 'gsd-ldsm-dialog.c' || echo '$(srcdir)/'`gsd-ldsm-dialog.c
-+@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/libhousekeeping_la-gsd-ldsm-dialog.Tpo $(DEPDIR)/libhousekeeping_la-gsd-ldsm-dialog.Plo
-+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='gsd-ldsm-dialog.c' object='libhousekeeping_la-gsd-ldsm-dialog.lo' libtool=yes @AMDEPBACKSLASH@
-+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-+@am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libhousekeeping_la_CPPFLAGS) $(CPPFLAGS) $(libhousekeeping_la_CFLAGS) $(CFLAGS) -c -o libhousekeeping_la-gsd-ldsm-dialog.lo `test -f 'gsd-ldsm-dialog.c' || echo '$(srcdir)/'`gsd-ldsm-dialog.c
-+
-+libhousekeeping_la-gsd-ldsm-trash-empty.lo: gsd-ldsm-trash-empty.c
-+@am__fastdepCC_TRUE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libhousekeeping_la_CPPFLAGS) $(CPPFLAGS) $(libhousekeeping_la_CFLAGS) $(CFLAGS) -MT libhousekeeping_la-gsd-ldsm-trash-empty.lo -MD -MP -MF $(DEPDIR)/libhousekeeping_la-gsd-ldsm-trash-empty.Tpo -c -o libhousekeeping_la-gsd-ldsm-trash-empty.lo `test -f 'gsd-ldsm-trash-empty.c' || echo '$(srcdir)/'`gsd-ldsm-trash-empty.c
-+@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/libhousekeeping_la-gsd-ldsm-trash-empty.Tpo $(DEPDIR)/libhousekeeping_la-gsd-ldsm-trash-empty.Plo
-+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='gsd-ldsm-trash-empty.c' object='libhousekeeping_la-gsd-ldsm-trash-empty.lo' libtool=yes @AMDEPBACKSLASH@
-+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-+@am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libhousekeeping_la_CPPFLAGS) $(CPPFLAGS) $(libhousekeeping_la_CFLAGS) $(CFLAGS) -c -o libhousekeeping_la-gsd-ldsm-trash-empty.lo `test -f 'gsd-ldsm-trash-empty.c' || echo '$(srcdir)/'`gsd-ldsm-trash-empty.c
-+
- libhousekeeping_la-gsd-disk-space.lo: gsd-disk-space.c
- @am__fastdepCC_TRUE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libhousekeeping_la_CPPFLAGS) $(CPPFLAGS) $(libhousekeeping_la_CFLAGS) $(CFLAGS) -MT libhousekeeping_la-gsd-disk-space.lo -MD -MP -MF $(DEPDIR)/libhousekeeping_la-gsd-disk-space.Tpo -c -o libhousekeeping_la-gsd-disk-space.lo `test -f 'gsd-disk-space.c' || echo '$(srcdir)/'`gsd-disk-space.c
- @am__fastdepCC_TRUE@	mv -f $(DEPDIR)/libhousekeeping_la-gsd-disk-space.Tpo $(DEPDIR)/libhousekeeping_la-gsd-disk-space.Plo
-@@ -425,7 +447,7 @@
+@@ -447,7 +447,7 @@
  	unique=`for i in $$list; do \
  	    if test -f "$$i"; then echo $$i; else echo $(srcdir)/$$i; fi; \
  	  done | \
@@ -19491,9 +19425,9 @@ diff -Nur -x '*.orig' -x '*~' gnome-settings-daemon-2.27.4/plugins/housekeeping/
  	      END { if (nonempty) { for (i in files) print i; }; }'`; \
  	mkid -fID $$unique
  tags: TAGS
-diff -Nur -x '*.orig' -x '*~' gnome-settings-daemon-2.27.4/plugins/keybindings/Makefile.in gnome-settings-daemon-2.27.4.new/plugins/keybindings/Makefile.in
---- gnome-settings-daemon-2.27.4/plugins/keybindings/Makefile.in	2009-07-14 12:46:29.000000000 +0100
-+++ gnome-settings-daemon-2.27.4.new/plugins/keybindings/Makefile.in	2009-07-20 21:41:36.837874122 +0100
+diff -Nur -x '*.orig' -x '*~' gnome-settings-daemon-2.27.5/plugins/keybindings/Makefile.in gnome-settings-daemon-2.27.5.new/plugins/keybindings/Makefile.in
+--- gnome-settings-daemon-2.27.5/plugins/keybindings/Makefile.in	2009-07-27 23:27:01.000000000 +0100
++++ gnome-settings-daemon-2.27.5.new/plugins/keybindings/Makefile.in	2009-07-28 22:40:55.329837278 +0100
 @@ -1,4 +1,4 @@
 -# Makefile.in generated by automake 1.10.1 from Makefile.am.
 +# Makefile.in generated by automake 1.10.2 from Makefile.am.
@@ -19520,9 +19454,9 @@ diff -Nur -x '*.orig' -x '*~' gnome-settings-daemon-2.27.4/plugins/keybindings/M
  	      END { if (nonempty) { for (i in files) print i; }; }'`; \
  	mkid -fID $$unique
  tags: TAGS
-diff -Nur -x '*.orig' -x '*~' gnome-settings-daemon-2.27.4/plugins/keyboard/Makefile.in gnome-settings-daemon-2.27.4.new/plugins/keyboard/Makefile.in
---- gnome-settings-daemon-2.27.4/plugins/keyboard/Makefile.in	2009-07-14 12:46:30.000000000 +0100
-+++ gnome-settings-daemon-2.27.4.new/plugins/keyboard/Makefile.in	2009-07-20 21:41:36.965873313 +0100
+diff -Nur -x '*.orig' -x '*~' gnome-settings-daemon-2.27.5/plugins/keyboard/Makefile.in gnome-settings-daemon-2.27.5.new/plugins/keyboard/Makefile.in
+--- gnome-settings-daemon-2.27.5/plugins/keyboard/Makefile.in	2009-07-27 23:27:01.000000000 +0100
++++ gnome-settings-daemon-2.27.5.new/plugins/keyboard/Makefile.in	2009-07-28 22:40:55.469837470 +0100
 @@ -1,4 +1,4 @@
 -# Makefile.in generated by automake 1.10.1 from Makefile.am.
 +# Makefile.in generated by automake 1.10.2 from Makefile.am.
@@ -19549,9 +19483,9 @@ diff -Nur -x '*.orig' -x '*~' gnome-settings-daemon-2.27.4/plugins/keyboard/Make
  	      END { if (nonempty) { for (i in files) print i; }; }'`; \
  	mkid -fID $$unique
  tags: TAGS
-diff -Nur -x '*.orig' -x '*~' gnome-settings-daemon-2.27.4/plugins/Makefile.in gnome-settings-daemon-2.27.4.new/plugins/Makefile.in
---- gnome-settings-daemon-2.27.4/plugins/Makefile.in	2009-07-14 12:46:27.000000000 +0100
-+++ gnome-settings-daemon-2.27.4.new/plugins/Makefile.in	2009-07-20 21:41:35.721875112 +0100
+diff -Nur -x '*.orig' -x '*~' gnome-settings-daemon-2.27.5/plugins/Makefile.in gnome-settings-daemon-2.27.5.new/plugins/Makefile.in
+--- gnome-settings-daemon-2.27.5/plugins/Makefile.in	2009-07-27 23:27:00.000000000 +0100
++++ gnome-settings-daemon-2.27.5.new/plugins/Makefile.in	2009-07-28 22:40:54.173834976 +0100
 @@ -1,4 +1,4 @@
 -# Makefile.in generated by automake 1.10.1 from Makefile.am.
 +# Makefile.in generated by automake 1.10.2 from Makefile.am.
@@ -19578,9 +19512,9 @@ diff -Nur -x '*.orig' -x '*~' gnome-settings-daemon-2.27.4/plugins/Makefile.in g
  	      END { if (nonempty) { for (i in files) print i; }; }'`; \
  	mkid -fID $$unique
  tags: TAGS
-diff -Nur -x '*.orig' -x '*~' gnome-settings-daemon-2.27.4/plugins/media-keys/cut-n-paste/Makefile.in gnome-settings-daemon-2.27.4.new/plugins/media-keys/cut-n-paste/Makefile.in
---- gnome-settings-daemon-2.27.4/plugins/media-keys/cut-n-paste/Makefile.in	2009-07-14 12:46:30.000000000 +0100
-+++ gnome-settings-daemon-2.27.4.new/plugins/media-keys/cut-n-paste/Makefile.in	2009-07-20 21:41:37.241875339 +0100
+diff -Nur -x '*.orig' -x '*~' gnome-settings-daemon-2.27.5/plugins/media-keys/cut-n-paste/Makefile.in gnome-settings-daemon-2.27.5.new/plugins/media-keys/cut-n-paste/Makefile.in
+--- gnome-settings-daemon-2.27.5/plugins/media-keys/cut-n-paste/Makefile.in	2009-07-27 23:27:01.000000000 +0100
++++ gnome-settings-daemon-2.27.5.new/plugins/media-keys/cut-n-paste/Makefile.in	2009-07-28 22:40:55.785837491 +0100
 @@ -1,4 +1,4 @@
 -# Makefile.in generated by automake 1.10.1 from Makefile.am.
 +# Makefile.in generated by automake 1.10.2 from Makefile.am.
@@ -19607,9 +19541,9 @@ diff -Nur -x '*.orig' -x '*~' gnome-settings-daemon-2.27.4/plugins/media-keys/cu
  	      END { if (nonempty) { for (i in files) print i; }; }'`; \
  	mkid -fID $$unique
  tags: TAGS
-diff -Nur -x '*.orig' -x '*~' gnome-settings-daemon-2.27.4/plugins/media-keys/Makefile.in gnome-settings-daemon-2.27.4.new/plugins/media-keys/Makefile.in
---- gnome-settings-daemon-2.27.4/plugins/media-keys/Makefile.in	2009-07-14 12:46:30.000000000 +0100
-+++ gnome-settings-daemon-2.27.4.new/plugins/media-keys/Makefile.in	2009-07-20 21:41:37.145874050 +0100
+diff -Nur -x '*.orig' -x '*~' gnome-settings-daemon-2.27.5/plugins/media-keys/Makefile.in gnome-settings-daemon-2.27.5.new/plugins/media-keys/Makefile.in
+--- gnome-settings-daemon-2.27.5/plugins/media-keys/Makefile.in	2009-07-27 23:27:01.000000000 +0100
++++ gnome-settings-daemon-2.27.5.new/plugins/media-keys/Makefile.in	2009-07-28 22:40:55.677837158 +0100
 @@ -1,4 +1,4 @@
 -# Makefile.in generated by automake 1.10.1 from Makefile.am.
 +# Makefile.in generated by automake 1.10.2 from Makefile.am.
@@ -19733,9 +19667,9 @@ diff -Nur -x '*.orig' -x '*~' gnome-settings-daemon-2.27.4/plugins/media-keys/Ma
  	      END { if (nonempty) { for (i in files) print i; }; }'`; \
  	mkid -fID $$unique
  tags: TAGS
-diff -Nur -x '*.orig' -x '*~' gnome-settings-daemon-2.27.4/plugins/mouse/Makefile.in gnome-settings-daemon-2.27.4.new/plugins/mouse/Makefile.in
---- gnome-settings-daemon-2.27.4/plugins/mouse/Makefile.in	2009-07-14 12:46:31.000000000 +0100
-+++ gnome-settings-daemon-2.27.4.new/plugins/mouse/Makefile.in	2009-07-20 21:41:37.353873763 +0100
+diff -Nur -x '*.orig' -x '*~' gnome-settings-daemon-2.27.5/plugins/mouse/Makefile.in gnome-settings-daemon-2.27.5.new/plugins/mouse/Makefile.in
+--- gnome-settings-daemon-2.27.5/plugins/mouse/Makefile.in	2009-07-27 23:27:02.000000000 +0100
++++ gnome-settings-daemon-2.27.5.new/plugins/mouse/Makefile.in	2009-07-28 22:40:55.921835399 +0100
 @@ -1,4 +1,4 @@
 -# Makefile.in generated by automake 1.10.1 from Makefile.am.
 +# Makefile.in generated by automake 1.10.2 from Makefile.am.
@@ -19762,9 +19696,9 @@ diff -Nur -x '*.orig' -x '*~' gnome-settings-daemon-2.27.4/plugins/mouse/Makefil
  	      END { if (nonempty) { for (i in files) print i; }; }'`; \
  	mkid -fID $$unique
  tags: TAGS
-diff -Nur -x '*.orig' -x '*~' gnome-settings-daemon-2.27.4/plugins/sound/Makefile.in gnome-settings-daemon-2.27.4.new/plugins/sound/Makefile.in
---- gnome-settings-daemon-2.27.4/plugins/sound/Makefile.in	2009-07-14 12:46:31.000000000 +0100
-+++ gnome-settings-daemon-2.27.4.new/plugins/sound/Makefile.in	2009-07-20 21:41:37.457874309 +0100
+diff -Nur -x '*.orig' -x '*~' gnome-settings-daemon-2.27.5/plugins/sound/Makefile.in gnome-settings-daemon-2.27.5.new/plugins/sound/Makefile.in
+--- gnome-settings-daemon-2.27.5/plugins/sound/Makefile.in	2009-07-27 23:27:02.000000000 +0100
++++ gnome-settings-daemon-2.27.5.new/plugins/sound/Makefile.in	2009-07-28 22:40:56.053834920 +0100
 @@ -1,4 +1,4 @@
 -# Makefile.in generated by automake 1.10.1 from Makefile.am.
 +# Makefile.in generated by automake 1.10.2 from Makefile.am.
@@ -19791,9 +19725,9 @@ diff -Nur -x '*.orig' -x '*~' gnome-settings-daemon-2.27.4/plugins/sound/Makefil
  	      END { if (nonempty) { for (i in files) print i; }; }'`; \
  	mkid -fID $$unique
  tags: TAGS
-diff -Nur -x '*.orig' -x '*~' gnome-settings-daemon-2.27.4/plugins/typing-break/Makefile.in gnome-settings-daemon-2.27.4.new/plugins/typing-break/Makefile.in
---- gnome-settings-daemon-2.27.4/plugins/typing-break/Makefile.in	2009-07-14 12:46:31.000000000 +0100
-+++ gnome-settings-daemon-2.27.4.new/plugins/typing-break/Makefile.in	2009-07-20 21:41:37.565873238 +0100
+diff -Nur -x '*.orig' -x '*~' gnome-settings-daemon-2.27.5/plugins/typing-break/Makefile.in gnome-settings-daemon-2.27.5.new/plugins/typing-break/Makefile.in
+--- gnome-settings-daemon-2.27.5/plugins/typing-break/Makefile.in	2009-07-27 23:27:02.000000000 +0100
++++ gnome-settings-daemon-2.27.5.new/plugins/typing-break/Makefile.in	2009-07-28 22:40:56.193836500 +0100
 @@ -1,4 +1,4 @@
 -# Makefile.in generated by automake 1.10.1 from Makefile.am.
 +# Makefile.in generated by automake 1.10.2 from Makefile.am.
@@ -19820,9 +19754,9 @@ diff -Nur -x '*.orig' -x '*~' gnome-settings-daemon-2.27.4/plugins/typing-break/
  	      END { if (nonempty) { for (i in files) print i; }; }'`; \
  	mkid -fID $$unique
  tags: TAGS
-diff -Nur -x '*.orig' -x '*~' gnome-settings-daemon-2.27.4/plugins/xrandr/Makefile.in gnome-settings-daemon-2.27.4.new/plugins/xrandr/Makefile.in
---- gnome-settings-daemon-2.27.4/plugins/xrandr/Makefile.in	2009-07-14 12:46:32.000000000 +0100
-+++ gnome-settings-daemon-2.27.4.new/plugins/xrandr/Makefile.in	2009-07-20 21:41:37.673873574 +0100
+diff -Nur -x '*.orig' -x '*~' gnome-settings-daemon-2.27.5/plugins/xrandr/Makefile.in gnome-settings-daemon-2.27.5.new/plugins/xrandr/Makefile.in
+--- gnome-settings-daemon-2.27.5/plugins/xrandr/Makefile.in	2009-07-27 23:27:02.000000000 +0100
++++ gnome-settings-daemon-2.27.5.new/plugins/xrandr/Makefile.in	2009-07-28 22:40:56.325835198 +0100
 @@ -1,4 +1,4 @@
 -# Makefile.in generated by automake 1.10.1 from Makefile.am.
 +# Makefile.in generated by automake 1.10.2 from Makefile.am.
@@ -19849,9 +19783,9 @@ diff -Nur -x '*.orig' -x '*~' gnome-settings-daemon-2.27.4/plugins/xrandr/Makefi
  	      END { if (nonempty) { for (i in files) print i; }; }'`; \
  	mkid -fID $$unique
  tags: TAGS
-diff -Nur -x '*.orig' -x '*~' gnome-settings-daemon-2.27.4/plugins/xrdb/data/Makefile.in gnome-settings-daemon-2.27.4.new/plugins/xrdb/data/Makefile.in
---- gnome-settings-daemon-2.27.4/plugins/xrdb/data/Makefile.in	2009-07-14 12:46:32.000000000 +0100
-+++ gnome-settings-daemon-2.27.4.new/plugins/xrdb/data/Makefile.in	2009-07-20 21:41:37.865875864 +0100
+diff -Nur -x '*.orig' -x '*~' gnome-settings-daemon-2.27.5/plugins/xrdb/data/Makefile.in gnome-settings-daemon-2.27.5.new/plugins/xrdb/data/Makefile.in
+--- gnome-settings-daemon-2.27.5/plugins/xrdb/data/Makefile.in	2009-07-27 23:27:02.000000000 +0100
++++ gnome-settings-daemon-2.27.5.new/plugins/xrdb/data/Makefile.in	2009-07-28 22:40:56.544835254 +0100
 @@ -1,4 +1,4 @@
 -# Makefile.in generated by automake 1.10.1 from Makefile.am.
 +# Makefile.in generated by automake 1.10.2 from Makefile.am.
@@ -19869,9 +19803,9 @@ diff -Nur -x '*.orig' -x '*~' gnome-settings-daemon-2.27.4/plugins/xrdb/data/Mak
  	      exit 1;; \
  	  esac; \
  	done; \
-diff -Nur -x '*.orig' -x '*~' gnome-settings-daemon-2.27.4/plugins/xrdb/Makefile.in gnome-settings-daemon-2.27.4.new/plugins/xrdb/Makefile.in
---- gnome-settings-daemon-2.27.4/plugins/xrdb/Makefile.in	2009-07-14 12:46:32.000000000 +0100
-+++ gnome-settings-daemon-2.27.4.new/plugins/xrdb/Makefile.in	2009-07-20 21:41:37.785873679 +0100
+diff -Nur -x '*.orig' -x '*~' gnome-settings-daemon-2.27.5/plugins/xrdb/Makefile.in gnome-settings-daemon-2.27.5.new/plugins/xrdb/Makefile.in
+--- gnome-settings-daemon-2.27.5/plugins/xrdb/Makefile.in	2009-07-27 23:27:02.000000000 +0100
++++ gnome-settings-daemon-2.27.5.new/plugins/xrdb/Makefile.in	2009-07-28 22:40:56.456835202 +0100
 @@ -1,4 +1,4 @@
 -# Makefile.in generated by automake 1.10.1 from Makefile.am.
 +# Makefile.in generated by automake 1.10.2 from Makefile.am.
@@ -19898,9 +19832,9 @@ diff -Nur -x '*.orig' -x '*~' gnome-settings-daemon-2.27.4/plugins/xrdb/Makefile
  	      END { if (nonempty) { for (i in files) print i; }; }'`; \
  	mkid -fID $$unique
  tags: TAGS
-diff -Nur -x '*.orig' -x '*~' gnome-settings-daemon-2.27.4/plugins/xsettings/Makefile.in gnome-settings-daemon-2.27.4.new/plugins/xsettings/Makefile.in
---- gnome-settings-daemon-2.27.4/plugins/xsettings/Makefile.in	2009-07-14 12:46:32.000000000 +0100
-+++ gnome-settings-daemon-2.27.4.new/plugins/xsettings/Makefile.in	2009-07-20 21:41:38.009873309 +0100
+diff -Nur -x '*.orig' -x '*~' gnome-settings-daemon-2.27.5/plugins/xsettings/Makefile.in gnome-settings-daemon-2.27.5.new/plugins/xsettings/Makefile.in
+--- gnome-settings-daemon-2.27.5/plugins/xsettings/Makefile.in	2009-07-27 23:27:02.000000000 +0100
++++ gnome-settings-daemon-2.27.5.new/plugins/xsettings/Makefile.in	2009-07-28 22:40:56.688836328 +0100
 @@ -1,4 +1,4 @@
 -# Makefile.in generated by automake 1.10.1 from Makefile.am.
 +# Makefile.in generated by automake 1.10.2 from Makefile.am.

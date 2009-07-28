@@ -14,7 +14,6 @@ Build-Depends: cdbs,
                libgconf2-dev (>= 2.6.1),
                gconf2,
                libgnome-desktop-dev (>= 1:2.26.3),
-               libglade2-dev,
                libgnomekbd-dev (>= 2.21.4),
                libgstreamer0.10-dev (>= 0.10.1.2),
                libgstreamer-plugins-base0.10-dev (>= 0.10.1.2),
@@ -35,6 +34,7 @@ Package: gnome-settings-daemon
 Architecture: any
 Depends: ${shlibs:Depends},
          ${misc:Depends}
+Recommends: pulseaudio
 Replaces: capplets-data (<< 1:2.21.5),
           gnome-control-center (<< 1:2.21.5)
 Conflicts: rhythmbox (<< 0.11.5),
