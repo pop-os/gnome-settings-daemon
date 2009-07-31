@@ -1,4 +1,4 @@
-gnome-settings-daemon (2.27.5-0ubuntu2) UNRELEASED; urgency=low
+gnome-settings-daemon (2.27.5-0ubuntu2) karmic; urgency=low
 
   * debian/patches/61_fix_volume_notification.patch:
     - Make sure the volume notification only shows the mute icon

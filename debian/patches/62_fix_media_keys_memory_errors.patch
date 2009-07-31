@@ -1,6 +1,6 @@
-# Launchpad: https://bugs.launchpad.net/ubuntu/+source/gnome-settings-daemon/+bug/404538
-# Bugzilla: http://bugzilla.gnome.org/show_bug.cgi?id=590073
-# Don't inadvertently finalize the GvcMixerStream when the default sink is changed
+# Ubuntu: https://bugs.launchpad.net/ubuntu/+source/gnome-settings-daemon/+bug/404538
+# Upstream: http://bugzilla.gnome.org/show_bug.cgi?id=590073
+# Description: Don't inadvertently finalize the GvcMixerStream when the default sink is changed
 
 diff -Nur -x '*.orig' -x '*~' gnome-settings-daemon-2.27.5/plugins/media-keys/gsd-media-keys-manager.c gnome-settings-daemon-2.27.5.new/plugins/media-keys/gsd-media-keys-manager.c
 --- gnome-settings-daemon-2.27.5/plugins/media-keys/gsd-media-keys-manager.c	2009-07-31 14:19:03.460440675 +0100
