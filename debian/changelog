@@ -1,3 +1,17 @@
+gnome-settings-daemon (2.27.5-0ubuntu2) UNRELEASED; urgency=low
+
+  * debian/patches/61_fix_volume_notification.patch:
+    - Make sure the volume notification only shows the mute icon
+      when the volume level is zero.
+  * debian/patches/16_use_synchronous_notifications.patch:
+    - Updated to not send duplicate notifications to notify-osd
+      when the volume is changed.
+  * debian/patches/62_fix_media_keys_memory_errors.patch:
+    - Fix some memory errors triggered when the default sink
+      is changed, which can eventually lead to a crash (LP: #404538).
+
+ -- Chris Coulson <chrisccoulson@ubuntu.com>  Fri, 31 Jul 2009 01:32:21 +0100
+
 gnome-settings-daemon (2.27.5-0ubuntu1) karmic; urgency=low
 
   * New upstream version (LP: #405698):

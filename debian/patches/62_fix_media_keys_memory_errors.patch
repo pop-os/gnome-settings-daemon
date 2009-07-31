@@ -1,0 +1,16 @@
+# Launchpad: https://bugs.launchpad.net/ubuntu/+source/gnome-settings-daemon/+bug/404538
+# Bugzilla: http://bugzilla.gnome.org/show_bug.cgi?id=590073
+# Don't inadvertently finalize the GvcMixerStream when the default sink is changed
+
+diff -Nur -x '*.orig' -x '*~' gnome-settings-daemon-2.27.5/plugins/media-keys/gsd-media-keys-manager.c gnome-settings-daemon-2.27.5.new/plugins/media-keys/gsd-media-keys-manager.c
+--- gnome-settings-daemon-2.27.5/plugins/media-keys/gsd-media-keys-manager.c	2009-07-31 14:19:03.460440675 +0100
++++ gnome-settings-daemon-2.27.5.new/plugins/media-keys/gsd-media-keys-manager.c	2009-07-31 14:21:21.639443889 +0100
+@@ -782,7 +782,7 @@
+         }
+ 
+         if (stream != NULL) {
+-                manager->priv->stream = stream;
++                manager->priv->stream = g_object_ref (stream);
+                 g_signal_connect (G_OBJECT (manager->priv->stream), "notify::volume",
+                                   G_CALLBACK (on_stream_event_notify), manager);
+                 g_signal_connect (G_OBJECT (manager->priv->stream), "notify::is-muted",
