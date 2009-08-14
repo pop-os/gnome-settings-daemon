@@ -1,3 +1,29 @@
+gnome-settings-daemon (2.27.90-0ubuntu1) UNRELEASED; urgency=low
+
+  * New upstream version (LP: #413618):
+    - Update gnome-volume-control from gnome-media (Bastien Nocera) 
+      (#589825).
+    - Fix crash in gvc_mixer_stream_is_running() (Chris Coulson) 
+      (#590073).
+    - Add '-k' option to syndaemon call for 'Disable touchpad while 
+      typing' (C de-Avillez) (#590588, LP: #408095).
+    - Low disk space warning bug-fixes (Chris Coulson) 
+      (#591153, LP: #404340).
+  * Removed patches that are merged upstream now:
+    - 60_ldsm_notification_fixup.patch
+    - 62_fix_media_keys_memory_errors.patch
+  * Removed 11_sleepkey.patch - there is no key assigned to sleep by
+    default and gdm-signal does not exist on the default install.
+  * Refreshed patches:
+    - 61_fix_volume_notification.patch
+    - 70_migrate_touchpad_config.patch
+    - 90_autoreconf.patch
+  * debian/control:
+    - Add versioned build-dep on libpulse-dev (>= 0.9.15).
+  * Also fixes LP: #404340.
+
+ -- Chris Coulson <chrisccoulson@ubuntu.com>  Fri, 14 Aug 2009 15:04:39 +0100
+
 gnome-settings-daemon (2.27.5-0ubuntu2) karmic; urgency=low
 
   * debian/patches/61_fix_volume_notification.patch:

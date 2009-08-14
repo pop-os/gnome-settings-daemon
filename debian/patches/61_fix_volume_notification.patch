@@ -4,10 +4,10 @@
 # This causes a confusing out-of-sync notification with a mute icon and a volume of greater
 # than zero.
 
-diff -Nur -x '*.orig' -x '*~' gnome-settings-daemon-2.27.5/plugins/media-keys/cut-n-paste/gvc-mixer-stream.c gnome-settings-daemon-2.27.5.new/plugins/media-keys/cut-n-paste/gvc-mixer-stream.c
---- gnome-settings-daemon-2.27.5/plugins/media-keys/cut-n-paste/gvc-mixer-stream.c	2009-06-29 13:24:44.000000000 +0100
-+++ gnome-settings-daemon-2.27.5.new/plugins/media-keys/cut-n-paste/gvc-mixer-stream.c	2009-07-31 15:36:24.644829306 +0100
-@@ -150,7 +150,6 @@
+diff -Nur -x '*.orig' -x '*~' gnome-settings-daemon-2.27.90/plugins/media-keys/cut-n-paste/gvc-mixer-stream.c gnome-settings-daemon-2.27.90.new/plugins/media-keys/cut-n-paste/gvc-mixer-stream.c
+--- gnome-settings-daemon-2.27.90/plugins/media-keys/cut-n-paste/gvc-mixer-stream.c	2009-08-12 10:15:00.000000000 +0100
++++ gnome-settings-daemon-2.27.90.new/plugins/media-keys/cut-n-paste/gvc-mixer-stream.c	2009-08-14 15:22:25.032298400 +0100
+@@ -154,7 +154,6 @@
  
          if (!pa_cvolume_equal(gvc_channel_map_get_cvolume(stream->priv->channel_map), &cv)) {
                  gvc_channel_map_volume_changed(stream->priv->channel_map, &cv);
