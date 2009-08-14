@@ -1,4 +1,4 @@
-gnome-settings-daemon (2.27.90-0ubuntu1) UNRELEASED; urgency=low
+gnome-settings-daemon (2.27.90-0ubuntu1) karmic; urgency=low
 
   * New upstream version (LP: #413618):
     - Update gnome-volume-control from gnome-media (Bastien Nocera) 
