@@ -1,7 +1,7 @@
 === modified file 'configure.ac'
-diff -Nur -x '*.orig' -x '*~' gnome-settings-daemon-2.27.5/configure.ac gnome-settings-daemon-2.27.5.new/configure.ac
---- gnome-settings-daemon-2.27.5/configure.ac	2009-07-27 23:26:40.000000000 +0100
-+++ gnome-settings-daemon-2.27.5.new/configure.ac	2009-07-31 15:47:54.253827967 +0100
+diff -Nur -x '*.orig' -x '*~' gnome-settings-daemon-2.27.91/configure.ac gnome-settings-daemon-2.27.91.new/configure.ac
+--- gnome-settings-daemon-2.27.91/configure.ac	2009-08-24 20:20:55.000000000 +1000
++++ gnome-settings-daemon-2.27.91.new/configure.ac	2009-08-27 14:49:43.000000000 +1000
 @@ -68,6 +68,7 @@
          gnome-desktop-2.0 >= $GNOME_DESKTOP_REQUIRED_VERSION
          gio-2.0 >= $GIO_REQUIRED_VERSION
@@ -10,10 +10,10 @@ diff -Nur -x '*.orig' -x '*~' gnome-settings-daemon-2.27.5/configure.ac gnome-se
  )
  
  GSD_PLUGIN_LDFLAGS="-export_dynamic -module -avoid-version -no-undefined"
-diff -Nur -x '*.orig' -x '*~' gnome-settings-daemon-2.27.5/plugins/media-keys/gsd-media-keys-manager.c gnome-settings-daemon-2.27.5.new/plugins/media-keys/gsd-media-keys-manager.c
---- gnome-settings-daemon-2.27.5/plugins/media-keys/gsd-media-keys-manager.c	2009-07-31 15:47:52.649833162 +0100
-+++ gnome-settings-daemon-2.27.5.new/plugins/media-keys/gsd-media-keys-manager.c	2009-07-31 15:49:35.977832490 +0100
-@@ -54,6 +54,14 @@
+diff -Nur -x '*.orig' -x '*~' gnome-settings-daemon-2.27.91/plugins/media-keys/gsd-media-keys-manager.c gnome-settings-daemon-2.27.91.new/plugins/media-keys/gsd-media-keys-manager.c
+--- gnome-settings-daemon-2.27.91/plugins/media-keys/gsd-media-keys-manager.c	2009-08-24 20:20:18.000000000 +1000
++++ gnome-settings-daemon-2.27.91.new/plugins/media-keys/gsd-media-keys-manager.c	2009-08-27 14:53:12.000000000 +1000
+@@ -54,6 +54,13 @@
  #include "gvc-mixer-control.h"
  #endif /* HAVE_PULSE */
  
@@ -24,11 +24,10 @@ diff -Nur -x '*.orig' -x '*~' gnome-settings-daemon-2.27.5/plugins/media-keys/gs
 +gboolean
 +gsd_media_keys_notification (int key, const char *hint);
 +
-+
  #define GSD_DBUS_PATH "/org/gnome/SettingsDaemon"
  #define GSD_DBUS_NAME "org.gnome.SettingsDaemon"
  #define GSD_MEDIA_KEYS_DBUS_PATH GSD_DBUS_PATH "/MediaKeys"
-@@ -109,6 +117,12 @@
+@@ -106,6 +113,12 @@
          LAST_SIGNAL
  };
  
@@ -41,7 +40,7 @@ diff -Nur -x '*.orig' -x '*~' gnome-settings-daemon-2.27.5/plugins/media-keys/gs
  static guint signals[LAST_SIGNAL] = { 0 };
  
  static void     gsd_media_keys_manager_class_init  (GsdMediaKeysManagerClass *klass);
-@@ -597,10 +611,13 @@
+@@ -594,10 +607,13 @@
  {
          char *command;
  
@@ -55,119 +54,7 @@ diff -Nur -x '*.orig' -x '*~' gnome-settings-daemon-2.27.5/plugins/media-keys/gs
  
          command = gconf_client_get_string (manager->priv->conf_client,
                                             GCONF_MISC_DIR "/eject_command",
-@@ -616,10 +633,12 @@
- 
- #ifdef HAVE_PULSE
- static void
--update_dialog (GsdMediaKeysManager *manager)
-+update_dialog (GsdMediaKeysManager *manager,
-+               int overshoot)
- {
-         gboolean muted;
--        guint vol;
-+        guint vol; 
-+        gint osd_vol;
- 
- 	/* Not expecting a dialogue to show up */
-         if (manager->priv->num_expected_update_signals == 0)
-@@ -632,6 +651,22 @@
- 
-         vol = gvc_mixer_stream_get_volume (manager->priv->stream);
-         muted = gvc_mixer_stream_get_is_muted (manager->priv->stream);
-+        
-+        if (overshoot == VOLUME_OVERSHOOT_HIGH) {
-+                /* if user hit volume-up while already at volume 100 trigger overshoot
-+                 * effect of notify-osd's value indicator */
-+                osd_vol = 101;
-+        } else if (overshoot == VOLUME_OVERSHOOT_LOW) {
-+                /* if user hit volume-down while already at volume 0 trigger undershoot
-+                 * effect of notify-osd's value indicator */
-+                osd_vol = -1;
-+        } else {
-+                osd_vol = (gint) (100 * (double)vol / PA_VOLUME_NORM);
-+        }
-+
-+        /* try to use the new notification service, if available */
-+        if (gsd_media_keys_notification_volume (osd_vol, muted))
-+                return;
- 
-         dialog_init (manager);
-         gsd_media_keys_window_set_volume_muted (GSD_MEDIA_KEYS_WINDOW (manager->priv->dialog),
-@@ -648,7 +683,7 @@
-                         GParamSpec          *pspec,
-                         GsdMediaKeysManager *manager)
- {
--        update_dialog (manager);
-+        update_dialog (manager, VOLUME_OVERSHOOT_NONE);
- }
- 
- static void
-@@ -658,6 +693,7 @@
-         gboolean muted;
-         guint vol, norm_vol_step;
-         int vol_step;
-+        gboolean changed = FALSE;
- 
-         if (manager->priv->stream == NULL)
-                 return;
-@@ -681,15 +717,18 @@
-         switch (type) {
-         case MUTE_KEY:
-                 manager->priv->num_expected_update_signals = 1;
-+                changed = TRUE;
-                 gvc_mixer_stream_change_is_muted (manager->priv->stream, !muted);
-                 break;
-         case VOLUME_DOWN_KEY:
-                 if (!muted && (vol <= norm_vol_step)) {
-                         manager->priv->num_expected_update_signals = 2;
-+                        changed = TRUE;
-                         gvc_mixer_stream_change_is_muted (manager->priv->stream, !muted);
-                         gvc_mixer_stream_set_volume (manager->priv->stream, 0);
-                 } else if (!muted) {
-                         manager->priv->num_expected_update_signals = 1;
-+                        changed = TRUE;
-                         gvc_mixer_stream_set_volume (manager->priv->stream, vol - norm_vol_step);
-                 }
-                 break;
-@@ -697,15 +736,18 @@
-                 if (muted) {
-                         if (vol == 0) {
-                                 manager->priv->num_expected_update_signals = 2;
-+                                changed = TRUE;
-                                 gvc_mixer_stream_set_volume (manager->priv->stream, vol + norm_vol_step);
-                                 gvc_mixer_stream_change_is_muted (manager->priv->stream, !muted);
-                         } else {
-                                 manager->priv->num_expected_update_signals = 1;
-+                                changed = TRUE;
-                                 gvc_mixer_stream_change_is_muted (manager->priv->stream, !muted);
-                         }
-                 } else {
-                         if (vol < MAX_VOLUME) {
-                                 manager->priv->num_expected_update_signals = 1;
-+                                changed = TRUE;
-                                 if (vol + norm_vol_step >= MAX_VOLUME) {
-                                         gvc_mixer_stream_set_volume (manager->priv->stream, MAX_VOLUME);
-                                 } else {
-@@ -717,9 +759,16 @@
-         }
- 
-         /* We didn't actually make any changes, so force showing the dialogue */
--        if (manager->priv->num_expected_update_signals == 0) {
-+        if (!changed) {
-                 manager->priv->num_expected_update_signals = 1;
--                update_dialog (manager);
-+                if (muted == TRUE && type == VOLUME_DOWN_KEY) {
-+                        update_dialog (manager, VOLUME_OVERSHOOT_LOW);
-+                } else if (vol == MAX_VOLUME && type == VOLUME_UP_KEY){
-+                        update_dialog (manager, VOLUME_OVERSHOOT_HIGH);
-+                } else {
-+                        /* It shouldn't be possible to get here really */
-+                        update_dialog (manager, VOLUME_OVERSHOOT_NONE);
-+                }
-         }
- }
- 
-@@ -871,8 +920,10 @@
+@@ -840,8 +856,10 @@
  
  static gboolean
  do_multimedia_player_action (GsdMediaKeysManager *manager,
@@ -178,7 +65,7 @@ diff -Nur -x '*.orig' -x '*~' gnome-settings-daemon-2.27.5/plugins/media-keys/gs
          return gsd_media_player_key_pressed (manager, key);
  }
  
-@@ -943,19 +994,19 @@
+@@ -912,19 +930,19 @@
                  execute (manager, "gcalctool", FALSE, FALSE);
                  break;
          case PLAY_KEY:
@@ -203,9 +90,9 @@ diff -Nur -x '*.orig' -x '*~' gnome-settings-daemon-2.27.5/plugins/media-keys/gs
                  break;
          default:
                  g_assert_not_reached ();
-diff -Nur -x '*.orig' -x '*~' gnome-settings-daemon-2.27.5/plugins/media-keys/gsd-media-keys-notification.c gnome-settings-daemon-2.27.5.new/plugins/media-keys/gsd-media-keys-notification.c
---- gnome-settings-daemon-2.27.5/plugins/media-keys/gsd-media-keys-notification.c	1970-01-01 01:00:00.000000000 +0100
-+++ gnome-settings-daemon-2.27.5.new/plugins/media-keys/gsd-media-keys-notification.c	2009-07-31 15:47:54.257831390 +0100
+diff -Nur -x '*.orig' -x '*~' gnome-settings-daemon-2.27.91/plugins/media-keys/gsd-media-keys-notification.c gnome-settings-daemon-2.27.91.new/plugins/media-keys/gsd-media-keys-notification.c
+--- gnome-settings-daemon-2.27.91/plugins/media-keys/gsd-media-keys-notification.c	1970-01-01 10:00:00.000000000 +1000
++++ gnome-settings-daemon-2.27.91.new/plugins/media-keys/gsd-media-keys-notification.c	2009-08-27 14:49:43.000000000 +1000
 @@ -0,0 +1,169 @@
 +/* -*- Mode: C; tab-width: 8; indent-tabs-mode: nil; c-basic-offset: 8 -*-
 + *
@@ -376,9 +263,9 @@ diff -Nur -x '*.orig' -x '*~' gnome-settings-daemon-2.27.5/plugins/media-keys/gs
 +
 +        return TRUE;
 +}
-diff -Nur -x '*.orig' -x '*~' gnome-settings-daemon-2.27.5/plugins/media-keys/Makefile.am gnome-settings-daemon-2.27.5.new/plugins/media-keys/Makefile.am
---- gnome-settings-daemon-2.27.5/plugins/media-keys/Makefile.am	2009-07-14 10:21:12.000000000 +0100
-+++ gnome-settings-daemon-2.27.5.new/plugins/media-keys/Makefile.am	2009-07-31 15:47:54.257831390 +0100
+diff -Nur -x '*.orig' -x '*~' gnome-settings-daemon-2.27.91/plugins/media-keys/Makefile.am gnome-settings-daemon-2.27.91.new/plugins/media-keys/Makefile.am
+--- gnome-settings-daemon-2.27.91/plugins/media-keys/Makefile.am	2009-07-14 19:21:12.000000000 +1000
++++ gnome-settings-daemon-2.27.91.new/plugins/media-keys/Makefile.am	2009-08-27 14:49:43.000000000 +1000
 @@ -32,6 +32,7 @@
  	gsd-media-keys-manager.c	\
  	gsd-media-keys-window.h		\
