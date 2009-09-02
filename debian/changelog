@@ -1,16 +1,20 @@
 gnome-settings-daemon (2.27.91-0ubuntu1) UNRELEASED; urgency=low
 
+  [ Robert Ancell ]
   * New upstream release: (LP: #419645)
     - Update gnome-volume-control code (Bastien Nocera)
     - Update cut'n'paste from gnome-media (Bastien Nocera)
     - Update volume control code for new API (Bastien Nocera)
   * debian/patches/16_use_synchronous_notifications.patch:
-  * debian/patches/61_fix_volume_notification.patch:
   * debian/patches/90_autoreconf.patch:
     - Updated
-    - FIXME FIXME FIXME:
-      - 16_use_synchronous_notifications.patch needs to be updated to the new
-        notification format before releasing
+
+  [ Chris Coulson ]
+  * debian/patches/16_use_synchronous_notifications.patch:
+    - Re-worked patch for new volume control code.
+  * Dropped 61_fix_volume_notification.patch - the volume notifications
+    are triggered on each keypress now rather than internal signals, so
+    this patch is no longer needed.
 
  -- Robert Ancell <robert.ancell@canonical.com>  Thu, 27 Aug 2009 12:09:37 +1000
 
