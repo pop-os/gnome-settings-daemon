@@ -1,4 +1,4 @@
-gnome-settings-daemon (2.27.91-0ubuntu1) UNRELEASED; urgency=low
+gnome-settings-daemon (2.27.91-0ubuntu1) karmic; urgency=low
 
   [ Robert Ancell ]
   * New upstream release: (LP: #419645)
@@ -16,7 +16,7 @@ gnome-settings-daemon (2.27.91-0ubuntu1) UNRELEASED; urgency=low
     are triggered on each keypress now rather than internal signals, so
     this patch is no longer needed.
 
- -- Robert Ancell <robert.ancell@canonical.com>  Thu, 27 Aug 2009 12:09:37 +1000
+ -- Robert Ancell <robert.ancell@canonical.com>  Fri, 04 Sep 2009 09:35:30 +0200
 
 gnome-settings-daemon (2.27.90-0ubuntu1) karmic; urgency=low
 
