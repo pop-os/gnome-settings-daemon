@@ -1,3 +1,15 @@
+gnome-settings-daemon (2.27.92-0ubuntu1) UNRELEASED; urgency=low
+
+  * New upstream version (LP: #425995):
+    - Make Locate Pointer a separate process (Matthias Clasen) 
+      (#524499)
+    - Skip button mappings only for core devices (Peter Hutterer)
+  * Refreshed patches:
+    - 70_migrate_touchpad_config.patch
+    - 90_autoreconf.patch
+    
+ -- Chris Coulson <chrisccoulson@ubuntu.com>  Tue, 08 Sep 2009 00:22:26 +0100
+
 gnome-settings-daemon (2.27.91-0ubuntu1) karmic; urgency=low
 
   [ Robert Ancell ]
