@@ -1,4 +1,4 @@
-gnome-settings-daemon (2.27.92-0ubuntu1) UNRELEASED; urgency=low
+gnome-settings-daemon (2.27.92-0ubuntu1) karmic; urgency=low
 
   * New upstream version (LP: #425995):
     - Make Locate Pointer a separate process (Matthias Clasen) 
