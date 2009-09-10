@@ -1,3 +1,10 @@
+gnome-settings-daemon (2.27.92-0ubuntu2) karmic; urgency=low
+
+  * debian/patches/91_git_update_fix_left_hand_setting.patch:
+    - git change to fix left handed setting (lp: #426675)
+
+ -- Sebastien Bacher <seb128@ubuntu.com>  Thu, 10 Sep 2009 11:34:59 +0200
+
 gnome-settings-daemon (2.27.92-0ubuntu1) karmic; urgency=low
 
   * New upstream version (LP: #425995):
