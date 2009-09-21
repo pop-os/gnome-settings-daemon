@@ -26,7 +26,8 @@ Build-Depends: cdbs,
                libxml-parser-perl,
                libnotify-dev,
                gnome-pkg-tools,
-               libpulse-dev (>= 0.9.15)
+               libpulse-dev (>= 0.9.15),
+               libcanberra-gtk-dev
 Standards-Version: 3.7.3
 Vcs-Bzr: https://code.launchpad.net/~ubuntu-desktop/gnome-settings-daemon/ubuntu
 
