@@ -1,3 +1,11 @@
+gnome-settings-daemon (2.28.0-0ubuntu3) UNRELEASED; urgency=low
+
+  * debian/patches/70_migrate_touchpad_config.patch:
+    - Fix a typo causing the settings to be migrated on every login,
+      over-writing user preferences (LP: #411083)
+
+ -- Chris Coulson <chrisccoulson@ubuntu.com>  Thu, 08 Oct 2009 22:14:54 +0100
+
 gnome-settings-daemon (2.28.0-0ubuntu2) karmic; urgency=low
 
   * Add 03_gdm_keyboard_variant_handling.patch: gdm's configuration and

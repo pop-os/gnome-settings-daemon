@@ -1,6 +1,6 @@
 diff -Nur -x '*.orig' -x '*~' gnome-settings-daemon-2.28.0/plugins/mouse/gsd-mouse-manager.c gnome-settings-daemon-2.28.0.new/plugins/mouse/gsd-mouse-manager.c
 --- gnome-settings-daemon-2.28.0/plugins/mouse/gsd-mouse-manager.c	2009-09-21 11:24:02.000000000 +0100
-+++ gnome-settings-daemon-2.28.0.new/plugins/mouse/gsd-mouse-manager.c	2009-09-21 23:39:27.866457237 +0100
++++ gnome-settings-daemon-2.28.0.new/plugins/mouse/gsd-mouse-manager.c	2009-10-08 22:14:38.355500251 +0100
 @@ -67,6 +67,10 @@
  #define KEY_SCROLL_METHOD       GCONF_TOUCHPAD_DIR "/scroll_method"
  #define KEY_PAD_HORIZ_SCROLL    GCONF_TOUCHPAD_DIR "/horiz_scroll_enabled"
@@ -36,7 +36,7 @@ diff -Nur -x '*.orig' -x '*~' gnome-settings-daemon-2.28.0/plugins/mouse/gsd-mou
 +         * nothing to migrate this from.
 +         */
 +        
-+        if (gconf_client_get_bool (client, KEY_TOUCHPAD_MIGRATION_NEEDED, NULL)); {
++        if (gconf_client_get_bool (client, KEY_TOUCHPAD_MIGRATION_NEEDED, NULL)) {
 +                /* Migrate the touchpad scrolling settings */
 +                old_pad_horiz_scroll_val = gconf_client_get (client, KEY_OLD_PAD_HORIZ_SCROLL, NULL);
 +                old_pad_vert_scroll_val = gconf_client_get (client, KEY_OLD_PAD_VERT_SCROLL, NULL);
