@@ -1,5 +1,6 @@
 01_xrdb.patch
 02_missing_libs.patch
+03_maintainer_mode.patch
 11_sleepkey.patch
 20_gstreamer.patch
 30_pkgconfig-path.patch
