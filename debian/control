@@ -2,7 +2,7 @@ Source: gnome-settings-daemon
 Section: gnome
 Priority: optional
 Maintainer: Debian GNOME Maintainers <pkg-gnome-maintainers@lists.alioth.debian.org>
-Uploaders: Josselin Mouette <joss@debian.org>, Sebastian Dröge <slomo@debian.org>, Sjoerd Simons <sjoerd@debian.org>
+Uploaders: Emilio Pozuelo Monfort <pochu@ubuntu.com>, Josselin Mouette <joss@debian.org>, Sebastian Dröge <slomo@debian.org>, Sjoerd Simons <sjoerd@debian.org>
 Build-Depends: cdbs,
                quilt,
                debhelper (>= 5),
@@ -29,7 +29,7 @@ Build-Depends: cdbs,
                libgstreamer0.10-dev (>= 0.10.1.2),
                libgstreamer-plugins-base0.10-dev (>= 0.10.1.2),
                gnome-pkg-tools
-Standards-Version: 3.8.1
+Standards-Version: 3.8.2
 
 Package: gnome-settings-daemon
 Architecture: any
@@ -46,8 +46,8 @@ Suggests: x11-xserver-utils,
           gnome-screensaver,
           metacity | x-window-manager
 Description: daemon handling the GNOME session settings
- This package contains the daemon which is responsible for setting the 
- various parameters of a GNOME session and the applications that run 
+ This package contains the daemon which is responsible for setting the
+ various parameters of a GNOME session and the applications that run
  under it. It handles the following kinds of settings:
  .
   * Keyboard: layout, accessibility options, shortcuts, media keys
@@ -58,7 +58,7 @@ Description: daemon handling the GNOME session settings
   * Startup of other daemons: screensaver, sound daemon
   * Typing break
  .
- It also sets various application settings through X resources and 
+ It also sets various application settings through X resources and
  freedesktop.org XSETTINGS.
 
 Package: gnome-settings-daemon-dev
@@ -69,5 +69,5 @@ Depends: ${shlibs:Depends},
          libglib2.0-dev (>= 2.17.3)
 Replaces: libgnome-settings-daemon-dev
 Description: Headers for building applications communicating with gnome-settings-daemon
- This package contains header files required to build applications that 
+ This package contains header files required to build applications that
  communicate with the GNOME settings daemon over D-Bus.

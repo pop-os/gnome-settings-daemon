@@ -1,4 +1,5 @@
-debian/tmp/etc
+debian/tmp/etc/gconf
+debian/tmp/etc/xdg/autostart /usr/share/gnome
 debian/tmp/usr/lib/gnome-settings-daemon*
 debian/tmp/usr/share/icons
 debian/tmp/usr/share/locale
