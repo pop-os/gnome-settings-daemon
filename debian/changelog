@@ -10,6 +10,8 @@ gnome-settings-daemon (2.28.0-1) UNRELEASED; urgency=low
       + Bump libgtk2.0-dev and libgnome-desktop-dev build dependencies.
       + Remove libglade2-dev build dependency, no longer needed.
       + Build depend on libxklavier-dev >= 4.0 instead of libxklavier12-dev.
+      + Break gnome-screensaver << 2.28 since g-s-d doesn't start it anymore,
+        relaying on the autostart file in g-s 2.28.
     - debian/patches/20_gstreamer.patch,
       debian/patches/70_relibtoolize.patch:
       + Updated to apply again.
