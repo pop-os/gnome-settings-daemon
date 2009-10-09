@@ -1,4 +1,4 @@
-gnome-settings-daemon (2.28.0-1) UNRELEASED; urgency=low
+gnome-settings-daemon (2.28.0-1) experimental; urgency=low
 
   * Add a watch file.
   * Add a manpage for gnome-settings-daemon, thanks Joshua Cummings!
@@ -21,8 +21,9 @@ gnome-settings-daemon (2.28.0-1) UNRELEASED; urgency=low
   * Standards-Version is 3.8.3, no changes needed.
   * debian/rules:
     - Don't touch every file anymore, it was done because of a broken tarball.
+    - Include check-dist.mk to avoid uploads to unstable.
 
- -- Emilio Pozuelo Monfort <pochu@debian.org>  Fri, 09 Oct 2009 11:40:06 +0200
+ -- Emilio Pozuelo Monfort <pochu@debian.org>  Fri, 09 Oct 2009 17:26:43 +0200
 
 gnome-settings-daemon (2.26.1-2) unstable; urgency=low
 
