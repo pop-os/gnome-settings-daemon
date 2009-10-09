@@ -1,24 +1,6 @@
-GNOME #571145
-
- configure.ac                                |   41 +++
- plugins/media-keys/Makefile.am              |   23 ++-
- plugins/media-keys/actions/Makefile.am      |   44 +++
- plugins/media-keys/actions/acme-volume.c    |  402 +++++++++++++++++++++++++++
- plugins/media-keys/actions/acme-volume.h    |   56 ++++
- plugins/media-keys/gsd-media-keys-manager.c |  101 ++++++-
- 6 files changed, 645 insertions(+), 22 deletions(-)
-
-Index: gnome-settings-daemon-2.26.1/configure.ac
-===================================================================
---- gnome-settings-daemon-2.26.1.orig/configure.ac	2009-05-29 11:46:55.273106402 +0200
-+++ gnome-settings-daemon-2.26.1/configure.ac	2009-05-29 11:46:57.029605209 +0200
-@@ -255,11 +255,54 @@ if test x$WANT_PULSE = xyes ; then
-               AC_DEFINE(HAVE_PULSE, 1, [Define if PULSE sound server should be used])],
-              [have_pulse=false])
- fi
-+
- AM_CONDITIONAL(HAVE_PULSE, test "x$have_pulse" = "xtrue")
- 
+--- a/configure.ac
++++ b/configure.ac
+@@ -260,6 +260,48 @@
  AC_SUBST(PULSE_CFLAGS)
  AC_SUBST(PULSE_LIBS)
  
@@ -67,15 +49,7 @@ Index: gnome-settings-daemon-2.26.1/configure.ac
  # ---------------------------------------------------------------------------
  # Enable Profiling
  # ---------------------------------------------------------------------------
-@@ -357,6 +400,7 @@ plugins/housekeeping/Makefile
- plugins/keybindings/Makefile
- plugins/keyboard/Makefile
- plugins/media-keys/Makefile
-+plugins/media-keys/actions/Makefile
- plugins/media-keys/cut-n-paste/Makefile
- plugins/mouse/Makefile
- plugins/screensaver/Makefile
-@@ -399,6 +443,7 @@ echo "
+@@ -398,6 +440,7 @@
          dbus-1 system.d dir:      ${DBUS_SYS_DIR}
  
          Libnotify support:        ${have_libnotify}
@@ -83,38 +57,29 @@ Index: gnome-settings-daemon-2.26.1/configure.ac
          PulseAudio support:       ${have_pulse}
          Profiling support:        ${enable_profiling}
  "
-Index: gnome-settings-daemon-2.26.1/plugins/media-keys/Makefile.am
-===================================================================
---- gnome-settings-daemon-2.26.1.orig/plugins/media-keys/Makefile.am	2009-05-29 11:46:55.221109148 +0200
-+++ gnome-settings-daemon-2.26.1/plugins/media-keys/Makefile.am	2009-05-29 11:47:08.515406259 +0200
-@@ -1,11 +1,12 @@
+--- a/plugins/media-keys/Makefile.am
++++ b/plugins/media-keys/Makefile.am
+@@ -1,12 +1,7 @@
  NULL =
  
- SUBDIRS =
+-SUBDIRS =
 -plugin_LTLIBRARIES =
+-
+-if HAVE_PULSE
+-SUBDIRS += cut-n-paste
+-plugin_LTLIBRARIES += libmedia-keys.la
+-endif
++SUBDIRS = cut-n-paste
 +plugin_LTLIBRARIES = libmedia-keys.la
  
- if HAVE_PULSE
- SUBDIRS += cut-n-paste
--plugin_LTLIBRARIES += libmedia-keys.la
-+else
-+SUBDIRS += actions
- endif
- 
  BUILT_SOURCES = 			\
-@@ -39,7 +40,6 @@ libmedia_keys_la_SOURCES = 		\
- libmedia_keys_la_CPPFLAGS = \
- 	-I$(top_srcdir)/gnome-settings-daemon			\
- 	-I$(top_srcdir)/plugins/common				\
--	-I$(top_srcdir)/plugins/media-keys/cut-n-paste		\
- 	-DPIXMAPDIR=\""$(pkgdatadir)"\"				\
- 	-DGLADEDIR=\""$(pkgdatadir)"\"				\
- 	-DGNOME_SETTINGS_LOCALEDIR=\""$(datadir)/locale"\"	\
-@@ -54,16 +54,13 @@ libmedia_keys_la_LDFLAGS = 		\
+ 	gsd-media-keys-manager-glue.h	\
+@@ -54,16 +49,14 @@
  
  libmedia_keys_la_LIBADD  = 		\
  	$(top_builddir)/plugins/common/libcommon.la			\
 -	$(top_builddir)/plugins/media-keys/cut-n-paste/libgvc.la	\
++	$(top_builddir)/plugins/media-keys/cut-n-paste/libgvc.la        \
  	$(SETTINGS_PLUGIN_LIBS)						\
  	$(XF86MISC_LIBS)
  
@@ -127,105 +92,74 @@ Index: gnome-settings-daemon-2.26.1/plugins/media-keys/Makefile.am
  
  noinst_PROGRAMS =				\
  	test-media-keys				\
-@@ -78,7 +75,6 @@ test_media_window_SOURCES =			\
- 
- test_media_window_CPPFLAGS = \
- 	-I$(top_srcdir)/gnome-settings-daemon			\
--	-I$(top_srcdir)/plugins/media-keys/cut-n-paste		\
- 	-DPIXMAPDIR=\""$(pkgdatadir)"\"				\
- 	-DGLADEDIR=\""$(pkgdatadir)"\"				\
- 	-DGNOME_SETTINGS_LOCALEDIR=\""$(datadir)/locale"\"	\
-@@ -106,7 +102,6 @@ test_media_keys_SOURCES =			\
- test_media_keys_CPPFLAGS = \
- 	-I$(top_srcdir)/gnome-settings-daemon			\
- 	-I$(top_srcdir)/plugins/common				\
--	-I$(top_srcdir)/plugins/media-keys/cut-n-paste		\
- 	-DPIXMAPDIR=\""$(pkgdatadir)"\"				\
- 	-DGLADEDIR=\""$(pkgdatadir)"\"				\
- 	-DGNOME_SETTINGS_LOCALEDIR=\""$(datadir)/locale"\"	\
-@@ -125,7 +120,17 @@ test_media_keys_LDADD = \
+@@ -124,9 +117,7 @@
+ 	$(XF86MISC_LIBS)			\
  	$(GST_LIBS)
  
- if HAVE_PULSE
-+libmedia_keys_la_CPPFLAGS += -I$(top_builddir)/plugins/media-keys/cut-n-paste
-+libmedia_keys_la_LIBADD += $(top_builddir)/plugins/media-keys/cut-n-paste/libgvc.la
-+test_media_window_CPPFLAGS += -I$(top_builddir)/plugins/media-keys/cut-n-paste
-+test_media_keys_CPPFLAGS += -I$(top_builddir)/plugins/media-keys/cut-n-paste
+-if HAVE_PULSE
  test_media_keys_LDADD += $(top_builddir)/plugins/media-keys/cut-n-paste/libgvc.la
-+else
-+libmedia_keys_la_CPPFLAGS += -I$(top_builddir)/plugins/media-keys/actions
-+libmedia_keys_la_LIBADD += $(top_builddir)/plugins/media-keys/actions/libacme.la
-+test_media_window_CPPFLAGS += -I$(top_builddir)/plugins/media-keys/actions
-+test_media_keys_CPPFLAGS += -I$(top_builddir)/plugins/media-keys/actions
-+test_media_keys_LDADD += $(top_builddir)/plugins/media-keys/actions/libacme.la
- endif
+-endif
  
- gladedir = $(pkgdatadir)
-@@ -138,7 +143,11 @@ pixmaps_DATA = 		\
- 	acme-eject.png	\
+ gtkbuilderdir = $(pkgdatadir)
+ gtkbuilder_DATA =	\
+--- a/plugins/media-keys/cut-n-paste/Makefile.am
++++ b/plugins/media-keys/cut-n-paste/Makefile.am
+@@ -4,16 +4,24 @@
+ 
+ INCLUDES =					\
+ 	$(WARN_CFLAGS)				\
+-	$(VOLUME_CONTROL_CFLAGS)		\
+-	$(PULSE_CFLAGS)				\
  	$(NULL)
  
-+if HAVE_PULSE
- DIST_SUBDIRS = cut-n-paste
-+else
-+DIST_SUBDIRS = actions
-+endif
+ libgvc_la_LIBADD =		\
+-	$(VOLUME_CONTROL_LIBS)	\
+-	$(PULSE_LIBS)		\
+ 	$(NULL)
  
- EXTRA_DIST = 				\
- 	gsd-media-keys-manager.xml	\
-Index: gnome-settings-daemon-2.26.1/plugins/media-keys/actions/Makefile.am
-===================================================================
---- /dev/null	1970-01-01 00:00:00.000000000 +0000
-+++ gnome-settings-daemon-2.26.1/plugins/media-keys/actions/Makefile.am	2009-05-29 11:46:57.033605299 +0200
-@@ -0,0 +1,44 @@
-+NULL =
-+
-+noinst_LTLIBRARIES = libacme.la
-+
-+libacme_la_SOURCES = 		\
-+	../acme.h		\
+ libgvc_la_SOURCES =			\
 +	$(NULL)
 +
-+libacme_la_CPPFLAGS = \
-+	-I$(top_srcdir)/gnome-settings-daemon		\
-+	-I$(top_srcdir)/plugins/common			\
-+	-DGNOME_SETTINGS_LOCALEDIR=\""$(datadir)/locale"\" \
-+	$(AM_CPPFLAGS)
++if HAVE_PULSE
++INCLUDES +=					\
++	$(VOLUME_CONTROL_CFLAGS)		\
++	$(PULSE_CFLAGS)
 +
-+libacme_la_CFLAGS = 			\
-+	$(SETTINGS_PLUGIN_CFLAGS)	\
-+	$(AM_CFLAGS)
++libgvc_la_LIBADD +=		\
++	$(VOLUME_CONTROL_LIBS)	\
++	$(PULSE_LIBS)
 +
-+libacme_la_LIBADD =			\
-+	$(NULL)
++libgvc_la_SOURCES +=			\
+ 	gvc-mixer-stream.h		\
+ 	gvc-mixer-stream.c		\
+ 	gvc-channel-map.h		\
+@@ -31,8 +39,22 @@
+ 	gvc-mixer-event-role.h		\
+ 	gvc-mixer-event-role.c		\
+ 	gvc-mixer-control.h		\
+-	gvc-mixer-control.c		\
+-	$(NULL)
++	gvc-mixer-control.c
++endif
 +
 +if HAVE_GSTREAMER
-+libacme_la_SOURCES += \
-+	acme-volume.c \
-+	acme-volume.h \
-+	$(NULL)
-+libacme_la_CFLAGS += $(GST_CFLAGS)
-+libacme_la_LIBADD += $(GST_LIBS)
++INCLUDES +=					\
++	$(SETTINGS_PLUGIN_CFLAGS)		\
++	$(AM_CFLAGS)				\
++	$(GST_CFLAGS)
++
++libgvc_la_LIBADD +=		\
++	$(GST_LIBS)
++
++libgvc_la_SOURCES +=			\
++	gvc-gstreamer-acme-vol.c	\
++	gvc-gstreamer-acme-vol.h
 +endif
-+
-+gladedir = $(pkgdatadir)
-+glade_DATA = 		\
-+	../acme.glade	\
-+	$(NULL)
-+
-+pixmapsdir = $(pkgdatadir)
-+pixmaps_DATA = 		\
-+	../acme-eject.png	\
-+	$(NULL)
-+
-+EXTRA_DIST =			\
-+	$(glade_DATA)		\
-+	$(pixmaps_DATA)		\
-+	$(NULL)
-Index: gnome-settings-daemon-2.26.1/plugins/media-keys/actions/acme-volume.c
-===================================================================
---- /dev/null	1970-01-01 00:00:00.000000000 +0000
-+++ gnome-settings-daemon-2.26.1/plugins/media-keys/actions/acme-volume.c	2009-05-29 11:46:57.033605299 +0200
+ 
+ MAINTAINERCLEANFILES =                  \
+         *~                              \
+--- /dev/null
++++ b/plugins/media-keys/cut-n-paste/gvc-gstreamer-acme-vol.c
 @@ -0,0 +1,402 @@
 +/* -*- Mode: C; tab-width: 8; indent-tabs-mode: t; c-basic-offset: 8 -*- */
 +
@@ -255,7 +189,7 @@ Index: gnome-settings-daemon-2.26.1/plugins/media-keys/actions/acme-volume.c
 +*/
 +
 +#include "config.h"
-+#include "acme-volume.h"
++#include "gvc-gstreamer-acme-vol.h"
 +
 +#include <gst/gst.h>
 +#include <gst/audio/mixerutils.h>
@@ -629,10 +563,8 @@ Index: gnome-settings-daemon-2.26.1/plugins/media-keys/actions/acme-volume.c
 +	return ACME_VOLUME(acme_volume_object);
 +}
 +
-Index: gnome-settings-daemon-2.26.1/plugins/media-keys/actions/acme-volume.h
-===================================================================
---- /dev/null	1970-01-01 00:00:00.000000000 +0000
-+++ gnome-settings-daemon-2.26.1/plugins/media-keys/actions/acme-volume.h	2009-05-29 11:46:57.033605299 +0200
+--- /dev/null
++++ b/plugins/media-keys/cut-n-paste/gvc-gstreamer-acme-vol.h
 @@ -0,0 +1,56 @@
 +/* acme-volume.h
 +
@@ -690,48 +622,29 @@ Index: gnome-settings-daemon-2.26.1/plugins/media-keys/actions/acme-volume.h
 +gint        acme_volume_get_threshold (AcmeVolume *self);
 +
 +
-Index: gnome-settings-daemon-2.26.1/plugins/media-keys/gsd-media-keys-manager.c
-===================================================================
---- gnome-settings-daemon-2.26.1.orig/plugins/media-keys/gsd-media-keys-manager.c	2009-05-29 11:46:55.045109131 +0200
-+++ gnome-settings-daemon-2.26.1/plugins/media-keys/gsd-media-keys-manager.c	2009-05-29 11:46:57.041608411 +0200
-@@ -48,11 +48,12 @@
- 
- #include "eggaccelerators.h"
- #include "acme.h"
--#include "gsd-media-keys-window.h"
--
+--- a/plugins/media-keys/gsd-media-keys-manager.c
++++ b/plugins/media-keys/gsd-media-keys-manager.c
+@@ -53,6 +53,8 @@
  #ifdef HAVE_PULSE
+ #include <canberra-gtk.h>
  #include "gvc-mixer-control.h"
 +#elif defined(HAVE_GSTREAMER)
-+#include "actions/acme-volume.h"
++#include "gvc-gstreamer-acme-vol.h"
  #endif /* HAVE_PULSE */
-+#include "gsd-media-keys-window.h"
  
  #define GSD_DBUS_PATH "/org/gnome/SettingsDaemon"
- #define GSD_DBUS_NAME "org.gnome.SettingsDaemon"
-@@ -90,6 +91,8 @@ struct GsdMediaKeysManagerPrivate
-         /* Number of expected update signals, zero meaning we
-          * shouldn't be showing any update dialogues */
-         guint            num_expected_update_signals;
+@@ -88,6 +90,8 @@
+         /* Volume bits */
+         GvcMixerControl *volume;
+         GvcMixerStream  *stream;
 +#elif defined(HAVE_GSTREAMER)
 +        AcmeVolume      *volume;
  #endif /* HAVE_PULSE */
          GtkWidget       *dialog;
          GConfClient     *conf_client;
-@@ -131,9 +134,8 @@ init_screens (GsdMediaKeysManager *manag
-                 GdkScreen *screen;
- 
-                 screen = gdk_display_get_screen (display, i);
--                if (screen == NULL) {
-+                if (screen == NULL)
-                         continue;
--                }
-                 manager->priv->screens = g_slist_append (manager->priv->screens, screen);
-         }
- 
-@@ -650,40 +652,75 @@ on_stream_event_notify (GObject         
- {
-         update_dialog (manager);
+@@ -633,7 +637,9 @@
+                                 CA_PROP_APPLICATION_ID, "org.gnome.VolumeControl",
+                                 NULL);
  }
 +#endif /* HAVE_PULSE */
  
@@ -739,58 +652,34 @@ Index: gnome-settings-daemon-2.26.1/plugins/media-keys/gsd-media-keys-manager.c
  static void
  do_sound_action (GsdMediaKeysManager *manager,
                   int                  type)
- {
-         gboolean muted;
-+	int vol_step;
-+#ifdef HAVE_PULSE
+@@ -642,8 +648,13 @@
          guint vol, norm_vol_step;
--        int vol_step;
--
-         if (manager->priv->stream == NULL)
-+#else
-+        int      vol;
-+        GError  *error = NULL;
-+        if (manager->priv->volume == NULL)
-+#endif
-                 return;
+         int vol_step;
  
 +#ifdef HAVE_PULSE
-+	vol_step = gconf_client_get_int (manager->priv->conf_client,
-+					 GCONF_MISC_DIR "/volume_step",
-+					 NULL);
-+#else
+         if (manager->priv->stream == NULL)
+                 return;
++#elif defined(HAVE_GSTREAMER)
++        if (manager->priv->volume == NULL)
++                return;
++#endif
+ 
          vol_step = gconf_client_get_int (manager->priv->conf_client,
                                           GCONF_MISC_DIR "/volume_step",
--                                         NULL);
-+                                         &error);
-+#endif
- 
--        if (vol_step <= 0 || vol_step > 100)
-+#ifdef HAVE_PULSE
-+        if (vol_step <= 0 || vol_step > 100) {
-+#else
-+        if (error) {
-+#endif
+@@ -652,18 +663,33 @@
+         if (vol_step <= 0 || vol_step > 100)
                  vol_step = VOLUME_STEP;
-+#ifndef HAVE_PULSE
-+                g_error_free (error);
-+#endif
-+	}
  
 +#ifdef HAVE_PULSE
          norm_vol_step = PA_VOLUME_NORM * vol_step / 100;
--
--        /* FIXME: this is racy */
+ 
+         /* FIXME: this is racy */
          vol = gvc_mixer_stream_get_volume (manager->priv->stream);
          muted = gvc_mixer_stream_get_is_muted (manager->priv->stream);
-+
-         /* By default, we would be showing a dialogue
-          * based on the current values, eg. an unchanged dialogue */
-         manager->priv->num_expected_update_signals = 0;
 -
 +#else
 +        if (vol_step > 0) {
-+                int threshold = acme_volume_get_threshold (manager->priv->volume);
++                gint threshold = acme_volume_get_threshold (manager->priv->volume);
 +                if (vol_step < threshold)
 +                        vol_step = threshold;
 +                g_debug ("Using volume step of %d", vol_step);
@@ -801,8 +690,8 @@ Index: gnome-settings-daemon-2.26.1/plugins/media-keys/gsd-media-keys-manager.c
          switch (type) {
          case MUTE_KEY:
 +#ifdef HAVE_PULSE
-                 manager->priv->num_expected_update_signals = 1;
-                 gvc_mixer_stream_change_is_muted (manager->priv->stream, !muted);
+                 muted = !muted;
+                 gvc_mixer_stream_change_is_muted (manager->priv->stream, muted);
 +#else
 +                acme_volume_mute_toggle (manager->priv->volume);
 +#endif
@@ -810,44 +699,44 @@ Index: gnome-settings-daemon-2.26.1/plugins/media-keys/gsd-media-keys-manager.c
          case VOLUME_DOWN_KEY:
 +#ifdef HAVE_PULSE
                  if (!muted && (vol <= norm_vol_step)) {
-                         manager->priv->num_expected_update_signals = 2;
-                         gvc_mixer_stream_change_is_muted (manager->priv->stream, !muted);
-@@ -692,18 +729,31 @@ do_sound_action (GsdMediaKeysManager *ma
-                         manager->priv->num_expected_update_signals = 1;
-                         gvc_mixer_stream_change_volume (manager->priv->stream, vol - norm_vol_step);
+                         muted = !muted;
+                         vol = 0;
+@@ -675,11 +701,17 @@
+                         if (gvc_mixer_stream_set_volume (manager->priv->stream, vol) != FALSE)
+                                 gvc_mixer_stream_push_volume (manager->priv->stream);
                  }
 +#else
-+                if (!muted && (vol <= vol_step)) {
++                if (!muted && (vol <= vol_step))
 +                        acme_volume_mute_toggle (manager->priv->volume);
-+                }
 +                acme_volume_set_volume (manager->priv->volume, vol - vol_step);
 +#endif
                  break;
          case VOLUME_UP_KEY:
                  if (muted) {
+                         muted = !muted;
                          if (vol == 0) {
 +#ifdef HAVE_PULSE
-                                 manager->priv->num_expected_update_signals = 2;
-                                 gvc_mixer_stream_change_volume (manager->priv->stream, vol + norm_vol_step);
-                                 gvc_mixer_stream_change_is_muted (manager->priv->stream, !muted);
+                                vol = vol + norm_vol_step;
+                                gvc_mixer_stream_change_is_muted (manager->priv->stream, muted);
+                                if (gvc_mixer_stream_set_volume (manager->priv->stream, vol) != FALSE)
+@@ -687,7 +719,14 @@
                          } else {
-                                 manager->priv->num_expected_update_signals = 1;
-                                 gvc_mixer_stream_change_is_muted (manager->priv->stream, !muted);
+                                 gvc_mixer_stream_change_is_muted (manager->priv->stream, muted);
+                         }
 +#else
-+                                acme_volume_set_volume (manager->priv->volume, vol + vol_step);
 +                                /* We need to unmute otherwise vol is blocked (and muted) */
 +                                acme_volume_set_mute   (manager->priv->volume, FALSE);
++                        }
++                        acme_volume_set_volume (manager->priv->volume, vol + vol_step);
 +#endif
-                         }
--                } else {
-+                } else { 
+                 } else {
 +#ifdef HAVE_PULSE
                          if (vol < MAX_VOLUME) {
-                                 manager->priv->num_expected_update_signals = 1;
+                                 gboolean set;
                                  if (vol + norm_vol_step >= MAX_VOLUME) {
-@@ -712,17 +762,39 @@ do_sound_action (GsdMediaKeysManager *ma
-                                         gvc_mixer_stream_change_volume (manager->priv->stream, vol + norm_vol_step);
-                                 }
+@@ -698,13 +737,34 @@
+                                 if (gvc_mixer_stream_set_volume (manager->priv->stream, vol) != FALSE)
+                                         gvc_mixer_stream_push_volume (manager->priv->stream);
                          }
 +#else
 +                        acme_volume_set_volume (manager->priv->volume, vol + vol_step);
@@ -857,16 +746,11 @@ Index: gnome-settings-daemon-2.26.1/plugins/media-keys/gsd-media-keys-manager.c
          }
  
 +#ifdef HAVE_PULSE
-         /* We didn't actually make any changes, so force showing the dialogue */
-         if (manager->priv->num_expected_update_signals == 0) {
-                 manager->priv->num_expected_update_signals = 1;
-                 update_dialog (manager);
-         }
--}
+         update_dialog (manager, vol, muted);
 +#else
 +        muted = acme_volume_get_mute (manager->priv->volume);
 +        vol = acme_volume_get_volume (manager->priv->volume);
- 
++
 +        /* FIXME: AcmeVolume should probably emit signals
 +           instead of doing it like this */
 +        dialog_init (manager);
@@ -877,16 +761,15 @@ Index: gnome-settings-daemon-2.26.1/plugins/media-keys/gsd-media-keys-manager.c
 +        gsd_media_keys_window_set_action (GSD_MEDIA_KEYS_WINDOW (manager->priv->dialog),
 +                                          GSD_MEDIA_KEYS_WINDOW_ACTION_VOLUME);
 +        dialog_show (manager);
-+#endif
-+        }
-+
++#endif /* HAVE_PULSE */
+ }
 +#endif /* defined(HAVE_PULSE) || defined(HAVE_GSTREAMER) */
-+
+ 
 +#ifdef HAVE_PULSE
  static void
  update_default_sink (GsdMediaKeysManager *manager)
  {
-@@ -887,9 +959,9 @@ do_action (GsdMediaKeysManager *manager,
+@@ -863,9 +923,9 @@
          case MUTE_KEY:
          case VOLUME_DOWN_KEY:
          case VOLUME_UP_KEY:
@@ -894,26 +777,11 @@ Index: gnome-settings-daemon-2.26.1/plugins/media-keys/gsd-media-keys-manager.c
 +#if defined(HAVE_PULSE) || defined(HAVE_GSTREAMER)
                  do_sound_action (manager, type);
 -#endif /* HAVE_PULSE */
-+#endif
++#endif /* HAVE_PULSE || HAVE_GSTREAMER */
                  break;
          case POWER_KEY:
                  do_exit_action (manager);
-@@ -1069,13 +1141,13 @@ gsd_media_keys_manager_start (GsdMediaKe
- {
-         gnome_settings_profile_start (NULL);
- 
--#ifdef HAVE_PULSE
-         /* initialise Volume handler
-          *
-          * We do this one here to force checking gstreamer cache, etc.
-          * The rest (grabbing and setting the keys) can happen in an
-          * idle.
-          */
-+#ifdef HAVE_PULSE
-         gnome_settings_profile_start ("gvc_mixer_control_new");
- 
-         manager->priv->volume = gvc_mixer_control_new ();
-@@ -1092,6 +1164,10 @@ gsd_media_keys_manager_start (GsdMediaKe
+@@ -1068,6 +1128,10 @@
          gvc_mixer_control_open (manager->priv->volume);
  
          gnome_settings_profile_end ("gvc_mixer_control_new");
@@ -924,18 +792,19 @@ Index: gnome-settings-daemon-2.26.1/plugins/media-keys/gsd-media-keys-manager.c
  #endif /* HAVE_PULSE */
          g_idle_add ((GSourceFunc) start_media_keys_idle_cb, manager);
  
-@@ -1164,13 +1240,13 @@ gsd_media_keys_manager_stop (GsdMediaKey
+@@ -1140,12 +1204,14 @@
                  g_object_unref (priv->stream);
                  priv->stream = NULL;
          }
-+#elif defined(HAVE_GSTREAMER)
++#endif /* HAVE_PULSE */
  
++#if defined(HAVE_PULSE) || defined(HAVE_GSTREAMER)
          if (priv->volume) {
                  g_object_unref (priv->volume);
                  priv->volume = NULL;
          }
- #endif /* HAVE_PULSE */
--
+-#endif /* HAVE_PULSE */
++#endif /* defined(HAVE_PULSE) || defined(HAVE_GSTREAMER) */
+ 
          if (priv->dialog != NULL) {
                  gtk_widget_destroy (priv->dialog);
-                 priv->dialog = NULL;

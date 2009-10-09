@@ -13,10 +13,6 @@ DEB_DH_MAKESHLIBS_ARGS_ALL += --no-act
 
 DEB_CONFIGURE_EXTRA_FLAGS += --disable-pulse
 
-pre-build::
-	find . -type f -exec touch '{}' \;
-	find . -type d -exec touch '{}' \;
-
 binary-install/gnome-settings-daemon::
 	find debian -name '*.a' -delete
 	find debian -name '*.la' -delete
