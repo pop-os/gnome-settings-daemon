@@ -1,3 +1,20 @@
+gnome-settings-daemon (2.28.0-0ubuntu5) karmic; urgency=low
+
+  * debian/gnome-settings-daemon.gconf-defaults:
+    - enable tap_on_click and disable_while_typing on by default,
+      it's the less confusing behaviour for user and was the consensus
+      during the discussion on the lists 
+
+ -- Sebastien Bacher <seb128@ubuntu.com>  Thu, 15 Oct 2009 18:47:25 +0200
+
+gnome-settings-daemon (2.28.0-0ubuntu4) karmic; urgency=low
+
+  * debian/patches/71_enable_tap_to_click_if_no_physical_buttons.patch:
+    - Enable tap-to-click when the touchpad doesn't have physical
+      buttons.
+
+ -- Alberto Milone <alberto.milone@canonical.com>  Tue, 13 Oct 2009 15:29:28 +0200
+
 gnome-settings-daemon (2.28.0-0ubuntu3) karmic; urgency=low
 
   * debian/patches/70_migrate_touchpad_config.patch:

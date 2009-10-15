@@ -1,3 +1,6 @@
 /desktop/gnome/font_rendering/antialiasing rgba
 /desktop/gnome/font_rendering/hinting slight
 /desktop/gnome/peripherals/touchpad/config_migration_needed true
+/desktop/gnome/peripherals/touchpad/disable_while_typing true
+/desktop/gnome/peripherals/touchpad/tap_to_click true
+
