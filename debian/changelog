@@ -1,3 +1,12 @@
+gnome-settings-daemon (2.28.1-1) unstable; urgency=low
+
+  * New upstream release.
+    - debian/patches/70_relibtoolize.patch:
+      + Updated.
+  * debian/rules: remove check-dist.mk to upload to unstable.
+
+ -- Emilio Pozuelo Monfort <pochu@debian.org>  Thu, 22 Oct 2009 06:08:36 +0200
+
 gnome-settings-daemon (2.28.0-1) experimental; urgency=low
 
   * Add a watch file.
