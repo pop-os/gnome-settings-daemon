@@ -1,3 +1,14 @@
+gnome-settings-daemon (2.28.1-0ubuntu2) karmic-proposed; urgency=low
+
+  * debian/patches/71_fix_ldsm_notification_crash.patch:
+    - Don't access free'd memory if a volume is unmounted whilst the
+      dialog is displayed (LP: #419354)
+  * debian/patches/91_gsd_locate_pointer_path_fix.patch:
+    - Upstream GIT change to honour libexecdir when spawning
+      gsd-locate-pointer (LP: #441642)
+
+ -- Chris Coulson <chrisccoulson@ubuntu.com>  Wed, 04 Nov 2009 00:13:34 +0000
+
 gnome-settings-daemon (2.28.1-0ubuntu1) karmic; urgency=low
 
   * New upstream bug fix release:
