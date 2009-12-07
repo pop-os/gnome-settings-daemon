@@ -1,0 +1,13 @@
+Index: gnome-settings-daemon-2.26.0/configure.ac
+===================================================================
+--- gnome-settings-daemon-2.26.0.orig/configure.ac	2009-04-11 13:37:02.222552992 +0200
++++ gnome-settings-daemon-2.26.0/configure.ac	2009-04-11 13:37:05.694052231 +0200
+@@ -69,6 +69,8 @@ PKG_CHECK_MODULES(SETTINGS_PLUGIN,
+         gio-2.0 >= $GIO_REQUIRED_VERSION
+         libglade-2.0 >= 2.0.0
+         dbus-glib-1 >= $DBUS_GLIB_REQUIRED_VERSION
++        xext
++        x11
+ )
+ 
+ GSD_PLUGIN_LDFLAGS="-export_dynamic -module -avoid-version -no-undefined"

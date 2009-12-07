@@ -1,6 +1,5 @@
-diff -Nur -x '*.orig' -x '*~' gnome-settings-daemon-2.27.4/data/gnome-settings-daemon.pc.in gnome-settings-daemon-2.27.4.new/data/gnome-settings-daemon.pc.in
---- gnome-settings-daemon-2.27.4/data/gnome-settings-daemon.pc.in	2009-05-03 19:15:30.000000000 +0100
-+++ gnome-settings-daemon-2.27.4.new/data/gnome-settings-daemon.pc.in	2009-07-20 00:05:17.088827307 +0100
+--- gnome-settings-daemon/data/gnome-settings-daemon.pc.in.orig	2007-11-03 02:19:59.340704956 +0100
++++ gnome-settings-daemon/data/gnome-settings-daemon.pc.in	2007-11-03 02:20:30.994508804 +0100
 @@ -2,6 +2,8 @@
  exec_prefix=@exec_prefix@
  libdir=@libdir@
