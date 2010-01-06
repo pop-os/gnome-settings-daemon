@@ -1,3 +1,9 @@
+gnome-settings-daemon (2.28.1-1ubuntu2) lucid; urgency=low
+
+  * No change rebuild to use the new libgnome-desktop soname
+
+ -- Sebastien Bacher <seb128@ubuntu.com>  Wed, 06 Jan 2010 19:57:06 +0100
+
 gnome-settings-daemon (2.28.1-1ubuntu1) lucid; urgency=low
 
   * Sync on Debian
