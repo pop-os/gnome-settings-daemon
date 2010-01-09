@@ -2,6 +2,7 @@
 02_missing_libs.patch
 03_maintainer_mode.patch
 11_sleepkey.patch
+12_monitor_network_fs.patch
 20_gstreamer.patch
 30_pkgconfig-path.patch
 70_relibtoolize.patch

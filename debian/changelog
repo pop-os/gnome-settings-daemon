@@ -1,9 +1,11 @@
-gnome-settings-daemon (2.28.1-2) UNRELEASED; urgency=low
+gnome-settings-daemon (2.28.1-2) unstable; urgency=low
 
   * Drop libxxf86misc-dev build-dependency. This extension is only used 
     as a fallback to XKB. Closes: #559690.
+  * 12_monitor_network_fs.patch: new patch. Don’t monitor remote 
+    filesystems for their free size. Closes: #563592.
 
- -- Josselin Mouette <joss@debian.org>  Mon, 07 Dec 2009 09:57:08 +0100
+ -- Josselin Mouette <joss@debian.org>  Sat, 09 Jan 2010 10:59:14 +0100
 
 gnome-settings-daemon (2.28.1-1) unstable; urgency=low
 
