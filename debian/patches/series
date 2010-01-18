@@ -1,7 +1,6 @@
 01_xrdb.patch
 02_fix_randr.patch
 02_missing_libs.patch
-03_gdm_keyboard_variant_handling.patch
 03_maintainer_mode.patch
 16_use_synchronous_notifications.patch
 30_pkgconfig-path.patch
@@ -9,5 +8,4 @@
 70_migrate_touchpad_config.patch
 71_fix_ldsm_notification_crash.patch
 90_autoreconf.patch
-91_gsd_locate_pointer_path_fix.patch
 99_ltmain_as-needed.patch
