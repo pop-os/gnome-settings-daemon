@@ -1,4 +1,4 @@
-gnome-settings-daemon (2.29.5-0ubuntu2) UNRELEASED; urgency=low
+gnome-settings-daemon (2.29.5-0ubuntu2) lucid; urgency=low
 
   * Add 04_dont_call_xrdb.patch: Use XLib calls to set the RESOURCE_MANAGER
     Xft.* properties in the xsettings and font plugins, instead of calling
@@ -6,7 +6,7 @@ gnome-settings-daemon (2.29.5-0ubuntu2) UNRELEASED; urgency=low
     the critical path and everything else needs to wait for it.
   * 40_xres_lcddefault.patch: Update accordingly.
 
- -- Martin Pitt <martin.pitt@ubuntu.com>  Thu, 21 Jan 2010 19:30:02 +0100
+ -- Martin Pitt <martin.pitt@ubuntu.com>  Fri, 22 Jan 2010 00:16:05 +0100
 
 gnome-settings-daemon (2.29.5-0ubuntu1) lucid; urgency=low
 
