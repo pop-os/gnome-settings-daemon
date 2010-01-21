@@ -1,0 +1,215 @@
+From e81d352b1de3d9732a4c2c78ab949ffc83736c84 Mon Sep 17 00:00:00 2001
+From: Martin Pitt <martin.pitt@ubuntu.com>
+Date: Thu, 21 Jan 2010 19:25:51 +0100
+Subject: Don't spawn xrdb
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Use XLib calls to set the RESOURCE_MANAGER Xft.* properties in the xsettings
+plugin instead of calling xrdb directly. This saves some startup time, since
+this plugin is in the critical path and everything else needs to wait for it.
+
+Code taken from demo program from Ross Burton.
+
+Bug: https://bugzilla.gnome.org/show_bug.cgi?id=586276
+---
+ plugins/xsettings/gsd-xsettings-manager.c |  160 +++++++++++------------------
+ 1 files changed, 61 insertions(+), 99 deletions(-)
+
+diff --git a/plugins/xsettings/gsd-xsettings-manager.c b/plugins/xsettings/gsd-xsettings-manager.c
+index 8aee25b..60a34c6 100644
+--- a/plugins/xsettings/gsd-xsettings-manager.c
++++ b/plugins/xsettings/gsd-xsettings-manager.c
+@@ -30,6 +30,9 @@
+ #include <errno.h>
+ #include <time.h>
+ 
++#include <X11/Xresource.h>
++#include <X11/Xatom.h>
++
+ #include <glib.h>
+ #include <glib/gi18n.h>
+ #include <gdk/gdk.h>
+@@ -399,120 +402,79 @@ xft_settings_set_xsettings (GnomeXSettingsManager *manager,
+         gnome_settings_profile_end (NULL);
+ }
+ 
+-static gboolean
+-write_all (int         fd,
+-           const char *buf,
+-           gsize       to_write)
++static Bool
++xrm_db_callback (XrmDatabase *database, XrmBindingList bindings, 
++        XrmQuarkList quarks, XrmRepresentation *type, XrmValue *value,
++        XPointer closure)
+ {
+-        while (to_write > 0) {
+-                gssize count = write (fd, buf, to_write);
+-                if (count < 0) {
+-                        if (errno != EINTR)
+-                                return FALSE;
+-                } else {
+-                        to_write -= count;
+-                        buf += count;
++        GString *s = (GString*) closure;
++        int i;
++        XrmQuark *q;
++
++        for (i = 0, q = quarks; *q; q++, i++) {
++                switch (bindings[i]) {
++                    case XrmBindTightly:
++                        if (i != 0)
++                            g_string_append_c (s, '.');
++                        break;
++                    case XrmBindLoosely:
++                        g_string_append_c (s, '*');
++                        break;
+                 }
++                g_string_append (s, XrmQuarkToString (*q));
+         }
+ 
+-        return TRUE;
+-}
+-
+-static void
+-child_watch_cb (GPid     pid,
+-                int      status,
+-                gpointer user_data)
+-{
+-        char *command = user_data;
+-
+-        gnome_settings_profile_end ("%s", command);
+-        if (!WIFEXITED (status) || WEXITSTATUS (status)) {
+-                g_warning ("Command %s failed", command);
+-        }
+-}
+-
+-static void
+-spawn_with_input (const char *command,
+-                  const char *input)
+-{
+-        char   **argv;
+-        int      child_pid;
+-        int      inpipe;
+-        GError  *error;
+-        gboolean res;
+-
+-        argv = NULL;
+-        res = g_shell_parse_argv (command, NULL, &argv, NULL);
+-        if (! res) {
+-                g_warning ("Unable to parse command: %s", command);
+-                return;
+-        }
+-
+-        gnome_settings_profile_start ("%s", command);
+-        error = NULL;
+-        res = g_spawn_async_with_pipes (NULL,
+-                                        argv,
+-                                        NULL,
+-                                        G_SPAWN_SEARCH_PATH | G_SPAWN_DO_NOT_REAP_CHILD,
+-                                        NULL,
+-                                        NULL,
+-                                        &child_pid,
+-                                        &inpipe,
+-                                        NULL,
+-                                        NULL,
+-                                        &error);
+-        g_strfreev (argv);
+-
+-        if (! res) {
+-                g_warning ("Could not execute %s: %s", command, error->message);
+-                g_error_free (error);
+-
+-                return;
+-        }
+-
+-        if (input != NULL) {
+-                if (! write_all (inpipe, input, strlen (input))) {
+-                        g_warning ("Could not write input to %s", command);
+-                }
+-
+-                close (inpipe);
+-        }
++        g_string_append (s, ":\t");
++        g_string_append (s, value->addr);
++        g_string_append_c (s, '\n');
+ 
+-        g_child_watch_add (child_pid, (GChildWatchFunc) child_watch_cb, (gpointer)command);
++        return False;
+ }
+ 
+ static void
+ xft_settings_set_xresources (GnomeXftSettings *settings)
+ {
+-        const char *command;
+-        GString    *add_string;
+-        char        dpibuf[G_ASCII_DTOSTR_BUF_SIZE];
++        char dpibuf[G_ASCII_DTOSTR_BUF_SIZE];
++        XrmDatabase db;
++        XrmQuark null_quark[1] = { NULLQUARK };
++        XTextProperty prop;
++        GString *s;
++        const char* resmgr_prop = XResourceManagerString (GDK_DISPLAY());
+ 
+         gnome_settings_profile_start (NULL);
+ 
+-        command = "xrdb -nocpp -merge";
+-
+-        add_string = g_string_new (NULL);
++        if (resmgr_prop != NULL) {
++                g_debug ("RESOURCE_MANAGER xprop already exists, opening");
++                db = XrmGetStringDatabase (resmgr_prop);
++        } else {
++                g_debug ("RESOURCE_MANAGER xprop does not exists, creating");
++                /* property does not exist; so we'll create it from an empty DB */
++                db = NULL;
++        }
+ 
+-        g_string_append_printf (add_string,
+-                                "Xft.dpi: %s\n",
++        /* write the properties into the DB */
++        XrmPutStringResource (&db, "Xft.dpi", 
+                                 g_ascii_dtostr (dpibuf, sizeof (dpibuf), (double) settings->dpi / 1024.0));
+-        g_string_append_printf (add_string,
+-                                "Xft.antialias: %d\n",
+-                                settings->antialias);
+-        g_string_append_printf (add_string,
+-                                "Xft.hinting: %d\n",
+-                                settings->hinting);
+-        g_string_append_printf (add_string,
+-                                "Xft.hintstyle: %s\n",
+-                                settings->hintstyle);
+-        g_string_append_printf (add_string,
+-                                "Xft.rgba: %s\n",
+-                                settings->rgba);
+-
+-        spawn_with_input (command, add_string->str);
+-
+-        g_string_free (add_string, TRUE);
++        XrmPutStringResource (&db, "Xft.antialias", 
++                                settings->antialias ? "1" : "0");
++        XrmPutStringResource (&db, "Xft.hinting", 
++                                settings->hinting ? "1" : "0");
++        XrmPutStringResource (&db, "Xft.hinting", settings->hintstyle);
++        XrmPutStringResource (&db, "Xft.rgba", settings->rgba);
++
++        /* write back the DB into the X property */
++        s = g_string_new (NULL);
++        XrmEnumerateDatabase(db, null_quark, null_quark,
++                XrmEnumAllLevels, xrm_db_callback, (XPointer)s);
++
++        prop.value = (unsigned char*) s->str;
++        prop.nitems = s->len;
++        prop.encoding = XA_STRING;
++        prop.format = 8;
++
++        /* Set the new X property */
++        XSetTextProperty (GDK_DISPLAY(), RootWindow (GDK_DISPLAY(), 0), &prop, XA_RESOURCE_MANAGER);
++        XSync (GDK_DISPLAY(), False);
+ 
+         gnome_settings_profile_end (NULL);
+ }
+-- 
+1.6.5
+
