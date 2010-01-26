@@ -1,3 +1,13 @@
+gnome-settings-daemon (2.29.6-0ubuntu1) lucid; urgency=low
+
+  * New upstream version:
+    - Don't allow left-handed setting for single-button touchpads 
+    - Don't die on X servers without XKB
+  * debian/patches/90_autoreconf.patch:
+    - new version update
+    
+ -- Sebastien Bacher <seb128@ubuntu.com>  Tue, 26 Jan 2010 10:22:02 +0100
+
 gnome-settings-daemon (2.29.5-0ubuntu2) lucid; urgency=low
 
   * Add 04_dont_call_xrdb.patch: Use XLib calls to set the RESOURCE_MANAGER
