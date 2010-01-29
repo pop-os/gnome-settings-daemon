@@ -3,6 +3,7 @@
 02_missing_libs.patch
 03_maintainer_mode.patch
 04_dont_call_xrdb.patch
+05_disable_corner_tapping.patch
 16_use_synchronous_notifications.patch
 30_pkgconfig-path.patch
 40_xres_lcddefault.patch

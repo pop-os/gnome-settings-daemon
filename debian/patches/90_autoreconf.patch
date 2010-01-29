@@ -1,6 +1,7 @@
-diff -Nur gnome-settings-daemon-2.29.6/aclocal.m4 gnome-settings-daemon-2.29.6.ubuntu/aclocal.m4
---- gnome-settings-daemon-2.29.6/aclocal.m4	2010-01-26 09:40:16.000000000 +0100
-+++ gnome-settings-daemon-2.29.6.ubuntu/aclocal.m4	2010-01-26 11:20:15.000000000 +0100
+Index: gnome-settings-daemon-2.29.6/aclocal.m4
+===================================================================
+--- gnome-settings-daemon-2.29.6.orig/aclocal.m4	2010-01-26 09:40:16.000000000 +0100
++++ gnome-settings-daemon-2.29.6/aclocal.m4	2010-01-29 11:28:57.000000000 +0100
 @@ -13,2054 +13,2726 @@
  
  m4_ifndef([AC_AUTOCONF_VERSION],
@@ -8842,9 +8843,10 @@ diff -Nur gnome-settings-daemon-2.29.6/aclocal.m4 gnome-settings-daemon-2.29.6.u
 +]) # _AM_PROG_TAR
  
  m4_include([acinclude.m4])
-diff -Nur gnome-settings-daemon-2.29.6/configure gnome-settings-daemon-2.29.6.ubuntu/configure
---- gnome-settings-daemon-2.29.6/configure	2010-01-26 09:40:17.000000000 +0100
-+++ gnome-settings-daemon-2.29.6.ubuntu/configure	2010-01-26 11:20:19.000000000 +0100
+Index: gnome-settings-daemon-2.29.6/configure
+===================================================================
+--- gnome-settings-daemon-2.29.6.orig/configure	2010-01-26 09:40:17.000000000 +0100
++++ gnome-settings-daemon-2.29.6/configure	2010-01-29 11:29:00.000000000 +0100
 @@ -1,12 +1,14 @@
  #! /bin/sh
  # Guess values for system-dependent variables and create Makefiles.
@@ -9636,9 +9638,10 @@ diff -Nur gnome-settings-daemon-2.29.6/configure gnome-settings-daemon-2.29.6.ub
  t more2
  s/["\\]/\\&/g; s/^/"/; s/$/"/
  p
-diff -Nur gnome-settings-daemon-2.29.6/data/Makefile.in gnome-settings-daemon-2.29.6.ubuntu/data/Makefile.in
---- gnome-settings-daemon-2.29.6/data/Makefile.in	2010-01-26 09:40:18.000000000 +0100
-+++ gnome-settings-daemon-2.29.6.ubuntu/data/Makefile.in	2010-01-26 11:20:20.000000000 +0100
+Index: gnome-settings-daemon-2.29.6/data/Makefile.in
+===================================================================
+--- gnome-settings-daemon-2.29.6.orig/data/Makefile.in	2010-01-26 09:40:18.000000000 +0100
++++ gnome-settings-daemon-2.29.6/data/Makefile.in	2010-01-29 11:29:01.000000000 +0100
 @@ -150,6 +150,7 @@
  LIPO = @LIPO@
  LN_S = @LN_S@
@@ -9668,9 +9671,10 @@ diff -Nur gnome-settings-daemon-2.29.6/data/Makefile.in gnome-settings-daemon-2.
  	cd $(top_builddir) && $(MAKE) $(AM_MAKEFLAGS) am--refresh
  $(am__aclocal_m4_deps):
  gnome-settings-daemon.desktop.in: $(top_builddir)/config.status $(srcdir)/gnome-settings-daemon.desktop.in.in
-diff -Nur gnome-settings-daemon-2.29.6/gnome-settings-daemon/Makefile.in gnome-settings-daemon-2.29.6.ubuntu/gnome-settings-daemon/Makefile.in
---- gnome-settings-daemon-2.29.6/gnome-settings-daemon/Makefile.in	2010-01-26 09:40:18.000000000 +0100
-+++ gnome-settings-daemon-2.29.6.ubuntu/gnome-settings-daemon/Makefile.in	2010-01-26 11:20:20.000000000 +0100
+Index: gnome-settings-daemon-2.29.6/gnome-settings-daemon/Makefile.in
+===================================================================
+--- gnome-settings-daemon-2.29.6.orig/gnome-settings-daemon/Makefile.in	2010-01-26 09:40:18.000000000 +0100
++++ gnome-settings-daemon-2.29.6/gnome-settings-daemon/Makefile.in	2010-01-29 11:29:01.000000000 +0100
 @@ -189,6 +189,7 @@
  LIPO = @LIPO@
  LN_S = @LN_S@
@@ -9700,9 +9704,10 @@ diff -Nur gnome-settings-daemon-2.29.6/gnome-settings-daemon/Makefile.in gnome-s
  	cd $(top_builddir) && $(MAKE) $(AM_MAKEFLAGS) am--refresh
  $(am__aclocal_m4_deps):
  
-diff -Nur gnome-settings-daemon-2.29.6/ltmain.sh gnome-settings-daemon-2.29.6.ubuntu/ltmain.sh
---- gnome-settings-daemon-2.29.6/ltmain.sh	2010-01-26 09:40:12.000000000 +0100
-+++ gnome-settings-daemon-2.29.6.ubuntu/ltmain.sh	2010-01-26 11:20:16.000000000 +0100
+Index: gnome-settings-daemon-2.29.6/ltmain.sh
+===================================================================
+--- gnome-settings-daemon-2.29.6.orig/ltmain.sh	2010-01-26 09:40:12.000000000 +0100
++++ gnome-settings-daemon-2.29.6/ltmain.sh	2010-01-29 11:28:50.000000000 +0100
 @@ -1,6 +1,6 @@
  # Generated from ltmain.m4sh.
  
@@ -9732,9 +9737,10 @@ diff -Nur gnome-settings-daemon-2.29.6/ltmain.sh gnome-settings-daemon-2.29.6.ub
  
  # Be Bourne compatible
  if test -n "${ZSH_VERSION+set}" && (emulate sh) >/dev/null 2>&1; then
-diff -Nur gnome-settings-daemon-2.29.6/Makefile.in gnome-settings-daemon-2.29.6.ubuntu/Makefile.in
---- gnome-settings-daemon-2.29.6/Makefile.in	2010-01-26 09:40:20.000000000 +0100
-+++ gnome-settings-daemon-2.29.6.ubuntu/Makefile.in	2010-01-26 11:20:21.000000000 +0100
+Index: gnome-settings-daemon-2.29.6/Makefile.in
+===================================================================
+--- gnome-settings-daemon-2.29.6.orig/Makefile.in	2010-01-26 09:40:20.000000000 +0100
++++ gnome-settings-daemon-2.29.6/Makefile.in	2010-01-29 11:29:03.000000000 +0100
 @@ -175,6 +175,7 @@
  LIPO = @LIPO@
  LN_S = @LN_S@
@@ -9773,9 +9779,10 @@ diff -Nur gnome-settings-daemon-2.29.6/Makefile.in gnome-settings-daemon-2.29.6.
  	($(am__cd) $(top_srcdir) && $(AUTOHEADER))
  	rm -f stamp-h1
  	touch $@
-diff -Nur gnome-settings-daemon-2.29.6/plugins/a11y-keyboard/Makefile.in gnome-settings-daemon-2.29.6.ubuntu/plugins/a11y-keyboard/Makefile.in
---- gnome-settings-daemon-2.29.6/plugins/a11y-keyboard/Makefile.in	2010-01-26 09:40:18.000000000 +0100
-+++ gnome-settings-daemon-2.29.6.ubuntu/plugins/a11y-keyboard/Makefile.in	2010-01-26 11:20:20.000000000 +0100
+Index: gnome-settings-daemon-2.29.6/plugins/a11y-keyboard/Makefile.in
+===================================================================
+--- gnome-settings-daemon-2.29.6.orig/plugins/a11y-keyboard/Makefile.in	2010-01-26 09:40:18.000000000 +0100
++++ gnome-settings-daemon-2.29.6/plugins/a11y-keyboard/Makefile.in	2010-01-29 11:29:02.000000000 +0100
 @@ -194,6 +194,7 @@
  LIPO = @LIPO@
  LN_S = @LN_S@
@@ -9805,9 +9812,10 @@ diff -Nur gnome-settings-daemon-2.29.6/plugins/a11y-keyboard/Makefile.in gnome-s
  	cd $(top_builddir) && $(MAKE) $(AM_MAKEFLAGS) am--refresh
  $(am__aclocal_m4_deps):
  install-pluginLTLIBRARIES: $(plugin_LTLIBRARIES)
-diff -Nur gnome-settings-daemon-2.29.6/plugins/background/Makefile.in gnome-settings-daemon-2.29.6.ubuntu/plugins/background/Makefile.in
---- gnome-settings-daemon-2.29.6/plugins/background/Makefile.in	2010-01-26 09:40:18.000000000 +0100
-+++ gnome-settings-daemon-2.29.6.ubuntu/plugins/background/Makefile.in	2010-01-26 11:20:20.000000000 +0100
+Index: gnome-settings-daemon-2.29.6/plugins/background/Makefile.in
+===================================================================
+--- gnome-settings-daemon-2.29.6.orig/plugins/background/Makefile.in	2010-01-26 09:40:18.000000000 +0100
++++ gnome-settings-daemon-2.29.6/plugins/background/Makefile.in	2010-01-29 11:29:02.000000000 +0100
 @@ -186,6 +186,7 @@
  LIPO = @LIPO@
  LN_S = @LN_S@
@@ -9837,9 +9845,10 @@ diff -Nur gnome-settings-daemon-2.29.6/plugins/background/Makefile.in gnome-sett
  	cd $(top_builddir) && $(MAKE) $(AM_MAKEFLAGS) am--refresh
  $(am__aclocal_m4_deps):
  install-pluginLTLIBRARIES: $(plugin_LTLIBRARIES)
-diff -Nur gnome-settings-daemon-2.29.6/plugins/clipboard/Makefile.in gnome-settings-daemon-2.29.6.ubuntu/plugins/clipboard/Makefile.in
---- gnome-settings-daemon-2.29.6/plugins/clipboard/Makefile.in	2010-01-26 09:40:18.000000000 +0100
-+++ gnome-settings-daemon-2.29.6.ubuntu/plugins/clipboard/Makefile.in	2010-01-26 11:20:20.000000000 +0100
+Index: gnome-settings-daemon-2.29.6/plugins/clipboard/Makefile.in
+===================================================================
+--- gnome-settings-daemon-2.29.6.orig/plugins/clipboard/Makefile.in	2010-01-26 09:40:18.000000000 +0100
++++ gnome-settings-daemon-2.29.6/plugins/clipboard/Makefile.in	2010-01-29 11:29:02.000000000 +0100
 @@ -172,6 +172,7 @@
  LIPO = @LIPO@
  LN_S = @LN_S@
@@ -9869,9 +9878,10 @@ diff -Nur gnome-settings-daemon-2.29.6/plugins/clipboard/Makefile.in gnome-setti
  	cd $(top_builddir) && $(MAKE) $(AM_MAKEFLAGS) am--refresh
  $(am__aclocal_m4_deps):
  install-pluginLTLIBRARIES: $(plugin_LTLIBRARIES)
-diff -Nur gnome-settings-daemon-2.29.6/plugins/common/Makefile.in gnome-settings-daemon-2.29.6.ubuntu/plugins/common/Makefile.in
---- gnome-settings-daemon-2.29.6/plugins/common/Makefile.in	2010-01-26 09:40:18.000000000 +0100
-+++ gnome-settings-daemon-2.29.6.ubuntu/plugins/common/Makefile.in	2010-01-26 11:20:20.000000000 +0100
+Index: gnome-settings-daemon-2.29.6/plugins/common/Makefile.in
+===================================================================
+--- gnome-settings-daemon-2.29.6.orig/plugins/common/Makefile.in	2010-01-26 09:40:18.000000000 +0100
++++ gnome-settings-daemon-2.29.6/plugins/common/Makefile.in	2010-01-29 11:29:02.000000000 +0100
 @@ -49,7 +49,8 @@
  am__DEPENDENCIES_1 =
  libcommon_la_DEPENDENCIES = $(am__DEPENDENCIES_1)
@@ -9954,9 +9964,10 @@ diff -Nur gnome-settings-daemon-2.29.6/plugins/common/Makefile.in gnome-settings
  mostlyclean-libtool:
  	-rm -f *.lo
  
-diff -Nur gnome-settings-daemon-2.29.6/plugins/dummy/Makefile.in gnome-settings-daemon-2.29.6.ubuntu/plugins/dummy/Makefile.in
---- gnome-settings-daemon-2.29.6/plugins/dummy/Makefile.in	2010-01-26 09:40:18.000000000 +0100
-+++ gnome-settings-daemon-2.29.6.ubuntu/plugins/dummy/Makefile.in	2010-01-26 11:20:20.000000000 +0100
+Index: gnome-settings-daemon-2.29.6/plugins/dummy/Makefile.in
+===================================================================
+--- gnome-settings-daemon-2.29.6.orig/plugins/dummy/Makefile.in	2010-01-26 09:40:18.000000000 +0100
++++ gnome-settings-daemon-2.29.6/plugins/dummy/Makefile.in	2010-01-29 11:29:02.000000000 +0100
 @@ -168,6 +168,7 @@
  LIPO = @LIPO@
  LN_S = @LN_S@
@@ -9986,9 +9997,10 @@ diff -Nur gnome-settings-daemon-2.29.6/plugins/dummy/Makefile.in gnome-settings-
  	cd $(top_builddir) && $(MAKE) $(AM_MAKEFLAGS) am--refresh
  $(am__aclocal_m4_deps):
  
-diff -Nur gnome-settings-daemon-2.29.6/plugins/font/Makefile.in gnome-settings-daemon-2.29.6.ubuntu/plugins/font/Makefile.in
---- gnome-settings-daemon-2.29.6/plugins/font/Makefile.in	2010-01-26 09:40:18.000000000 +0100
-+++ gnome-settings-daemon-2.29.6.ubuntu/plugins/font/Makefile.in	2010-01-26 11:20:20.000000000 +0100
+Index: gnome-settings-daemon-2.29.6/plugins/font/Makefile.in
+===================================================================
+--- gnome-settings-daemon-2.29.6.orig/plugins/font/Makefile.in	2010-01-26 09:40:18.000000000 +0100
++++ gnome-settings-daemon-2.29.6/plugins/font/Makefile.in	2010-01-29 11:29:02.000000000 +0100
 @@ -170,6 +170,7 @@
  LIPO = @LIPO@
  LN_S = @LN_S@
@@ -10018,9 +10030,10 @@ diff -Nur gnome-settings-daemon-2.29.6/plugins/font/Makefile.in gnome-settings-d
  	cd $(top_builddir) && $(MAKE) $(AM_MAKEFLAGS) am--refresh
  $(am__aclocal_m4_deps):
  install-pluginLTLIBRARIES: $(plugin_LTLIBRARIES)
-diff -Nur gnome-settings-daemon-2.29.6/plugins/housekeeping/Makefile.in gnome-settings-daemon-2.29.6.ubuntu/plugins/housekeeping/Makefile.in
---- gnome-settings-daemon-2.29.6/plugins/housekeeping/Makefile.in	2010-01-26 09:40:19.000000000 +0100
-+++ gnome-settings-daemon-2.29.6.ubuntu/plugins/housekeeping/Makefile.in	2010-01-26 11:20:20.000000000 +0100
+Index: gnome-settings-daemon-2.29.6/plugins/housekeeping/Makefile.in
+===================================================================
+--- gnome-settings-daemon-2.29.6.orig/plugins/housekeeping/Makefile.in	2010-01-26 09:40:19.000000000 +0100
++++ gnome-settings-daemon-2.29.6/plugins/housekeeping/Makefile.in	2010-01-29 11:29:02.000000000 +0100
 @@ -173,6 +173,7 @@
  LIPO = @LIPO@
  LN_S = @LN_S@
@@ -10050,9 +10063,10 @@ diff -Nur gnome-settings-daemon-2.29.6/plugins/housekeeping/Makefile.in gnome-se
  	cd $(top_builddir) && $(MAKE) $(AM_MAKEFLAGS) am--refresh
  $(am__aclocal_m4_deps):
  install-pluginLTLIBRARIES: $(plugin_LTLIBRARIES)
-diff -Nur gnome-settings-daemon-2.29.6/plugins/keybindings/Makefile.in gnome-settings-daemon-2.29.6.ubuntu/plugins/keybindings/Makefile.in
---- gnome-settings-daemon-2.29.6/plugins/keybindings/Makefile.in	2010-01-26 09:40:19.000000000 +0100
-+++ gnome-settings-daemon-2.29.6.ubuntu/plugins/keybindings/Makefile.in	2010-01-26 11:20:20.000000000 +0100
+Index: gnome-settings-daemon-2.29.6/plugins/keybindings/Makefile.in
+===================================================================
+--- gnome-settings-daemon-2.29.6.orig/plugins/keybindings/Makefile.in	2010-01-26 09:40:19.000000000 +0100
++++ gnome-settings-daemon-2.29.6/plugins/keybindings/Makefile.in	2010-01-29 11:29:02.000000000 +0100
 @@ -173,6 +173,7 @@
  LIPO = @LIPO@
  LN_S = @LN_S@
@@ -10082,9 +10096,10 @@ diff -Nur gnome-settings-daemon-2.29.6/plugins/keybindings/Makefile.in gnome-set
  	cd $(top_builddir) && $(MAKE) $(AM_MAKEFLAGS) am--refresh
  $(am__aclocal_m4_deps):
  install-pluginLTLIBRARIES: $(plugin_LTLIBRARIES)
-diff -Nur gnome-settings-daemon-2.29.6/plugins/keyboard/Makefile.in gnome-settings-daemon-2.29.6.ubuntu/plugins/keyboard/Makefile.in
---- gnome-settings-daemon-2.29.6/plugins/keyboard/Makefile.in	2010-01-26 09:40:19.000000000 +0100
-+++ gnome-settings-daemon-2.29.6.ubuntu/plugins/keyboard/Makefile.in	2010-01-26 11:20:21.000000000 +0100
+Index: gnome-settings-daemon-2.29.6/plugins/keyboard/Makefile.in
+===================================================================
+--- gnome-settings-daemon-2.29.6.orig/plugins/keyboard/Makefile.in	2010-01-26 09:40:19.000000000 +0100
++++ gnome-settings-daemon-2.29.6/plugins/keyboard/Makefile.in	2010-01-29 11:29:02.000000000 +0100
 @@ -175,6 +175,7 @@
  LIPO = @LIPO@
  LN_S = @LN_S@
@@ -10114,9 +10129,10 @@ diff -Nur gnome-settings-daemon-2.29.6/plugins/keyboard/Makefile.in gnome-settin
  	cd $(top_builddir) && $(MAKE) $(AM_MAKEFLAGS) am--refresh
  $(am__aclocal_m4_deps):
  install-pluginLTLIBRARIES: $(plugin_LTLIBRARIES)
-diff -Nur gnome-settings-daemon-2.29.6/plugins/Makefile.in gnome-settings-daemon-2.29.6.ubuntu/plugins/Makefile.in
---- gnome-settings-daemon-2.29.6/plugins/Makefile.in	2010-01-26 09:40:18.000000000 +0100
-+++ gnome-settings-daemon-2.29.6.ubuntu/plugins/Makefile.in	2010-01-26 11:20:20.000000000 +0100
+Index: gnome-settings-daemon-2.29.6/plugins/Makefile.in
+===================================================================
+--- gnome-settings-daemon-2.29.6.orig/plugins/Makefile.in	2010-01-26 09:40:18.000000000 +0100
++++ gnome-settings-daemon-2.29.6/plugins/Makefile.in	2010-01-29 11:29:01.000000000 +0100
 @@ -159,6 +159,7 @@
  LIPO = @LIPO@
  LN_S = @LN_S@
@@ -10146,9 +10162,10 @@ diff -Nur gnome-settings-daemon-2.29.6/plugins/Makefile.in gnome-settings-daemon
  	cd $(top_builddir) && $(MAKE) $(AM_MAKEFLAGS) am--refresh
  $(am__aclocal_m4_deps):
  
-diff -Nur gnome-settings-daemon-2.29.6/plugins/media-keys/cut-n-paste/Makefile.in gnome-settings-daemon-2.29.6.ubuntu/plugins/media-keys/cut-n-paste/Makefile.in
---- gnome-settings-daemon-2.29.6/plugins/media-keys/cut-n-paste/Makefile.in	2010-01-26 09:40:19.000000000 +0100
-+++ gnome-settings-daemon-2.29.6.ubuntu/plugins/media-keys/cut-n-paste/Makefile.in	2010-01-26 11:20:21.000000000 +0100
+Index: gnome-settings-daemon-2.29.6/plugins/media-keys/cut-n-paste/Makefile.in
+===================================================================
+--- gnome-settings-daemon-2.29.6.orig/plugins/media-keys/cut-n-paste/Makefile.in	2010-01-26 09:40:19.000000000 +0100
++++ gnome-settings-daemon-2.29.6/plugins/media-keys/cut-n-paste/Makefile.in	2010-01-29 11:29:02.000000000 +0100
 @@ -144,6 +144,7 @@
  LIPO = @LIPO@
  LN_S = @LN_S@
@@ -10178,10 +10195,19 @@ diff -Nur gnome-settings-daemon-2.29.6/plugins/media-keys/cut-n-paste/Makefile.i
  	cd $(top_builddir) && $(MAKE) $(AM_MAKEFLAGS) am--refresh
  $(am__aclocal_m4_deps):
  
-diff -Nur gnome-settings-daemon-2.29.6/plugins/media-keys/Makefile.in gnome-settings-daemon-2.29.6.ubuntu/plugins/media-keys/Makefile.in
---- gnome-settings-daemon-2.29.6/plugins/media-keys/Makefile.in	2010-01-26 09:40:19.000000000 +0100
-+++ gnome-settings-daemon-2.29.6.ubuntu/plugins/media-keys/Makefile.in	2010-01-26 11:20:21.000000000 +0100
-@@ -86,8 +86,9 @@
+Index: gnome-settings-daemon-2.29.6/plugins/media-keys/Makefile.in
+===================================================================
+--- gnome-settings-daemon-2.29.6.orig/plugins/media-keys/Makefile.in	2010-01-26 09:40:19.000000000 +0100
++++ gnome-settings-daemon-2.29.6/plugins/media-keys/Makefile.in	2010-01-29 11:29:02.000000000 +0100
+@@ -80,14 +80,16 @@
+ libmedia_keys_la_DEPENDENCIES =  \
+ 	$(top_builddir)/plugins/common/libcommon.la \
+ 	$(top_builddir)/plugins/media-keys/cut-n-paste/libgvc.la \
+-	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1)
++	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
++	$(am__DEPENDENCIES_1)
+ am__objects_1 =
+ am__objects_2 = libmedia_keys_la-gsd-marshal.lo $(am__objects_1)
  am_libmedia_keys_la_OBJECTS =  \
  	libmedia_keys_la-gsd-media-keys-plugin.lo \
  	libmedia_keys_la-gsd-media-keys-manager.lo \
@@ -10193,7 +10219,7 @@ diff -Nur gnome-settings-daemon-2.29.6/plugins/media-keys/Makefile.in gnome-sett
  libmedia_keys_la_OBJECTS = $(am_libmedia_keys_la_OBJECTS)
  libmedia_keys_la_LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) \
  	$(LIBTOOLFLAGS) --mode=link $(CCLD) $(libmedia_keys_la_CFLAGS) \
-@@ -252,6 +253,7 @@
+@@ -252,6 +254,7 @@
  LIPO = @LIPO@
  LN_S = @LN_S@
  LTLIBOBJS = @LTLIBOBJS@
@@ -10201,7 +10227,7 @@ diff -Nur gnome-settings-daemon-2.29.6/plugins/media-keys/Makefile.in gnome-sett
  MAKEINFO = @MAKEINFO@
  MKDIR_P = @MKDIR_P@
  MKINSTALLDIRS = @MKINSTALLDIRS@
-@@ -370,6 +372,8 @@
+@@ -370,6 +373,8 @@
  	gsd-media-keys-manager.c	\
  	gsd-media-keys-window.h		\
  	gsd-media-keys-window.c		\
@@ -10210,7 +10236,7 @@ diff -Nur gnome-settings-daemon-2.29.6/plugins/media-keys/Makefile.in gnome-sett
  	acme.h				\
  	$(BUILT_SOURCES)		\
  	$(NULL)
-@@ -385,9 +389,11 @@
+@@ -385,6 +390,7 @@
  
  libmedia_keys_la_CFLAGS = \
  	$(SETTINGS_PLUGIN_CFLAGS)	\
@@ -10218,11 +10244,15 @@ diff -Nur gnome-settings-daemon-2.29.6/plugins/media-keys/Makefile.in gnome-sett
  	$(AM_CFLAGS)
  
  libmedia_keys_la_LDFLAGS = \
-+	$(LIBNOTIFY_LDFLAGS)		\
- 	$(GSD_PLUGIN_LDFLAGS)
+@@ -394,6 +400,7 @@
+ 	$(top_builddir)/plugins/common/libcommon.la			\
+ 	$(top_builddir)/plugins/media-keys/cut-n-paste/libgvc.la	\
+ 	$(SETTINGS_PLUGIN_LIBS)						\
++	$(LIBNOTIFY_LIBS)		\
+ 	$(XF86MISC_LIBS)
  
- libmedia_keys_la_LIBADD = \
-@@ -479,7 +485,7 @@
+ plugin_in_files = \
+@@ -479,7 +486,7 @@
  
  .SUFFIXES:
  .SUFFIXES: .c .lo .o .obj
@@ -10231,7 +10261,7 @@ diff -Nur gnome-settings-daemon-2.29.6/plugins/media-keys/Makefile.in gnome-sett
  	@for dep in $?; do \
  	  case '$(am__configure_deps)' in \
  	    *$$dep*) \
-@@ -504,9 +510,9 @@
+@@ -504,9 +511,9 @@
  $(top_builddir)/config.status: $(top_srcdir)/configure $(CONFIG_STATUS_DEPENDENCIES)
  	cd $(top_builddir) && $(MAKE) $(AM_MAKEFLAGS) am--refresh
  
@@ -10243,7 +10273,7 @@ diff -Nur gnome-settings-daemon-2.29.6/plugins/media-keys/Makefile.in gnome-sett
  	cd $(top_builddir) && $(MAKE) $(AM_MAKEFLAGS) am--refresh
  $(am__aclocal_m4_deps):
  install-pluginLTLIBRARIES: $(plugin_LTLIBRARIES)
-@@ -566,6 +572,7 @@
+@@ -566,6 +573,7 @@
  
  @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libmedia_keys_la-gsd-marshal.Plo@am__quote@
  @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libmedia_keys_la-gsd-media-keys-manager.Plo@am__quote@
@@ -10251,7 +10281,7 @@ diff -Nur gnome-settings-daemon-2.29.6/plugins/media-keys/Makefile.in gnome-sett
  @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libmedia_keys_la-gsd-media-keys-plugin.Plo@am__quote@
  @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libmedia_keys_la-gsd-media-keys-window.Plo@am__quote@
  @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/test_media_keys-gsd-marshal.Po@am__quote@
-@@ -617,6 +624,13 @@
+@@ -617,6 +625,13 @@
  @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
  @am__fastdepCC_FALSE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmedia_keys_la_CPPFLAGS) $(CPPFLAGS) $(libmedia_keys_la_CFLAGS) $(CFLAGS) -c -o libmedia_keys_la-gsd-media-keys-window.lo `test -f 'gsd-media-keys-window.c' || echo '$(srcdir)/'`gsd-media-keys-window.c
  
@@ -10265,9 +10295,10 @@ diff -Nur gnome-settings-daemon-2.29.6/plugins/media-keys/Makefile.in gnome-sett
  libmedia_keys_la-gsd-marshal.lo: gsd-marshal.c
  @am__fastdepCC_TRUE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmedia_keys_la_CPPFLAGS) $(CPPFLAGS) $(libmedia_keys_la_CFLAGS) $(CFLAGS) -MT libmedia_keys_la-gsd-marshal.lo -MD -MP -MF $(DEPDIR)/libmedia_keys_la-gsd-marshal.Tpo -c -o libmedia_keys_la-gsd-marshal.lo `test -f 'gsd-marshal.c' || echo '$(srcdir)/'`gsd-marshal.c
  @am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libmedia_keys_la-gsd-marshal.Tpo $(DEPDIR)/libmedia_keys_la-gsd-marshal.Plo
-diff -Nur gnome-settings-daemon-2.29.6/plugins/mouse/Makefile.in gnome-settings-daemon-2.29.6.ubuntu/plugins/mouse/Makefile.in
---- gnome-settings-daemon-2.29.6/plugins/mouse/Makefile.in	2010-01-26 09:40:19.000000000 +0100
-+++ gnome-settings-daemon-2.29.6.ubuntu/plugins/mouse/Makefile.in	2010-01-26 11:20:21.000000000 +0100
+Index: gnome-settings-daemon-2.29.6/plugins/mouse/Makefile.in
+===================================================================
+--- gnome-settings-daemon-2.29.6.orig/plugins/mouse/Makefile.in	2010-01-26 09:40:19.000000000 +0100
++++ gnome-settings-daemon-2.29.6/plugins/mouse/Makefile.in	2010-01-29 11:29:02.000000000 +0100
 @@ -181,6 +181,7 @@
  LIPO = @LIPO@
  LN_S = @LN_S@
@@ -10297,9 +10328,10 @@ diff -Nur gnome-settings-daemon-2.29.6/plugins/mouse/Makefile.in gnome-settings-
  	cd $(top_builddir) && $(MAKE) $(AM_MAKEFLAGS) am--refresh
  $(am__aclocal_m4_deps):
  install-pluginLTLIBRARIES: $(plugin_LTLIBRARIES)
-diff -Nur gnome-settings-daemon-2.29.6/plugins/sound/Makefile.in gnome-settings-daemon-2.29.6.ubuntu/plugins/sound/Makefile.in
---- gnome-settings-daemon-2.29.6/plugins/sound/Makefile.in	2010-01-26 09:40:19.000000000 +0100
-+++ gnome-settings-daemon-2.29.6.ubuntu/plugins/sound/Makefile.in	2010-01-26 11:20:21.000000000 +0100
+Index: gnome-settings-daemon-2.29.6/plugins/sound/Makefile.in
+===================================================================
+--- gnome-settings-daemon-2.29.6.orig/plugins/sound/Makefile.in	2010-01-26 09:40:19.000000000 +0100
++++ gnome-settings-daemon-2.29.6/plugins/sound/Makefile.in	2010-01-29 11:29:02.000000000 +0100
 @@ -168,6 +168,7 @@
  LIPO = @LIPO@
  LN_S = @LN_S@
@@ -10329,9 +10361,10 @@ diff -Nur gnome-settings-daemon-2.29.6/plugins/sound/Makefile.in gnome-settings-
  	cd $(top_builddir) && $(MAKE) $(AM_MAKEFLAGS) am--refresh
  $(am__aclocal_m4_deps):
  install-pluginLTLIBRARIES: $(plugin_LTLIBRARIES)
-diff -Nur gnome-settings-daemon-2.29.6/plugins/typing-break/Makefile.in gnome-settings-daemon-2.29.6.ubuntu/plugins/typing-break/Makefile.in
---- gnome-settings-daemon-2.29.6/plugins/typing-break/Makefile.in	2010-01-26 09:40:19.000000000 +0100
-+++ gnome-settings-daemon-2.29.6.ubuntu/plugins/typing-break/Makefile.in	2010-01-26 11:20:21.000000000 +0100
+Index: gnome-settings-daemon-2.29.6/plugins/typing-break/Makefile.in
+===================================================================
+--- gnome-settings-daemon-2.29.6.orig/plugins/typing-break/Makefile.in	2010-01-26 09:40:19.000000000 +0100
++++ gnome-settings-daemon-2.29.6/plugins/typing-break/Makefile.in	2010-01-29 11:29:03.000000000 +0100
 @@ -173,6 +173,7 @@
  LIPO = @LIPO@
  LN_S = @LN_S@
@@ -10361,9 +10394,10 @@ diff -Nur gnome-settings-daemon-2.29.6/plugins/typing-break/Makefile.in gnome-se
  	cd $(top_builddir) && $(MAKE) $(AM_MAKEFLAGS) am--refresh
  $(am__aclocal_m4_deps):
  install-pluginLTLIBRARIES: $(plugin_LTLIBRARIES)
-diff -Nur gnome-settings-daemon-2.29.6/plugins/xrandr/Makefile.in gnome-settings-daemon-2.29.6.ubuntu/plugins/xrandr/Makefile.in
---- gnome-settings-daemon-2.29.6/plugins/xrandr/Makefile.in	2010-01-26 09:40:19.000000000 +0100
-+++ gnome-settings-daemon-2.29.6.ubuntu/plugins/xrandr/Makefile.in	2010-01-26 11:20:21.000000000 +0100
+Index: gnome-settings-daemon-2.29.6/plugins/xrandr/Makefile.in
+===================================================================
+--- gnome-settings-daemon-2.29.6.orig/plugins/xrandr/Makefile.in	2010-01-26 09:40:19.000000000 +0100
++++ gnome-settings-daemon-2.29.6/plugins/xrandr/Makefile.in	2010-01-29 11:29:03.000000000 +0100
 @@ -171,6 +171,7 @@
  LIPO = @LIPO@
  LN_S = @LN_S@
@@ -10393,9 +10427,10 @@ diff -Nur gnome-settings-daemon-2.29.6/plugins/xrandr/Makefile.in gnome-settings
  	cd $(top_builddir) && $(MAKE) $(AM_MAKEFLAGS) am--refresh
  $(am__aclocal_m4_deps):
  install-pluginLTLIBRARIES: $(plugin_LTLIBRARIES)
-diff -Nur gnome-settings-daemon-2.29.6/plugins/xrdb/data/Makefile.in gnome-settings-daemon-2.29.6.ubuntu/plugins/xrdb/data/Makefile.in
---- gnome-settings-daemon-2.29.6/plugins/xrdb/data/Makefile.in	2010-01-26 09:40:20.000000000 +0100
-+++ gnome-settings-daemon-2.29.6.ubuntu/plugins/xrdb/data/Makefile.in	2010-01-26 11:20:21.000000000 +0100
+Index: gnome-settings-daemon-2.29.6/plugins/xrdb/data/Makefile.in
+===================================================================
+--- gnome-settings-daemon-2.29.6.orig/plugins/xrdb/data/Makefile.in	2010-01-26 09:40:20.000000000 +0100
++++ gnome-settings-daemon-2.29.6/plugins/xrdb/data/Makefile.in	2010-01-29 11:29:03.000000000 +0100
 @@ -143,6 +143,7 @@
  LIPO = @LIPO@
  LN_S = @LN_S@
@@ -10425,9 +10460,10 @@ diff -Nur gnome-settings-daemon-2.29.6/plugins/xrdb/data/Makefile.in gnome-setti
  	cd $(top_builddir) && $(MAKE) $(AM_MAKEFLAGS) am--refresh
  $(am__aclocal_m4_deps):
  
-diff -Nur gnome-settings-daemon-2.29.6/plugins/xrdb/Makefile.in gnome-settings-daemon-2.29.6.ubuntu/plugins/xrdb/Makefile.in
---- gnome-settings-daemon-2.29.6/plugins/xrdb/Makefile.in	2010-01-26 09:40:20.000000000 +0100
-+++ gnome-settings-daemon-2.29.6.ubuntu/plugins/xrdb/Makefile.in	2010-01-26 11:20:21.000000000 +0100
+Index: gnome-settings-daemon-2.29.6/plugins/xrdb/Makefile.in
+===================================================================
+--- gnome-settings-daemon-2.29.6.orig/plugins/xrdb/Makefile.in	2010-01-26 09:40:20.000000000 +0100
++++ gnome-settings-daemon-2.29.6/plugins/xrdb/Makefile.in	2010-01-29 11:29:03.000000000 +0100
 @@ -207,6 +207,7 @@
  LIPO = @LIPO@
  LN_S = @LN_S@
@@ -10457,9 +10493,10 @@ diff -Nur gnome-settings-daemon-2.29.6/plugins/xrdb/Makefile.in gnome-settings-d
  	cd $(top_builddir) && $(MAKE) $(AM_MAKEFLAGS) am--refresh
  $(am__aclocal_m4_deps):
  install-pluginLTLIBRARIES: $(plugin_LTLIBRARIES)
-diff -Nur gnome-settings-daemon-2.29.6/plugins/xsettings/Makefile.in gnome-settings-daemon-2.29.6.ubuntu/plugins/xsettings/Makefile.in
---- gnome-settings-daemon-2.29.6/plugins/xsettings/Makefile.in	2010-01-26 09:40:20.000000000 +0100
-+++ gnome-settings-daemon-2.29.6.ubuntu/plugins/xsettings/Makefile.in	2010-01-26 11:20:21.000000000 +0100
+Index: gnome-settings-daemon-2.29.6/plugins/xsettings/Makefile.in
+===================================================================
+--- gnome-settings-daemon-2.29.6.orig/plugins/xsettings/Makefile.in	2010-01-26 09:40:20.000000000 +0100
++++ gnome-settings-daemon-2.29.6/plugins/xsettings/Makefile.in	2010-01-29 11:29:03.000000000 +0100
 @@ -193,6 +193,7 @@
  LIPO = @LIPO@
  LN_S = @LN_S@

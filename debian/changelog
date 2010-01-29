@@ -1,3 +1,14 @@
+gnome-settings-daemon (2.29.6-0ubuntu2) lucid; urgency=low
+
+  * debian/patches/16_use_synchronous_notifications.patch,
+    debian/patches/90_autoreconf.patch:
+    - use correct ldflags variable and fix unresolved symbols issues
+  * debian/patches/05_disable_corner_tapping.patch:
+    - disable corner tapping when disabling tap to clik, thank Sebastian Keller
+      (lp: #509724)
+
+ -- Sebastien Bacher <seb128@ubuntu.com>  Fri, 29 Jan 2010 11:30:51 +0100
+
 gnome-settings-daemon (2.29.6-0ubuntu1) lucid; urgency=low
 
   * New upstream version:
