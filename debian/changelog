@@ -1,3 +1,11 @@
+gnome-settings-daemon (2.29.6-0ubuntu3) lucid; urgency=low
+
+  * debian/patches/05_disable_corner_tapping.patch:
+    - upgraded previous change to change middle click too, 
+      thank Sebastian Keller (lp: #509724)
+
+ -- Sebastien Bacher <seb128@ubuntu.com>  Tue, 02 Feb 2010 14:57:32 -0800
+
 gnome-settings-daemon (2.29.6-0ubuntu2) lucid; urgency=low
 
   * debian/patches/16_use_synchronous_notifications.patch,
