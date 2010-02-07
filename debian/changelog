@@ -1,3 +1,14 @@
+gnome-settings-daemon (2.29.6-0ubuntu4) UNRELEASED; urgency=low
+
+  * debian/patches/16_use_synchronous_notifications.patch:
+    - Create a new class for the volume notifications (makes the 
+      code more portable)
+    - Make the overshoot effects work again
+  * debian/patches/90_autoreconf.patch:
+    - Update 
+
+ -- Chris Coulson <chrisccoulson@ubuntu.com>  Sun, 07 Feb 2010 22:56:36 +0000
+
 gnome-settings-daemon (2.29.6-0ubuntu3) lucid; urgency=low
 
   * debian/patches/05_disable_corner_tapping.patch:

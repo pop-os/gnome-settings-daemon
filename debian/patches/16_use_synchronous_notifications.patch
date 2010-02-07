@@ -1,14 +1,8 @@
 Index: gnome-settings-daemon-2.29.6/plugins/common/Makefile.am
 ===================================================================
---- gnome-settings-daemon-2.29.6.orig/plugins/common/Makefile.am	2010-01-12 16:51:57.000000000 +0100
-+++ gnome-settings-daemon-2.29.6/plugins/common/Makefile.am	2010-01-29 11:28:10.000000000 +0100
-@@ -1,3 +1,5 @@
-+INCLUDES = \
-+	-DPACKAGE_NAME=\""$(PACKAGE_NAME)"\"
- 
- noinst_LTLIBRARIES = libcommon.la
- 
-@@ -7,7 +9,9 @@
+--- gnome-settings-daemon-2.29.6.orig/plugins/common/Makefile.am	2010-01-12 15:51:57.000000000 +0000
++++ gnome-settings-daemon-2.29.6/plugins/common/Makefile.am	2010-02-07 23:07:11.464106948 +0000
+@@ -7,17 +7,21 @@
  	gsd-keygrab.c		\
  	gsd-keygrab.h		\
  	gsd-osd-window.c	\
@@ -19,41 +13,106 @@ Index: gnome-settings-daemon-2.29.6/plugins/common/Makefile.am
  
  libcommon_la_CPPFLAGS = \
  	$(AM_CPPFLAGS)
+ 
+ libcommon_la_CFLAGS = \
+ 	$(SETTINGS_PLUGIN_CFLAGS)	\
++	$(LIBNOTIFY_CFLAGS)	\
+ 	$(AM_CFLAGS)
+ 
+ libcommon_la_LDFLAGS = \
+ 	$(GSD_PLUGIN_LDFLAGS)
+ 
+ libcommon_la_LIBADD  = \
+-	$(SETTINGS_PLUGIN_LIBS)
++	$(SETTINGS_PLUGIN_LIBS)		\
++	$(LIBNOTIFY_LIBS)
 Index: gnome-settings-daemon-2.29.6/plugins/common/gsd-osd-notification.c
 ===================================================================
 --- /dev/null	1970-01-01 00:00:00.000000000 +0000
-+++ gnome-settings-daemon-2.29.6/plugins/common/gsd-osd-notification.c	2010-01-29 11:28:10.000000000 +0100
-@@ -0,0 +1,144 @@
-+/* -*- Mode: C; indent-tabs-mode: nil; c-basic-offset: 8; tab-width: 8 -*-
-+ *
-+ * Copyright (C) 2009 Canonical Ltd
++++ gnome-settings-daemon-2.29.6/plugins/common/gsd-osd-notification.c	2010-02-07 23:08:58.114116800 +0000
+@@ -0,0 +1,285 @@
++/* -*- Mode: C; indent-tabs-mode: nil; c-basic-offset: 8; tab-width: 8 -*- */
++/*
++ * gsd-osd-notification.c
 + * Copyright (C) 2010 Chris Coulson <chrisccoulson@ubuntu.com>
-+ *
-+ * This program is free software; you can redistribute it and/or modify
-+ * it under the terms of the GNU General Public License as published by
-+ * the Free Software Foundation; either version 2 of the License, or
++ * Copyright (C) 2009 Canonical Ltd
++ * 
++ * gsd-osd-notification.c is free software: you can redistribute it and/or modify it
++ * under the terms of the GNU General Public License as published by the
++ * Free Software Foundation, either version 3 of the License, or
 + * (at your option) any later version.
-+ *
-+ * This program is distributed in the hope that it will be useful,
-+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+ * GNU General Public License for more details.
-+ *
-+ * You should have received a copy of the GNU General Public License
-+ * along with this program; if not, write to the Free Software
-+ * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
-+ *
++ * 
++ * gsd-osd-notification.c is distributed in the hope that it will be useful, but
++ * WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
++ * See the GNU General Public License for more details.
++ * 
++ * You should have received a copy of the GNU General Public License along
++ * with this program.  If not, see <http://www.gnu.org/licenses/>.
 + */
 +
 +#include <libnotify/notify.h>
 +#include "gsd-osd-notification.h"
 +
++struct _GsdOsdNotificationPrivate
++{
++        NotifyNotification *notification;
++        char **icon_names;
++        char *hint;
++        guint icon_array_size;
++};
++
++#define GSD_OSD_NOTIFICATION_PRIVATE(o)  (G_TYPE_INSTANCE_GET_PRIVATE ((o), GSD_TYPE_OSD_NOTIFICATION, GsdOsdNotificationPrivate))
++
++enum
++{
++	PROP_0,
++	PROP_ICON_NAMES,
++        PROP_HINT
++};
++
 +#define NOTIFY_CAP_PRIVATE_SYNCHRONOUS "x-canonical-private-synchronous"
 +#define NOTIFY_CAP_PRIVATE_ICON_ONLY "x-canonical-private-icon-only"
 +#define NOTIFY_HINT_TRUE "true"
 +
-+static gboolean
-+_synchronous_is_supported (void)
++G_DEFINE_TYPE (GsdOsdNotification, gsd_osd_notification, G_TYPE_OBJECT);
++
++static const char*
++_calculate_icon (GsdOsdNotification *notifier, guint value, gboolean muted)
++{
++        guint s;
++
++        s = (notifier->priv->icon_array_size -1) * value / 100 + 1;
++        s = MAX (s, 1);
++        s = MIN (s, notifier->priv->icon_array_size -1);
++        if (value <= 0)
++                s = 0;
++
++        return muted ? notifier->priv->icon_names[0] : notifier->priv->icon_names[s];
++}
++
++void
++gsd_osd_notification_set_icon_array (GsdOsdNotification *notifier, const char **icon_names)
++{
++        g_return_if_fail (GSD_IS_OSD_NOTIFICATION (notifier));
++
++        g_strfreev (notifier->priv->icon_names);
++        notifier->priv->icon_names = g_strdupv ((gchar **) icon_names);
++
++        notifier->priv->icon_array_size = g_strv_length ((gchar **) icon_names);
++}
++
++void
++gsd_osd_notification_set_hint (GsdOsdNotification *notifier, const char *hint)
++{
++        g_return_if_fail (GSD_IS_OSD_NOTIFICATION (notifier));
++
++        g_free (notifier->priv->hint);
++        notifier->priv->hint = g_strdup (hint);
++}
++
++gboolean
++gsd_osd_notification_is_supported (void)
 +{
 +        GList *caps;
 +        gboolean has_cap;
@@ -66,342 +125,312 @@ Index: gnome-settings-daemon-2.29.6/plugins/common/gsd-osd-notification.c
 +        return has_cap;
 +}
 +
-+GQuark
-+gsd_osd_notification_error_quark (void)
-+{
-+        return g_quark_from_static_string ("gsd-osd-notification-error-quark");
-+}
-+
 +gboolean
-+gsd_osd_notification_notify (const char *icon,
-+                             const char *hint,
-+                             GError    **error)
++gsd_osd_notification_show_icon_only (const char *icon, const char *hint)
 +{
 +        NotifyNotification *notification;
-+        GError *tmp_error = NULL;
-+        gboolean ret = FALSE;     
 +
 +        g_return_val_if_fail (icon != NULL, FALSE);
 +        g_return_val_if_fail (hint != NULL, FALSE);
 +
-+        if (!notify_is_initted ())
-+                notify_init (PACKAGE_NAME);
++        if (!gsd_osd_notification_is_supported ())
++                return FALSE;
 +
-+        if (!_synchronous_is_supported ()) {
-+                g_set_error (error, GSD_OSD_NOTIFICATION_ERROR, 
-+                             GSD_OSD_NOTIFICATION_SYNC_NOT_SUPPORTED,
-+                             "The notification server does not support the \"" \
-+                             NOTIFY_CAP_PRIVATE_SYNCHRONOUS "\" capability");
-+                goto out;
++        notification = notify_notification_new (" ", "", NULL, NULL);
++
++        if (notification != NULL) {
++                notify_notification_set_hint_string (notification, NOTIFY_CAP_PRIVATE_SYNCHRONOUS, hint);
++                notify_notification_set_hint_string (notification, NOTIFY_CAP_PRIVATE_ICON_ONLY, NOTIFY_HINT_TRUE);
++                notify_notification_update (notification, " ", "", icon);
++        } else {
++                return FALSE;
 +        }
 +
-+        notification = notify_notification_new (" ", "", icon, NULL);
-+        if (notification == NULL) {
-+                g_set_error (error, GSD_OSD_NOTIFICATION_ERROR,
-+                             GSD_OSD_NOTIFICATION_GENERIC_ERROR,
-+                             "Failed to create a NotifyNotification instance");
-+                goto out;
-+        }
-+        notify_notification_set_hint_string (notification, NOTIFY_CAP_PRIVATE_SYNCHRONOUS, hint);
-+        notify_notification_set_hint_string (notification, NOTIFY_CAP_PRIVATE_ICON_ONLY, NOTIFY_HINT_TRUE);
-+
-+        if (!notify_notification_show (notification, &tmp_error)) {
-+                g_propagate_error (error, tmp_error);
-+                goto out;
-+        }
-+
-+        ret = TRUE;
-+out:
-+        if (notification != NULL)
++        if (!notify_notification_show (notification, NULL)) {
 +                g_object_unref (notification);
++                return FALSE;
++        }
 +
-+        return ret;
++        g_object_unref (notification);
++
++        return TRUE;
 +}
 +
 +gboolean
-+gsd_osd_notification_notify_value (const char *icon,
-+                                   const char *hint,
-+                                   int         value,
-+                                   GError    **error)
++gsd_osd_notification_show_value (GsdOsdNotification *notifier, gint value, gboolean muted)
 +{
-+        NotifyNotification *notification;
-+        GError *tmp_error = NULL;
-+        gboolean ret = FALSE;
++        const char *icon;
 +
-+        g_return_val_if_fail (icon != NULL, FALSE);
-+        g_return_val_if_fail (hint != NULL, FALSE);
++        g_return_val_if_fail (GSD_IS_OSD_NOTIFICATION (notifier), FALSE);
++        g_return_val_if_fail (notifier->priv->icon_names != NULL, FALSE);
++        g_return_val_if_fail (notifier->priv->hint != NULL, FALSE);
++
++        if (!gsd_osd_notification_is_supported ())
++                return FALSE;
++
++        if (notifier->priv->notification == NULL) {
++                notifier->priv->notification = notify_notification_new (" ", "", NULL, NULL);
++                notify_notification_set_hint_string (notifier->priv->notification, NOTIFY_CAP_PRIVATE_SYNCHRONOUS, notifier->priv->hint);
++}
++        if (notifier->priv->notification != NULL) {
++                value = MIN (value, 101);
++                value = MAX (value, -1);
++                icon = _calculate_icon (notifier, value, muted);
++                notify_notification_set_hint_int32(notifier->priv->notification, "value", (muted && value > 0) ? 0 : value);
++                notify_notification_update (notifier->priv->notification, " ", "", icon);
++        } else {
++                return FALSE;
++        }
++
++        if (!notify_notification_show (notifier->priv->notification, NULL))
++                return FALSE;
++
++        return TRUE;
++}
++
++gboolean
++gsd_osd_notification_show_overshoot (GsdOsdNotification *notifier, GsdOsdNotifierOvershootType type)
++{
++        gint value;
++        gboolean muted;
++
++        g_return_val_if_fail (type == GSD_OSD_NOTIFICATION_UNDERSHOOT || type == GSD_OSD_NOTIFICATION_OVERSHOOT, FALSE);
++
++        switch (type)
++        {
++        case GSD_OSD_NOTIFICATION_UNDERSHOOT:
++                value = -1;
++                muted = TRUE;
++                break;
++        case GSD_OSD_NOTIFICATION_OVERSHOOT:
++                value = 101;
++                muted = FALSE;
++                break;
++        default:
++                g_assert_not_reached ();
++                break;
++        }
++
++        return gsd_osd_notification_show_value (notifier, value, muted);
++}
++
++GsdOsdNotification*
++gsd_osd_notification_new (const char **icon_names, const char *hint)
++{
++        return (GsdOsdNotification *) g_object_new (GSD_TYPE_OSD_NOTIFICATION,
++                                                    "icon-names", icon_names,
++                                                    "hint", hint);
++}
++
++static void
++gsd_osd_notification_init (GsdOsdNotification *object)
++{
++        object->priv = GSD_OSD_NOTIFICATION_PRIVATE (object);
 +
 +        if (!notify_is_initted ())
-+                notify_init (PACKAGE_NAME);
++                notify_init (g_get_application_name ());
 +
-+        if (!_synchronous_is_supported ()) {
-+                g_set_error (error, GSD_OSD_NOTIFICATION_ERROR, 
-+                             GSD_OSD_NOTIFICATION_SYNC_NOT_SUPPORTED,
-+                             "The notification server does not support the \"" \
-+                             NOTIFY_CAP_PRIVATE_SYNCHRONOUS "\" capability");
-+                goto out;
-+        }
++        object->priv->hint = NULL;
++        object->priv->icon_names = NULL;
++        object->priv->notification = NULL;
++}
 +
-+        notification = notify_notification_new (" ", "", icon, NULL);
-+        if (notification == NULL) {
-+                g_set_error (error, GSD_OSD_NOTIFICATION_ERROR,
-+                             GSD_OSD_NOTIFICATION_GENERIC_ERROR,
-+                             "Failed to create a NotifyNotification instance");
-+                goto out;
-+        }
++static void
++gsd_osd_notification_finalize (GObject *object)
++{
++        GsdOsdNotification *notifier = GSD_OSD_NOTIFICATION (object);
 +
-+        value = MIN (value, 101);
-+        value = MAX (value, -1);
++        g_strfreev (notifier->priv->icon_names);
++        g_free (notifier->priv->hint);
 +
-+        notify_notification_set_hint_string (notification, NOTIFY_CAP_PRIVATE_SYNCHRONOUS, hint);
-+        notify_notification_set_hint_int32(notification, "value", value);
++        if (notifier->priv->notification)
++                g_object_unref (notifier->priv->notification);
 +
-+        if (!notify_notification_show (notification, &tmp_error)) {
-+                g_propagate_error (error, tmp_error);
-+                goto out;
-+        }
++        G_OBJECT_CLASS (gsd_osd_notification_parent_class)->finalize (object);
++}
 +
-+        ret = TRUE;
-+out:
-+        if (notification != NULL)
-+                g_object_unref (notification);
++static void
++gsd_osd_notification_set_property (GObject *object, guint prop_id, const GValue *value, GParamSpec *pspec)
++{
++	g_return_if_fail (GSD_IS_OSD_NOTIFICATION (object));
++        GsdOsdNotification *notifier = GSD_OSD_NOTIFICATION (object);
 +
-+        return ret;
++	switch (prop_id)
++	{
++	case PROP_ICON_NAMES:
++		gsd_osd_notification_set_icon_array (notifier, (const char**) g_value_get_boxed (value));
++		break;
++        case PROP_HINT:
++                gsd_osd_notification_set_hint (notifier, (char**) g_value_get_string (value));
++                break;
++	default:
++		G_OBJECT_WARN_INVALID_PROPERTY_ID (object, prop_id, pspec);
++		break;
++	}
++}
++
++static void
++gsd_osd_notification_get_property (GObject *object, guint prop_id, GValue *value, GParamSpec *pspec)
++{
++	g_return_if_fail (GSD_IS_OSD_NOTIFICATION (object));
++        GsdOsdNotification *notifier = GSD_OSD_NOTIFICATION (object);
++
++	switch (prop_id)
++	{
++	case PROP_ICON_NAMES:
++		g_value_set_boxed (value, notifier->priv->icon_names);
++		break;
++        case PROP_HINT:
++                g_value_set_string (value, notifier->priv->hint);
++                break;
++	default:
++		G_OBJECT_WARN_INVALID_PROPERTY_ID (object, prop_id, pspec);
++		break;
++	}
++}
++
++static void
++gsd_osd_notification_class_init (GsdOsdNotificationClass *klass)
++{
++        GObjectClass* object_class = G_OBJECT_CLASS (klass);
++
++        object_class->finalize = gsd_osd_notification_finalize;
++	object_class->set_property = gsd_osd_notification_set_property;
++	object_class->get_property = gsd_osd_notification_get_property;
++
++	g_object_class_install_property (object_class,
++	                                 PROP_ICON_NAMES,
++	                                 g_param_spec_boxed ("icon-names",
++	                                                     "Icon name array",
++	                                                     "An array of icon names for the notification",
++	                                                     G_TYPE_STRV,
++	                                                     G_PARAM_WRITABLE | G_PARAM_CONSTRUCT));
++
++        g_object_class_install_property (object_class,
++	                                 PROP_HINT,
++	                                 g_param_spec_string ("hint",
++	                                                     "Notification hint",
++	                                                     "Hint for the notification",
++	                                                     NULL,
++	                                                     G_PARAM_WRITABLE | G_PARAM_CONSTRUCT));
++
++        g_type_class_add_private (klass, sizeof (GsdOsdNotificationPrivate));
 +}
 Index: gnome-settings-daemon-2.29.6/plugins/common/gsd-osd-notification.h
 ===================================================================
 --- /dev/null	1970-01-01 00:00:00.000000000 +0000
-+++ gnome-settings-daemon-2.29.6/plugins/common/gsd-osd-notification.h	2010-01-29 11:28:10.000000000 +0100
-@@ -0,0 +1,49 @@
-+/* -*- Mode: C; indent-tabs-mode: nil; c-basic-offset: 8; tab-width: 8 -*-
-+ *
-+ * Copyright (C) 2009 Canonical Ltd
++++ gnome-settings-daemon-2.29.6/plugins/common/gsd-osd-notification.h	2010-02-07 23:07:11.464106948 +0000
+@@ -0,0 +1,75 @@
++/* -*- Mode: C; indent-tabs-mode: nil; c-basic-offset: 8; tab-width: 8 -*- */
++/*
++ * gsd-osd-notification.c
 + * Copyright (C) 2010 Chris Coulson <chrisccoulson@ubuntu.com>
-+ *
-+ * This program is free software; you can redistribute it and/or modify
-+ * it under the terms of the GNU General Public License as published by
-+ * the Free Software Foundation; either version 2 of the License, or
++ * Copyright (C) 2009 Canonical Ltd
++ * 
++ * gsd-osd-notification.c is free software: you can redistribute it and/or modify it
++ * under the terms of the GNU General Public License as published by the
++ * Free Software Foundation, either version 3 of the License, or
 + * (at your option) any later version.
-+ *
-+ * This program is distributed in the hope that it will be useful,
-+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+ * GNU General Public License for more details.
-+ *
-+ * You should have received a copy of the GNU General Public License
-+ * along with this program; if not, write to the Free Software
-+ * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
-+ *
++ * 
++ * gsd-osd-notification.c is distributed in the hope that it will be useful, but
++ * WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
++ * See the GNU General Public License for more details.
++ * 
++ * You should have received a copy of the GNU General Public License along
++ * with this program.  If not, see <http://www.gnu.org/licenses/>.
 + */
-+ 
-+#ifndef GSD_OSD_NOTIFICATION_H
-+#define GSD_OSD_NOTIFICATION_H
 +
-+#include <glib.h>
++#ifndef _GSD_OSD_NOTIFICATION_H_
++#define _GSD_OSD_NOTIFICATION_H_
++
++#include <glib-object.h>
 +
 +G_BEGIN_DECLS
 +
++#define GSD_TYPE_OSD_NOTIFICATION             (gsd_osd_notification_get_type ())
++#define GSD_OSD_NOTIFICATION(obj)             (G_TYPE_CHECK_INSTANCE_CAST ((obj), GSD_TYPE_OSD_NOTIFICATION, GsdOsdNotification))
++#define GSD_OSD_NOTIFICATION_CLASS(klass)     (G_TYPE_CHECK_CLASS_CAST ((klass), GSD_TYPE_OSD_NOTIFICATION, GsdOsdNotificationClass))
++#define GSD_IS_OSD_NOTIFICATION(obj)          (G_TYPE_CHECK_INSTANCE_TYPE ((obj), GSD_TYPE_OSD_NOTIFICATION))
++#define GSD_IS_OSD_NOTIFICATION_CLASS(klass)  (G_TYPE_CHECK_CLASS_TYPE ((klass), GSD_TYPE_OSD_NOTIFICATION))
++#define GSD_OSD_NOTIFICATION_GET_CLASS(obj)   (G_TYPE_INSTANCE_GET_CLASS ((obj), GSD_TYPE_OSD_NOTIFICATION, GsdOsdNotificationClass))
++
++typedef struct _GsdOsdNotificationClass GsdOsdNotificationClass;
++typedef struct _GsdOsdNotification GsdOsdNotification;
++typedef struct _GsdOsdNotificationPrivate GsdOsdNotificationPrivate;
++
++struct _GsdOsdNotificationClass
++{
++        GObjectClass parent_class;
++};
++
++struct _GsdOsdNotification
++{
++        GObject parent_instance;
++
++        GsdOsdNotificationPrivate *priv;
++};
++
 +typedef enum {
-+        GSD_OSD_NOTIFICATION_GENERIC_ERROR,
-+        GSD_OSD_NOTIFICATION_SYNC_NOT_SUPPORTED,
-+} GsdOsdNotificationError;
++        GSD_OSD_NOTIFICATION_NO_OVERSHOOT = 0,
++        GSD_OSD_NOTIFICATION_UNDERSHOOT,
++        GSD_OSD_NOTIFICATION_OVERSHOOT,
++} GsdOsdNotifierOvershootType;
 +
-+#define GSD_OSD_NOTIFICATION_ERROR (gsd_osd_notification_error_quark ())
-+GQuark          gsd_osd_notification_error_quark  (void);
-+
-+gboolean        gsd_osd_notification_notify       (const char *icon,
-+                                                   const char *hint,
-+                                                   GError    **error);
-+gboolean        gsd_osd_notification_notify_value (const char *icon,
-+                                                   const char *hint,
-+                                                   int         value,
-+                                                   GError    **error);
++GType                   gsd_osd_notification_get_type           (void) G_GNUC_CONST;
++GsdOsdNotification*     gsd_osd_notification_new                (const char                 **icon_names,
++                                                                 const char                  *hint);
++void                    gsd_osd_notification_set_icon_array     (GsdOsdNotification          *notifier, 
++                                                                 const char                 **icon_names);
++void                    gsd_osd_notification_set_hint           (GsdOsdNotification          *notifier,
++                                                                 const char                  *hint);
++gboolean                gsd_osd_notification_is_supported       (void);
++gboolean                gsd_osd_notification_show_value         (GsdOsdNotification          *notifier,
++                                                                 gint                        value,
++                                                                 gboolean                     muted);
++gboolean                gsd_osd_notification_show_overshoot     (GsdOsdNotification          *notifier,
++                                                                 GsdOsdNotifierOvershootType  type);
++gboolean                gsd_osd_notification_show_icon_only     (const char                  *icon,
++                                                                 const char                  *hint);
 +
 +G_END_DECLS
 +
-+
-+#endif
-+
-Index: gnome-settings-daemon-2.29.6/plugins/media-keys/gsd-media-keys-osd-notification.c
++#endif /* _GSD_OSD_NOTIFICATION_H_ */
+Index: gnome-settings-daemon-2.29.6/plugins/media-keys/gsd-media-keys-manager.c
 ===================================================================
---- /dev/null	1970-01-01 00:00:00.000000000 +0000
-+++ gnome-settings-daemon-2.29.6/plugins/media-keys/gsd-media-keys-osd-notification.c	2010-01-29 11:28:10.000000000 +0100
-@@ -0,0 +1,91 @@
-+/* -*- Mode: C; indent-tabs-mode: nil; c-basic-offset: 8; tab-width: 8 -*-
-+ *
-+ * Copyright (C) 2009 Canonical Ltd
-+ * Copyright (C) 2010 Chris Coulson <chrisccoulson@ubuntu.com>
-+ *
-+ * This program is free software; you can redistribute it and/or modify
-+ * it under the terms of the GNU General Public License as published by
-+ * the Free Software Foundation; either version 2 of the License, or
-+ * (at your option) any later version.
-+ *
-+ * This program is distributed in the hope that it will be useful,
-+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+ * GNU General Public License for more details.
-+ *
-+ * You should have received a copy of the GNU General Public License
-+ * along with this program; if not, write to the Free Software
-+ * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
-+ *
-+ */
-+ 
-+#include <gdk/gdkx.h>
-+#include "acme.h"
-+
+--- gnome-settings-daemon-2.29.6.orig/plugins/media-keys/gsd-media-keys-manager.c	2010-01-12 15:51:57.000000000 +0000
++++ gnome-settings-daemon-2.29.6/plugins/media-keys/gsd-media-keys-manager.c	2010-02-07 23:07:11.464106948 +0000
+@@ -49,6 +49,7 @@
+ #include "eggaccelerators.h"
+ #include "acme.h"
+ #include "gsd-media-keys-window.h"
 +#include "gsd-osd-notification.h"
-+
-+static const char *icon_name[] = {
+ 
+ #ifdef HAVE_PULSE
+ #include <canberra-gtk.h>
+@@ -85,6 +86,7 @@
+ #endif /* HAVE_PULSE */
+         GtkWidget       *dialog;
+         GConfClient     *conf_client;
++        GsdOsdNotification *notifier;
+ 
+         /* Multihead stuff */
+         GdkScreen       *current_screen;
+@@ -111,6 +113,13 @@
+ 
+ static gpointer manager_object = NULL;
+ 
++static const char *volume_icons[] = {
 +        "notification-audio-volume-muted",
 +        "notification-audio-volume-low",
 +        "notification-audio-volume-medium",
 +        "notification-audio-volume-high",
 +        NULL
 +};
-+
-+/* Warning: keep that in sync with the enum in action/acme.h */
-+static const char *media_key_icon[] = {
-+        NULL, /* MUTE_KEY */
-+        NULL, /* VOLUME_DOWN_KEY */
-+        NULL, /* VOLUME_UP_KEY */
-+        NULL, /* POWER_KEY */
-+        "notification-device-eject", /* EJECT_KEY */
-+        NULL, /* HOME_KEY */
-+        NULL, /* MEDIA_KEY */
-+        NULL, /* CALCULATOR_KEY */
-+        NULL, /* SEARCH_KEY */
-+        NULL, /* EMAIL_KEY */
-+        NULL, /* SCREENSAVER_KEY */
-+        NULL, /* HELP_KEY */
-+        NULL, /* WWW_KEY */
-+        NULL, /* "notification-audio-play", */ /* PLAY_KEY */
-+        NULL, /* "notification-audio-pause",*/ /* PAUSE_KEY */
-+        NULL, /* STOP_KEY */
-+        NULL, /* PREVIOUS_KEY */
-+        NULL, /* NEXT_KEY */
-+        NULL, /* HANDLED_KEYS */
-+        NULL
-+};
-+
-+gboolean
-+gsd_media_keys_osd_notification_notify_volume (int value, gboolean muted)
-+{
-+        int icon;
-+
-+        if (value < 0) {
-+                icon = 0;
-+        } else {
-+                icon = 3 * value / 100 + 1;
-+                if (icon < 1)
-+                        icon = 1;
-+                if (icon > 3)
-+                        icon = 3;
-+        }
-+
-+        if (muted)
-+                icon = 0;
-+
-+        return gsd_osd_notification_notify_value (icon_name[icon],
-+                                                  "volume",
-+                                                  value,
-+                                                  NULL);
-+}
-+
-+gboolean
-+gsd_media_keys_osd_notification_notify (int key, const char *hint)
-+{
-+        g_return_val_if_fail (key < HANDLED_KEYS && key >= MUTE_KEY, FALSE);
-+
-+        return gsd_osd_notification_notify (media_key_icon[key],
-+                                            hint,
-+                                            NULL);
-+}
-Index: gnome-settings-daemon-2.29.6/plugins/media-keys/Makefile.am
-===================================================================
---- gnome-settings-daemon-2.29.6.orig/plugins/media-keys/Makefile.am	2010-01-12 16:51:57.000000000 +0100
-+++ gnome-settings-daemon-2.29.6/plugins/media-keys/Makefile.am	2010-01-29 11:28:33.000000000 +0100
-@@ -32,6 +32,8 @@
- 	gsd-media-keys-manager.c	\
- 	gsd-media-keys-window.h		\
- 	gsd-media-keys-window.c		\
-+	gsd-media-keys-osd-notification.c	\
-+	gsd-media-keys-osd-notification.h	\
- 	acme.h				\
- 	$(BUILT_SOURCES)		\
- 	$(NULL)
-@@ -47,6 +49,7 @@
  
- libmedia_keys_la_CFLAGS = \
- 	$(SETTINGS_PLUGIN_CFLAGS)	\
-+	$(LIBNOTIFY_CFLAGS)		\
- 	$(AM_CFLAGS)
- 
- libmedia_keys_la_LDFLAGS = 		\
-@@ -56,6 +59,7 @@
- 	$(top_builddir)/plugins/common/libcommon.la			\
- 	$(top_builddir)/plugins/media-keys/cut-n-paste/libgvc.la	\
- 	$(SETTINGS_PLUGIN_LIBS)						\
-+	$(LIBNOTIFY_LIBS)		\
- 	$(XF86MISC_LIBS)
- 
- plugin_in_files = 		\
-Index: gnome-settings-daemon-2.29.6/plugins/media-keys/gsd-media-keys-osd-notification.h
-===================================================================
---- /dev/null	1970-01-01 00:00:00.000000000 +0000
-+++ gnome-settings-daemon-2.29.6/plugins/media-keys/gsd-media-keys-osd-notification.h	2010-01-29 11:28:10.000000000 +0100
-@@ -0,0 +1,37 @@
-+/* -*- Mode: C; indent-tabs-mode: nil; c-basic-offset: 8; tab-width: 8 -*-
-+ *
-+ * Copyright (C) 2009 Canonical Ltd
-+ * Copyright (C) 2010 Chris Coulson <chrisccoulson@ubuntu.com>
-+ *
-+ * This program is free software; you can redistribute it and/or modify
-+ * it under the terms of the GNU General Public License as published by
-+ * the Free Software Foundation; either version 2 of the License, or
-+ * (at your option) any later version.
-+ *
-+ * This program is distributed in the hope that it will be useful,
-+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+ * GNU General Public License for more details.
-+ *
-+ * You should have received a copy of the GNU General Public License
-+ * along with this program; if not, write to the Free Software
-+ * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
-+ *
-+ */
-+
-+#ifndef GSD_MEDIA_KEYS_OSD_NOTIFICATION_H
-+#define GSD_MEDIA_KEYS_OSD_NOTIFICATION_H
-+
-+#include <glib.h>
-+
-+G_BEGIN_DECLS
-+
-+gboolean	gsd_media_keys_osd_notification_notify_volume   (int value,
-+                                                                 gboolean muted);
-+gboolean        gsd_media_keys_osd_notification_notify          (int key,
-+                                                                 const char *hint);
-+
-+G_END_DECLS
-+
-+
-+#endif
-Index: gnome-settings-daemon-2.29.6/plugins/media-keys/gsd-media-keys-manager.c
-===================================================================
---- gnome-settings-daemon-2.29.6.orig/plugins/media-keys/gsd-media-keys-manager.c	2010-01-12 16:51:57.000000000 +0100
-+++ gnome-settings-daemon-2.29.6/plugins/media-keys/gsd-media-keys-manager.c	2010-01-29 11:28:10.000000000 +0100
-@@ -49,6 +49,7 @@
- #include "eggaccelerators.h"
- #include "acme.h"
- #include "gsd-media-keys-window.h"
-+#include "gsd-media-keys-osd-notification.h"
- 
- #ifdef HAVE_PULSE
- #include <canberra-gtk.h>
-@@ -589,11 +590,13 @@
+ static void
+ init_screens (GsdMediaKeysManager *manager)
+@@ -589,11 +598,13 @@
  {
          char *command;
  
@@ -410,7 +439,7 @@ Index: gnome-settings-daemon-2.29.6/plugins/media-keys/gsd-media-keys-manager.c
 -                                                 "media-eject",
 -                                                 FALSE);
 -        dialog_show (manager);
-+        if (!gsd_media_keys_osd_notification_notify (EJECT_KEY, "Eject")) {
++        if (!gsd_osd_notification_show_icon_only ("notification-device-eject", "Eject")) {
 +                dialog_init (manager);
 +                gsd_media_keys_window_set_action_custom (GSD_MEDIA_KEYS_WINDOW (manager->priv->dialog),
 +                                                         "media-eject",
@@ -420,66 +449,122 @@ Index: gnome-settings-daemon-2.29.6/plugins/media-keys/gsd-media-keys-manager.c
  
          command = gconf_client_get_string (manager->priv->conf_client,
                                             GCONF_MISC_DIR "/eject_command",
-@@ -614,15 +617,17 @@
-                gboolean muted)
+@@ -611,11 +622,19 @@
+ static void
+ update_dialog (GsdMediaKeysManager *manager,
+                guint vol,
+-               gboolean muted)
++               gboolean muted,
++               GsdOsdNotifierOvershootType overshoot)
  {
          vol = (int) (100 * (double) vol / PA_VOLUME_NORM);
 -        vol = CLAMP (vol, 0, 100);
--
--        dialog_init (manager);
--        gsd_media_keys_window_set_volume_muted (GSD_MEDIA_KEYS_WINDOW (manager->priv->dialog),
--                                                muted);
--        gsd_media_keys_window_set_volume_level (GSD_MEDIA_KEYS_WINDOW (manager->priv->dialog), vol);
--        gsd_media_keys_window_set_action (GSD_MEDIA_KEYS_WINDOW (manager->priv->dialog),
--                                          GSD_MEDIA_KEYS_WINDOW_ACTION_VOLUME);
--        dialog_show (manager);
-+        
-+        if (!gsd_media_keys_osd_notification_notify_volume (vol, muted)) {
-+                vol = CLAMP (vol, 0, 100);
-+                dialog_init (manager);
-+                gsd_media_keys_window_set_volume_muted (GSD_MEDIA_KEYS_WINDOW (manager->priv->dialog),
-+                                                        muted);
-+                gsd_media_keys_window_set_volume_level (GSD_MEDIA_KEYS_WINDOW (manager->priv->dialog), vol);
-+                gsd_media_keys_window_set_action (GSD_MEDIA_KEYS_WINDOW (manager->priv->dialog),
-+                                                  GSD_MEDIA_KEYS_WINDOW_ACTION_VOLUME);
-+                dialog_show (manager);
++        if (overshoot != GSD_OSD_NOTIFICATION_NO_OVERSHOOT) {
++                if (gsd_osd_notification_show_overshoot (manager->priv->notifier, overshoot))
++                        goto done;
++        } else {
++                if (gsd_osd_notification_show_value (manager->priv->notifier, vol, muted))
++                        goto done;
 +        }
  
++        vol = CLAMP (vol, 0, 100);
+         dialog_init (manager);
+         gsd_media_keys_window_set_volume_muted (GSD_MEDIA_KEYS_WINDOW (manager->priv->dialog),
+                                                 muted);
+@@ -624,6 +643,7 @@
+                                           GSD_MEDIA_KEYS_WINDOW_ACTION_VOLUME);
+         dialog_show (manager);
+ 
++done:
          ca_gtk_play_for_widget (manager->priv->dialog, 0,
                                  CA_PROP_EVENT_ID, "audio-volume-change",
-@@ -843,8 +848,10 @@
+                                 CA_PROP_EVENT_DESCRIPTION, "volume changed through key press",
+@@ -638,6 +658,7 @@
+         gboolean muted;
+         guint vol, norm_vol_step;
+         int vol_step;
++        GsdOsdNotifierOvershootType overshoot = GSD_OSD_NOTIFICATION_NO_OVERSHOOT;
+ 
+         if (manager->priv->stream == NULL)
+                 return;
+@@ -671,6 +692,8 @@
+                         vol = vol - norm_vol_step;
+                         if (gvc_mixer_stream_set_volume (manager->priv->stream, vol) != FALSE)
+                                 gvc_mixer_stream_push_volume (manager->priv->stream);
++                } else {
++                        overshoot = GSD_OSD_NOTIFICATION_UNDERSHOOT;
+                 }
+                 break;
+         case VOLUME_UP_KEY:
+@@ -693,12 +716,14 @@
+                                 }
+                                 if (gvc_mixer_stream_set_volume (manager->priv->stream, vol) != FALSE)
+                                         gvc_mixer_stream_push_volume (manager->priv->stream);
++                        } else {
++                                overshoot = GSD_OSD_NOTIFICATION_OVERSHOOT;
+                         }
+                 }
+                 break;
+         }
+ 
+-        update_dialog (manager, vol, muted);
++        update_dialog (manager, vol, muted, overshoot);
+ }
+ 
+ static void
+@@ -843,8 +868,11 @@
  
  static gboolean
  do_multimedia_player_action (GsdMediaKeysManager *manager,
-+                             int                  type,
++                             const char          *icon,
                               const char          *key)
  {
-+        gsd_media_keys_osd_notification_notify (type, key);
++        if (icon != NULL)
++                gsd_osd_notification_show_icon_only (icon, key);
          return gsd_media_player_key_pressed (manager, key);
  }
  
-@@ -912,19 +919,19 @@
+@@ -912,19 +940,19 @@
                  execute (manager, "gcalctool", FALSE, FALSE);
                  break;
          case PLAY_KEY:
 -                return do_multimedia_player_action (manager, "Play");
-+                return do_multimedia_player_action (manager, type, "Play");
++                return do_multimedia_player_action (manager, NULL, "Play");
                  break;
          case PAUSE_KEY:
 -                return do_multimedia_player_action (manager, "Pause");
-+                return do_multimedia_player_action (manager, type, "Pause");
++                return do_multimedia_player_action (manager, NULL, "Pause");
                  break;
          case STOP_KEY:
 -                return do_multimedia_player_action (manager, "Stop");
-+                return do_multimedia_player_action (manager, type, "Stop");
++                return do_multimedia_player_action (manager, NULL, "Stop");
                  break;
          case PREVIOUS_KEY:
 -                return do_multimedia_player_action (manager, "Previous");
-+                return do_multimedia_player_action (manager, type, "Previous");
++                return do_multimedia_player_action (manager, NULL, "Previous");
                  break;
          case NEXT_KEY:
 -                return do_multimedia_player_action (manager, "Next");
-+                return do_multimedia_player_action (manager, type, "Next");
++                return do_multimedia_player_action (manager, NULL, "Next");
                  break;
          default:
                  g_assert_not_reached ();
+@@ -1060,6 +1088,8 @@
+ 
+         gvc_mixer_control_open (manager->priv->volume);
+ 
++        manager->priv->notifier = gsd_osd_notification_new (volume_icons, "volume");
++
+         gnome_settings_profile_end ("gvc_mixer_control_new");
+ #endif /* HAVE_PULSE */
+         g_idle_add ((GSourceFunc) start_media_keys_idle_cb, manager);
+@@ -1152,6 +1182,9 @@
+         }
+         g_list_free (priv->media_players);
+         priv->media_players = NULL;
++
++        if (manager->priv->notifier != NULL)
++                g_object_unref (manager->priv->notifier);
+ }
+ 
+ static void
