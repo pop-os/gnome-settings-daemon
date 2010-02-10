@@ -1,4 +1,4 @@
-gnome-settings-daemon (2.29.90-0ubuntu1) UNRELEASED; urgency=low
+gnome-settings-daemon (2.29.90-0ubuntu1) lucid; urgency=low
 
   * New upstream version
     - Add gthread-2.0 to required modules for the daemon
