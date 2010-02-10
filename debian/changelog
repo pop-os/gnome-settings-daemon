@@ -1,3 +1,16 @@
+gnome-settings-daemon (2.29.90-0ubuntu1) UNRELEASED; urgency=low
+
+  * New upstream version
+    - Add gthread-2.0 to required modules for the daemon
+    - Centralize the use of gnome_rr_config_apply_with_time
+  * Refreshed patches:
+    - 02_fix_randr.patch
+    - 02_missing_libs.patch
+    - 70_migrate_touchpad_config.patch
+    - 90_autoreconf.patch
+
+ -- Chris Coulson <chrisccoulson@ubuntu.com>  Wed, 10 Feb 2010 00:29:16 +0000
+
 gnome-settings-daemon (2.29.6-0ubuntu4) lucid; urgency=low
 
   * debian/patches/16_use_synchronous_notifications.patch:
