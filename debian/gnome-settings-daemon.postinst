@@ -11,8 +11,10 @@ configure)
     if dpkg --compare-versions "$2" le "2.29.90-0ubuntu1"; then
         update_wallpaper="/usr/lib/gnome-settings-daemon/gnome-update-wallpaper-cache"
         if [ -x $update_wallpaper ] ; then
-            for user in `ps -C gnome-settings-daemon -o user=` ; do
-                sudo -i -u $user $update_wallpaper || true
+            for pid in `pidof gnome-settings-daemon` ; do
+                user=`ps -p $pid -o user=`
+                display=`xargs -0n1 < /proc/$pid/environ | grep ^DISPLAY`
+                sudo -u $user -i $display $update_wallpaper || true
             done
         fi
     fi
