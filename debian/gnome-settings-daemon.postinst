@@ -8,6 +8,14 @@ configure)
     if dpkg --compare-versions "$2" lt-nl "2.24.1"; then
         rm -rf /etc/gnome/config/xrdb
     fi
+    if dpkg --compare-versions "$2" le "2.29.90-0ubuntu1"; then
+        update_wallpaper="/usr/lib/gnome-settings-daemon/gnome-update-wallpaper-cache"
+        if [ -x $update_wallpaper ] ; then
+            for user in `ps -C gnome-settings-daemon -o user=` ; do
+                sudo -i -u $user $update_wallpaper || true
+            done
+        fi
+    fi
 esac
 
 #DEBHELPER#
