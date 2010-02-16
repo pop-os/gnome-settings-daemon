@@ -1,3 +1,11 @@
+gnome-settings-daemon (2.29.90-0ubuntu2) UNRELEASED; urgency=low
+
+  * debian/patches/06_update_wallpaper_cache.patch: add a command
+    to refresh current wallpaper cache
+  * debian/postinst: call this command on upgrade for all connected users
+
+ -- Didier Roche <didrocks@ubuntu.com>  Tue, 16 Feb 2010 13:26:12 +0100
+
 gnome-settings-daemon (2.29.90-0ubuntu1) lucid; urgency=low
 
   * New upstream version
