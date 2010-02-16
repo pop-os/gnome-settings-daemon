@@ -5,6 +5,7 @@ gnome-settings-daemon (2.29.90-0ubuntu2) UNRELEASED; urgency=low
   * debian/gnome-settings-daemon.postinst: call this command on upgrade for all
     connected users
   * debian/patches/90_autoreconf.patch: refreshed
+  * debian/control.in: update Standards-Version
 
  -- Didier Roche <didrocks@ubuntu.com>  Tue, 16 Feb 2010 13:26:12 +0100
 

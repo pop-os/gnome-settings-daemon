@@ -8,7 +8,7 @@ Section: gnome
 Priority: optional
 Maintainer: Ubuntu Desktop Team <ubuntu-desktop@lists.ubuntu.com>
 XSBC-Original-Maintainer: Debian GNOME Maintainers <pkg-gnome-maintainers@lists.alioth.debian.org>
-Uploaders: Debian GNOME Maintainers <pkg-gnome-maintainers@lists.alioth.debian.org>, Emilio Pozuelo Monfort <pochu@debian.org>
+Uploaders: Debian GNOME Maintainers <pkg-gnome-maintainers@lists.alioth.debian.org>
 Build-Depends: cdbs,
                quilt,
                debhelper (>= 5),
@@ -36,7 +36,7 @@ Build-Depends: cdbs,
                gnome-pkg-tools,
                libpulse-dev (>= 0.9.15),
                libcanberra-gtk-dev
-Standards-Version: 3.8.3
+Standards-Version: 3.8.4
 Vcs-Bzr: https://code.launchpad.net/~ubuntu-desktop/gnome-settings-daemon/ubuntu
 
 Package: gnome-settings-daemon
