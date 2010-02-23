@@ -1,4 +1,4 @@
-gnome-settings-daemon (2.29.90-0ubuntu2) UNRELEASED; urgency=low
+gnome-settings-daemon (2.29.90-0ubuntu2) lucid; urgency=low
 
   * debian/patches/16_use_synchronous_notifications.patch:
     - NULL terminate the list of properties passed to g_object_new, to
