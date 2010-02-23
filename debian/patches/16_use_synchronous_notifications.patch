@@ -1,7 +1,7 @@
-Index: gnome-settings-daemon-2.29.6/plugins/common/Makefile.am
+Index: gnome-settings-daemon-2.29.90/plugins/common/Makefile.am
 ===================================================================
---- gnome-settings-daemon-2.29.6.orig/plugins/common/Makefile.am	2010-01-12 15:51:57.000000000 +0000
-+++ gnome-settings-daemon-2.29.6/plugins/common/Makefile.am	2010-02-07 23:07:11.464106948 +0000
+--- gnome-settings-daemon-2.29.90.orig/plugins/common/Makefile.am	2010-01-12 15:51:57.000000000 +0000
++++ gnome-settings-daemon-2.29.90/plugins/common/Makefile.am	2010-02-23 18:44:47.152053476 +0000
 @@ -7,17 +7,21 @@
  	gsd-keygrab.c		\
  	gsd-keygrab.h		\
@@ -26,11 +26,11 @@ Index: gnome-settings-daemon-2.29.6/plugins/common/Makefile.am
 -	$(SETTINGS_PLUGIN_LIBS)
 +	$(SETTINGS_PLUGIN_LIBS)		\
 +	$(LIBNOTIFY_LIBS)
-Index: gnome-settings-daemon-2.29.6/plugins/common/gsd-osd-notification.c
+Index: gnome-settings-daemon-2.29.90/plugins/common/gsd-osd-notification.c
 ===================================================================
 --- /dev/null	1970-01-01 00:00:00.000000000 +0000
-+++ gnome-settings-daemon-2.29.6/plugins/common/gsd-osd-notification.c	2010-02-07 23:08:58.114116800 +0000
-@@ -0,0 +1,285 @@
++++ gnome-settings-daemon-2.29.90/plugins/common/gsd-osd-notification.c	2010-02-23 18:46:16.942022106 +0000
+@@ -0,0 +1,286 @@
 +/* -*- Mode: C; indent-tabs-mode: nil; c-basic-offset: 8; tab-width: 8 -*- */
 +/*
 + * gsd-osd-notification.c
@@ -219,7 +219,8 @@ Index: gnome-settings-daemon-2.29.6/plugins/common/gsd-osd-notification.c
 +{
 +        return (GsdOsdNotification *) g_object_new (GSD_TYPE_OSD_NOTIFICATION,
 +                                                    "icon-names", icon_names,
-+                                                    "hint", hint);
++                                                    "hint", hint,
++                                                    NULL);
 +}
 +
 +static void
@@ -316,10 +317,10 @@ Index: gnome-settings-daemon-2.29.6/plugins/common/gsd-osd-notification.c
 +
 +        g_type_class_add_private (klass, sizeof (GsdOsdNotificationPrivate));
 +}
-Index: gnome-settings-daemon-2.29.6/plugins/common/gsd-osd-notification.h
+Index: gnome-settings-daemon-2.29.90/plugins/common/gsd-osd-notification.h
 ===================================================================
 --- /dev/null	1970-01-01 00:00:00.000000000 +0000
-+++ gnome-settings-daemon-2.29.6/plugins/common/gsd-osd-notification.h	2010-02-07 23:07:11.464106948 +0000
++++ gnome-settings-daemon-2.29.90/plugins/common/gsd-osd-notification.h	2010-02-23 18:44:47.152053476 +0000
 @@ -0,0 +1,75 @@
 +/* -*- Mode: C; indent-tabs-mode: nil; c-basic-offset: 8; tab-width: 8 -*- */
 +/*
@@ -396,10 +397,10 @@ Index: gnome-settings-daemon-2.29.6/plugins/common/gsd-osd-notification.h
 +G_END_DECLS
 +
 +#endif /* _GSD_OSD_NOTIFICATION_H_ */
-Index: gnome-settings-daemon-2.29.6/plugins/media-keys/gsd-media-keys-manager.c
+Index: gnome-settings-daemon-2.29.90/plugins/media-keys/gsd-media-keys-manager.c
 ===================================================================
---- gnome-settings-daemon-2.29.6.orig/plugins/media-keys/gsd-media-keys-manager.c	2010-01-12 15:51:57.000000000 +0000
-+++ gnome-settings-daemon-2.29.6/plugins/media-keys/gsd-media-keys-manager.c	2010-02-07 23:07:11.464106948 +0000
+--- gnome-settings-daemon-2.29.90.orig/plugins/media-keys/gsd-media-keys-manager.c	2010-01-12 15:51:57.000000000 +0000
++++ gnome-settings-daemon-2.29.90/plugins/media-keys/gsd-media-keys-manager.c	2010-02-23 18:44:47.152053476 +0000
 @@ -49,6 +49,7 @@
  #include "eggaccelerators.h"
  #include "acme.h"
