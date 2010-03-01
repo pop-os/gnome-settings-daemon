@@ -1,4 +1,4 @@
-gnome-settings-daemon (2.29.91.1-0ubuntu2) UNRELEASED; urgency=low
+gnome-settings-daemon (2.29.91.1-0ubuntu2) lucid; urgency=low
 
   * debian/gnome-update-cache-wallpaper.c:
     - enable creating a cached wallpaper even when g-s-d or nautilus isn't
