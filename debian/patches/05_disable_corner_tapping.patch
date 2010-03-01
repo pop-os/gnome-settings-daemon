@@ -1,11 +1,11 @@
 # Description: disable corner typing when disabling tap to clik
 # Upstream: https://bugzilla.gnome.org/show_bug.cgi?id=607474
 # Ubuntu: https://bugs.launchpad.net/bugs/509724
-diff --git a/plugins/mouse/gsd-mouse-manager.c b/plugins/mouse/gsd-mouse-manager.c
-index d0ecf6b..f3e6c49 100644
---- a/plugins/mouse/gsd-mouse-manager.c
-+++ b/plugins/mouse/gsd-mouse-manager.c
-@@ -606,6 +606,9 @@ set_tap_to_click (gboolean state, gboolean left_handed)
+Index: gnome-settings-daemon-2.29.91.1/plugins/mouse/gsd-mouse-manager.c
+===================================================================
+--- gnome-settings-daemon-2.29.91.1.orig/plugins/mouse/gsd-mouse-manager.c	2010-02-16 22:40:19.000000000 +0000
++++ gnome-settings-daemon-2.29.91.1/plugins/mouse/gsd-mouse-manager.c	2010-03-01 10:29:33.570386714 +0000
+@@ -607,6 +607,9 @@
  
                          if (rc == Success && type == XA_INTEGER && format == 8 && nitems >= 7)
                          {

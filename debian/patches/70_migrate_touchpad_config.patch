@@ -1,10 +1,10 @@
-Index: gnome-settings-daemon-2.29.90/plugins/mouse/gsd-mouse-manager.c
+Index: gnome-settings-daemon-2.29.91.1/plugins/mouse/gsd-mouse-manager.c
 ===================================================================
---- gnome-settings-daemon-2.29.90.orig/plugins/mouse/gsd-mouse-manager.c	2010-02-10 00:33:01.012587392 +0000
-+++ gnome-settings-daemon-2.29.90/plugins/mouse/gsd-mouse-manager.c	2010-02-10 00:33:05.012595704 +0000
-@@ -67,6 +67,10 @@
- #define KEY_SCROLL_METHOD       GCONF_TOUCHPAD_DIR "/scroll_method"
+--- gnome-settings-daemon-2.29.91.1.orig/plugins/mouse/gsd-mouse-manager.c	2010-03-01 10:29:33.570386714 +0000
++++ gnome-settings-daemon-2.29.91.1/plugins/mouse/gsd-mouse-manager.c	2010-03-01 10:29:55.160387887 +0000
+@@ -68,6 +68,10 @@
  #define KEY_PAD_HORIZ_SCROLL    GCONF_TOUCHPAD_DIR "/horiz_scroll_enabled"
+ #define KEY_TOUCHPAD_ENABLED    GCONF_TOUCHPAD_DIR "/touchpad_enabled"
  
 +#define KEY_TOUCHPAD_MIGRATION_NEEDED   GCONF_TOUCHPAD_DIR "/config_migration_needed"
 +#define KEY_OLD_PAD_HORIZ_SCROLL        GCONF_MOUSE_DIR "/pad_horiz_scroll"
@@ -13,7 +13,7 @@ Index: gnome-settings-daemon-2.29.90/plugins/mouse/gsd-mouse-manager.c
  struct GsdMouseManagerPrivate
  {
          guint notify;
-@@ -938,6 +942,63 @@
+@@ -982,6 +986,63 @@
          manager->priv = GSD_MOUSE_MANAGER_GET_PRIVATE (manager);
  }
  
@@ -77,7 +77,7 @@ Index: gnome-settings-daemon-2.29.90/plugins/mouse/gsd-mouse-manager.c
  static gboolean
  gsd_mouse_manager_idle_cb (GsdMouseManager *manager)
  {
-@@ -963,6 +1024,8 @@
+@@ -1007,6 +1068,8 @@
                                            GCONF_TOUCHPAD_DIR,
                                            (GConfClientNotifyFunc) mouse_callback);
          manager->priv->syndaemon_spawned = FALSE;
