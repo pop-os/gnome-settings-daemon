@@ -1,4 +1,4 @@
-gnome-settings-daemon (2.29.91.1-0ubuntu1) UNRELEASED; urgency=low
+gnome-settings-daemon (2.29.91.1-0ubuntu1) lucid; urgency=low
 
   * New upstream version
     - Fn-F8 should disable/enable touch points (Peter Hutterer) (#594831)
