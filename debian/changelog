@@ -1,3 +1,14 @@
+gnome-settings-daemon (2.29.91.1-0ubuntu3) lucid; urgency=low
+
+  * debian/control.in:
+    - build-depends on libappindicator-dev
+  * debian/patches/06_use_application_indicator.patch:
+    - change by Jan Arne Petersen to use application indicators (lp: #497875)
+  * debian/patches/90_autoreconf.patch:
+    - refreshed for the previous change
+
+ -- Sebastien Bacher <seb128@ubuntu.com>  Tue, 02 Mar 2010 17:37:58 +0100
+
 gnome-settings-daemon (2.29.91.1-0ubuntu2) lucid; urgency=low
 
   * debian/gnome-update-cache-wallpaper.c:
