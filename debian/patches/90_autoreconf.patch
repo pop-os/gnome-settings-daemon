@@ -1,7 +1,7 @@
 Index: gnome-settings-daemon-2.29.91.1/aclocal.m4
 ===================================================================
 --- gnome-settings-daemon-2.29.91.1.orig/aclocal.m4	2010-02-24 15:39:15.000000000 +0100
-+++ gnome-settings-daemon-2.29.91.1/aclocal.m4	2010-03-02 19:13:56.000000000 +0100
++++ gnome-settings-daemon-2.29.91.1/aclocal.m4	2010-03-03 21:38:56.000000000 +0100
 @@ -19,987 +19,677 @@
  If you have problems, you may need to regenerate the build system entirely.
  To do so, use the procedure documented by the package, typically `autoreconf'.])])
@@ -4321,7 +4321,7 @@ Index: gnome-settings-daemon-2.29.91.1/aclocal.m4
 Index: gnome-settings-daemon-2.29.91.1/configure
 ===================================================================
 --- gnome-settings-daemon-2.29.91.1.orig/configure	2010-02-24 15:39:16.000000000 +0100
-+++ gnome-settings-daemon-2.29.91.1/configure	2010-03-02 19:13:59.000000000 +0100
++++ gnome-settings-daemon-2.29.91.1/configure	2010-03-03 21:38:59.000000000 +0100
 @@ -772,6 +772,10 @@
  X_CFLAGS
  XMKMF
@@ -4825,7 +4825,7 @@ Index: gnome-settings-daemon-2.29.91.1/configure
 Index: gnome-settings-daemon-2.29.91.1/data/Makefile.in
 ===================================================================
 --- gnome-settings-daemon-2.29.91.1.orig/data/Makefile.in	2010-02-24 15:39:16.000000000 +0100
-+++ gnome-settings-daemon-2.29.91.1/data/Makefile.in	2010-03-02 19:14:00.000000000 +0100
++++ gnome-settings-daemon-2.29.91.1/data/Makefile.in	2010-03-03 21:39:00.000000000 +0100
 @@ -81,6 +81,8 @@
  ACLOCAL = @ACLOCAL@
  ALL_LINGUAS = @ALL_LINGUAS@
@@ -4867,7 +4867,7 @@ Index: gnome-settings-daemon-2.29.91.1/data/Makefile.in
 Index: gnome-settings-daemon-2.29.91.1/gnome-settings-daemon/Makefile.in
 ===================================================================
 --- gnome-settings-daemon-2.29.91.1.orig/gnome-settings-daemon/Makefile.in	2010-02-24 15:39:16.000000000 +0100
-+++ gnome-settings-daemon-2.29.91.1/gnome-settings-daemon/Makefile.in	2010-03-02 19:14:00.000000000 +0100
++++ gnome-settings-daemon-2.29.91.1/gnome-settings-daemon/Makefile.in	2010-03-03 21:39:00.000000000 +0100
 @@ -120,6 +120,8 @@
  ACLOCAL = @ACLOCAL@
  ALL_LINGUAS = @ALL_LINGUAS@
@@ -4909,7 +4909,7 @@ Index: gnome-settings-daemon-2.29.91.1/gnome-settings-daemon/Makefile.in
 Index: gnome-settings-daemon-2.29.91.1/Makefile.in
 ===================================================================
 --- gnome-settings-daemon-2.29.91.1.orig/Makefile.in	2010-02-24 15:39:18.000000000 +0100
-+++ gnome-settings-daemon-2.29.91.1/Makefile.in	2010-03-02 19:14:01.000000000 +0100
++++ gnome-settings-daemon-2.29.91.1/Makefile.in	2010-03-03 21:39:02.000000000 +0100
 @@ -106,6 +106,8 @@
  ACLOCAL = @ACLOCAL@
  ALL_LINGUAS = @ALL_LINGUAS@
@@ -4960,7 +4960,7 @@ Index: gnome-settings-daemon-2.29.91.1/Makefile.in
 Index: gnome-settings-daemon-2.29.91.1/plugins/a11y-keyboard/Makefile.in
 ===================================================================
 --- gnome-settings-daemon-2.29.91.1.orig/plugins/a11y-keyboard/Makefile.in	2010-02-24 15:39:17.000000000 +0100
-+++ gnome-settings-daemon-2.29.91.1/plugins/a11y-keyboard/Makefile.in	2010-03-02 19:14:00.000000000 +0100
++++ gnome-settings-daemon-2.29.91.1/plugins/a11y-keyboard/Makefile.in	2010-03-03 21:39:00.000000000 +0100
 @@ -76,7 +76,7 @@
  am__DEPENDENCIES_1 =
  liba11y_keyboard_la_DEPENDENCIES = $(am__DEPENDENCIES_1) \
@@ -5027,7 +5027,7 @@ Index: gnome-settings-daemon-2.29.91.1/plugins/a11y-keyboard/Makefile.in
 Index: gnome-settings-daemon-2.29.91.1/plugins/background/Makefile.in
 ===================================================================
 --- gnome-settings-daemon-2.29.91.1.orig/plugins/background/Makefile.in	2010-02-24 15:39:17.000000000 +0100
-+++ gnome-settings-daemon-2.29.91.1/plugins/background/Makefile.in	2010-03-02 19:14:00.000000000 +0100
++++ gnome-settings-daemon-2.29.91.1/plugins/background/Makefile.in	2010-03-03 21:39:00.000000000 +0100
 @@ -117,6 +117,8 @@
  ACLOCAL = @ACLOCAL@
  ALL_LINGUAS = @ALL_LINGUAS@
@@ -5069,7 +5069,7 @@ Index: gnome-settings-daemon-2.29.91.1/plugins/background/Makefile.in
 Index: gnome-settings-daemon-2.29.91.1/plugins/clipboard/Makefile.in
 ===================================================================
 --- gnome-settings-daemon-2.29.91.1.orig/plugins/clipboard/Makefile.in	2010-02-24 15:39:17.000000000 +0100
-+++ gnome-settings-daemon-2.29.91.1/plugins/clipboard/Makefile.in	2010-03-02 19:14:00.000000000 +0100
++++ gnome-settings-daemon-2.29.91.1/plugins/clipboard/Makefile.in	2010-03-03 21:39:01.000000000 +0100
 @@ -103,6 +103,8 @@
  ACLOCAL = @ACLOCAL@
  ALL_LINGUAS = @ALL_LINGUAS@
@@ -5111,7 +5111,7 @@ Index: gnome-settings-daemon-2.29.91.1/plugins/clipboard/Makefile.in
 Index: gnome-settings-daemon-2.29.91.1/plugins/common/Makefile.in
 ===================================================================
 --- gnome-settings-daemon-2.29.91.1.orig/plugins/common/Makefile.in	2010-02-24 15:39:17.000000000 +0100
-+++ gnome-settings-daemon-2.29.91.1/plugins/common/Makefile.in	2010-03-02 19:14:00.000000000 +0100
++++ gnome-settings-daemon-2.29.91.1/plugins/common/Makefile.in	2010-03-03 21:39:01.000000000 +0100
 @@ -47,9 +47,11 @@
  CONFIG_CLEAN_VPATH_FILES =
  LTLIBRARIES = $(noinst_LTLIBRARIES)
@@ -5214,7 +5214,7 @@ Index: gnome-settings-daemon-2.29.91.1/plugins/common/Makefile.in
 Index: gnome-settings-daemon-2.29.91.1/plugins/dummy/Makefile.in
 ===================================================================
 --- gnome-settings-daemon-2.29.91.1.orig/plugins/dummy/Makefile.in	2010-02-24 15:39:17.000000000 +0100
-+++ gnome-settings-daemon-2.29.91.1/plugins/dummy/Makefile.in	2010-03-02 19:14:00.000000000 +0100
++++ gnome-settings-daemon-2.29.91.1/plugins/dummy/Makefile.in	2010-03-03 21:39:01.000000000 +0100
 @@ -99,6 +99,8 @@
  ACLOCAL = @ACLOCAL@
  ALL_LINGUAS = @ALL_LINGUAS@
@@ -5256,7 +5256,7 @@ Index: gnome-settings-daemon-2.29.91.1/plugins/dummy/Makefile.in
 Index: gnome-settings-daemon-2.29.91.1/plugins/font/Makefile.in
 ===================================================================
 --- gnome-settings-daemon-2.29.91.1.orig/plugins/font/Makefile.in	2010-02-24 15:39:17.000000000 +0100
-+++ gnome-settings-daemon-2.29.91.1/plugins/font/Makefile.in	2010-03-02 19:14:00.000000000 +0100
++++ gnome-settings-daemon-2.29.91.1/plugins/font/Makefile.in	2010-03-03 21:39:01.000000000 +0100
 @@ -101,6 +101,8 @@
  ACLOCAL = @ACLOCAL@
  ALL_LINGUAS = @ALL_LINGUAS@
@@ -5298,7 +5298,7 @@ Index: gnome-settings-daemon-2.29.91.1/plugins/font/Makefile.in
 Index: gnome-settings-daemon-2.29.91.1/plugins/housekeeping/Makefile.in
 ===================================================================
 --- gnome-settings-daemon-2.29.91.1.orig/plugins/housekeeping/Makefile.in	2010-02-24 15:39:17.000000000 +0100
-+++ gnome-settings-daemon-2.29.91.1/plugins/housekeeping/Makefile.in	2010-03-02 19:14:00.000000000 +0100
++++ gnome-settings-daemon-2.29.91.1/plugins/housekeeping/Makefile.in	2010-03-03 21:39:01.000000000 +0100
 @@ -104,6 +104,8 @@
  ACLOCAL = @ACLOCAL@
  ALL_LINGUAS = @ALL_LINGUAS@
@@ -5340,7 +5340,7 @@ Index: gnome-settings-daemon-2.29.91.1/plugins/housekeeping/Makefile.in
 Index: gnome-settings-daemon-2.29.91.1/plugins/keybindings/Makefile.in
 ===================================================================
 --- gnome-settings-daemon-2.29.91.1.orig/plugins/keybindings/Makefile.in	2010-02-24 15:39:17.000000000 +0100
-+++ gnome-settings-daemon-2.29.91.1/plugins/keybindings/Makefile.in	2010-03-02 19:14:00.000000000 +0100
++++ gnome-settings-daemon-2.29.91.1/plugins/keybindings/Makefile.in	2010-03-03 21:39:01.000000000 +0100
 @@ -104,6 +104,8 @@
  ACLOCAL = @ACLOCAL@
  ALL_LINGUAS = @ALL_LINGUAS@
@@ -5382,23 +5382,7 @@ Index: gnome-settings-daemon-2.29.91.1/plugins/keybindings/Makefile.in
 Index: gnome-settings-daemon-2.29.91.1/plugins/keyboard/Makefile.in
 ===================================================================
 --- gnome-settings-daemon-2.29.91.1.orig/plugins/keyboard/Makefile.in	2010-02-24 15:39:17.000000000 +0100
-+++ gnome-settings-daemon-2.29.91.1/plugins/keyboard/Makefile.in	2010-03-02 19:14:00.000000000 +0100
-@@ -73,13 +73,13 @@
- am__DEPENDENCIES_1 =
- libkeyboard_la_DEPENDENCIES = $(am__DEPENDENCIES_1) \
- 	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
--	$(am__DEPENDENCIES_1)
-+	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1)
- am__objects_1 =
- am_libkeyboard_la_OBJECTS = libkeyboard_la-gsd-keyboard-plugin.lo \
- 	libkeyboard_la-gsd-keyboard-manager.lo \
- 	libkeyboard_la-gsd-keyboard-xkb.lo \
- 	libkeyboard_la-gsd-xmodmap.lo libkeyboard_la-delayed-dialog.lo \
--	$(am__objects_1)
-+	libkeyboard_la-gkbd-configuration.lo $(am__objects_1)
- libkeyboard_la_OBJECTS = $(am_libkeyboard_la_OBJECTS)
- libkeyboard_la_LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) \
- 	$(LIBTOOLFLAGS) --mode=link $(CCLD) $(libkeyboard_la_CFLAGS) \
++++ gnome-settings-daemon-2.29.91.1/plugins/keyboard/Makefile.in	2010-03-03 21:39:01.000000000 +0100
 @@ -106,6 +106,8 @@
  ACLOCAL = @ACLOCAL@
  ALL_LINGUAS = @ALL_LINGUAS@
@@ -5416,32 +5400,7 @@ Index: gnome-settings-daemon-2.29.91.1/plugins/keyboard/Makefile.in
  MAKEINFO = @MAKEINFO@
  MKDIR_P = @MKDIR_P@
  MKINSTALLDIRS = @MKINSTALLDIRS@
-@@ -294,6 +297,8 @@
- 	gsd-xmodmap.c		\
- 	delayed-dialog.h	\
- 	delayed-dialog.c	\
-+	gkbd-configuration.c	\
-+	gkbd-configuration.h	\
- 	$(NULL)
- 
- libkeyboard_la_CPPFLAGS = \
-@@ -305,6 +310,7 @@
- libkeyboard_la_CFLAGS = \
- 	$(SETTINGS_PLUGIN_CFLAGS)	\
- 	$(LIBGNOMEKBDUI_CFLAGS)		\
-+	$(APPINDICATOR_CFLAGS)		\
- 	$(AM_CFLAGS)
- 
- libkeyboard_la_LDFLAGS = \
-@@ -315,6 +321,7 @@
- 	$(SETTINGS_PLUGIN_LIBS)	\
- 	$(XF86MISC_LIBS)	\
- 	$(LIBGNOMEKBDUI_LIBS)	\
-+	$(APPINDICATOR_LIBS)	\
- 	$(NULL)
- 
- plugin_in_files = \
-@@ -339,7 +346,7 @@
+@@ -339,7 +342,7 @@
  
  .SUFFIXES:
  .SUFFIXES: .c .lo .o .obj
@@ -5450,7 +5409,7 @@ Index: gnome-settings-daemon-2.29.91.1/plugins/keyboard/Makefile.in
  	@for dep in $?; do \
  	  case '$(am__configure_deps)' in \
  	    *$$dep*) \
-@@ -364,9 +371,9 @@
+@@ -364,9 +367,9 @@
  $(top_builddir)/config.status: $(top_srcdir)/configure $(CONFIG_STATUS_DEPENDENCIES)
  	cd $(top_builddir) && $(MAKE) $(AM_MAKEFLAGS) am--refresh
  
@@ -5462,32 +5421,10 @@ Index: gnome-settings-daemon-2.29.91.1/plugins/keyboard/Makefile.in
  	cd $(top_builddir) && $(MAKE) $(AM_MAKEFLAGS) am--refresh
  $(am__aclocal_m4_deps):
  install-pluginLTLIBRARIES: $(plugin_LTLIBRARIES)
-@@ -410,6 +417,7 @@
- 	-rm -f *.tab.c
- 
- @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libkeyboard_la-delayed-dialog.Plo@am__quote@
-+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libkeyboard_la-gkbd-configuration.Plo@am__quote@
- @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libkeyboard_la-gsd-keyboard-manager.Plo@am__quote@
- @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libkeyboard_la-gsd-keyboard-plugin.Plo@am__quote@
- @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libkeyboard_la-gsd-keyboard-xkb.Plo@am__quote@
-@@ -471,6 +479,13 @@
- @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
- @am__fastdepCC_FALSE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libkeyboard_la_CPPFLAGS) $(CPPFLAGS) $(libkeyboard_la_CFLAGS) $(CFLAGS) -c -o libkeyboard_la-delayed-dialog.lo `test -f 'delayed-dialog.c' || echo '$(srcdir)/'`delayed-dialog.c
- 
-+libkeyboard_la-gkbd-configuration.lo: gkbd-configuration.c
-+@am__fastdepCC_TRUE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libkeyboard_la_CPPFLAGS) $(CPPFLAGS) $(libkeyboard_la_CFLAGS) $(CFLAGS) -MT libkeyboard_la-gkbd-configuration.lo -MD -MP -MF $(DEPDIR)/libkeyboard_la-gkbd-configuration.Tpo -c -o libkeyboard_la-gkbd-configuration.lo `test -f 'gkbd-configuration.c' || echo '$(srcdir)/'`gkbd-configuration.c
-+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libkeyboard_la-gkbd-configuration.Tpo $(DEPDIR)/libkeyboard_la-gkbd-configuration.Plo
-+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='gkbd-configuration.c' object='libkeyboard_la-gkbd-configuration.lo' libtool=yes @AMDEPBACKSLASH@
-+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-+@am__fastdepCC_FALSE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libkeyboard_la_CPPFLAGS) $(CPPFLAGS) $(libkeyboard_la_CFLAGS) $(CFLAGS) -c -o libkeyboard_la-gkbd-configuration.lo `test -f 'gkbd-configuration.c' || echo '$(srcdir)/'`gkbd-configuration.c
-+
- mostlyclean-libtool:
- 	-rm -f *.lo
- 
 Index: gnome-settings-daemon-2.29.91.1/plugins/Makefile.in
 ===================================================================
 --- gnome-settings-daemon-2.29.91.1.orig/plugins/Makefile.in	2010-02-24 15:39:17.000000000 +0100
-+++ gnome-settings-daemon-2.29.91.1/plugins/Makefile.in	2010-03-02 19:14:00.000000000 +0100
++++ gnome-settings-daemon-2.29.91.1/plugins/Makefile.in	2010-03-03 21:39:00.000000000 +0100
 @@ -90,6 +90,8 @@
  ACLOCAL = @ACLOCAL@
  ALL_LINGUAS = @ALL_LINGUAS@
@@ -5529,7 +5466,7 @@ Index: gnome-settings-daemon-2.29.91.1/plugins/Makefile.in
 Index: gnome-settings-daemon-2.29.91.1/plugins/media-keys/cut-n-paste/Makefile.in
 ===================================================================
 --- gnome-settings-daemon-2.29.91.1.orig/plugins/media-keys/cut-n-paste/Makefile.in	2010-02-24 15:39:17.000000000 +0100
-+++ gnome-settings-daemon-2.29.91.1/plugins/media-keys/cut-n-paste/Makefile.in	2010-03-02 19:14:01.000000000 +0100
++++ gnome-settings-daemon-2.29.91.1/plugins/media-keys/cut-n-paste/Makefile.in	2010-03-03 21:39:01.000000000 +0100
 @@ -75,6 +75,8 @@
  ACLOCAL = @ACLOCAL@
  ALL_LINGUAS = @ALL_LINGUAS@
@@ -5571,7 +5508,7 @@ Index: gnome-settings-daemon-2.29.91.1/plugins/media-keys/cut-n-paste/Makefile.i
 Index: gnome-settings-daemon-2.29.91.1/plugins/media-keys/Makefile.in
 ===================================================================
 --- gnome-settings-daemon-2.29.91.1.orig/plugins/media-keys/Makefile.in	2010-02-24 15:39:17.000000000 +0100
-+++ gnome-settings-daemon-2.29.91.1/plugins/media-keys/Makefile.in	2010-03-02 19:14:00.000000000 +0100
++++ gnome-settings-daemon-2.29.91.1/plugins/media-keys/Makefile.in	2010-03-03 21:39:01.000000000 +0100
 @@ -183,6 +183,8 @@
  ACLOCAL = @ACLOCAL@
  ALL_LINGUAS = @ALL_LINGUAS@
@@ -5613,7 +5550,7 @@ Index: gnome-settings-daemon-2.29.91.1/plugins/media-keys/Makefile.in
 Index: gnome-settings-daemon-2.29.91.1/plugins/mouse/Makefile.in
 ===================================================================
 --- gnome-settings-daemon-2.29.91.1.orig/plugins/mouse/Makefile.in	2010-02-24 15:39:18.000000000 +0100
-+++ gnome-settings-daemon-2.29.91.1/plugins/mouse/Makefile.in	2010-03-02 19:14:01.000000000 +0100
++++ gnome-settings-daemon-2.29.91.1/plugins/mouse/Makefile.in	2010-03-03 21:39:01.000000000 +0100
 @@ -112,6 +112,8 @@
  ACLOCAL = @ACLOCAL@
  ALL_LINGUAS = @ALL_LINGUAS@
@@ -5655,7 +5592,7 @@ Index: gnome-settings-daemon-2.29.91.1/plugins/mouse/Makefile.in
 Index: gnome-settings-daemon-2.29.91.1/plugins/sound/Makefile.in
 ===================================================================
 --- gnome-settings-daemon-2.29.91.1.orig/plugins/sound/Makefile.in	2010-02-24 15:39:18.000000000 +0100
-+++ gnome-settings-daemon-2.29.91.1/plugins/sound/Makefile.in	2010-03-02 19:14:01.000000000 +0100
++++ gnome-settings-daemon-2.29.91.1/plugins/sound/Makefile.in	2010-03-03 21:39:01.000000000 +0100
 @@ -99,6 +99,8 @@
  ACLOCAL = @ACLOCAL@
  ALL_LINGUAS = @ALL_LINGUAS@
@@ -5697,7 +5634,7 @@ Index: gnome-settings-daemon-2.29.91.1/plugins/sound/Makefile.in
 Index: gnome-settings-daemon-2.29.91.1/plugins/typing-break/Makefile.in
 ===================================================================
 --- gnome-settings-daemon-2.29.91.1.orig/plugins/typing-break/Makefile.in	2010-02-24 15:39:18.000000000 +0100
-+++ gnome-settings-daemon-2.29.91.1/plugins/typing-break/Makefile.in	2010-03-02 19:14:01.000000000 +0100
++++ gnome-settings-daemon-2.29.91.1/plugins/typing-break/Makefile.in	2010-03-03 21:39:01.000000000 +0100
 @@ -104,6 +104,8 @@
  ACLOCAL = @ACLOCAL@
  ALL_LINGUAS = @ALL_LINGUAS@
@@ -5739,7 +5676,7 @@ Index: gnome-settings-daemon-2.29.91.1/plugins/typing-break/Makefile.in
 Index: gnome-settings-daemon-2.29.91.1/plugins/xrandr/Makefile.in
 ===================================================================
 --- gnome-settings-daemon-2.29.91.1.orig/plugins/xrandr/Makefile.in	2010-02-24 15:39:18.000000000 +0100
-+++ gnome-settings-daemon-2.29.91.1/plugins/xrandr/Makefile.in	2010-03-02 19:14:01.000000000 +0100
++++ gnome-settings-daemon-2.29.91.1/plugins/xrandr/Makefile.in	2010-03-03 21:39:01.000000000 +0100
 @@ -71,7 +71,7 @@
  LTLIBRARIES = $(plugin_LTLIBRARIES)
  am__DEPENDENCIES_1 =
@@ -5808,7 +5745,7 @@ Index: gnome-settings-daemon-2.29.91.1/plugins/xrandr/Makefile.in
 Index: gnome-settings-daemon-2.29.91.1/plugins/xrdb/data/Makefile.in
 ===================================================================
 --- gnome-settings-daemon-2.29.91.1.orig/plugins/xrdb/data/Makefile.in	2010-02-24 15:39:18.000000000 +0100
-+++ gnome-settings-daemon-2.29.91.1/plugins/xrdb/data/Makefile.in	2010-03-02 19:14:01.000000000 +0100
++++ gnome-settings-daemon-2.29.91.1/plugins/xrdb/data/Makefile.in	2010-03-03 21:39:02.000000000 +0100
 @@ -74,6 +74,8 @@
  ACLOCAL = @ACLOCAL@
  ALL_LINGUAS = @ALL_LINGUAS@
@@ -5850,7 +5787,7 @@ Index: gnome-settings-daemon-2.29.91.1/plugins/xrdb/data/Makefile.in
 Index: gnome-settings-daemon-2.29.91.1/plugins/xrdb/Makefile.in
 ===================================================================
 --- gnome-settings-daemon-2.29.91.1.orig/plugins/xrdb/Makefile.in	2010-02-24 15:39:18.000000000 +0100
-+++ gnome-settings-daemon-2.29.91.1/plugins/xrdb/Makefile.in	2010-03-02 19:14:01.000000000 +0100
++++ gnome-settings-daemon-2.29.91.1/plugins/xrdb/Makefile.in	2010-03-03 21:39:01.000000000 +0100
 @@ -138,6 +138,8 @@
  ACLOCAL = @ACLOCAL@
  ALL_LINGUAS = @ALL_LINGUAS@
@@ -5892,7 +5829,7 @@ Index: gnome-settings-daemon-2.29.91.1/plugins/xrdb/Makefile.in
 Index: gnome-settings-daemon-2.29.91.1/plugins/xsettings/Makefile.in
 ===================================================================
 --- gnome-settings-daemon-2.29.91.1.orig/plugins/xsettings/Makefile.in	2010-02-24 15:39:18.000000000 +0100
-+++ gnome-settings-daemon-2.29.91.1/plugins/xsettings/Makefile.in	2010-03-02 19:14:01.000000000 +0100
++++ gnome-settings-daemon-2.29.91.1/plugins/xsettings/Makefile.in	2010-03-03 21:39:02.000000000 +0100
 @@ -124,6 +124,8 @@
  ACLOCAL = @ACLOCAL@
  ALL_LINGUAS = @ALL_LINGUAS@
@@ -5934,7 +5871,7 @@ Index: gnome-settings-daemon-2.29.91.1/plugins/xsettings/Makefile.in
 Index: gnome-settings-daemon-2.29.91.1/config.h.in
 ===================================================================
 --- gnome-settings-daemon-2.29.91.1.orig/config.h.in	2010-02-24 15:39:16.000000000 +0100
-+++ gnome-settings-daemon-2.29.91.1/config.h.in	2010-03-02 19:13:47.000000000 +0100
++++ gnome-settings-daemon-2.29.91.1/config.h.in	2010-03-03 21:38:51.000000000 +0100
 @@ -9,6 +9,9 @@
  /* Name of default gettext domain */
  #undef GETTEXT_PACKAGE

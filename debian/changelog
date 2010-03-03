@@ -1,3 +1,15 @@
+gnome-settings-daemon (2.29.91.1-0ubuntu4) lucid; urgency=low
+
+  * debian/patches/06_use_application_indicator.patch:
+    - update by Jan Arne Petersen to undo the keyboard indicator change since
+      the current indicator-application doesn't allow to use a label, which
+      would be required to indicate the selected keyboard layout 
+      (lp: #531173, #531290, #531296)
+  * debian/patches/90_autoreconf.patch:
+    - refreshed for the previous change
+
+ -- Sebastien Bacher <seb128@ubuntu.com>  Wed, 03 Mar 2010 21:39:12 +0100
+
 gnome-settings-daemon (2.29.91.1-0ubuntu3) lucid; urgency=low
 
   * debian/control.in:
