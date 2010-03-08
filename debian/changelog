@@ -2,6 +2,8 @@ gnome-settings-daemon (2.29.92-0ubuntu1) UNRELEASED; urgency=low
 
   * debian/control.in:
     - bump libgnome-desktop-dev build-dep
+  * debian/patches/90_autoreconf.patch:
+    - refreshed
 
  -- Didier Roche <didrocks@ubuntu.com>  Mon, 08 Mar 2010 13:13:20 +0100
 
