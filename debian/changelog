@@ -1,3 +1,11 @@
+gnome-settings-daemon (2.29.91.1-0ubuntu5) UNRELEASED; urgency=low
+
+  * debian/rules:
+    - install gnome-update-wallpaper-cache in install: and not in 
+      binary-install: target
+
+ -- Didier Roche <didrocks@ubuntu.com>  Mon, 08 Mar 2010 09:45:40 +0100
+
 gnome-settings-daemon (2.29.91.1-0ubuntu4) lucid; urgency=low
 
   * debian/patches/06_use_application_indicator.patch:

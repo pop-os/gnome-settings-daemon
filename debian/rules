@@ -14,10 +14,12 @@ DEB_DH_MAKESHLIBS_ARGS_ALL += --no-act
 build/gnome-settings-daemon::
 	gcc -o gnome-settings-daemon/gnome-update-wallpaper-cache `pkg-config --cflags --libs glib-2.0 gdk-2.0 gconf-2.0 gnome-desktop-2.0` debian/gnome-update-wallpaper-cache.c
 
+install/gnome-settings-daemon::
+	/usr/bin/install -c gnome-settings-daemon/gnome-update-wallpaper-cache 'debian/tmp/usr/lib/gnome-settings-daemon'
+
 binary-install/gnome-settings-daemon::
 	find debian -name '*.a' -delete
 	find debian -name '*.la' -delete
-	/usr/bin/install -c gnome-settings-daemon/gnome-update-wallpaper-cache 'debian/tmp/usr/lib/gnome-settings-daemon'
 
 clean::
 	rm -f gnome-settings-daemon/gnome-update-wallpaper-cache
