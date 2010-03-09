@@ -1,11 +1,16 @@
-gnome-settings-daemon (2.29.92-0ubuntu1) UNRELEASED; urgency=low
+gnome-settings-daemon (2.29.92-0ubuntu1) lucid; urgency=low
 
+  * debian/patches/91_update_gvc_source.patch:
+    - update gvc copy using the current gnome-media version to fix a leak issue
+      (lp: #485923)
+
+  [ Didier Roche ]
   * debian/control.in:
     - bump libgnome-desktop-dev build-dep
   * debian/patches/90_autoreconf.patch:
     - refreshed
 
- -- Didier Roche <didrocks@ubuntu.com>  Mon, 08 Mar 2010 13:13:20 +0100
+ -- Sebastien Bacher <seb128@ubuntu.com>  Tue, 09 Mar 2010 10:18:09 +0100
 
 gnome-settings-daemon (2.29.91.1-0ubuntu5) lucid; urgency=low
 

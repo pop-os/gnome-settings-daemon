@@ -1,0 +1,13 @@
+diff -Nur gnome-settings-daemon-2.29.92/plugins/media-keys/cut-n-paste/gvc-mixer-stream.c gnome-settings-daemon-2.29.92.ubuntu/plugins/media-keys/cut-n-paste/gvc-mixer-stream.c
+--- gnome-settings-daemon-2.29.92/plugins/media-keys/cut-n-paste/gvc-mixer-stream.c	2009-08-24 12:20:18.000000000 +0200
++++ gnome-settings-daemon-2.29.92.ubuntu/plugins/media-keys/cut-n-paste/gvc-mixer-stream.c	2010-03-09 10:20:33.000000000 +0100
+@@ -844,6 +844,9 @@
+ 
+         g_return_if_fail (mixer_stream->priv != NULL);
+ 
++        g_object_unref (mixer_stream->priv->channel_map);
++        mixer_stream->priv->channel_map = NULL;
++
+         g_free (mixer_stream->priv->name);
+         mixer_stream->priv->name = NULL;
+ 
