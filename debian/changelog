@@ -1,3 +1,14 @@
+gnome-settings-daemon (2.29.92-0ubuntu2) lucid; urgency=low
+
+  * debian/patches/07_dont_display_autostart.patch:
+    - don't show the gnome-settings-daemon autostart in the session capplet,
+      the description is confusing and it's a required component (lp: #146918)
+  * debian/patches/92_keyboard_settings_update.patch:
+    - upstream change to apply xkb settings to newly connected keyboards
+      (lp: #427168)
+
+ -- Sebastien Bacher <seb128@ubuntu.com>  Wed, 10 Mar 2010 00:15:32 +0100
+
 gnome-settings-daemon (2.29.92-0ubuntu1) lucid; urgency=low
 
   * debian/patches/91_update_gvc_source.patch:

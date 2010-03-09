@@ -5,6 +5,7 @@
 04_dont_call_xrdb.patch
 05_disable_corner_tapping.patch
 06_use_application_indicator.patch
+07_dont_display_autostart.patch
 16_use_synchronous_notifications.patch
 30_pkgconfig-path.patch
 40_xres_lcddefault.patch
@@ -12,4 +13,5 @@
 71_fix_ldsm_notification_crash.patch
 90_autoreconf.patch
 91_update_gvc_source.patch
+92_keyboard_settings_update.patch
 99_ltmain_as-needed.patch
