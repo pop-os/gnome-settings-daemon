@@ -1,4 +1,4 @@
-gnome-settings-daemon (2.29.92-0ubuntu3) UNRELEASED; urgency=low
+gnome-settings-daemon (2.29.92-0ubuntu3) lucid; urgency=low
 
   * Add 08_multi_keyboard_layouts.patch: Default to system settings for
     handling multiple keyboard layouts. (LP: #460328)
@@ -7,7 +7,7 @@ gnome-settings-daemon (2.29.92-0ubuntu3) UNRELEASED; urgency=low
     always want to show the indicator if we have multiple keyboard layouts
     available.
 
- -- Martin Pitt <martin.pitt@ubuntu.com>  Tue, 23 Mar 2010 16:55:45 +0100
+ -- Martin Pitt <martin.pitt@ubuntu.com>  Tue, 23 Mar 2010 17:09:20 +0100
 
 gnome-settings-daemon (2.29.92-0ubuntu2) lucid; urgency=low
 
