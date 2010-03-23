@@ -2,6 +2,10 @@ gnome-settings-daemon (2.29.92-0ubuntu3) UNRELEASED; urgency=low
 
   * Add 08_multi_keyboard_layouts.patch: Default to system settings for
     handling multiple keyboard layouts. (LP: #460328)
+  * Add 09_indicator-display.patch: Always call show_hide_icon() in
+    apply_xkb_settings(), not just when we set a different keyboard layout. We
+    always want to show the indicator if we have multiple keyboard layouts
+    available.
 
  -- Martin Pitt <martin.pitt@ubuntu.com>  Tue, 23 Mar 2010 16:55:45 +0100
 
