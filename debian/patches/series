@@ -6,6 +6,7 @@
 05_disable_corner_tapping.patch
 06_use_application_indicator.patch
 07_dont_display_autostart.patch
+08_multi_keyboard_layouts.patch
 16_use_synchronous_notifications.patch
 30_pkgconfig-path.patch
 40_xres_lcddefault.patch

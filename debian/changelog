@@ -1,3 +1,10 @@
+gnome-settings-daemon (2.29.92-0ubuntu3) UNRELEASED; urgency=low
+
+  * Add 08_multi_keyboard_layouts.patch: Default to system settings for
+    handling multiple keyboard layouts. (LP: #460328)
+
+ -- Martin Pitt <martin.pitt@ubuntu.com>  Tue, 23 Mar 2010 16:55:45 +0100
+
 gnome-settings-daemon (2.29.92-0ubuntu2) lucid; urgency=low
 
   * debian/patches/07_dont_display_autostart.patch:
