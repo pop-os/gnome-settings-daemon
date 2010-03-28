@@ -1,3 +1,10 @@
+gnome-settings-daemon (2.29.92-0ubuntu4) UNRELEASED; urgency=low
+
+  * debian/patches/16_use_synchronous_notifications.patch:
+    - Update so that volume change event sounds work correctly (LP: #538761)
+
+ -- Chris Coulson <chris.coulson@canonical.com>  Sun, 28 Mar 2010 02:07:56 +0100
+
 gnome-settings-daemon (2.29.92-0ubuntu3) lucid; urgency=low
 
   * Add 08_multi_keyboard_layouts.patch: Default to system settings for
