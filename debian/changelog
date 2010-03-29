@@ -1,4 +1,4 @@
-gnome-settings-daemon (2.29.92-0ubuntu4) UNRELEASED; urgency=low
+gnome-settings-daemon (2.29.92-0ubuntu4) lucid; urgency=low
 
   * debian/patches/16_use_synchronous_notifications.patch:
     - Update so that volume change event sounds work correctly (LP: #538761)
