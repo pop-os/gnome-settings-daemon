@@ -1,9 +1,10 @@
-gnome-settings-daemon (2.30.0-0ubuntu2) UNRELEASED; urgency=low
+gnome-settings-daemon (2.30.0-0ubuntu3) UNRELEASED; urgency=low
 
   * remove debian/patches/04_dont_call_xrdb.patch: upstreamed
   * debian/patches/16_use_synchronous_notifications.patch: refreshed
+  * debian/patches/90_autoreconf.patch: refreshed
 
- -- Didier Roche <didrocks@ubuntu.com>  Tue, 30 Mar 2010 12:00:35 +0200
+ -- Didier Roche <didrocks@ubuntu.com>  Tue, 30 Mar 2010 12:01:57 +0200
 
 gnome-settings-daemon (2.29.92-0ubuntu4) lucid; urgency=low
 
