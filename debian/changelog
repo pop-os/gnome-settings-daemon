@@ -1,11 +1,17 @@
 gnome-settings-daemon (2.30.0-0ubuntu1) UNRELEASED; urgency=low
 
+  [ Didier Roche ]
   * remove debian/patches/04_dont_call_xrdb.patch: upstreamed
   * debian/patches/16_use_synchronous_notifications.patch: refreshed
   * debian/patches/90_autoreconf.patch: refreshed
   * remove debian/patches/92_keyboard_settings_update.patch: from upstream
 
- -- Didier Roche <didrocks@ubuntu.com>  Tue, 30 Mar 2010 12:05:19 +0200
+  [ Chris Coulson ]
+  * debian/patches/16_use_synchronous_notifications.patch:
+    - Make sure that gsd-osd-notification.[c,h] are compiled
+    - Remove superfluous ca_gtk_play_for_widget_call
+
+ -- Chris Coulson <chris.coulson@canonical.com>  Tue, 30 Mar 2010 12:19:54 +0100
 
 gnome-settings-daemon (2.29.92-0ubuntu4) lucid; urgency=low
 

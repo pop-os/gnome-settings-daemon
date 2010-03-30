@@ -1,7 +1,7 @@
 Index: gnome-settings-daemon-2.30.0/plugins/common/gsd-osd-notification.c
 ===================================================================
 --- /dev/null	1970-01-01 00:00:00.000000000 +0000
-+++ gnome-settings-daemon-2.30.0/plugins/common/gsd-osd-notification.c	2010-03-30 12:19:39.150399688 +0200
++++ gnome-settings-daemon-2.30.0/plugins/common/gsd-osd-notification.c	2010-03-30 12:07:31.070072473 +0100
 @@ -0,0 +1,286 @@
 +/* -*- Mode: C; indent-tabs-mode: nil; c-basic-offset: 8; tab-width: 8 -*- */
 +/*
@@ -292,7 +292,7 @@ Index: gnome-settings-daemon-2.30.0/plugins/common/gsd-osd-notification.c
 Index: gnome-settings-daemon-2.30.0/plugins/common/gsd-osd-notification.h
 ===================================================================
 --- /dev/null	1970-01-01 00:00:00.000000000 +0000
-+++ gnome-settings-daemon-2.30.0/plugins/common/gsd-osd-notification.h	2010-03-30 12:19:39.150399688 +0200
++++ gnome-settings-daemon-2.30.0/plugins/common/gsd-osd-notification.h	2010-03-30 12:07:31.070072473 +0100
 @@ -0,0 +1,75 @@
 +/* -*- Mode: C; indent-tabs-mode: nil; c-basic-offset: 8; tab-width: 8 -*- */
 +/*
@@ -371,8 +371,8 @@ Index: gnome-settings-daemon-2.30.0/plugins/common/gsd-osd-notification.h
 +#endif /* _GSD_OSD_NOTIFICATION_H_ */
 Index: gnome-settings-daemon-2.30.0/plugins/media-keys/gsd-media-keys-manager.c
 ===================================================================
---- gnome-settings-daemon-2.30.0.orig/plugins/media-keys/gsd-media-keys-manager.c	2010-03-29 10:15:04.000000000 +0200
-+++ gnome-settings-daemon-2.30.0/plugins/media-keys/gsd-media-keys-manager.c	2010-03-30 12:21:19.906400245 +0200
+--- gnome-settings-daemon-2.30.0.orig/plugins/media-keys/gsd-media-keys-manager.c	2010-03-30 12:07:25.787575811 +0100
++++ gnome-settings-daemon-2.30.0/plugins/media-keys/gsd-media-keys-manager.c	2010-03-30 12:12:09.677573212 +0100
 @@ -49,6 +49,7 @@
  #include "eggaccelerators.h"
  #include "acme.h"
@@ -473,25 +473,32 @@ Index: gnome-settings-daemon-2.30.0/plugins/media-keys/gsd-media-keys-manager.c
          vol = CLAMP (vol, 0, 100);
  
          dialog_init (manager);
-@@ -674,6 +706,17 @@
-                                         CA_PROP_EVENT_DESCRIPTION, "volume changed through key press",
-                                         CA_PROP_APPLICATION_ID, "org.gnome.VolumeControl",
-                                         NULL);
-+
+@@ -668,12 +700,18 @@
+                                           GSD_MEDIA_KEYS_WINDOW_ACTION_VOLUME);
+         dialog_show (manager);
+ 
+-        if (sound_changed != FALSE && muted == FALSE)
+-                ca_gtk_play_for_widget (manager->priv->dialog, 0,
+-                                        CA_PROP_EVENT_ID, "audio-volume-change",
+-                                        CA_PROP_EVENT_DESCRIPTION, "volume changed through key press",
+-                                        CA_PROP_APPLICATION_ID, "org.gnome.VolumeControl",
+-                                        NULL);
 +done:
-+        if (manager->priv->dialog == NULL) {
-+                window = gtk_window_new (GTK_WINDOW_TOPLEVEL);
-+                gtk_window_set_screen (GTK_WINDOW (window), manager->priv->current_screen);
-+                gtk_widget_realize (window);
-+                play_volume_event_sound (window);
-+                gtk_widget_destroy (window);        
-+        } else {
-+                play_volume_event_sound (manager->priv->dialog);        
++        if (sound_changed != FALSE && muted == FALSE) {
++                if (manager->priv->dialog == NULL) {
++                        window = gtk_window_new (GTK_WINDOW_TOPLEVEL);
++                        gtk_window_set_screen (GTK_WINDOW (window), manager->priv->current_screen);
++                        gtk_widget_realize (window);
++                        play_volume_event_sound (window);
++                        gtk_widget_destroy (window);        
++                } else {
++                        play_volume_event_sound (manager->priv->dialog);        
++                }
 +        }
  }
  
  static void
-@@ -683,6 +726,7 @@
+@@ -683,6 +721,7 @@
          gboolean muted;
          guint vol, norm_vol_step;
          int vol_step;
@@ -499,7 +506,7 @@ Index: gnome-settings-daemon-2.30.0/plugins/media-keys/gsd-media-keys-manager.c
          gboolean sound_changed;
  
          if (manager->priv->stream == NULL)
-@@ -722,7 +766,10 @@
+@@ -722,7 +761,10 @@
                          if (gvc_mixer_stream_set_volume (manager->priv->stream, vol) != FALSE) {
                                  gvc_mixer_stream_push_volume (manager->priv->stream);
                                  sound_changed = TRUE;
@@ -510,7 +517,7 @@ Index: gnome-settings-daemon-2.30.0/plugins/media-keys/gsd-media-keys-manager.c
                  }
                  break;
          case VOLUME_UP_KEY:
-@@ -750,12 +797,14 @@
+@@ -750,12 +792,14 @@
                                          gvc_mixer_stream_push_volume (manager->priv->stream);
                                          sound_changed = TRUE;
                                  }
@@ -526,7 +533,7 @@ Index: gnome-settings-daemon-2.30.0/plugins/media-keys/gsd-media-keys-manager.c
  }
  
  static void
-@@ -900,8 +949,11 @@
+@@ -900,8 +944,11 @@
  
  static gboolean
  do_multimedia_player_action (GsdMediaKeysManager *manager,
@@ -538,7 +545,7 @@ Index: gnome-settings-daemon-2.30.0/plugins/media-keys/gsd-media-keys-manager.c
          return gsd_media_player_key_pressed (manager, key);
  }
  
-@@ -972,19 +1024,19 @@
+@@ -972,19 +1019,19 @@
                  execute (manager, "gcalctool", FALSE, FALSE);
                  break;
          case PLAY_KEY:
@@ -563,7 +570,7 @@ Index: gnome-settings-daemon-2.30.0/plugins/media-keys/gsd-media-keys-manager.c
                  break;
          default:
                  g_assert_not_reached ();
-@@ -1121,6 +1173,8 @@
+@@ -1121,6 +1168,8 @@
  
          gvc_mixer_control_open (manager->priv->volume);
  
@@ -572,7 +579,7 @@ Index: gnome-settings-daemon-2.30.0/plugins/media-keys/gsd-media-keys-manager.c
          gnome_settings_profile_end ("gvc_mixer_control_new");
  #endif /* HAVE_PULSE */
          g_idle_add ((GSourceFunc) start_media_keys_idle_cb, manager);
-@@ -1218,6 +1272,9 @@
+@@ -1218,6 +1267,9 @@
          }
          g_list_free (priv->media_players);
          priv->media_players = NULL;

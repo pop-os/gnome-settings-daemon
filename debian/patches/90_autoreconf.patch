@@ -1,60 +1,7 @@
-
-Index: gnome-settings-daemon-2.30.0/Makefile.in
-===================================================================
---- gnome-settings-daemon-2.30.0.orig/Makefile.in	2010-03-29 16:11:15.000000000 +0200
-+++ gnome-settings-daemon-2.30.0/Makefile.in	2010-03-30 12:01:16.354401042 +0200
-@@ -106,6 +106,8 @@
- ACLOCAL = @ACLOCAL@
- ALL_LINGUAS = @ALL_LINGUAS@
- AMTAR = @AMTAR@
-+APPINDICATOR_CFLAGS = @APPINDICATOR_CFLAGS@
-+APPINDICATOR_LIBS = @APPINDICATOR_LIBS@
- AR = @AR@
- AUTOCONF = @AUTOCONF@
- AUTOHEADER = @AUTOHEADER@
-@@ -175,6 +177,7 @@
- LIPO = @LIPO@
- LN_S = @LN_S@
- LTLIBOBJS = @LTLIBOBJS@
-+MAINT = @MAINT@
- MAKEINFO = @MAKEINFO@
- MKDIR_P = @MKDIR_P@
- MKINSTALLDIRS = @MKINSTALLDIRS@
-@@ -300,7 +303,7 @@
- .SUFFIXES:
- am--refresh:
- 	@:
--$(srcdir)/Makefile.in:  $(srcdir)/Makefile.am  $(am__configure_deps)
-+$(srcdir)/Makefile.in: @MAINTAINER_MODE_TRUE@ $(srcdir)/Makefile.am  $(am__configure_deps)
- 	@for dep in $?; do \
- 	  case '$(am__configure_deps)' in \
- 	    *$$dep*) \
-@@ -327,9 +330,9 @@
- $(top_builddir)/config.status: $(top_srcdir)/configure $(CONFIG_STATUS_DEPENDENCIES)
- 	$(SHELL) ./config.status --recheck
- 
--$(top_srcdir)/configure:  $(am__configure_deps)
-+$(top_srcdir)/configure: @MAINTAINER_MODE_TRUE@ $(am__configure_deps)
- 	$(am__cd) $(srcdir) && $(AUTOCONF)
--$(ACLOCAL_M4):  $(am__aclocal_m4_deps)
-+$(ACLOCAL_M4): @MAINTAINER_MODE_TRUE@ $(am__aclocal_m4_deps)
- 	$(am__cd) $(srcdir) && $(ACLOCAL) $(ACLOCAL_AMFLAGS)
- $(am__aclocal_m4_deps):
- 
-@@ -342,7 +345,7 @@
- stamp-h1: $(srcdir)/config.h.in $(top_builddir)/config.status
- 	@rm -f stamp-h1
- 	cd $(top_builddir) && $(SHELL) ./config.status config.h
--$(srcdir)/config.h.in:  $(am__configure_deps) 
-+$(srcdir)/config.h.in: @MAINTAINER_MODE_TRUE@ $(am__configure_deps) 
- 	($(am__cd) $(top_srcdir) && $(AUTOHEADER))
- 	rm -f stamp-h1
- 	touch $@
-Index: gnome-settings-daemon-2.30.0/aclocal.m4
-===================================================================
---- gnome-settings-daemon-2.30.0.orig/aclocal.m4	2010-03-29 16:11:11.000000000 +0200
-+++ gnome-settings-daemon-2.30.0/aclocal.m4	2010-03-30 12:00:56.750401857 +0200
-@@ -19,2048 +19,2720 @@
+diff -Nurp gnome-settings-daemon-2.30.0.orig/aclocal.m4 gnome-settings-daemon-2.30.0/aclocal.m4
+--- gnome-settings-daemon-2.30.0.orig/aclocal.m4	2010-03-30 12:18:41.920078901 +0100
++++ gnome-settings-daemon-2.30.0/aclocal.m4	2010-03-30 12:18:47.427598222 +0100
+@@ -19,2048 +19,2720 @@ You have another version of autoconf.  I
  If you have problems, you may need to regenerate the build system entirely.
  To do so, use the procedure documented by the package, typically `autoreconf'.])])
  
@@ -4553,7 +4500,7 @@ Index: gnome-settings-daemon-2.30.0/aclocal.m4
    if $ECHO "$lt_search_path_spec" | $GREP ';' >/dev/null ; then
      # if the path contains ";" then we assume it to be the separator
      # otherwise default to the standard path separator (i.e. ":") - it is
-@@ -7232,2601 +7904,1969 @@
+@@ -7232,2601 +7904,1969 @@ func_stripname ()
    # positional parameters, so assign one to ordinary parameter first.
    func_stripname_result=${3}
    func_stripname_result=${func_stripname_result#"${1}"}
@@ -8815,10 +8762,9 @@ Index: gnome-settings-daemon-2.30.0/aclocal.m4
 +]) # _AM_PROG_TAR
  
  m4_include([acinclude.m4])
-Index: gnome-settings-daemon-2.30.0/config.h.in
-===================================================================
---- gnome-settings-daemon-2.30.0.orig/config.h.in	2010-03-29 16:11:13.000000000 +0200
-+++ gnome-settings-daemon-2.30.0/config.h.in	2010-03-30 12:00:56.754402924 +0200
+diff -Nurp gnome-settings-daemon-2.30.0.orig/config.h.in gnome-settings-daemon-2.30.0/config.h.in
+--- gnome-settings-daemon-2.30.0.orig/config.h.in	2010-03-30 12:18:41.900075659 +0100
++++ gnome-settings-daemon-2.30.0/config.h.in	2010-03-30 12:18:53.547573803 +0100
 @@ -9,6 +9,9 @@
  /* Name of default gettext domain */
  #undef GETTEXT_PACKAGE
@@ -8829,11 +8775,10 @@ Index: gnome-settings-daemon-2.30.0/config.h.in
  /* Define to 1 if you have the `bind_textdomain_codeset' function. */
  #undef HAVE_BIND_TEXTDOMAIN_CODESET
  
-Index: gnome-settings-daemon-2.30.0/configure
-===================================================================
---- gnome-settings-daemon-2.30.0.orig/configure	2010-03-29 16:11:12.000000000 +0200
-+++ gnome-settings-daemon-2.30.0/configure	2010-03-30 12:01:12.782400133 +0200
-@@ -773,6 +773,10 @@
+diff -Nurp gnome-settings-daemon-2.30.0.orig/configure gnome-settings-daemon-2.30.0/configure
+--- gnome-settings-daemon-2.30.0.orig/configure	2010-03-30 12:18:41.900075659 +0100
++++ gnome-settings-daemon-2.30.0/configure	2010-03-30 12:18:52.997571919 +0100
+@@ -773,6 +773,10 @@ X_PRE_LIBS
  X_CFLAGS
  XMKMF
  DBUS_SYS_DIR
@@ -8844,7 +8789,7 @@ Index: gnome-settings-daemon-2.30.0/configure
  LIBNOTIFY_LIBS
  LIBNOTIFY_CFLAGS
  GCONF_SCHEMAS_INSTALL_FALSE
-@@ -884,6 +888,9 @@
+@@ -884,6 +888,9 @@ CPPFLAGS
  LDFLAGS
  CFLAGS
  CC
@@ -8854,7 +8799,7 @@ Index: gnome-settings-daemon-2.30.0/configure
  am__untar
  am__tar
  AMTAR
-@@ -948,6 +955,7 @@
+@@ -948,6 +955,7 @@ SHELL'
  ac_subst_files=''
  ac_user_opts='
  enable_option_checking
@@ -8862,7 +8807,7 @@ Index: gnome-settings-daemon-2.30.0/configure
  enable_dependency_tracking
  enable_shared
  enable_static
-@@ -962,6 +970,7 @@
+@@ -962,6 +970,7 @@ with_gconf_source
  with_gconf_schema_file_dir
  enable_schemas_install
  with_libnotify
@@ -8870,7 +8815,7 @@ Index: gnome-settings-daemon-2.30.0/configure
  with_dbus_sys
  with_dbus_services
  with_x
-@@ -990,6 +999,8 @@
+@@ -990,6 +999,8 @@ SETTINGS_PLUGIN_CFLAGS
  SETTINGS_PLUGIN_LIBS
  LIBNOTIFY_CFLAGS
  LIBNOTIFY_LIBS
@@ -8879,7 +8824,7 @@ Index: gnome-settings-daemon-2.30.0/configure
  XMKMF
  FONTCONFIG_CFLAGS
  FONTCONFIG_LIBS
-@@ -1623,6 +1634,8 @@
+@@ -1623,6 +1634,8 @@ Optional Features:
    --disable-option-checking  ignore unrecognized --enable/--with options
    --disable-FEATURE       do not include FEATURE (same as --enable-FEATURE=no)
    --enable-FEATURE[=ARG]  include FEATURE [ARG=yes]
@@ -8888,7 +8833,7 @@ Index: gnome-settings-daemon-2.30.0/configure
    --disable-dependency-tracking  speeds up one-time build
    --enable-dependency-tracking   do not reject slow dependency extractors
    --enable-shared[=PKGS]  build shared libraries [default=yes]
-@@ -1636,6 +1649,8 @@
+@@ -1636,6 +1649,8 @@ Optional Features:
    --enable-iso-c          Try to warn if code is not ISO C
    --disable-schemas-install
                            Disable the schemas installation
@@ -8897,7 +8842,7 @@ Index: gnome-settings-daemon-2.30.0/configure
    --disable-pulse         turn off PulseAudio support
    --enable-profiling      turn on profiling
    --enable-more-warnings  Maximum compiler warnings
-@@ -1682,6 +1697,10 @@
+@@ -1682,6 +1697,10 @@ Some influential environment variables:
                C compiler flags for LIBNOTIFY, overriding pkg-config
    LIBNOTIFY_LIBS
                linker flags for LIBNOTIFY, overriding pkg-config
@@ -8908,7 +8853,7 @@ Index: gnome-settings-daemon-2.30.0/configure
    XMKMF       Path to xmkmf, Makefile generator for X Window System
    FONTCONFIG_CFLAGS
                C compiler flags for FONTCONFIG, overriding pkg-config
-@@ -3244,6 +3263,29 @@
+@@ -3244,6 +3263,29 @@ $as_echo "$am_cv_prog_tar_ustar" >&6; }
  
  
  
@@ -8938,7 +8883,7 @@ Index: gnome-settings-daemon-2.30.0/configure
  DEPDIR="${am__leading_dot}deps"
  
  ac_config_commands="$ac_config_commands depfiles"
-@@ -5665,13 +5707,13 @@
+@@ -5665,13 +5707,13 @@ if test "${lt_cv_nm_interface+set}" = se
  else
    lt_cv_nm_interface="BSD nm"
    echo "int some_variable = 0;" > conftest.$ac_ext
@@ -8955,7 +8900,7 @@ Index: gnome-settings-daemon-2.30.0/configure
    cat conftest.out >&5
    if $GREP 'External.*some_variable' conftest.out > /dev/null; then
      lt_cv_nm_interface="MS dumpbin"
-@@ -6876,7 +6918,7 @@
+@@ -6876,7 +6918,7 @@ ia64-*-hpux*)
    ;;
  *-*-irix6*)
    # Find out which ABI we are using.
@@ -8964,7 +8909,7 @@ Index: gnome-settings-daemon-2.30.0/configure
    if { { eval echo "\"\$as_me\":${as_lineno-$LINENO}: \"$ac_compile\""; } >&5
    (eval $ac_compile) 2>&5
    ac_status=$?
-@@ -8679,11 +8721,11 @@
+@@ -8679,11 +8721,11 @@ else
     -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
     -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
     -e 's:$: $lt_compiler_flag:'`
@@ -8978,7 +8923,7 @@ Index: gnome-settings-daemon-2.30.0/configure
     if (exit $ac_status) && test -s "$ac_outfile"; then
       # The compiler can only warn and ignore the option if not recognized
       # So say no if there are warnings other than the usual output.
-@@ -9018,11 +9060,11 @@
+@@ -9018,11 +9060,11 @@ else
     -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
     -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
     -e 's:$: $lt_compiler_flag:'`
@@ -8992,7 +8937,7 @@ Index: gnome-settings-daemon-2.30.0/configure
     if (exit $ac_status) && test -s "$ac_outfile"; then
       # The compiler can only warn and ignore the option if not recognized
       # So say no if there are warnings other than the usual output.
-@@ -9123,11 +9165,11 @@
+@@ -9123,11 +9165,11 @@ else
     -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
     -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
     -e 's:$: $lt_compiler_flag:'`
@@ -9006,7 +8951,7 @@ Index: gnome-settings-daemon-2.30.0/configure
     if (exit $ac_status) && test -s out/conftest2.$ac_objext
     then
       # The compiler can only warn and ignore the option if not recognized
-@@ -9178,11 +9220,11 @@
+@@ -9178,11 +9220,11 @@ else
     -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
     -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
     -e 's:$: $lt_compiler_flag:'`
@@ -9020,7 +8965,7 @@ Index: gnome-settings-daemon-2.30.0/configure
     if (exit $ac_status) && test -s out/conftest2.$ac_objext
     then
       # The compiler can only warn and ignore the option if not recognized
-@@ -11562,7 +11604,7 @@
+@@ -11562,7 +11604,7 @@ else
    lt_dlunknown=0; lt_dlno_uscore=1; lt_dlneed_uscore=2
    lt_status=$lt_dlunknown
    cat > conftest.$ac_ext <<_LT_EOF
@@ -9029,7 +8974,7 @@ Index: gnome-settings-daemon-2.30.0/configure
  #include "confdefs.h"
  
  #if HAVE_DLFCN_H
-@@ -11658,7 +11700,7 @@
+@@ -11658,7 +11700,7 @@ else
    lt_dlunknown=0; lt_dlno_uscore=1; lt_dlneed_uscore=2
    lt_status=$lt_dlunknown
    cat > conftest.$ac_ext <<_LT_EOF
@@ -9038,7 +8983,7 @@ Index: gnome-settings-daemon-2.30.0/configure
  #include "confdefs.h"
  
  #if HAVE_DLFCN_H
-@@ -13614,11 +13656,11 @@
+@@ -13614,11 +13656,11 @@ else
     -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
     -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
     -e 's:$: $lt_compiler_flag:'`
@@ -9052,7 +8997,7 @@ Index: gnome-settings-daemon-2.30.0/configure
     if (exit $ac_status) && test -s "$ac_outfile"; then
       # The compiler can only warn and ignore the option if not recognized
       # So say no if there are warnings other than the usual output.
-@@ -13713,11 +13755,11 @@
+@@ -13713,11 +13755,11 @@ else
     -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
     -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
     -e 's:$: $lt_compiler_flag:'`
@@ -9066,7 +9011,7 @@ Index: gnome-settings-daemon-2.30.0/configure
     if (exit $ac_status) && test -s out/conftest2.$ac_objext
     then
       # The compiler can only warn and ignore the option if not recognized
-@@ -13765,11 +13807,11 @@
+@@ -13765,11 +13807,11 @@ else
     -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
     -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
     -e 's:$: $lt_compiler_flag:'`
@@ -9080,7 +9025,7 @@ Index: gnome-settings-daemon-2.30.0/configure
     if (exit $ac_status) && test -s out/conftest2.$ac_objext
     then
       # The compiler can only warn and ignore the option if not recognized
-@@ -16166,6 +16208,7 @@
+@@ -16166,6 +16208,7 @@ GCONF_REQUIRED_VERSION=2.6.1
  GIO_REQUIRED_VERSION=2.17.3
  GNOME_DESKTOP_REQUIRED_VERSION=2.29.92
  LIBNOTIFY_REQUIRED_VERSION=0.4.3
@@ -9088,7 +9033,7 @@ Index: gnome-settings-daemon-2.30.0/configure
  
  
  
-@@ -16550,12 +16593,16 @@
+@@ -16550,12 +16593,16 @@ if test -n "$PKG_CONFIG"; then
          gnome-desktop-2.0 >= \$GNOME_DESKTOP_REQUIRED_VERSION
          gio-2.0 >= \$GIO_REQUIRED_VERSION
          dbus-glib-1 >= \$DBUS_GLIB_REQUIRED_VERSION
@@ -9105,7 +9050,7 @@ Index: gnome-settings-daemon-2.30.0/configure
  ") 2>&5
    ac_status=$?
    $as_echo "$as_me:${as_lineno-$LINENO}: \$? = $ac_status" >&5
-@@ -16565,6 +16612,8 @@
+@@ -16565,6 +16612,8 @@ if test -n "$PKG_CONFIG"; then
          gnome-desktop-2.0 >= $GNOME_DESKTOP_REQUIRED_VERSION
          gio-2.0 >= $GIO_REQUIRED_VERSION
          dbus-glib-1 >= $DBUS_GLIB_REQUIRED_VERSION
@@ -9114,7 +9059,7 @@ Index: gnome-settings-daemon-2.30.0/configure
  " 2>/dev/null`
  else
    pkg_failed=yes
-@@ -16583,12 +16632,16 @@
+@@ -16583,12 +16632,16 @@ if test -n "$PKG_CONFIG"; then
          gnome-desktop-2.0 >= \$GNOME_DESKTOP_REQUIRED_VERSION
          gio-2.0 >= \$GIO_REQUIRED_VERSION
          dbus-glib-1 >= \$DBUS_GLIB_REQUIRED_VERSION
@@ -9131,7 +9076,7 @@ Index: gnome-settings-daemon-2.30.0/configure
  ") 2>&5
    ac_status=$?
    $as_echo "$as_me:${as_lineno-$LINENO}: \$? = $ac_status" >&5
-@@ -16598,6 +16651,8 @@
+@@ -16598,6 +16651,8 @@ if test -n "$PKG_CONFIG"; then
          gnome-desktop-2.0 >= $GNOME_DESKTOP_REQUIRED_VERSION
          gio-2.0 >= $GIO_REQUIRED_VERSION
          dbus-glib-1 >= $DBUS_GLIB_REQUIRED_VERSION
@@ -9140,7 +9085,7 @@ Index: gnome-settings-daemon-2.30.0/configure
  " 2>/dev/null`
  else
    pkg_failed=yes
-@@ -16622,6 +16677,8 @@
+@@ -16622,6 +16677,8 @@ fi
          gnome-desktop-2.0 >= $GNOME_DESKTOP_REQUIRED_VERSION
          gio-2.0 >= $GIO_REQUIRED_VERSION
          dbus-glib-1 >= $DBUS_GLIB_REQUIRED_VERSION
@@ -9149,7 +9094,7 @@ Index: gnome-settings-daemon-2.30.0/configure
  "`
          else
  	        SETTINGS_PLUGIN_PKG_ERRORS=`$PKG_CONFIG --errors-to-stdout --print-errors "gtk+-2.0 >= $GTK_REQUIRED_VERSION
-@@ -16629,6 +16686,8 @@
+@@ -16629,6 +16686,8 @@ fi
          gnome-desktop-2.0 >= $GNOME_DESKTOP_REQUIRED_VERSION
          gio-2.0 >= $GIO_REQUIRED_VERSION
          dbus-glib-1 >= $DBUS_GLIB_REQUIRED_VERSION
@@ -9158,7 +9103,7 @@ Index: gnome-settings-daemon-2.30.0/configure
  "`
          fi
  	# Put the nasty error message in config.log where it belongs
-@@ -16639,6 +16698,8 @@
+@@ -16639,6 +16698,8 @@ fi
          gnome-desktop-2.0 >= $GNOME_DESKTOP_REQUIRED_VERSION
          gio-2.0 >= $GIO_REQUIRED_VERSION
          dbus-glib-1 >= $DBUS_GLIB_REQUIRED_VERSION
@@ -9167,7 +9112,7 @@ Index: gnome-settings-daemon-2.30.0/configure
  ) were not met:
  
  $SETTINGS_PLUGIN_PKG_ERRORS
-@@ -16906,6 +16967,135 @@
+@@ -16906,6 +16967,135 @@ fi
  
  
  
@@ -9303,7 +9248,7 @@ Index: gnome-settings-daemon-2.30.0/configure
  
  # Check whether --with-dbus-sys was given.
  if test "${with_dbus_sys+set}" = set; then :
-@@ -18428,6 +18618,10 @@
+@@ -18428,6 +18618,10 @@ else
    am__EXEEXT_FALSE=
  fi
  
@@ -9314,7 +9259,7 @@ Index: gnome-settings-daemon-2.30.0/configure
  if test -z "${AMDEP_TRUE}" && test -z "${AMDEP_FALSE}"; then
    as_fn_error "conditional \"AMDEP\" was never defined.
  Usually this means the macro was only invoked conditionally." "$LINENO" 5
-@@ -18452,6 +18646,10 @@
+@@ -18452,6 +18646,10 @@ if test -z "${GCONF_SCHEMAS_INSTALL_TRUE
    as_fn_error "conditional \"GCONF_SCHEMAS_INSTALL\" was never defined.
  Usually this means the macro was only invoked conditionally." "$LINENO" 5
  fi
@@ -9325,7 +9270,7 @@ Index: gnome-settings-daemon-2.30.0/configure
  if test -z "${HAVE_XINPUT_TRUE}" && test -z "${HAVE_XINPUT_FALSE}"; then
    as_fn_error "conditional \"HAVE_XINPUT\" was never defined.
  Usually this means the macro was only invoked conditionally." "$LINENO" 5
-@@ -21010,6 +21208,7 @@
+@@ -21010,6 +21208,7 @@ echo "
          dbus-1 system.d dir:      ${DBUS_SYS_DIR}
  
          Libnotify support:        ${have_libnotify}
@@ -9333,11 +9278,10 @@ Index: gnome-settings-daemon-2.30.0/configure
          PulseAudio support:       ${have_pulse}
          Profiling support:        ${enable_profiling}
  "
-Index: gnome-settings-daemon-2.30.0/data/Makefile.in
-===================================================================
---- gnome-settings-daemon-2.30.0.orig/data/Makefile.in	2010-03-29 16:11:13.000000000 +0200
-+++ gnome-settings-daemon-2.30.0/data/Makefile.in	2010-03-30 12:01:14.046400225 +0200
-@@ -81,6 +81,8 @@
+diff -Nurp gnome-settings-daemon-2.30.0.orig/data/Makefile.in gnome-settings-daemon-2.30.0/data/Makefile.in
+--- gnome-settings-daemon-2.30.0.orig/data/Makefile.in	2010-03-30 12:18:41.890102813 +0100
++++ gnome-settings-daemon-2.30.0/data/Makefile.in	2010-03-30 12:18:54.337573929 +0100
+@@ -81,6 +81,8 @@ DISTFILES = $(DIST_COMMON) $(DIST_SOURCE
  ACLOCAL = @ACLOCAL@
  ALL_LINGUAS = @ALL_LINGUAS@
  AMTAR = @AMTAR@
@@ -9346,7 +9290,7 @@ Index: gnome-settings-daemon-2.30.0/data/Makefile.in
  AR = @AR@
  AUTOCONF = @AUTOCONF@
  AUTOHEADER = @AUTOHEADER@
-@@ -150,6 +152,7 @@
+@@ -150,6 +152,7 @@ LIBTOOL = @LIBTOOL@
  LIPO = @LIPO@
  LN_S = @LN_S@
  LTLIBOBJS = @LTLIBOBJS@
@@ -9354,7 +9298,7 @@ Index: gnome-settings-daemon-2.30.0/data/Makefile.in
  MAKEINFO = @MAKEINFO@
  MKDIR_P = @MKDIR_P@
  MKINSTALLDIRS = @MKINSTALLDIRS@
-@@ -298,7 +301,7 @@
+@@ -298,7 +301,7 @@ MAINTAINERCLEANFILES = \
  all: all-am
  
  .SUFFIXES:
@@ -9363,7 +9307,7 @@ Index: gnome-settings-daemon-2.30.0/data/Makefile.in
  	@for dep in $?; do \
  	  case '$(am__configure_deps)' in \
  	    *$$dep*) \
-@@ -323,9 +326,9 @@
+@@ -323,9 +326,9 @@ Makefile: $(srcdir)/Makefile.in $(top_bu
  $(top_builddir)/config.status: $(top_srcdir)/configure $(CONFIG_STATUS_DEPENDENCIES)
  	cd $(top_builddir) && $(MAKE) $(AM_MAKEFLAGS) am--refresh
  
@@ -9375,11 +9319,10 @@ Index: gnome-settings-daemon-2.30.0/data/Makefile.in
  	cd $(top_builddir) && $(MAKE) $(AM_MAKEFLAGS) am--refresh
  $(am__aclocal_m4_deps):
  gnome-settings-daemon.desktop.in: $(top_builddir)/config.status $(srcdir)/gnome-settings-daemon.desktop.in.in
-Index: gnome-settings-daemon-2.30.0/gnome-settings-daemon/Makefile.in
-===================================================================
---- gnome-settings-daemon-2.30.0.orig/gnome-settings-daemon/Makefile.in	2010-03-29 16:11:13.000000000 +0200
-+++ gnome-settings-daemon-2.30.0/gnome-settings-daemon/Makefile.in	2010-03-30 12:01:14.261400885 +0200
-@@ -120,6 +120,8 @@
+diff -Nurp gnome-settings-daemon-2.30.0.orig/gnome-settings-daemon/Makefile.in gnome-settings-daemon-2.30.0/gnome-settings-daemon/Makefile.in
+--- gnome-settings-daemon-2.30.0.orig/gnome-settings-daemon/Makefile.in	2010-03-30 12:18:41.900075659 +0100
++++ gnome-settings-daemon-2.30.0/gnome-settings-daemon/Makefile.in	2010-03-30 12:18:54.457572842 +0100
+@@ -120,6 +120,8 @@ DISTFILES = $(DIST_COMMON) $(DIST_SOURCE
  ACLOCAL = @ACLOCAL@
  ALL_LINGUAS = @ALL_LINGUAS@
  AMTAR = @AMTAR@
@@ -9388,7 +9331,7 @@ Index: gnome-settings-daemon-2.30.0/gnome-settings-daemon/Makefile.in
  AR = @AR@
  AUTOCONF = @AUTOCONF@
  AUTOHEADER = @AUTOHEADER@
-@@ -189,6 +191,7 @@
+@@ -189,6 +191,7 @@ LIBTOOL = @LIBTOOL@
  LIPO = @LIPO@
  LN_S = @LN_S@
  LTLIBOBJS = @LTLIBOBJS@
@@ -9396,7 +9339,7 @@ Index: gnome-settings-daemon-2.30.0/gnome-settings-daemon/Makefile.in
  MAKEINFO = @MAKEINFO@
  MKDIR_P = @MKDIR_P@
  MKINSTALLDIRS = @MKINSTALLDIRS@
-@@ -376,7 +379,7 @@
+@@ -376,7 +379,7 @@ all: $(BUILT_SOURCES)
  
  .SUFFIXES:
  .SUFFIXES: .c .lo .o .obj
@@ -9405,7 +9348,7 @@ Index: gnome-settings-daemon-2.30.0/gnome-settings-daemon/Makefile.in
  	@for dep in $?; do \
  	  case '$(am__configure_deps)' in \
  	    *$$dep*) \
-@@ -401,9 +404,9 @@
+@@ -401,9 +404,9 @@ Makefile: $(srcdir)/Makefile.in $(top_bu
  $(top_builddir)/config.status: $(top_srcdir)/configure $(CONFIG_STATUS_DEPENDENCIES)
  	cd $(top_builddir) && $(MAKE) $(AM_MAKEFLAGS) am--refresh
  
@@ -9417,53 +9360,10 @@ Index: gnome-settings-daemon-2.30.0/gnome-settings-daemon/Makefile.in
  	cd $(top_builddir) && $(MAKE) $(AM_MAKEFLAGS) am--refresh
  $(am__aclocal_m4_deps):
  
-Index: gnome-settings-daemon-2.30.0/plugins/Makefile.in
-===================================================================
---- gnome-settings-daemon-2.30.0.orig/plugins/Makefile.in	2010-03-29 16:11:13.000000000 +0200
-+++ gnome-settings-daemon-2.30.0/plugins/Makefile.in	2010-03-30 12:01:14.341402324 +0200
-@@ -90,6 +90,8 @@
- ACLOCAL = @ACLOCAL@
- ALL_LINGUAS = @ALL_LINGUAS@
- AMTAR = @AMTAR@
-+APPINDICATOR_CFLAGS = @APPINDICATOR_CFLAGS@
-+APPINDICATOR_LIBS = @APPINDICATOR_LIBS@
- AR = @AR@
- AUTOCONF = @AUTOCONF@
- AUTOHEADER = @AUTOHEADER@
-@@ -159,6 +161,7 @@
- LIPO = @LIPO@
- LN_S = @LN_S@
- LTLIBOBJS = @LTLIBOBJS@
-+MAINT = @MAINT@
- MAKEINFO = @MAKEINFO@
- MKDIR_P = @MKDIR_P@
- MKINSTALLDIRS = @MKINSTALLDIRS@
-@@ -284,7 +287,7 @@
- all: all-recursive
- 
- .SUFFIXES:
--$(srcdir)/Makefile.in:  $(srcdir)/Makefile.am  $(am__configure_deps)
-+$(srcdir)/Makefile.in: @MAINTAINER_MODE_TRUE@ $(srcdir)/Makefile.am  $(am__configure_deps)
- 	@for dep in $?; do \
- 	  case '$(am__configure_deps)' in \
- 	    *$$dep*) \
-@@ -309,9 +312,9 @@
- $(top_builddir)/config.status: $(top_srcdir)/configure $(CONFIG_STATUS_DEPENDENCIES)
- 	cd $(top_builddir) && $(MAKE) $(AM_MAKEFLAGS) am--refresh
- 
--$(top_srcdir)/configure:  $(am__configure_deps)
-+$(top_srcdir)/configure: @MAINTAINER_MODE_TRUE@ $(am__configure_deps)
- 	cd $(top_builddir) && $(MAKE) $(AM_MAKEFLAGS) am--refresh
--$(ACLOCAL_M4):  $(am__aclocal_m4_deps)
-+$(ACLOCAL_M4): @MAINTAINER_MODE_TRUE@ $(am__aclocal_m4_deps)
- 	cd $(top_builddir) && $(MAKE) $(AM_MAKEFLAGS) am--refresh
- $(am__aclocal_m4_deps):
- 
-Index: gnome-settings-daemon-2.30.0/plugins/a11y-keyboard/Makefile.in
-===================================================================
---- gnome-settings-daemon-2.30.0.orig/plugins/a11y-keyboard/Makefile.in	2010-03-29 16:11:13.000000000 +0200
-+++ gnome-settings-daemon-2.30.0/plugins/a11y-keyboard/Makefile.in	2010-03-30 12:01:14.457400296 +0200
-@@ -76,7 +76,7 @@
+diff -Nurp gnome-settings-daemon-2.30.0.orig/plugins/a11y-keyboard/Makefile.in gnome-settings-daemon-2.30.0/plugins/a11y-keyboard/Makefile.in
+--- gnome-settings-daemon-2.30.0.orig/plugins/a11y-keyboard/Makefile.in	2010-03-30 12:18:41.900075659 +0100
++++ gnome-settings-daemon-2.30.0/plugins/a11y-keyboard/Makefile.in	2010-03-30 12:18:54.637573089 +0100
+@@ -76,7 +76,7 @@ LTLIBRARIES = $(plugin_LTLIBRARIES)
  am__DEPENDENCIES_1 =
  liba11y_keyboard_la_DEPENDENCIES = $(am__DEPENDENCIES_1) \
  	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
@@ -9472,7 +9372,7 @@ Index: gnome-settings-daemon-2.30.0/plugins/a11y-keyboard/Makefile.in
  am__objects_1 =
  am_liba11y_keyboard_la_OBJECTS =  \
  	liba11y_keyboard_la-gsd-a11y-keyboard-plugin.lo \
-@@ -125,6 +125,8 @@
+@@ -125,6 +125,8 @@ DISTFILES = $(DIST_COMMON) $(DIST_SOURCE
  ACLOCAL = @ACLOCAL@
  ALL_LINGUAS = @ALL_LINGUAS@
  AMTAR = @AMTAR@
@@ -9481,7 +9381,7 @@ Index: gnome-settings-daemon-2.30.0/plugins/a11y-keyboard/Makefile.in
  AR = @AR@
  AUTOCONF = @AUTOCONF@
  AUTOHEADER = @AUTOHEADER@
-@@ -194,6 +196,7 @@
+@@ -194,6 +196,7 @@ LIBTOOL = @LIBTOOL@
  LIPO = @LIPO@
  LN_S = @LN_S@
  LTLIBOBJS = @LTLIBOBJS@
@@ -9489,7 +9389,7 @@ Index: gnome-settings-daemon-2.30.0/plugins/a11y-keyboard/Makefile.in
  MAKEINFO = @MAKEINFO@
  MKDIR_P = @MKDIR_P@
  MKINSTALLDIRS = @MKINSTALLDIRS@
-@@ -346,6 +349,7 @@
+@@ -346,6 +349,7 @@ liba11y_keyboard_la_CPPFLAGS = \
  liba11y_keyboard_la_CFLAGS = \
  	$(SETTINGS_PLUGIN_CFLAGS)	\
  	$(LIBNOTIFY_CFLAGS)		\
@@ -9497,7 +9397,7 @@ Index: gnome-settings-daemon-2.30.0/plugins/a11y-keyboard/Makefile.in
  	$(AM_CFLAGS)
  
  liba11y_keyboard_la_LDFLAGS = \
-@@ -356,6 +360,7 @@
+@@ -356,6 +360,7 @@ liba11y_keyboard_la_LIBADD = \
  	$(SETTINGS_PLUGIN_LIBS)		\
  	$(XF86MISC_LIBS)		\
  	$(LIBNOTIFY_LIBS)		\
@@ -9505,7 +9405,7 @@ Index: gnome-settings-daemon-2.30.0/plugins/a11y-keyboard/Makefile.in
  	$(NULL)
  
  plugin_in_files = \
-@@ -380,7 +385,7 @@
+@@ -380,7 +385,7 @@ all: all-am
  
  .SUFFIXES:
  .SUFFIXES: .c .lo .o .obj
@@ -9514,7 +9414,7 @@ Index: gnome-settings-daemon-2.30.0/plugins/a11y-keyboard/Makefile.in
  	@for dep in $?; do \
  	  case '$(am__configure_deps)' in \
  	    *$$dep*) \
-@@ -405,9 +410,9 @@
+@@ -405,9 +410,9 @@ Makefile: $(srcdir)/Makefile.in $(top_bu
  $(top_builddir)/config.status: $(top_srcdir)/configure $(CONFIG_STATUS_DEPENDENCIES)
  	cd $(top_builddir) && $(MAKE) $(AM_MAKEFLAGS) am--refresh
  
@@ -9526,11 +9426,10 @@ Index: gnome-settings-daemon-2.30.0/plugins/a11y-keyboard/Makefile.in
  	cd $(top_builddir) && $(MAKE) $(AM_MAKEFLAGS) am--refresh
  $(am__aclocal_m4_deps):
  install-pluginLTLIBRARIES: $(plugin_LTLIBRARIES)
-Index: gnome-settings-daemon-2.30.0/plugins/background/Makefile.in
-===================================================================
---- gnome-settings-daemon-2.30.0.orig/plugins/background/Makefile.in	2010-03-29 16:11:14.000000000 +0200
-+++ gnome-settings-daemon-2.30.0/plugins/background/Makefile.in	2010-03-30 12:01:14.637405788 +0200
-@@ -118,6 +118,8 @@
+diff -Nurp gnome-settings-daemon-2.30.0.orig/plugins/background/Makefile.in gnome-settings-daemon-2.30.0/plugins/background/Makefile.in
+--- gnome-settings-daemon-2.30.0.orig/plugins/background/Makefile.in	2010-03-30 12:18:41.910077629 +0100
++++ gnome-settings-daemon-2.30.0/plugins/background/Makefile.in	2010-03-30 12:18:54.757572975 +0100
+@@ -118,6 +118,8 @@ DISTFILES = $(DIST_COMMON) $(DIST_SOURCE
  ACLOCAL = @ACLOCAL@
  ALL_LINGUAS = @ALL_LINGUAS@
  AMTAR = @AMTAR@
@@ -9539,7 +9438,7 @@ Index: gnome-settings-daemon-2.30.0/plugins/background/Makefile.in
  AR = @AR@
  AUTOCONF = @AUTOCONF@
  AUTOHEADER = @AUTOHEADER@
-@@ -187,6 +189,7 @@
+@@ -187,6 +189,7 @@ LIBTOOL = @LIBTOOL@
  LIPO = @LIPO@
  LN_S = @LN_S@
  LTLIBOBJS = @LTLIBOBJS@
@@ -9547,7 +9446,7 @@ Index: gnome-settings-daemon-2.30.0/plugins/background/Makefile.in
  MAKEINFO = @MAKEINFO@
  MKDIR_P = @MKDIR_P@
  MKINSTALLDIRS = @MKINSTALLDIRS@
-@@ -361,7 +364,7 @@
+@@ -361,7 +364,7 @@ all: all-am
  
  .SUFFIXES:
  .SUFFIXES: .c .lo .o .obj
@@ -9556,7 +9455,7 @@ Index: gnome-settings-daemon-2.30.0/plugins/background/Makefile.in
  	@for dep in $?; do \
  	  case '$(am__configure_deps)' in \
  	    *$$dep*) \
-@@ -386,9 +389,9 @@
+@@ -386,9 +389,9 @@ Makefile: $(srcdir)/Makefile.in $(top_bu
  $(top_builddir)/config.status: $(top_srcdir)/configure $(CONFIG_STATUS_DEPENDENCIES)
  	cd $(top_builddir) && $(MAKE) $(AM_MAKEFLAGS) am--refresh
  
@@ -9568,11 +9467,10 @@ Index: gnome-settings-daemon-2.30.0/plugins/background/Makefile.in
  	cd $(top_builddir) && $(MAKE) $(AM_MAKEFLAGS) am--refresh
  $(am__aclocal_m4_deps):
  install-pluginLTLIBRARIES: $(plugin_LTLIBRARIES)
-Index: gnome-settings-daemon-2.30.0/plugins/clipboard/Makefile.in
-===================================================================
---- gnome-settings-daemon-2.30.0.orig/plugins/clipboard/Makefile.in	2010-03-29 16:11:14.000000000 +0200
-+++ gnome-settings-daemon-2.30.0/plugins/clipboard/Makefile.in	2010-03-30 12:01:14.754400553 +0200
-@@ -103,6 +103,8 @@
+diff -Nurp gnome-settings-daemon-2.30.0.orig/plugins/clipboard/Makefile.in gnome-settings-daemon-2.30.0/plugins/clipboard/Makefile.in
+--- gnome-settings-daemon-2.30.0.orig/plugins/clipboard/Makefile.in	2010-03-30 12:18:41.910077629 +0100
++++ gnome-settings-daemon-2.30.0/plugins/clipboard/Makefile.in	2010-03-30 12:18:54.857574026 +0100
+@@ -103,6 +103,8 @@ DISTFILES = $(DIST_COMMON) $(DIST_SOURCE
  ACLOCAL = @ACLOCAL@
  ALL_LINGUAS = @ALL_LINGUAS@
  AMTAR = @AMTAR@
@@ -9581,7 +9479,7 @@ Index: gnome-settings-daemon-2.30.0/plugins/clipboard/Makefile.in
  AR = @AR@
  AUTOCONF = @AUTOCONF@
  AUTOHEADER = @AUTOHEADER@
-@@ -172,6 +174,7 @@
+@@ -172,6 +174,7 @@ LIBTOOL = @LIBTOOL@
  LIPO = @LIPO@
  LN_S = @LN_S@
  LTLIBOBJS = @LTLIBOBJS@
@@ -9589,7 +9487,7 @@ Index: gnome-settings-daemon-2.30.0/plugins/clipboard/Makefile.in
  MAKEINFO = @MAKEINFO@
  MKDIR_P = @MKDIR_P@
  MKINSTALLDIRS = @MKINSTALLDIRS@
-@@ -328,7 +331,7 @@
+@@ -328,7 +331,7 @@ all: all-am
  
  .SUFFIXES:
  .SUFFIXES: .c .lo .o .obj
@@ -9598,7 +9496,7 @@ Index: gnome-settings-daemon-2.30.0/plugins/clipboard/Makefile.in
  	@for dep in $?; do \
  	  case '$(am__configure_deps)' in \
  	    *$$dep*) \
-@@ -353,9 +356,9 @@
+@@ -353,9 +356,9 @@ Makefile: $(srcdir)/Makefile.in $(top_bu
  $(top_builddir)/config.status: $(top_srcdir)/configure $(CONFIG_STATUS_DEPENDENCIES)
  	cd $(top_builddir) && $(MAKE) $(AM_MAKEFLAGS) am--refresh
  
@@ -9610,11 +9508,10 @@ Index: gnome-settings-daemon-2.30.0/plugins/clipboard/Makefile.in
  	cd $(top_builddir) && $(MAKE) $(AM_MAKEFLAGS) am--refresh
  $(am__aclocal_m4_deps):
  install-pluginLTLIBRARIES: $(plugin_LTLIBRARIES)
-Index: gnome-settings-daemon-2.30.0/plugins/common/Makefile.in
-===================================================================
---- gnome-settings-daemon-2.30.0.orig/plugins/common/Makefile.in	2010-03-29 16:11:14.000000000 +0200
-+++ gnome-settings-daemon-2.30.0/plugins/common/Makefile.in	2010-03-30 12:01:14.838399358 +0200
-@@ -75,6 +75,8 @@
+diff -Nurp gnome-settings-daemon-2.30.0.orig/plugins/Makefile.in gnome-settings-daemon-2.30.0/plugins/Makefile.in
+--- gnome-settings-daemon-2.30.0.orig/plugins/Makefile.in	2010-03-30 12:18:41.910077629 +0100
++++ gnome-settings-daemon-2.30.0/plugins/Makefile.in	2010-03-30 12:18:54.527572869 +0100
+@@ -90,6 +90,8 @@ am__relativize = \
  ACLOCAL = @ACLOCAL@
  ALL_LINGUAS = @ALL_LINGUAS@
  AMTAR = @AMTAR@
@@ -9623,7 +9520,7 @@ Index: gnome-settings-daemon-2.30.0/plugins/common/Makefile.in
  AR = @AR@
  AUTOCONF = @AUTOCONF@
  AUTOHEADER = @AUTOHEADER@
-@@ -144,6 +146,7 @@
+@@ -159,6 +161,7 @@ LIBTOOL = @LIBTOOL@
  LIPO = @LIPO@
  LN_S = @LN_S@
  LTLIBOBJS = @LTLIBOBJS@
@@ -9631,16 +9528,16 @@ Index: gnome-settings-daemon-2.30.0/plugins/common/Makefile.in
  MAKEINFO = @MAKEINFO@
  MKDIR_P = @MKDIR_P@
  MKINSTALLDIRS = @MKINSTALLDIRS@
-@@ -272,7 +275,7 @@
+@@ -284,7 +287,7 @@ SUBDIRS = \
+ all: all-recursive
  
  .SUFFIXES:
- .SUFFIXES: .c .lo .o .obj
 -$(srcdir)/Makefile.in:  $(srcdir)/Makefile.am  $(am__configure_deps)
 +$(srcdir)/Makefile.in: @MAINTAINER_MODE_TRUE@ $(srcdir)/Makefile.am  $(am__configure_deps)
  	@for dep in $?; do \
  	  case '$(am__configure_deps)' in \
  	    *$$dep*) \
-@@ -297,9 +300,9 @@
+@@ -309,9 +312,9 @@ Makefile: $(srcdir)/Makefile.in $(top_bu
  $(top_builddir)/config.status: $(top_srcdir)/configure $(CONFIG_STATUS_DEPENDENCIES)
  	cd $(top_builddir) && $(MAKE) $(AM_MAKEFLAGS) am--refresh
  
@@ -9652,618 +9549,3 @@ Index: gnome-settings-daemon-2.30.0/plugins/common/Makefile.in
  	cd $(top_builddir) && $(MAKE) $(AM_MAKEFLAGS) am--refresh
  $(am__aclocal_m4_deps):
  
-Index: gnome-settings-daemon-2.30.0/plugins/dummy/Makefile.in
-===================================================================
---- gnome-settings-daemon-2.30.0.orig/plugins/dummy/Makefile.in	2010-03-29 16:11:14.000000000 +0200
-+++ gnome-settings-daemon-2.30.0/plugins/dummy/Makefile.in	2010-03-30 12:01:14.930400150 +0200
-@@ -99,6 +99,8 @@
- ACLOCAL = @ACLOCAL@
- ALL_LINGUAS = @ALL_LINGUAS@
- AMTAR = @AMTAR@
-+APPINDICATOR_CFLAGS = @APPINDICATOR_CFLAGS@
-+APPINDICATOR_LIBS = @APPINDICATOR_LIBS@
- AR = @AR@
- AUTOCONF = @AUTOCONF@
- AUTOHEADER = @AUTOHEADER@
-@@ -168,6 +170,7 @@
- LIPO = @LIPO@
- LN_S = @LN_S@
- LTLIBOBJS = @LTLIBOBJS@
-+MAINT = @MAINT@
- MAKEINFO = @MAKEINFO@
- MKDIR_P = @MKDIR_P@
- MKINSTALLDIRS = @MKINSTALLDIRS@
-@@ -311,7 +314,7 @@
- 
- .SUFFIXES:
- .SUFFIXES: .c .lo .o .obj
--$(srcdir)/Makefile.in:  $(srcdir)/Makefile.am  $(am__configure_deps)
-+$(srcdir)/Makefile.in: @MAINTAINER_MODE_TRUE@ $(srcdir)/Makefile.am  $(am__configure_deps)
- 	@for dep in $?; do \
- 	  case '$(am__configure_deps)' in \
- 	    *$$dep*) \
-@@ -336,9 +339,9 @@
- $(top_builddir)/config.status: $(top_srcdir)/configure $(CONFIG_STATUS_DEPENDENCIES)
- 	cd $(top_builddir) && $(MAKE) $(AM_MAKEFLAGS) am--refresh
- 
--$(top_srcdir)/configure:  $(am__configure_deps)
-+$(top_srcdir)/configure: @MAINTAINER_MODE_TRUE@ $(am__configure_deps)
- 	cd $(top_builddir) && $(MAKE) $(AM_MAKEFLAGS) am--refresh
--$(ACLOCAL_M4):  $(am__aclocal_m4_deps)
-+$(ACLOCAL_M4): @MAINTAINER_MODE_TRUE@ $(am__aclocal_m4_deps)
- 	cd $(top_builddir) && $(MAKE) $(AM_MAKEFLAGS) am--refresh
- $(am__aclocal_m4_deps):
- 
-Index: gnome-settings-daemon-2.30.0/plugins/font/Makefile.in
-===================================================================
---- gnome-settings-daemon-2.30.0.orig/plugins/font/Makefile.in	2010-03-29 16:11:14.000000000 +0200
-+++ gnome-settings-daemon-2.30.0/plugins/font/Makefile.in	2010-03-30 12:01:15.026400475 +0200
-@@ -101,6 +101,8 @@
- ACLOCAL = @ACLOCAL@
- ALL_LINGUAS = @ALL_LINGUAS@
- AMTAR = @AMTAR@
-+APPINDICATOR_CFLAGS = @APPINDICATOR_CFLAGS@
-+APPINDICATOR_LIBS = @APPINDICATOR_LIBS@
- AR = @AR@
- AUTOCONF = @AUTOCONF@
- AUTOHEADER = @AUTOHEADER@
-@@ -170,6 +172,7 @@
- LIPO = @LIPO@
- LN_S = @LN_S@
- LTLIBOBJS = @LTLIBOBJS@
-+MAINT = @MAINT@
- MAKEINFO = @MAKEINFO@
- MKDIR_P = @MKDIR_P@
- MKINSTALLDIRS = @MKINSTALLDIRS@
-@@ -324,7 +327,7 @@
- 
- .SUFFIXES:
- .SUFFIXES: .c .lo .o .obj
--$(srcdir)/Makefile.in:  $(srcdir)/Makefile.am  $(am__configure_deps)
-+$(srcdir)/Makefile.in: @MAINTAINER_MODE_TRUE@ $(srcdir)/Makefile.am  $(am__configure_deps)
- 	@for dep in $?; do \
- 	  case '$(am__configure_deps)' in \
- 	    *$$dep*) \
-@@ -349,9 +352,9 @@
- $(top_builddir)/config.status: $(top_srcdir)/configure $(CONFIG_STATUS_DEPENDENCIES)
- 	cd $(top_builddir) && $(MAKE) $(AM_MAKEFLAGS) am--refresh
- 
--$(top_srcdir)/configure:  $(am__configure_deps)
-+$(top_srcdir)/configure: @MAINTAINER_MODE_TRUE@ $(am__configure_deps)
- 	cd $(top_builddir) && $(MAKE) $(AM_MAKEFLAGS) am--refresh
--$(ACLOCAL_M4):  $(am__aclocal_m4_deps)
-+$(ACLOCAL_M4): @MAINTAINER_MODE_TRUE@ $(am__aclocal_m4_deps)
- 	cd $(top_builddir) && $(MAKE) $(AM_MAKEFLAGS) am--refresh
- $(am__aclocal_m4_deps):
- install-pluginLTLIBRARIES: $(plugin_LTLIBRARIES)
-Index: gnome-settings-daemon-2.30.0/plugins/housekeeping/Makefile.in
-===================================================================
---- gnome-settings-daemon-2.30.0.orig/plugins/housekeeping/Makefile.in	2010-03-29 16:11:14.000000000 +0200
-+++ gnome-settings-daemon-2.30.0/plugins/housekeeping/Makefile.in	2010-03-30 12:01:15.134400169 +0200
-@@ -104,6 +104,8 @@
- ACLOCAL = @ACLOCAL@
- ALL_LINGUAS = @ALL_LINGUAS@
- AMTAR = @AMTAR@
-+APPINDICATOR_CFLAGS = @APPINDICATOR_CFLAGS@
-+APPINDICATOR_LIBS = @APPINDICATOR_LIBS@
- AR = @AR@
- AUTOCONF = @AUTOCONF@
- AUTOHEADER = @AUTOHEADER@
-@@ -173,6 +175,7 @@
- LIPO = @LIPO@
- LN_S = @LN_S@
- LTLIBOBJS = @LTLIBOBJS@
-+MAINT = @MAINT@
- MAKEINFO = @MAKEINFO@
- MKDIR_P = @MKDIR_P@
- MKINSTALLDIRS = @MKINSTALLDIRS@
-@@ -310,7 +313,7 @@
- 
- .SUFFIXES:
- .SUFFIXES: .c .lo .o .obj
--$(srcdir)/Makefile.in:  $(srcdir)/Makefile.am  $(am__configure_deps)
-+$(srcdir)/Makefile.in: @MAINTAINER_MODE_TRUE@ $(srcdir)/Makefile.am  $(am__configure_deps)
- 	@for dep in $?; do \
- 	  case '$(am__configure_deps)' in \
- 	    *$$dep*) \
-@@ -335,9 +338,9 @@
- $(top_builddir)/config.status: $(top_srcdir)/configure $(CONFIG_STATUS_DEPENDENCIES)
- 	cd $(top_builddir) && $(MAKE) $(AM_MAKEFLAGS) am--refresh
- 
--$(top_srcdir)/configure:  $(am__configure_deps)
-+$(top_srcdir)/configure: @MAINTAINER_MODE_TRUE@ $(am__configure_deps)
- 	cd $(top_builddir) && $(MAKE) $(AM_MAKEFLAGS) am--refresh
--$(ACLOCAL_M4):  $(am__aclocal_m4_deps)
-+$(ACLOCAL_M4): @MAINTAINER_MODE_TRUE@ $(am__aclocal_m4_deps)
- 	cd $(top_builddir) && $(MAKE) $(AM_MAKEFLAGS) am--refresh
- $(am__aclocal_m4_deps):
- install-pluginLTLIBRARIES: $(plugin_LTLIBRARIES)
-Index: gnome-settings-daemon-2.30.0/plugins/keybindings/Makefile.in
-===================================================================
---- gnome-settings-daemon-2.30.0.orig/plugins/keybindings/Makefile.in	2010-03-29 16:11:14.000000000 +0200
-+++ gnome-settings-daemon-2.30.0/plugins/keybindings/Makefile.in	2010-03-30 12:01:15.230400225 +0200
-@@ -104,6 +104,8 @@
- ACLOCAL = @ACLOCAL@
- ALL_LINGUAS = @ALL_LINGUAS@
- AMTAR = @AMTAR@
-+APPINDICATOR_CFLAGS = @APPINDICATOR_CFLAGS@
-+APPINDICATOR_LIBS = @APPINDICATOR_LIBS@
- AR = @AR@
- AUTOCONF = @AUTOCONF@
- AUTOHEADER = @AUTOHEADER@
-@@ -173,6 +175,7 @@
- LIPO = @LIPO@
- LN_S = @LN_S@
- LTLIBOBJS = @LTLIBOBJS@
-+MAINT = @MAINT@
- MAKEINFO = @MAKEINFO@
- MKDIR_P = @MKDIR_P@
- MKINSTALLDIRS = @MKINSTALLDIRS@
-@@ -327,7 +330,7 @@
- 
- .SUFFIXES:
- .SUFFIXES: .c .lo .o .obj
--$(srcdir)/Makefile.in:  $(srcdir)/Makefile.am  $(am__configure_deps)
-+$(srcdir)/Makefile.in: @MAINTAINER_MODE_TRUE@ $(srcdir)/Makefile.am  $(am__configure_deps)
- 	@for dep in $?; do \
- 	  case '$(am__configure_deps)' in \
- 	    *$$dep*) \
-@@ -352,9 +355,9 @@
- $(top_builddir)/config.status: $(top_srcdir)/configure $(CONFIG_STATUS_DEPENDENCIES)
- 	cd $(top_builddir) && $(MAKE) $(AM_MAKEFLAGS) am--refresh
- 
--$(top_srcdir)/configure:  $(am__configure_deps)
-+$(top_srcdir)/configure: @MAINTAINER_MODE_TRUE@ $(am__configure_deps)
- 	cd $(top_builddir) && $(MAKE) $(AM_MAKEFLAGS) am--refresh
--$(ACLOCAL_M4):  $(am__aclocal_m4_deps)
-+$(ACLOCAL_M4): @MAINTAINER_MODE_TRUE@ $(am__aclocal_m4_deps)
- 	cd $(top_builddir) && $(MAKE) $(AM_MAKEFLAGS) am--refresh
- $(am__aclocal_m4_deps):
- install-pluginLTLIBRARIES: $(plugin_LTLIBRARIES)
-Index: gnome-settings-daemon-2.30.0/plugins/keyboard/Makefile.in
-===================================================================
---- gnome-settings-daemon-2.30.0.orig/plugins/keyboard/Makefile.in	2010-03-29 16:11:14.000000000 +0200
-+++ gnome-settings-daemon-2.30.0/plugins/keyboard/Makefile.in	2010-03-30 12:01:15.337400139 +0200
-@@ -106,6 +106,8 @@
- ACLOCAL = @ACLOCAL@
- ALL_LINGUAS = @ALL_LINGUAS@
- AMTAR = @AMTAR@
-+APPINDICATOR_CFLAGS = @APPINDICATOR_CFLAGS@
-+APPINDICATOR_LIBS = @APPINDICATOR_LIBS@
- AR = @AR@
- AUTOCONF = @AUTOCONF@
- AUTOHEADER = @AUTOHEADER@
-@@ -175,6 +177,7 @@
- LIPO = @LIPO@
- LN_S = @LN_S@
- LTLIBOBJS = @LTLIBOBJS@
-+MAINT = @MAINT@
- MAKEINFO = @MAKEINFO@
- MKDIR_P = @MKDIR_P@
- MKINSTALLDIRS = @MKINSTALLDIRS@
-@@ -340,7 +343,7 @@
- 
- .SUFFIXES:
- .SUFFIXES: .c .lo .o .obj
--$(srcdir)/Makefile.in:  $(srcdir)/Makefile.am  $(am__configure_deps)
-+$(srcdir)/Makefile.in: @MAINTAINER_MODE_TRUE@ $(srcdir)/Makefile.am  $(am__configure_deps)
- 	@for dep in $?; do \
- 	  case '$(am__configure_deps)' in \
- 	    *$$dep*) \
-@@ -365,9 +368,9 @@
- $(top_builddir)/config.status: $(top_srcdir)/configure $(CONFIG_STATUS_DEPENDENCIES)
- 	cd $(top_builddir) && $(MAKE) $(AM_MAKEFLAGS) am--refresh
- 
--$(top_srcdir)/configure:  $(am__configure_deps)
-+$(top_srcdir)/configure: @MAINTAINER_MODE_TRUE@ $(am__configure_deps)
- 	cd $(top_builddir) && $(MAKE) $(AM_MAKEFLAGS) am--refresh
--$(ACLOCAL_M4):  $(am__aclocal_m4_deps)
-+$(ACLOCAL_M4): @MAINTAINER_MODE_TRUE@ $(am__aclocal_m4_deps)
- 	cd $(top_builddir) && $(MAKE) $(AM_MAKEFLAGS) am--refresh
- $(am__aclocal_m4_deps):
- install-pluginLTLIBRARIES: $(plugin_LTLIBRARIES)
-Index: gnome-settings-daemon-2.30.0/plugins/media-keys/Makefile.in
-===================================================================
---- gnome-settings-daemon-2.30.0.orig/plugins/media-keys/Makefile.in	2010-03-29 16:11:14.000000000 +0200
-+++ gnome-settings-daemon-2.30.0/plugins/media-keys/Makefile.in	2010-03-30 12:01:15.493402775 +0200
-@@ -183,6 +183,8 @@
- ACLOCAL = @ACLOCAL@
- ALL_LINGUAS = @ALL_LINGUAS@
- AMTAR = @AMTAR@
-+APPINDICATOR_CFLAGS = @APPINDICATOR_CFLAGS@
-+APPINDICATOR_LIBS = @APPINDICATOR_LIBS@
- AR = @AR@
- AUTOCONF = @AUTOCONF@
- AUTOHEADER = @AUTOHEADER@
-@@ -252,6 +254,7 @@
- LIPO = @LIPO@
- LN_S = @LN_S@
- LTLIBOBJS = @LTLIBOBJS@
-+MAINT = @MAINT@
- MAKEINFO = @MAKEINFO@
- MKDIR_P = @MKDIR_P@
- MKINSTALLDIRS = @MKINSTALLDIRS@
-@@ -498,7 +501,7 @@
- 
- .SUFFIXES:
- .SUFFIXES: .c .lo .o .obj
--$(srcdir)/Makefile.in:  $(srcdir)/Makefile.am  $(am__configure_deps)
-+$(srcdir)/Makefile.in: @MAINTAINER_MODE_TRUE@ $(srcdir)/Makefile.am  $(am__configure_deps)
- 	@for dep in $?; do \
- 	  case '$(am__configure_deps)' in \
- 	    *$$dep*) \
-@@ -523,9 +526,9 @@
- $(top_builddir)/config.status: $(top_srcdir)/configure $(CONFIG_STATUS_DEPENDENCIES)
- 	cd $(top_builddir) && $(MAKE) $(AM_MAKEFLAGS) am--refresh
- 
--$(top_srcdir)/configure:  $(am__configure_deps)
-+$(top_srcdir)/configure: @MAINTAINER_MODE_TRUE@ $(am__configure_deps)
- 	cd $(top_builddir) && $(MAKE) $(AM_MAKEFLAGS) am--refresh
--$(ACLOCAL_M4):  $(am__aclocal_m4_deps)
-+$(ACLOCAL_M4): @MAINTAINER_MODE_TRUE@ $(am__aclocal_m4_deps)
- 	cd $(top_builddir) && $(MAKE) $(AM_MAKEFLAGS) am--refresh
- $(am__aclocal_m4_deps):
- install-pluginLTLIBRARIES: $(plugin_LTLIBRARIES)
-Index: gnome-settings-daemon-2.30.0/plugins/media-keys/cut-n-paste/Makefile.in
-===================================================================
---- gnome-settings-daemon-2.30.0.orig/plugins/media-keys/cut-n-paste/Makefile.in	2010-03-29 16:11:14.000000000 +0200
-+++ gnome-settings-daemon-2.30.0/plugins/media-keys/cut-n-paste/Makefile.in	2010-03-30 12:01:15.570400483 +0200
-@@ -75,6 +75,8 @@
- ACLOCAL = @ACLOCAL@
- ALL_LINGUAS = @ALL_LINGUAS@
- AMTAR = @AMTAR@
-+APPINDICATOR_CFLAGS = @APPINDICATOR_CFLAGS@
-+APPINDICATOR_LIBS = @APPINDICATOR_LIBS@
- AR = @AR@
- AUTOCONF = @AUTOCONF@
- AUTOHEADER = @AUTOHEADER@
-@@ -144,6 +146,7 @@
- LIPO = @LIPO@
- LN_S = @LN_S@
- LTLIBOBJS = @LTLIBOBJS@
-+MAINT = @MAINT@
- MAKEINFO = @MAKEINFO@
- MKDIR_P = @MKDIR_P@
- MKINSTALLDIRS = @MKINSTALLDIRS@
-@@ -288,7 +291,7 @@
- 
- .SUFFIXES:
- .SUFFIXES: .c .lo .o .obj
--$(srcdir)/Makefile.in:  $(srcdir)/Makefile.am  $(am__configure_deps)
-+$(srcdir)/Makefile.in: @MAINTAINER_MODE_TRUE@ $(srcdir)/Makefile.am  $(am__configure_deps)
- 	@for dep in $?; do \
- 	  case '$(am__configure_deps)' in \
- 	    *$$dep*) \
-@@ -313,9 +316,9 @@
- $(top_builddir)/config.status: $(top_srcdir)/configure $(CONFIG_STATUS_DEPENDENCIES)
- 	cd $(top_builddir) && $(MAKE) $(AM_MAKEFLAGS) am--refresh
- 
--$(top_srcdir)/configure:  $(am__configure_deps)
-+$(top_srcdir)/configure: @MAINTAINER_MODE_TRUE@ $(am__configure_deps)
- 	cd $(top_builddir) && $(MAKE) $(AM_MAKEFLAGS) am--refresh
--$(ACLOCAL_M4):  $(am__aclocal_m4_deps)
-+$(ACLOCAL_M4): @MAINTAINER_MODE_TRUE@ $(am__aclocal_m4_deps)
- 	cd $(top_builddir) && $(MAKE) $(AM_MAKEFLAGS) am--refresh
- $(am__aclocal_m4_deps):
- 
-Index: gnome-settings-daemon-2.30.0/plugins/mouse/Makefile.in
-===================================================================
---- gnome-settings-daemon-2.30.0.orig/plugins/mouse/Makefile.in	2010-03-29 16:11:14.000000000 +0200
-+++ gnome-settings-daemon-2.30.0/plugins/mouse/Makefile.in	2010-03-30 12:01:15.678399757 +0200
-@@ -114,6 +114,8 @@
- ACLOCAL = @ACLOCAL@
- ALL_LINGUAS = @ALL_LINGUAS@
- AMTAR = @AMTAR@
-+APPINDICATOR_CFLAGS = @APPINDICATOR_CFLAGS@
-+APPINDICATOR_LIBS = @APPINDICATOR_LIBS@
- AR = @AR@
- AUTOCONF = @AUTOCONF@
- AUTOHEADER = @AUTOHEADER@
-@@ -183,6 +185,7 @@
- LIPO = @LIPO@
- LN_S = @LN_S@
- LTLIBOBJS = @LTLIBOBJS@
-+MAINT = @MAINT@
- MAKEINFO = @MAKEINFO@
- MKDIR_P = @MKDIR_P@
- MKINSTALLDIRS = @MKINSTALLDIRS@
-@@ -334,7 +337,7 @@
- 
- .SUFFIXES:
- .SUFFIXES: .c .lo .o .obj
--$(srcdir)/Makefile.in:  $(srcdir)/Makefile.am  $(am__configure_deps)
-+$(srcdir)/Makefile.in: @MAINTAINER_MODE_TRUE@ $(srcdir)/Makefile.am  $(am__configure_deps)
- 	@for dep in $?; do \
- 	  case '$(am__configure_deps)' in \
- 	    *$$dep*) \
-@@ -359,9 +362,9 @@
- $(top_builddir)/config.status: $(top_srcdir)/configure $(CONFIG_STATUS_DEPENDENCIES)
- 	cd $(top_builddir) && $(MAKE) $(AM_MAKEFLAGS) am--refresh
- 
--$(top_srcdir)/configure:  $(am__configure_deps)
-+$(top_srcdir)/configure: @MAINTAINER_MODE_TRUE@ $(am__configure_deps)
- 	cd $(top_builddir) && $(MAKE) $(AM_MAKEFLAGS) am--refresh
--$(ACLOCAL_M4):  $(am__aclocal_m4_deps)
-+$(ACLOCAL_M4): @MAINTAINER_MODE_TRUE@ $(am__aclocal_m4_deps)
- 	cd $(top_builddir) && $(MAKE) $(AM_MAKEFLAGS) am--refresh
- $(am__aclocal_m4_deps):
- install-pluginLTLIBRARIES: $(plugin_LTLIBRARIES)
-Index: gnome-settings-daemon-2.30.0/plugins/sound/Makefile.in
-===================================================================
---- gnome-settings-daemon-2.30.0.orig/plugins/sound/Makefile.in	2010-03-29 16:11:15.000000000 +0200
-+++ gnome-settings-daemon-2.30.0/plugins/sound/Makefile.in	2010-03-30 12:01:15.774400582 +0200
-@@ -99,6 +99,8 @@
- ACLOCAL = @ACLOCAL@
- ALL_LINGUAS = @ALL_LINGUAS@
- AMTAR = @AMTAR@
-+APPINDICATOR_CFLAGS = @APPINDICATOR_CFLAGS@
-+APPINDICATOR_LIBS = @APPINDICATOR_LIBS@
- AR = @AR@
- AUTOCONF = @AUTOCONF@
- AUTOHEADER = @AUTOHEADER@
-@@ -168,6 +170,7 @@
- LIPO = @LIPO@
- LN_S = @LN_S@
- LTLIBOBJS = @LTLIBOBJS@
-+MAINT = @MAINT@
- MAKEINFO = @MAKEINFO@
- MKDIR_P = @MKDIR_P@
- MKINSTALLDIRS = @MKINSTALLDIRS@
-@@ -314,7 +317,7 @@
- 
- .SUFFIXES:
- .SUFFIXES: .c .lo .o .obj
--$(srcdir)/Makefile.in:  $(srcdir)/Makefile.am  $(am__configure_deps)
-+$(srcdir)/Makefile.in: @MAINTAINER_MODE_TRUE@ $(srcdir)/Makefile.am  $(am__configure_deps)
- 	@for dep in $?; do \
- 	  case '$(am__configure_deps)' in \
- 	    *$$dep*) \
-@@ -339,9 +342,9 @@
- $(top_builddir)/config.status: $(top_srcdir)/configure $(CONFIG_STATUS_DEPENDENCIES)
- 	cd $(top_builddir) && $(MAKE) $(AM_MAKEFLAGS) am--refresh
- 
--$(top_srcdir)/configure:  $(am__configure_deps)
-+$(top_srcdir)/configure: @MAINTAINER_MODE_TRUE@ $(am__configure_deps)
- 	cd $(top_builddir) && $(MAKE) $(AM_MAKEFLAGS) am--refresh
--$(ACLOCAL_M4):  $(am__aclocal_m4_deps)
-+$(ACLOCAL_M4): @MAINTAINER_MODE_TRUE@ $(am__aclocal_m4_deps)
- 	cd $(top_builddir) && $(MAKE) $(AM_MAKEFLAGS) am--refresh
- $(am__aclocal_m4_deps):
- install-pluginLTLIBRARIES: $(plugin_LTLIBRARIES)
-Index: gnome-settings-daemon-2.30.0/plugins/typing-break/Makefile.in
-===================================================================
---- gnome-settings-daemon-2.30.0.orig/plugins/typing-break/Makefile.in	2010-03-29 16:11:15.000000000 +0200
-+++ gnome-settings-daemon-2.30.0/plugins/typing-break/Makefile.in	2010-03-30 12:01:15.866400262 +0200
-@@ -104,6 +104,8 @@
- ACLOCAL = @ACLOCAL@
- ALL_LINGUAS = @ALL_LINGUAS@
- AMTAR = @AMTAR@
-+APPINDICATOR_CFLAGS = @APPINDICATOR_CFLAGS@
-+APPINDICATOR_LIBS = @APPINDICATOR_LIBS@
- AR = @AR@
- AUTOCONF = @AUTOCONF@
- AUTOHEADER = @AUTOHEADER@
-@@ -173,6 +175,7 @@
- LIPO = @LIPO@
- LN_S = @LN_S@
- LTLIBOBJS = @LTLIBOBJS@
-+MAINT = @MAINT@
- MAKEINFO = @MAKEINFO@
- MKDIR_P = @MKDIR_P@
- MKINSTALLDIRS = @MKINSTALLDIRS@
-@@ -325,7 +328,7 @@
- 
- .SUFFIXES:
- .SUFFIXES: .c .lo .o .obj
--$(srcdir)/Makefile.in:  $(srcdir)/Makefile.am  $(am__configure_deps)
-+$(srcdir)/Makefile.in: @MAINTAINER_MODE_TRUE@ $(srcdir)/Makefile.am  $(am__configure_deps)
- 	@for dep in $?; do \
- 	  case '$(am__configure_deps)' in \
- 	    *$$dep*) \
-@@ -350,9 +353,9 @@
- $(top_builddir)/config.status: $(top_srcdir)/configure $(CONFIG_STATUS_DEPENDENCIES)
- 	cd $(top_builddir) && $(MAKE) $(AM_MAKEFLAGS) am--refresh
- 
--$(top_srcdir)/configure:  $(am__configure_deps)
-+$(top_srcdir)/configure: @MAINTAINER_MODE_TRUE@ $(am__configure_deps)
- 	cd $(top_builddir) && $(MAKE) $(AM_MAKEFLAGS) am--refresh
--$(ACLOCAL_M4):  $(am__aclocal_m4_deps)
-+$(ACLOCAL_M4): @MAINTAINER_MODE_TRUE@ $(am__aclocal_m4_deps)
- 	cd $(top_builddir) && $(MAKE) $(AM_MAKEFLAGS) am--refresh
- $(am__aclocal_m4_deps):
- install-pluginLTLIBRARIES: $(plugin_LTLIBRARIES)
-Index: gnome-settings-daemon-2.30.0/plugins/xrandr/Makefile.in
-===================================================================
---- gnome-settings-daemon-2.30.0.orig/plugins/xrandr/Makefile.in	2010-03-29 16:11:15.000000000 +0200
-+++ gnome-settings-daemon-2.30.0/plugins/xrandr/Makefile.in	2010-03-30 12:01:15.962401001 +0200
-@@ -71,7 +71,7 @@
- LTLIBRARIES = $(plugin_LTLIBRARIES)
- am__DEPENDENCIES_1 =
- libxrandr_la_DEPENDENCIES = $(am__DEPENDENCIES_1) \
--	$(am__DEPENDENCIES_1)
-+	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1)
- am__objects_1 =
- am_libxrandr_la_OBJECTS = $(am__objects_1) \
- 	libxrandr_la-gsd-xrandr-plugin.lo \
-@@ -102,6 +102,8 @@
- ACLOCAL = @ACLOCAL@
- ALL_LINGUAS = @ALL_LINGUAS@
- AMTAR = @AMTAR@
-+APPINDICATOR_CFLAGS = @APPINDICATOR_CFLAGS@
-+APPINDICATOR_LIBS = @APPINDICATOR_LIBS@
- AR = @AR@
- AUTOCONF = @AUTOCONF@
- AUTOHEADER = @AUTOHEADER@
-@@ -171,6 +173,7 @@
- LIPO = @LIPO@
- LN_S = @LN_S@
- LTLIBOBJS = @LTLIBOBJS@
-+MAINT = @MAINT@
- MAKEINFO = @MAKEINFO@
- MKDIR_P = @MKDIR_P@
- MKINSTALLDIRS = @MKINSTALLDIRS@
-@@ -304,6 +307,7 @@
- libxrandr_la_CFLAGS = \
- 	$(SETTINGS_PLUGIN_CFLAGS)	\
- 	$(LIBNOTIFY_CFLAGS)		\
-+	$(APPINDICATOR_CFLAGS)		\
- 	$(AM_CFLAGS)
- 
- libxrandr_la_LDFLAGS = \
-@@ -311,7 +315,8 @@
- 
- libxrandr_la_LIBADD = \
- 	$(SETTINGS_PLUGIN_LIBS)		\
--	$(LIBNOTIFY_LIBS)
-+	$(LIBNOTIFY_LIBS)		\
-+	$(APPINDICATOR_LIBS)
- 
- plugin_in_files = \
- 	xrandr.gnome-settings-plugin.in
-@@ -325,7 +330,7 @@
- 
- .SUFFIXES:
- .SUFFIXES: .c .lo .o .obj
--$(srcdir)/Makefile.in:  $(srcdir)/Makefile.am  $(am__configure_deps)
-+$(srcdir)/Makefile.in: @MAINTAINER_MODE_TRUE@ $(srcdir)/Makefile.am  $(am__configure_deps)
- 	@for dep in $?; do \
- 	  case '$(am__configure_deps)' in \
- 	    *$$dep*) \
-@@ -350,9 +355,9 @@
- $(top_builddir)/config.status: $(top_srcdir)/configure $(CONFIG_STATUS_DEPENDENCIES)
- 	cd $(top_builddir) && $(MAKE) $(AM_MAKEFLAGS) am--refresh
- 
--$(top_srcdir)/configure:  $(am__configure_deps)
-+$(top_srcdir)/configure: @MAINTAINER_MODE_TRUE@ $(am__configure_deps)
- 	cd $(top_builddir) && $(MAKE) $(AM_MAKEFLAGS) am--refresh
--$(ACLOCAL_M4):  $(am__aclocal_m4_deps)
-+$(ACLOCAL_M4): @MAINTAINER_MODE_TRUE@ $(am__aclocal_m4_deps)
- 	cd $(top_builddir) && $(MAKE) $(AM_MAKEFLAGS) am--refresh
- $(am__aclocal_m4_deps):
- install-pluginLTLIBRARIES: $(plugin_LTLIBRARIES)
-Index: gnome-settings-daemon-2.30.0/plugins/xrdb/Makefile.in
-===================================================================
---- gnome-settings-daemon-2.30.0.orig/plugins/xrdb/Makefile.in	2010-03-29 16:11:15.000000000 +0200
-+++ gnome-settings-daemon-2.30.0/plugins/xrdb/Makefile.in	2010-03-30 12:01:16.062399745 +0200
-@@ -138,6 +138,8 @@
- ACLOCAL = @ACLOCAL@
- ALL_LINGUAS = @ALL_LINGUAS@
- AMTAR = @AMTAR@
-+APPINDICATOR_CFLAGS = @APPINDICATOR_CFLAGS@
-+APPINDICATOR_LIBS = @APPINDICATOR_LIBS@
- AR = @AR@
- AUTOCONF = @AUTOCONF@
- AUTOHEADER = @AUTOHEADER@
-@@ -207,6 +209,7 @@
- LIPO = @LIPO@
- LN_S = @LN_S@
- LTLIBOBJS = @LTLIBOBJS@
-+MAINT = @MAINT@
- MAKEINFO = @MAKEINFO@
- MKDIR_P = @MKDIR_P@
- MKINSTALLDIRS = @MKINSTALLDIRS@
-@@ -364,7 +367,7 @@
- 
- .SUFFIXES:
- .SUFFIXES: .c .lo .o .obj
--$(srcdir)/Makefile.in:  $(srcdir)/Makefile.am  $(am__configure_deps)
-+$(srcdir)/Makefile.in: @MAINTAINER_MODE_TRUE@ $(srcdir)/Makefile.am  $(am__configure_deps)
- 	@for dep in $?; do \
- 	  case '$(am__configure_deps)' in \
- 	    *$$dep*) \
-@@ -389,9 +392,9 @@
- $(top_builddir)/config.status: $(top_srcdir)/configure $(CONFIG_STATUS_DEPENDENCIES)
- 	cd $(top_builddir) && $(MAKE) $(AM_MAKEFLAGS) am--refresh
- 
--$(top_srcdir)/configure:  $(am__configure_deps)
-+$(top_srcdir)/configure: @MAINTAINER_MODE_TRUE@ $(am__configure_deps)
- 	cd $(top_builddir) && $(MAKE) $(AM_MAKEFLAGS) am--refresh
--$(ACLOCAL_M4):  $(am__aclocal_m4_deps)
-+$(ACLOCAL_M4): @MAINTAINER_MODE_TRUE@ $(am__aclocal_m4_deps)
- 	cd $(top_builddir) && $(MAKE) $(AM_MAKEFLAGS) am--refresh
- $(am__aclocal_m4_deps):
- install-pluginLTLIBRARIES: $(plugin_LTLIBRARIES)
-Index: gnome-settings-daemon-2.30.0/plugins/xrdb/data/Makefile.in
-===================================================================
---- gnome-settings-daemon-2.30.0.orig/plugins/xrdb/data/Makefile.in	2010-03-29 16:11:15.000000000 +0200
-+++ gnome-settings-daemon-2.30.0/plugins/xrdb/data/Makefile.in	2010-03-30 12:01:16.133401159 +0200
-@@ -74,6 +74,8 @@
- ACLOCAL = @ACLOCAL@
- ALL_LINGUAS = @ALL_LINGUAS@
- AMTAR = @AMTAR@
-+APPINDICATOR_CFLAGS = @APPINDICATOR_CFLAGS@
-+APPINDICATOR_LIBS = @APPINDICATOR_LIBS@
- AR = @AR@
- AUTOCONF = @AUTOCONF@
- AUTOHEADER = @AUTOHEADER@
-@@ -143,6 +145,7 @@
- LIPO = @LIPO@
- LN_S = @LN_S@
- LTLIBOBJS = @LTLIBOBJS@
-+MAINT = @MAINT@
- MAKEINFO = @MAKEINFO@
- MKDIR_P = @MKDIR_P@
- MKINSTALLDIRS = @MKINSTALLDIRS@
-@@ -263,7 +266,7 @@
- all: all-am
- 
- .SUFFIXES:
--$(srcdir)/Makefile.in:  $(srcdir)/Makefile.am  $(am__configure_deps)
-+$(srcdir)/Makefile.in: @MAINTAINER_MODE_TRUE@ $(srcdir)/Makefile.am  $(am__configure_deps)
- 	@for dep in $?; do \
- 	  case '$(am__configure_deps)' in \
- 	    *$$dep*) \
-@@ -288,9 +291,9 @@
- $(top_builddir)/config.status: $(top_srcdir)/configure $(CONFIG_STATUS_DEPENDENCIES)
- 	cd $(top_builddir) && $(MAKE) $(AM_MAKEFLAGS) am--refresh
- 
--$(top_srcdir)/configure:  $(am__configure_deps)
-+$(top_srcdir)/configure: @MAINTAINER_MODE_TRUE@ $(am__configure_deps)
- 	cd $(top_builddir) && $(MAKE) $(AM_MAKEFLAGS) am--refresh
--$(ACLOCAL_M4):  $(am__aclocal_m4_deps)
-+$(ACLOCAL_M4): @MAINTAINER_MODE_TRUE@ $(am__aclocal_m4_deps)
- 	cd $(top_builddir) && $(MAKE) $(AM_MAKEFLAGS) am--refresh
- $(am__aclocal_m4_deps):
- 
-Index: gnome-settings-daemon-2.30.0/plugins/xsettings/Makefile.in
-===================================================================
---- gnome-settings-daemon-2.30.0.orig/plugins/xsettings/Makefile.in	2010-03-29 16:11:15.000000000 +0200
-+++ gnome-settings-daemon-2.30.0/plugins/xsettings/Makefile.in	2010-03-30 12:01:16.241400297 +0200
-@@ -124,6 +124,8 @@
- ACLOCAL = @ACLOCAL@
- ALL_LINGUAS = @ALL_LINGUAS@
- AMTAR = @AMTAR@
-+APPINDICATOR_CFLAGS = @APPINDICATOR_CFLAGS@
-+APPINDICATOR_LIBS = @APPINDICATOR_LIBS@
- AR = @AR@
- AUTOCONF = @AUTOCONF@
- AUTOHEADER = @AUTOHEADER@
-@@ -193,6 +195,7 @@
- LIPO = @LIPO@
- LN_S = @LN_S@
- LTLIBOBJS = @LTLIBOBJS@
-+MAINT = @MAINT@
- MAKEINFO = @MAKEINFO@
- MKDIR_P = @MKDIR_P@
- MKINSTALLDIRS = @MKINSTALLDIRS@
-@@ -339,7 +342,7 @@
- 
- .SUFFIXES:
- .SUFFIXES: .c .lo .o .obj
--$(srcdir)/Makefile.in:  $(srcdir)/Makefile.am  $(am__configure_deps)
-+$(srcdir)/Makefile.in: @MAINTAINER_MODE_TRUE@ $(srcdir)/Makefile.am  $(am__configure_deps)
- 	@for dep in $?; do \
- 	  case '$(am__configure_deps)' in \
- 	    *$$dep*) \
-@@ -364,9 +367,9 @@
- $(top_builddir)/config.status: $(top_srcdir)/configure $(CONFIG_STATUS_DEPENDENCIES)
- 	cd $(top_builddir) && $(MAKE) $(AM_MAKEFLAGS) am--refresh
- 
--$(top_srcdir)/configure:  $(am__configure_deps)
-+$(top_srcdir)/configure: @MAINTAINER_MODE_TRUE@ $(am__configure_deps)
- 	cd $(top_builddir) && $(MAKE) $(AM_MAKEFLAGS) am--refresh
--$(ACLOCAL_M4):  $(am__aclocal_m4_deps)
-+$(ACLOCAL_M4): @MAINTAINER_MODE_TRUE@ $(am__aclocal_m4_deps)
- 	cd $(top_builddir) && $(MAKE) $(AM_MAKEFLAGS) am--refresh
- $(am__aclocal_m4_deps):
- install-pluginLTLIBRARIES: $(plugin_LTLIBRARIES)
