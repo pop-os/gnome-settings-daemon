@@ -1,6 +1,18 @@
 gnome-settings-daemon (2.30.0-0ubuntu1) UNRELEASED; urgency=low
 
   [ Didier Roche ]
+  * New upstream release:
+    - Protect XInput code by ifdefs if XInput isn't available (Daniel Macks)
+    - Don't play a sound when the volume doesn't change (Bastien Nocera)
+    - Fix linking with pedantic linkers (Bastien Nocera) (#610244)
+    - Remove unused do_sleep_action function (Bastien Nocera)
+    - Apply all keyboard settings to new keyboards (Bastien Nocera) (#610245)
+    - Ensure the window is realized before we invalidate it (Richard Hughes)
+    - Replace "eject" spawn with GIO code (Bastien Nocera) (#580779)
+    - Don't spawn xrdb (Martin Pitt) (#586276)
+    - Add translator hint (Jens Granseuer) (#613647)
+    - Disable font plugin by default (Bastien Nocera) (#613604)
+    - Updated translations
   * remove debian/patches/04_dont_call_xrdb.patch: upstreamed
   * debian/patches/16_use_synchronous_notifications.patch: refreshed
   * debian/patches/90_autoreconf.patch: refreshed
@@ -13,7 +25,7 @@ gnome-settings-daemon (2.30.0-0ubuntu1) UNRELEASED; urgency=low
     - Correctly update asynchronous notifications 
     - Fix a compiler warning
 
- -- Chris Coulson <chris.coulson@canonical.com>  Tue, 30 Mar 2010 13:51:57 +0100
+ -- Didier Roche <didrocks@ubuntu.com>  Tue, 30 Mar 2010 17:11:09 +0200
 
 gnome-settings-daemon (2.29.92-0ubuntu4) lucid; urgency=low
 
