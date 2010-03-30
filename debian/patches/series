@@ -2,7 +2,6 @@
 02_fix_randr.patch
 02_missing_libs.patch
 03_maintainer_mode.patch
-04_dont_call_xrdb.patch
 05_disable_corner_tapping.patch
 06_use_application_indicator.patch
 07_dont_display_autostart.patch
