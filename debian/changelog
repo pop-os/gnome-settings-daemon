@@ -1,4 +1,4 @@
-gnome-settings-daemon (2.30.0-0ubuntu4) UNRELEASED; urgency=low
+gnome-settings-daemon (2.30.0-0ubuntu1) UNRELEASED; urgency=low
 
   * remove debian/patches/04_dont_call_xrdb.patch: upstreamed
   * debian/patches/16_use_synchronous_notifications.patch: refreshed

@@ -1,7 +1,7 @@
 Index: gnome-settings-daemon-2.30.0/plugins/common/gsd-osd-notification.c
 ===================================================================
 --- /dev/null	1970-01-01 00:00:00.000000000 +0000
-+++ gnome-settings-daemon-2.30.0/plugins/common/gsd-osd-notification.c	2010-03-30 11:48:02.357403657 +0200
++++ gnome-settings-daemon-2.30.0/plugins/common/gsd-osd-notification.c	2010-03-30 12:19:39.150399688 +0200
 @@ -0,0 +1,286 @@
 +/* -*- Mode: C; indent-tabs-mode: nil; c-basic-offset: 8; tab-width: 8 -*- */
 +/*
@@ -292,7 +292,7 @@ Index: gnome-settings-daemon-2.30.0/plugins/common/gsd-osd-notification.c
 Index: gnome-settings-daemon-2.30.0/plugins/common/gsd-osd-notification.h
 ===================================================================
 --- /dev/null	1970-01-01 00:00:00.000000000 +0000
-+++ gnome-settings-daemon-2.30.0/plugins/common/gsd-osd-notification.h	2010-03-30 11:48:02.361402069 +0200
++++ gnome-settings-daemon-2.30.0/plugins/common/gsd-osd-notification.h	2010-03-30 12:19:39.150399688 +0200
 @@ -0,0 +1,75 @@
 +/* -*- Mode: C; indent-tabs-mode: nil; c-basic-offset: 8; tab-width: 8 -*- */
 +/*
@@ -372,7 +372,7 @@ Index: gnome-settings-daemon-2.30.0/plugins/common/gsd-osd-notification.h
 Index: gnome-settings-daemon-2.30.0/plugins/media-keys/gsd-media-keys-manager.c
 ===================================================================
 --- gnome-settings-daemon-2.30.0.orig/plugins/media-keys/gsd-media-keys-manager.c	2010-03-29 10:15:04.000000000 +0200
-+++ gnome-settings-daemon-2.30.0/plugins/media-keys/gsd-media-keys-manager.c	2010-03-30 11:59:54.350418551 +0200
++++ gnome-settings-daemon-2.30.0/plugins/media-keys/gsd-media-keys-manager.c	2010-03-30 12:21:19.906400245 +0200
 @@ -49,6 +49,7 @@
  #include "eggaccelerators.h"
  #include "acme.h"
@@ -499,18 +499,18 @@ Index: gnome-settings-daemon-2.30.0/plugins/media-keys/gsd-media-keys-manager.c
          gboolean sound_changed;
  
          if (manager->priv->stream == NULL)
-@@ -722,7 +766,9 @@
+@@ -722,7 +766,10 @@
                          if (gvc_mixer_stream_set_volume (manager->priv->stream, vol) != FALSE) {
                                  gvc_mixer_stream_push_volume (manager->priv->stream);
                                  sound_changed = TRUE;
--                        }
 +                                gvc_mixer_stream_push_volume (manager->priv->stream);
+                         }
 +                } else {
 +                        overshoot = GSD_OSD_NOTIFICATION_UNDERSHOOT;
                  }
                  break;
          case VOLUME_UP_KEY:
-@@ -750,12 +796,14 @@
+@@ -750,12 +797,14 @@
                                          gvc_mixer_stream_push_volume (manager->priv->stream);
                                          sound_changed = TRUE;
                                  }
@@ -526,7 +526,7 @@ Index: gnome-settings-daemon-2.30.0/plugins/media-keys/gsd-media-keys-manager.c
  }
  
  static void
-@@ -900,8 +948,11 @@
+@@ -900,8 +949,11 @@
  
  static gboolean
  do_multimedia_player_action (GsdMediaKeysManager *manager,
@@ -538,7 +538,7 @@ Index: gnome-settings-daemon-2.30.0/plugins/media-keys/gsd-media-keys-manager.c
          return gsd_media_player_key_pressed (manager, key);
  }
  
-@@ -972,19 +1023,19 @@
+@@ -972,19 +1024,19 @@
                  execute (manager, "gcalctool", FALSE, FALSE);
                  break;
          case PLAY_KEY:
@@ -563,7 +563,7 @@ Index: gnome-settings-daemon-2.30.0/plugins/media-keys/gsd-media-keys-manager.c
                  break;
          default:
                  g_assert_not_reached ();
-@@ -1121,6 +1172,8 @@
+@@ -1121,6 +1173,8 @@
  
          gvc_mixer_control_open (manager->priv->volume);
  
@@ -572,7 +572,7 @@ Index: gnome-settings-daemon-2.30.0/plugins/media-keys/gsd-media-keys-manager.c
          gnome_settings_profile_end ("gvc_mixer_control_new");
  #endif /* HAVE_PULSE */
          g_idle_add ((GSourceFunc) start_media_keys_idle_cb, manager);
-@@ -1218,6 +1271,9 @@
+@@ -1218,6 +1272,9 @@
          }
          g_list_free (priv->media_players);
          priv->media_players = NULL;
