@@ -1,3 +1,11 @@
+gnome-settings-daemon (2.30.0-0ubuntu2) lucid; urgency=low
+
+  * debian/patches/91_bugzilla_update_touchpad_icons.patch:
+    - updated touchpad svg icons with the ones on 
+      https://bugzilla.gnome.org/show_bug.cgi?id=611348 (lp: #539025)
+
+ -- Sebastien Bacher <seb128@ubuntu.com>  Wed, 31 Mar 2010 12:00:44 +0200
+
 gnome-settings-daemon (2.30.0-0ubuntu1) lucid; urgency=low
 
   [ Didier Roche ]
