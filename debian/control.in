@@ -23,7 +23,7 @@ Build-Depends: cdbs,
                libxext-dev,
                libx11-dev,
                libgnomekbd-dev (>= 2.21.4),
-               libxklavier-dev (>= 4.0),
+               libxklavier-dev (>= 5.0),
                libgstreamer0.10-dev (>= 0.10.1.2),
                libgstreamer-plugins-base0.10-dev (>= 0.10.1.2),
                gnome-pkg-tools

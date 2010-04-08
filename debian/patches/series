@@ -5,5 +5,6 @@
 12_monitor_network_fs.patch
 20_gstreamer.patch
 30_pkgconfig-path.patch
+40_xklavier_5.0.patch
 70_relibtoolize.patch
 99_ltmain_as-needed.patch
