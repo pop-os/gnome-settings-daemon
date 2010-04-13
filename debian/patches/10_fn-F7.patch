@@ -1,0 +1,53 @@
+From 22990893be444374a642d73f5b7c054fb41602ed Mon Sep 17 00:00:00 2001
+From: Chase Douglas <chase.douglas@canonical.com>
+Date: Fri, 2 Apr 2010 01:37:44 +0000
+Subject: [PATCH] Ensure fn-F7 event timestamps are valid
+
+The X randr extension requires timestamps to be valid for configurations
+to be made. The xrandr plugin uses the timestamps from the input events
+from the kernel, but input events can be sent by the kernel out of
+order and/or have a timestamp previous to the latest g-s-d
+autoconfiguration. In such cases, the X randr extension errors out due
+to timestamp warping.
+
+In deference to the fact that all input events should be handled, this
+change fixes up the timestamps so they are always later than or equal to
+the value used in the server.
+
+Signed-off-by: Chase Douglas <chase.douglas@ubuntu.com>
+---
+ plugins/xrandr/gsd-xrandr-manager.c |   11 +++++++++++
+ 1 files changed, 11 insertions(+), 0 deletions(-)
+
+diff --git a/plugins/xrandr/gsd-xrandr-manager.c b/plugins/xrandr/gsd-xrandr-manager.c
+index e78eb6b..058db48 100644
+--- a/plugins/xrandr/gsd-xrandr-manager.c
++++ b/plugins/xrandr/gsd-xrandr-manager.c
+@@ -945,6 +945,7 @@ handle_fn_f7 (GsdXrandrManager *mgr, guint32 timestamp)
+         GnomeRRScreen *screen = priv->rw_screen;
+         GnomeRRConfig *current;
+         GError *error;
++        guint32 server_timestamp;
+ 
+         /* Theory of fn-F7 operation
+          *
+@@ -999,6 +1000,16 @@ handle_fn_f7 (GsdXrandrManager *mgr, guint32 timestamp)
+ 
+                 g_debug ("applying");
+ 
++                /* The X server will error out if the timestamp provided is
++                 * older than a previous change configuration timestamp. We
++                 * assume here that we do want this event to go through still,
++                 * since kernel timestamps may be skewed wrt the X server.
++                 */
++                gnome_rr_screen_get_timestamps (screen, NULL, &server_timestamp);
++                if ((gint32) timestamp - (gint32) server_timestamp < 0) {
++                        timestamp = server_timestamp;
++                }
++
+                 apply_configuration_and_display_error (mgr, priv->fn_f7_configs[mgr->priv->current_fn_f7_config], timestamp);
+         }
+         else {
+-- 
+1.7.0
+

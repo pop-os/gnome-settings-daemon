@@ -7,6 +7,7 @@
 07_dont_display_autostart.patch
 08_multi_keyboard_layouts.patch
 09_indicator-display.patch
+10_fn-F7.patch
 16_use_synchronous_notifications.patch
 30_pkgconfig-path.patch
 40_xres_lcddefault.patch
