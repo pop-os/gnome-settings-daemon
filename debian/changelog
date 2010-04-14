@@ -1,3 +1,10 @@
+gnome-settings-daemon (2.30.0-0ubuntu4) lucid; urgency=low
+
+  * Be compliant with the settings in the synaptics driver as regards
+    performing middle and right taps with multiple fingers (LP: #432814).
+
+ -- Alberto Milone <alberto.milone@canonical.com>  Wed, 14 Apr 2010 16:22:46 +0200
+
 gnome-settings-daemon (2.30.0-0ubuntu3) lucid; urgency=low
 
   * Fix handling of fn-F7 (xrandr) when xev timestamp is later than server
