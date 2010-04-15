@@ -8,7 +8,7 @@
 08_multi_keyboard_layouts.patch
 09_indicator-display.patch
 10_fn-F7.patch
-11_change_tap_to_click_order.patch
+#11_change_tap_to_click_order.patch
 16_use_synchronous_notifications.patch
 30_pkgconfig-path.patch
 40_xres_lcddefault.patch

@@ -1,3 +1,11 @@
+gnome-settings-daemon (2.30.0-0ubuntu5) lucid; urgency=low
+
+  * Revert the previous changes and use upstream's default settings for
+    multi-finger taps now that the synaptics driver behaves in the same
+    way.
+
+ -- Alberto Milone <alberto.milone@canonical.com>  Thu, 15 Apr 2010 15:40:03 +0200
+
 gnome-settings-daemon (2.30.0-0ubuntu4) lucid; urgency=low
 
   * Be compliant with the settings in the synaptics driver as regards
