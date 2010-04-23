@@ -1,7 +1,7 @@
 Index: gnome-settings-daemon-2.30.0/plugins/common/gsd-osd-notification.c
 ===================================================================
 --- /dev/null	1970-01-01 00:00:00.000000000 +0000
-+++ gnome-settings-daemon-2.30.0/plugins/common/gsd-osd-notification.c	2010-03-30 13:51:23.887571975 +0100
++++ gnome-settings-daemon-2.30.0/plugins/common/gsd-osd-notification.c	2010-04-23 17:05:08.862133020 +0100
 @@ -0,0 +1,296 @@
 +/* -*- Mode: C; indent-tabs-mode: nil; c-basic-offset: 8; tab-width: 8 -*- */
 +/*
@@ -302,7 +302,7 @@ Index: gnome-settings-daemon-2.30.0/plugins/common/gsd-osd-notification.c
 Index: gnome-settings-daemon-2.30.0/plugins/common/gsd-osd-notification.h
 ===================================================================
 --- /dev/null	1970-01-01 00:00:00.000000000 +0000
-+++ gnome-settings-daemon-2.30.0/plugins/common/gsd-osd-notification.h	2010-03-30 13:49:19.077588582 +0100
++++ gnome-settings-daemon-2.30.0/plugins/common/gsd-osd-notification.h	2010-04-23 17:05:08.862133020 +0100
 @@ -0,0 +1,75 @@
 +/* -*- Mode: C; indent-tabs-mode: nil; c-basic-offset: 8; tab-width: 8 -*- */
 +/*
@@ -382,7 +382,7 @@ Index: gnome-settings-daemon-2.30.0/plugins/common/gsd-osd-notification.h
 Index: gnome-settings-daemon-2.30.0/plugins/media-keys/gsd-media-keys-manager.c
 ===================================================================
 --- gnome-settings-daemon-2.30.0.orig/plugins/media-keys/gsd-media-keys-manager.c	2010-03-29 09:15:04.000000000 +0100
-+++ gnome-settings-daemon-2.30.0/plugins/media-keys/gsd-media-keys-manager.c	2010-03-30 13:49:19.077588582 +0100
++++ gnome-settings-daemon-2.30.0/plugins/media-keys/gsd-media-keys-manager.c	2010-04-23 17:05:08.862133020 +0100
 @@ -49,6 +49,7 @@
  #include "eggaccelerators.h"
  #include "acme.h"
@@ -602,8 +602,8 @@ Index: gnome-settings-daemon-2.30.0/plugins/media-keys/gsd-media-keys-manager.c
 Index: gnome-settings-daemon-2.30.0/plugins/common/Makefile.am
 ===================================================================
 --- gnome-settings-daemon-2.30.0.orig/plugins/common/Makefile.am	2010-03-10 11:59:38.000000000 +0000
-+++ gnome-settings-daemon-2.30.0/plugins/common/Makefile.am	2010-03-30 13:49:19.077588582 +0100
-@@ -7,7 +7,9 @@
++++ gnome-settings-daemon-2.30.0/plugins/common/Makefile.am	2010-04-23 17:10:43.209632216 +0100
+@@ -7,17 +7,21 @@
  	gsd-keygrab.c		\
  	gsd-keygrab.h		\
  	gsd-osd-window.c	\
@@ -614,3 +614,16 @@ Index: gnome-settings-daemon-2.30.0/plugins/common/Makefile.am
  
  libcommon_la_CPPFLAGS = \
  	$(AM_CPPFLAGS)
+ 
+ libcommon_la_CFLAGS = \
+ 	$(SETTINGS_PLUGIN_CFLAGS)	\
++	$(LIBNOTIFY_CFLAGS)	\
+ 	$(AM_CFLAGS)
+ 
+ libcommon_la_LDFLAGS = \
+ 	$(GSD_PLUGIN_LDFLAGS) $(X11_LIBS)
+ 
+ libcommon_la_LIBADD  = \
+-	$(SETTINGS_PLUGIN_LIBS)
++	$(SETTINGS_PLUGIN_LIBS)	\
++	$(LIBNOTIFY_LIBS)

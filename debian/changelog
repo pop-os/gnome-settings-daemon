@@ -1,3 +1,12 @@
+gnome-settings-daemon (2.30.0-0ubuntu6) UNRELEASED; urgency=low
+
+  * debian/patches/16_use_synchronous_notifications.patch:
+    - Make sure the media keys plugin links with libnotify
+  * debian/patches/90_autoreconf.patch:
+    - Refreshed to pick up the change above
+
+ -- Chris Coulson <chris.coulson@canonical.com>  Fri, 23 Apr 2010 17:16:35 +0100
+
 gnome-settings-daemon (2.30.0-0ubuntu5) lucid; urgency=low
 
   * Revert the previous changes and use upstream's default settings for

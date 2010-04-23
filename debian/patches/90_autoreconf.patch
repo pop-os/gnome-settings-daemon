@@ -1,6 +1,6 @@
 diff -Nurp gnome-settings-daemon-2.30.0.orig/aclocal.m4 gnome-settings-daemon-2.30.0/aclocal.m4
---- gnome-settings-daemon-2.30.0.orig/aclocal.m4	2010-03-30 13:43:07.030084571 +0100
-+++ gnome-settings-daemon-2.30.0/aclocal.m4	2010-03-30 13:43:12.307606569 +0100
+--- gnome-settings-daemon-2.30.0.orig/aclocal.m4	2010-04-23 17:13:16.299624938 +0100
++++ gnome-settings-daemon-2.30.0/aclocal.m4	2010-04-23 17:13:22.299632900 +0100
 @@ -19,2048 +19,2720 @@ You have another version of autoconf.  I
  If you have problems, you may need to regenerate the build system entirely.
  To do so, use the procedure documented by the package, typically `autoreconf'.])])
@@ -8763,8 +8763,8 @@ diff -Nurp gnome-settings-daemon-2.30.0.orig/aclocal.m4 gnome-settings-daemon-2.
  
  m4_include([acinclude.m4])
 diff -Nurp gnome-settings-daemon-2.30.0.orig/config.h.in gnome-settings-daemon-2.30.0/config.h.in
---- gnome-settings-daemon-2.30.0.orig/config.h.in	2010-03-30 13:43:07.010075673 +0100
-+++ gnome-settings-daemon-2.30.0/config.h.in	2010-03-30 13:43:16.577583342 +0100
+--- gnome-settings-daemon-2.30.0.orig/config.h.in	2010-04-23 17:13:16.279686511 +0100
++++ gnome-settings-daemon-2.30.0/config.h.in	2010-04-23 17:13:26.742122519 +0100
 @@ -9,6 +9,9 @@
  /* Name of default gettext domain */
  #undef GETTEXT_PACKAGE
@@ -8776,8 +8776,8 @@ diff -Nurp gnome-settings-daemon-2.30.0.orig/config.h.in gnome-settings-daemon-2
  #undef HAVE_BIND_TEXTDOMAIN_CODESET
  
 diff -Nurp gnome-settings-daemon-2.30.0.orig/configure gnome-settings-daemon-2.30.0/configure
---- gnome-settings-daemon-2.30.0.orig/configure	2010-03-30 13:43:07.010075673 +0100
-+++ gnome-settings-daemon-2.30.0/configure	2010-03-30 13:43:16.227613790 +0100
+--- gnome-settings-daemon-2.30.0.orig/configure	2010-04-23 17:13:16.289625832 +0100
++++ gnome-settings-daemon-2.30.0/configure	2010-04-23 17:13:26.359669299 +0100
 @@ -773,6 +773,10 @@ X_PRE_LIBS
  X_CFLAGS
  XMKMF
@@ -9279,8 +9279,8 @@ diff -Nurp gnome-settings-daemon-2.30.0.orig/configure gnome-settings-daemon-2.3
          Profiling support:        ${enable_profiling}
  "
 diff -Nurp gnome-settings-daemon-2.30.0.orig/data/Makefile.in gnome-settings-daemon-2.30.0/data/Makefile.in
---- gnome-settings-daemon-2.30.0.orig/data/Makefile.in	2010-03-30 13:43:06.990101417 +0100
-+++ gnome-settings-daemon-2.30.0/data/Makefile.in	2010-03-30 13:43:17.247614027 +0100
+--- gnome-settings-daemon-2.30.0.orig/data/Makefile.in	2010-04-23 17:13:16.279686511 +0100
++++ gnome-settings-daemon-2.30.0/data/Makefile.in	2010-04-23 17:13:27.499622351 +0100
 @@ -81,6 +81,8 @@ DISTFILES = $(DIST_COMMON) $(DIST_SOURCE
  ACLOCAL = @ACLOCAL@
  ALL_LINGUAS = @ALL_LINGUAS@
@@ -9320,8 +9320,8 @@ diff -Nurp gnome-settings-daemon-2.30.0.orig/data/Makefile.in gnome-settings-dae
  $(am__aclocal_m4_deps):
  gnome-settings-daemon.desktop.in: $(top_builddir)/config.status $(srcdir)/gnome-settings-daemon.desktop.in.in
 diff -Nurp gnome-settings-daemon-2.30.0.orig/gnome-settings-daemon/Makefile.in gnome-settings-daemon-2.30.0/gnome-settings-daemon/Makefile.in
---- gnome-settings-daemon-2.30.0.orig/gnome-settings-daemon/Makefile.in	2010-03-30 13:43:07.010075673 +0100
-+++ gnome-settings-daemon-2.30.0/gnome-settings-daemon/Makefile.in	2010-03-30 13:43:17.367577253 +0100
+--- gnome-settings-daemon-2.30.0.orig/gnome-settings-daemon/Makefile.in	2010-04-23 17:13:16.289625832 +0100
++++ gnome-settings-daemon-2.30.0/gnome-settings-daemon/Makefile.in	2010-04-23 17:13:27.639628208 +0100
 @@ -120,6 +120,8 @@ DISTFILES = $(DIST_COMMON) $(DIST_SOURCE
  ACLOCAL = @ACLOCAL@
  ALL_LINGUAS = @ALL_LINGUAS@
@@ -9361,8 +9361,8 @@ diff -Nurp gnome-settings-daemon-2.30.0.orig/gnome-settings-daemon/Makefile.in g
  $(am__aclocal_m4_deps):
  
 diff -Nurp gnome-settings-daemon-2.30.0.orig/Makefile.in gnome-settings-daemon-2.30.0/Makefile.in
---- gnome-settings-daemon-2.30.0.orig/Makefile.in	2010-03-30 13:43:06.990101417 +0100
-+++ gnome-settings-daemon-2.30.0/Makefile.in	2010-03-30 13:43:19.137582517 +0100
+--- gnome-settings-daemon-2.30.0.orig/Makefile.in	2010-04-23 17:13:16.279686511 +0100
++++ gnome-settings-daemon-2.30.0/Makefile.in	2010-04-23 17:13:29.672122491 +0100
 @@ -106,6 +106,8 @@ distcleancheck_listfiles = find . -type 
  ACLOCAL = @ACLOCAL@
  ALL_LINGUAS = @ALL_LINGUAS@
@@ -9411,8 +9411,8 @@ diff -Nurp gnome-settings-daemon-2.30.0.orig/Makefile.in gnome-settings-daemon-2
  	rm -f stamp-h1
  	touch $@
 diff -Nurp gnome-settings-daemon-2.30.0.orig/plugins/a11y-keyboard/Makefile.in gnome-settings-daemon-2.30.0/plugins/a11y-keyboard/Makefile.in
---- gnome-settings-daemon-2.30.0.orig/plugins/a11y-keyboard/Makefile.in	2010-03-30 13:43:07.010075673 +0100
-+++ gnome-settings-daemon-2.30.0/plugins/a11y-keyboard/Makefile.in	2010-03-30 13:43:17.527603458 +0100
+--- gnome-settings-daemon-2.30.0.orig/plugins/a11y-keyboard/Makefile.in	2010-04-23 17:13:16.289625832 +0100
++++ gnome-settings-daemon-2.30.0/plugins/a11y-keyboard/Makefile.in	2010-04-23 17:13:27.812202513 +0100
 @@ -76,7 +76,7 @@ LTLIBRARIES = $(plugin_LTLIBRARIES)
  am__DEPENDENCIES_1 =
  liba11y_keyboard_la_DEPENDENCIES = $(am__DEPENDENCIES_1) \
@@ -9477,8 +9477,8 @@ diff -Nurp gnome-settings-daemon-2.30.0.orig/plugins/a11y-keyboard/Makefile.in g
  $(am__aclocal_m4_deps):
  install-pluginLTLIBRARIES: $(plugin_LTLIBRARIES)
 diff -Nurp gnome-settings-daemon-2.30.0.orig/plugins/background/Makefile.in gnome-settings-daemon-2.30.0/plugins/background/Makefile.in
---- gnome-settings-daemon-2.30.0.orig/plugins/background/Makefile.in	2010-03-30 13:43:07.030084571 +0100
-+++ gnome-settings-daemon-2.30.0/plugins/background/Makefile.in	2010-03-30 13:43:17.627572306 +0100
+--- gnome-settings-daemon-2.30.0.orig/plugins/background/Makefile.in	2010-04-23 17:13:16.299624938 +0100
++++ gnome-settings-daemon-2.30.0/plugins/background/Makefile.in	2010-04-23 17:13:27.942123491 +0100
 @@ -118,6 +118,8 @@ DISTFILES = $(DIST_COMMON) $(DIST_SOURCE
  ACLOCAL = @ACLOCAL@
  ALL_LINGUAS = @ALL_LINGUAS@
@@ -9518,8 +9518,8 @@ diff -Nurp gnome-settings-daemon-2.30.0.orig/plugins/background/Makefile.in gnom
  $(am__aclocal_m4_deps):
  install-pluginLTLIBRARIES: $(plugin_LTLIBRARIES)
 diff -Nurp gnome-settings-daemon-2.30.0.orig/plugins/clipboard/Makefile.in gnome-settings-daemon-2.30.0/plugins/clipboard/Makefile.in
---- gnome-settings-daemon-2.30.0.orig/plugins/clipboard/Makefile.in	2010-03-30 13:43:07.020081065 +0100
-+++ gnome-settings-daemon-2.30.0/plugins/clipboard/Makefile.in	2010-03-30 13:43:17.717593103 +0100
+--- gnome-settings-daemon-2.30.0.orig/plugins/clipboard/Makefile.in	2010-04-23 17:13:16.289625832 +0100
++++ gnome-settings-daemon-2.30.0/plugins/clipboard/Makefile.in	2010-04-23 17:13:28.052121830 +0100
 @@ -103,6 +103,8 @@ DISTFILES = $(DIST_COMMON) $(DIST_SOURCE
  ACLOCAL = @ACLOCAL@
  ALL_LINGUAS = @ALL_LINGUAS@
@@ -9559,11 +9559,15 @@ diff -Nurp gnome-settings-daemon-2.30.0.orig/plugins/clipboard/Makefile.in gnome
  $(am__aclocal_m4_deps):
  install-pluginLTLIBRARIES: $(plugin_LTLIBRARIES)
 diff -Nurp gnome-settings-daemon-2.30.0.orig/plugins/common/Makefile.in gnome-settings-daemon-2.30.0/plugins/common/Makefile.in
---- gnome-settings-daemon-2.30.0.orig/plugins/common/Makefile.in	2010-03-30 13:43:07.030084571 +0100
-+++ gnome-settings-daemon-2.30.0/plugins/common/Makefile.in	2010-03-30 13:43:17.807592740 +0100
-@@ -49,7 +49,8 @@ LTLIBRARIES = $(noinst_LTLIBRARIES)
+--- gnome-settings-daemon-2.30.0.orig/plugins/common/Makefile.in	2010-04-23 17:13:16.299624938 +0100
++++ gnome-settings-daemon-2.30.0/plugins/common/Makefile.in	2010-04-23 17:13:28.142132925 +0100
+@@ -47,9 +47,11 @@ CONFIG_CLEAN_FILES =
+ CONFIG_CLEAN_VPATH_FILES =
+ LTLIBRARIES = $(noinst_LTLIBRARIES)
  am__DEPENDENCIES_1 =
- libcommon_la_DEPENDENCIES = $(am__DEPENDENCIES_1)
+-libcommon_la_DEPENDENCIES = $(am__DEPENDENCIES_1)
++libcommon_la_DEPENDENCIES = $(am__DEPENDENCIES_1) \
++	$(am__DEPENDENCIES_1)
  am_libcommon_la_OBJECTS = libcommon_la-eggaccelerators.lo \
 -	libcommon_la-gsd-keygrab.lo libcommon_la-gsd-osd-window.lo
 +	libcommon_la-gsd-keygrab.lo libcommon_la-gsd-osd-window.lo \
@@ -9571,7 +9575,7 @@ diff -Nurp gnome-settings-daemon-2.30.0.orig/plugins/common/Makefile.in gnome-se
  libcommon_la_OBJECTS = $(am_libcommon_la_OBJECTS)
  libcommon_la_LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) \
  	$(LIBTOOLFLAGS) --mode=link $(CCLD) $(libcommon_la_CFLAGS) \
-@@ -75,6 +76,8 @@ DISTFILES = $(DIST_COMMON) $(DIST_SOURCE
+@@ -75,6 +77,8 @@ DISTFILES = $(DIST_COMMON) $(DIST_SOURCE
  ACLOCAL = @ACLOCAL@
  ALL_LINGUAS = @ALL_LINGUAS@
  AMTAR = @AMTAR@
@@ -9580,7 +9584,7 @@ diff -Nurp gnome-settings-daemon-2.30.0.orig/plugins/common/Makefile.in gnome-se
  AR = @AR@
  AUTOCONF = @AUTOCONF@
  AUTOHEADER = @AUTOHEADER@
-@@ -144,6 +147,7 @@ LIBTOOL = @LIBTOOL@
+@@ -144,6 +148,7 @@ LIBTOOL = @LIBTOOL@
  LIPO = @LIPO@
  LN_S = @LN_S@
  LTLIBOBJS = @LTLIBOBJS@
@@ -9588,7 +9592,7 @@ diff -Nurp gnome-settings-daemon-2.30.0.orig/plugins/common/Makefile.in gnome-se
  MAKEINFO = @MAKEINFO@
  MKDIR_P = @MKDIR_P@
  MKINSTALLDIRS = @MKINSTALLDIRS@
-@@ -253,7 +257,9 @@ libcommon_la_SOURCES = \
+@@ -253,26 +258,30 @@ libcommon_la_SOURCES = \
  	gsd-keygrab.c		\
  	gsd-keygrab.h		\
  	gsd-osd-window.c	\
@@ -9599,7 +9603,21 @@ diff -Nurp gnome-settings-daemon-2.30.0.orig/plugins/common/Makefile.in gnome-se
  
  libcommon_la_CPPFLAGS = \
  	$(AM_CPPFLAGS)
-@@ -272,7 +278,7 @@ all: all-am
+ 
+ libcommon_la_CFLAGS = \
+ 	$(SETTINGS_PLUGIN_CFLAGS)	\
++	$(LIBNOTIFY_CFLAGS)	\
+ 	$(AM_CFLAGS)
+ 
+ libcommon_la_LDFLAGS = \
+ 	$(GSD_PLUGIN_LDFLAGS) $(X11_LIBS)
+ 
+ libcommon_la_LIBADD = \
+-	$(SETTINGS_PLUGIN_LIBS)
++	$(SETTINGS_PLUGIN_LIBS)	\
++	$(LIBNOTIFY_LIBS)
+ 
+ all: all-am
  
  .SUFFIXES:
  .SUFFIXES: .c .lo .o .obj
@@ -9608,7 +9626,7 @@ diff -Nurp gnome-settings-daemon-2.30.0.orig/plugins/common/Makefile.in gnome-se
  	@for dep in $?; do \
  	  case '$(am__configure_deps)' in \
  	    *$$dep*) \
-@@ -297,9 +303,9 @@ Makefile: $(srcdir)/Makefile.in $(top_bu
+@@ -297,9 +306,9 @@ Makefile: $(srcdir)/Makefile.in $(top_bu
  $(top_builddir)/config.status: $(top_srcdir)/configure $(CONFIG_STATUS_DEPENDENCIES)
  	cd $(top_builddir) && $(MAKE) $(AM_MAKEFLAGS) am--refresh
  
@@ -9620,7 +9638,7 @@ diff -Nurp gnome-settings-daemon-2.30.0.orig/plugins/common/Makefile.in gnome-se
  	cd $(top_builddir) && $(MAKE) $(AM_MAKEFLAGS) am--refresh
  $(am__aclocal_m4_deps):
  
-@@ -322,6 +328,7 @@ distclean-compile:
+@@ -322,6 +331,7 @@ distclean-compile:
  
  @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libcommon_la-eggaccelerators.Plo@am__quote@
  @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libcommon_la-gsd-keygrab.Plo@am__quote@
@@ -9628,7 +9646,7 @@ diff -Nurp gnome-settings-daemon-2.30.0.orig/plugins/common/Makefile.in gnome-se
  @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libcommon_la-gsd-osd-window.Plo@am__quote@
  
  .c.o:
-@@ -366,6 +373,13 @@ libcommon_la-gsd-osd-window.lo: gsd-osd-
+@@ -366,6 +376,13 @@ libcommon_la-gsd-osd-window.lo: gsd-osd-
  @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
  @am__fastdepCC_FALSE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libcommon_la_CPPFLAGS) $(CPPFLAGS) $(libcommon_la_CFLAGS) $(CFLAGS) -c -o libcommon_la-gsd-osd-window.lo `test -f 'gsd-osd-window.c' || echo '$(srcdir)/'`gsd-osd-window.c
  
@@ -9643,8 +9661,8 @@ diff -Nurp gnome-settings-daemon-2.30.0.orig/plugins/common/Makefile.in gnome-se
  	-rm -f *.lo
  
 diff -Nurp gnome-settings-daemon-2.30.0.orig/plugins/dummy/Makefile.in gnome-settings-daemon-2.30.0/plugins/dummy/Makefile.in
---- gnome-settings-daemon-2.30.0.orig/plugins/dummy/Makefile.in	2010-03-30 13:43:07.030084571 +0100
-+++ gnome-settings-daemon-2.30.0/plugins/dummy/Makefile.in	2010-03-30 13:43:17.887604030 +0100
+--- gnome-settings-daemon-2.30.0.orig/plugins/dummy/Makefile.in	2010-04-23 17:13:16.299624938 +0100
++++ gnome-settings-daemon-2.30.0/plugins/dummy/Makefile.in	2010-04-23 17:13:28.232132632 +0100
 @@ -99,6 +99,8 @@ DISTFILES = $(DIST_COMMON) $(DIST_SOURCE
  ACLOCAL = @ACLOCAL@
  ALL_LINGUAS = @ALL_LINGUAS@
@@ -9684,8 +9702,8 @@ diff -Nurp gnome-settings-daemon-2.30.0.orig/plugins/dummy/Makefile.in gnome-set
  $(am__aclocal_m4_deps):
  
 diff -Nurp gnome-settings-daemon-2.30.0.orig/plugins/font/Makefile.in gnome-settings-daemon-2.30.0/plugins/font/Makefile.in
---- gnome-settings-daemon-2.30.0.orig/plugins/font/Makefile.in	2010-03-30 13:43:07.030084571 +0100
-+++ gnome-settings-daemon-2.30.0/plugins/font/Makefile.in	2010-03-30 13:43:17.977603668 +0100
+--- gnome-settings-daemon-2.30.0.orig/plugins/font/Makefile.in	2010-04-23 17:13:16.299624938 +0100
++++ gnome-settings-daemon-2.30.0/plugins/font/Makefile.in	2010-04-23 17:13:28.322121999 +0100
 @@ -101,6 +101,8 @@ DISTFILES = $(DIST_COMMON) $(DIST_SOURCE
  ACLOCAL = @ACLOCAL@
  ALL_LINGUAS = @ALL_LINGUAS@
@@ -9725,8 +9743,8 @@ diff -Nurp gnome-settings-daemon-2.30.0.orig/plugins/font/Makefile.in gnome-sett
  $(am__aclocal_m4_deps):
  install-pluginLTLIBRARIES: $(plugin_LTLIBRARIES)
 diff -Nurp gnome-settings-daemon-2.30.0.orig/plugins/housekeeping/Makefile.in gnome-settings-daemon-2.30.0/plugins/housekeeping/Makefile.in
---- gnome-settings-daemon-2.30.0.orig/plugins/housekeeping/Makefile.in	2010-03-30 13:43:07.020081065 +0100
-+++ gnome-settings-daemon-2.30.0/plugins/housekeeping/Makefile.in	2010-03-30 13:43:18.067614827 +0100
+--- gnome-settings-daemon-2.30.0.orig/plugins/housekeeping/Makefile.in	2010-04-23 17:13:16.299624938 +0100
++++ gnome-settings-daemon-2.30.0/plugins/housekeeping/Makefile.in	2010-04-23 17:13:28.422143438 +0100
 @@ -104,6 +104,8 @@ DISTFILES = $(DIST_COMMON) $(DIST_SOURCE
  ACLOCAL = @ACLOCAL@
  ALL_LINGUAS = @ALL_LINGUAS@
@@ -9766,8 +9784,8 @@ diff -Nurp gnome-settings-daemon-2.30.0.orig/plugins/housekeeping/Makefile.in gn
  $(am__aclocal_m4_deps):
  install-pluginLTLIBRARIES: $(plugin_LTLIBRARIES)
 diff -Nurp gnome-settings-daemon-2.30.0.orig/plugins/keybindings/Makefile.in gnome-settings-daemon-2.30.0/plugins/keybindings/Makefile.in
---- gnome-settings-daemon-2.30.0.orig/plugins/keybindings/Makefile.in	2010-03-30 13:43:07.020081065 +0100
-+++ gnome-settings-daemon-2.30.0/plugins/keybindings/Makefile.in	2010-03-30 13:43:18.157583103 +0100
+--- gnome-settings-daemon-2.30.0.orig/plugins/keybindings/Makefile.in	2010-04-23 17:13:16.289625832 +0100
++++ gnome-settings-daemon-2.30.0/plugins/keybindings/Makefile.in	2010-04-23 17:13:28.522137781 +0100
 @@ -104,6 +104,8 @@ DISTFILES = $(DIST_COMMON) $(DIST_SOURCE
  ACLOCAL = @ACLOCAL@
  ALL_LINGUAS = @ALL_LINGUAS@
@@ -9807,8 +9825,8 @@ diff -Nurp gnome-settings-daemon-2.30.0.orig/plugins/keybindings/Makefile.in gno
  $(am__aclocal_m4_deps):
  install-pluginLTLIBRARIES: $(plugin_LTLIBRARIES)
 diff -Nurp gnome-settings-daemon-2.30.0.orig/plugins/keyboard/Makefile.in gnome-settings-daemon-2.30.0/plugins/keyboard/Makefile.in
---- gnome-settings-daemon-2.30.0.orig/plugins/keyboard/Makefile.in	2010-03-30 13:43:07.020081065 +0100
-+++ gnome-settings-daemon-2.30.0/plugins/keyboard/Makefile.in	2010-03-30 13:43:18.257592950 +0100
+--- gnome-settings-daemon-2.30.0.orig/plugins/keyboard/Makefile.in	2010-04-23 17:13:16.289625832 +0100
++++ gnome-settings-daemon-2.30.0/plugins/keyboard/Makefile.in	2010-04-23 17:13:28.632122434 +0100
 @@ -106,6 +106,8 @@ DISTFILES = $(DIST_COMMON) $(DIST_SOURCE
  ACLOCAL = @ACLOCAL@
  ALL_LINGUAS = @ALL_LINGUAS@
@@ -9848,8 +9866,8 @@ diff -Nurp gnome-settings-daemon-2.30.0.orig/plugins/keyboard/Makefile.in gnome-
  $(am__aclocal_m4_deps):
  install-pluginLTLIBRARIES: $(plugin_LTLIBRARIES)
 diff -Nurp gnome-settings-daemon-2.30.0.orig/plugins/Makefile.in gnome-settings-daemon-2.30.0/plugins/Makefile.in
---- gnome-settings-daemon-2.30.0.orig/plugins/Makefile.in	2010-03-30 13:43:07.020081065 +0100
-+++ gnome-settings-daemon-2.30.0/plugins/Makefile.in	2010-03-30 13:43:17.417593597 +0100
+--- gnome-settings-daemon-2.30.0.orig/plugins/Makefile.in	2010-04-23 17:13:16.289625832 +0100
++++ gnome-settings-daemon-2.30.0/plugins/Makefile.in	2010-04-23 17:13:27.709647024 +0100
 @@ -90,6 +90,8 @@ am__relativize = \
  ACLOCAL = @ACLOCAL@
  ALL_LINGUAS = @ALL_LINGUAS@
@@ -9889,8 +9907,8 @@ diff -Nurp gnome-settings-daemon-2.30.0.orig/plugins/Makefile.in gnome-settings-
  $(am__aclocal_m4_deps):
  
 diff -Nurp gnome-settings-daemon-2.30.0.orig/plugins/media-keys/cut-n-paste/Makefile.in gnome-settings-daemon-2.30.0/plugins/media-keys/cut-n-paste/Makefile.in
---- gnome-settings-daemon-2.30.0.orig/plugins/media-keys/cut-n-paste/Makefile.in	2010-03-30 13:43:07.020081065 +0100
-+++ gnome-settings-daemon-2.30.0/plugins/media-keys/cut-n-paste/Makefile.in	2010-03-30 13:43:18.467593318 +0100
+--- gnome-settings-daemon-2.30.0.orig/plugins/media-keys/cut-n-paste/Makefile.in	2010-04-23 17:13:16.299624938 +0100
++++ gnome-settings-daemon-2.30.0/plugins/media-keys/cut-n-paste/Makefile.in	2010-04-23 17:13:28.852127978 +0100
 @@ -75,6 +75,8 @@ DISTFILES = $(DIST_COMMON) $(DIST_SOURCE
  ACLOCAL = @ACLOCAL@
  ALL_LINGUAS = @ALL_LINGUAS@
@@ -9930,8 +9948,8 @@ diff -Nurp gnome-settings-daemon-2.30.0.orig/plugins/media-keys/cut-n-paste/Make
  $(am__aclocal_m4_deps):
  
 diff -Nurp gnome-settings-daemon-2.30.0.orig/plugins/media-keys/Makefile.in gnome-settings-daemon-2.30.0/plugins/media-keys/Makefile.in
---- gnome-settings-daemon-2.30.0.orig/plugins/media-keys/Makefile.in	2010-03-30 13:43:07.020081065 +0100
-+++ gnome-settings-daemon-2.30.0/plugins/media-keys/Makefile.in	2010-03-30 13:43:18.397592521 +0100
+--- gnome-settings-daemon-2.30.0.orig/plugins/media-keys/Makefile.in	2010-04-23 17:13:16.289625832 +0100
++++ gnome-settings-daemon-2.30.0/plugins/media-keys/Makefile.in	2010-04-23 17:13:28.782122364 +0100
 @@ -183,6 +183,8 @@ am__relativize = \
  ACLOCAL = @ACLOCAL@
  ALL_LINGUAS = @ALL_LINGUAS@
@@ -9971,8 +9989,8 @@ diff -Nurp gnome-settings-daemon-2.30.0.orig/plugins/media-keys/Makefile.in gnom
  $(am__aclocal_m4_deps):
  install-pluginLTLIBRARIES: $(plugin_LTLIBRARIES)
 diff -Nurp gnome-settings-daemon-2.30.0.orig/plugins/mouse/Makefile.in gnome-settings-daemon-2.30.0/plugins/mouse/Makefile.in
---- gnome-settings-daemon-2.30.0.orig/plugins/mouse/Makefile.in	2010-03-30 13:43:07.020081065 +0100
-+++ gnome-settings-daemon-2.30.0/plugins/mouse/Makefile.in	2010-03-30 13:43:18.567614059 +0100
+--- gnome-settings-daemon-2.30.0.orig/plugins/mouse/Makefile.in	2010-04-23 17:13:16.299624938 +0100
++++ gnome-settings-daemon-2.30.0/plugins/mouse/Makefile.in	2010-04-23 17:13:28.992122234 +0100
 @@ -114,6 +114,8 @@ DISTFILES = $(DIST_COMMON) $(DIST_SOURCE
  ACLOCAL = @ACLOCAL@
  ALL_LINGUAS = @ALL_LINGUAS@
@@ -10012,8 +10030,8 @@ diff -Nurp gnome-settings-daemon-2.30.0.orig/plugins/mouse/Makefile.in gnome-set
  $(am__aclocal_m4_deps):
  install-pluginLTLIBRARIES: $(plugin_LTLIBRARIES)
 diff -Nurp gnome-settings-daemon-2.30.0.orig/plugins/sound/Makefile.in gnome-settings-daemon-2.30.0/plugins/sound/Makefile.in
---- gnome-settings-daemon-2.30.0.orig/plugins/sound/Makefile.in	2010-03-30 13:43:07.020081065 +0100
-+++ gnome-settings-daemon-2.30.0/plugins/sound/Makefile.in	2010-03-30 13:43:18.647604112 +0100
+--- gnome-settings-daemon-2.30.0.orig/plugins/sound/Makefile.in	2010-04-23 17:13:16.289625832 +0100
++++ gnome-settings-daemon-2.30.0/plugins/sound/Makefile.in	2010-04-23 17:13:29.082128718 +0100
 @@ -99,6 +99,8 @@ DISTFILES = $(DIST_COMMON) $(DIST_SOURCE
  ACLOCAL = @ACLOCAL@
  ALL_LINGUAS = @ALL_LINGUAS@
@@ -10053,8 +10071,8 @@ diff -Nurp gnome-settings-daemon-2.30.0.orig/plugins/sound/Makefile.in gnome-set
  $(am__aclocal_m4_deps):
  install-pluginLTLIBRARIES: $(plugin_LTLIBRARIES)
 diff -Nurp gnome-settings-daemon-2.30.0.orig/plugins/typing-break/Makefile.in gnome-settings-daemon-2.30.0/plugins/typing-break/Makefile.in
---- gnome-settings-daemon-2.30.0.orig/plugins/typing-break/Makefile.in	2010-03-30 13:43:07.020081065 +0100
-+++ gnome-settings-daemon-2.30.0/plugins/typing-break/Makefile.in	2010-03-30 13:43:18.737603747 +0100
+--- gnome-settings-daemon-2.30.0.orig/plugins/typing-break/Makefile.in	2010-04-23 17:13:16.299624938 +0100
++++ gnome-settings-daemon-2.30.0/plugins/typing-break/Makefile.in	2010-04-23 17:13:29.172129754 +0100
 @@ -104,6 +104,8 @@ DISTFILES = $(DIST_COMMON) $(DIST_SOURCE
  ACLOCAL = @ACLOCAL@
  ALL_LINGUAS = @ALL_LINGUAS@
@@ -10094,8 +10112,8 @@ diff -Nurp gnome-settings-daemon-2.30.0.orig/plugins/typing-break/Makefile.in gn
  $(am__aclocal_m4_deps):
  install-pluginLTLIBRARIES: $(plugin_LTLIBRARIES)
 diff -Nurp gnome-settings-daemon-2.30.0.orig/plugins/xrandr/Makefile.in gnome-settings-daemon-2.30.0/plugins/xrandr/Makefile.in
---- gnome-settings-daemon-2.30.0.orig/plugins/xrandr/Makefile.in	2010-03-30 13:43:07.020081065 +0100
-+++ gnome-settings-daemon-2.30.0/plugins/xrandr/Makefile.in	2010-03-30 13:43:18.817572291 +0100
+--- gnome-settings-daemon-2.30.0.orig/plugins/xrandr/Makefile.in	2010-04-23 17:13:16.289625832 +0100
++++ gnome-settings-daemon-2.30.0/plugins/xrandr/Makefile.in	2010-04-23 17:13:29.302124626 +0100
 @@ -71,7 +71,7 @@ am__installdirs = "$(DESTDIR)$(plugindir
  LTLIBRARIES = $(plugin_LTLIBRARIES)
  am__DEPENDENCIES_1 =
@@ -10162,8 +10180,8 @@ diff -Nurp gnome-settings-daemon-2.30.0.orig/plugins/xrandr/Makefile.in gnome-se
  $(am__aclocal_m4_deps):
  install-pluginLTLIBRARIES: $(plugin_LTLIBRARIES)
 diff -Nurp gnome-settings-daemon-2.30.0.orig/plugins/xrdb/data/Makefile.in gnome-settings-daemon-2.30.0/plugins/xrdb/data/Makefile.in
---- gnome-settings-daemon-2.30.0.orig/plugins/xrdb/data/Makefile.in	2010-03-30 13:43:07.030084571 +0100
-+++ gnome-settings-daemon-2.30.0/plugins/xrdb/data/Makefile.in	2010-03-30 13:43:18.967572296 +0100
+--- gnome-settings-daemon-2.30.0.orig/plugins/xrdb/data/Makefile.in	2010-04-23 17:13:16.299624938 +0100
++++ gnome-settings-daemon-2.30.0/plugins/xrdb/data/Makefile.in	2010-04-23 17:13:29.482138423 +0100
 @@ -74,6 +74,8 @@ DISTFILES = $(DIST_COMMON) $(DIST_SOURCE
  ACLOCAL = @ACLOCAL@
  ALL_LINGUAS = @ALL_LINGUAS@
@@ -10203,8 +10221,8 @@ diff -Nurp gnome-settings-daemon-2.30.0.orig/plugins/xrdb/data/Makefile.in gnome
  $(am__aclocal_m4_deps):
  
 diff -Nurp gnome-settings-daemon-2.30.0.orig/plugins/xrdb/Makefile.in gnome-settings-daemon-2.30.0/plugins/xrdb/Makefile.in
---- gnome-settings-daemon-2.30.0.orig/plugins/xrdb/Makefile.in	2010-03-30 13:43:07.030084571 +0100
-+++ gnome-settings-daemon-2.30.0/plugins/xrdb/Makefile.in	2010-03-30 13:43:18.907572002 +0100
+--- gnome-settings-daemon-2.30.0.orig/plugins/xrdb/Makefile.in	2010-04-23 17:13:16.299624938 +0100
++++ gnome-settings-daemon-2.30.0/plugins/xrdb/Makefile.in	2010-04-23 17:13:29.422137850 +0100
 @@ -138,6 +138,8 @@ am__relativize = \
  ACLOCAL = @ACLOCAL@
  ALL_LINGUAS = @ALL_LINGUAS@
@@ -10244,8 +10262,8 @@ diff -Nurp gnome-settings-daemon-2.30.0.orig/plugins/xrdb/Makefile.in gnome-sett
  $(am__aclocal_m4_deps):
  install-pluginLTLIBRARIES: $(plugin_LTLIBRARIES)
 diff -Nurp gnome-settings-daemon-2.30.0.orig/plugins/xsettings/Makefile.in gnome-settings-daemon-2.30.0/plugins/xsettings/Makefile.in
---- gnome-settings-daemon-2.30.0.orig/plugins/xsettings/Makefile.in	2010-03-30 13:43:07.020081065 +0100
-+++ gnome-settings-daemon-2.30.0/plugins/xsettings/Makefile.in	2010-03-30 13:43:19.067583259 +0100
+--- gnome-settings-daemon-2.30.0.orig/plugins/xsettings/Makefile.in	2010-04-23 17:13:16.289625832 +0100
++++ gnome-settings-daemon-2.30.0/plugins/xsettings/Makefile.in	2010-04-23 17:13:29.592122167 +0100
 @@ -124,6 +124,8 @@ DISTFILES = $(DIST_COMMON) $(DIST_SOURCE
  ACLOCAL = @ACLOCAL@
  ALL_LINGUAS = @ALL_LINGUAS@
