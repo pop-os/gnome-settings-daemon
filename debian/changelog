@@ -1,4 +1,4 @@
-gnome-settings-daemon (2.30.0-0ubuntu6) UNRELEASED; urgency=low
+gnome-settings-daemon (2.30.0-0ubuntu6) lucid; urgency=low
 
   * debian/patches/16_use_synchronous_notifications.patch:
     - Make sure the media keys plugin links with libnotify
