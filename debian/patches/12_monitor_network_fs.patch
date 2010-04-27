@@ -1,11 +1,11 @@
 Debian #563592
 GNOME #606421
 
-Index: gnome-settings-daemon-2.28.1/plugins/housekeeping/gsd-disk-space.c
+Index: gnome-settings-daemon-2.30.1/plugins/housekeeping/gsd-disk-space.c
 ===================================================================
---- gnome-settings-daemon-2.28.1.orig/plugins/housekeeping/gsd-disk-space.c	2010-01-08 16:18:59.000000000 +0100
-+++ gnome-settings-daemon-2.28.1/plugins/housekeeping/gsd-disk-space.c	2010-01-08 16:31:40.000000000 +0100
-@@ -302,10 +302,13 @@
+--- gnome-settings-daemon-2.30.1.orig/plugins/housekeeping/gsd-disk-space.c	2010-01-12 16:51:57.000000000 +0100
++++ gnome-settings-daemon-2.30.1/plugins/housekeeping/gsd-disk-space.c	2010-04-27 19:32:30.509534907 +0200
+@@ -302,10 +302,13 @@ ldsm_mount_should_ignore (GUnixMountEntr
           * expose this in a way that allows it to be used for this
           * purpose
           */
@@ -19,7 +19,7 @@ Index: gnome-settings-daemon-2.28.1/plugins/housekeeping/gsd-disk-space.c
                  "devfs",
                  "devpts",
                  "ecryptfs",
-@@ -321,6 +324,20 @@
+@@ -322,6 +325,20 @@ ldsm_mount_should_ignore (GUnixMountEntr
                  "nfsd",
                  "rpc_pipefs",
                  "zfs",

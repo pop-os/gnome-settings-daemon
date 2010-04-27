@@ -1,8 +1,10 @@
 Bug: https://bugzilla.gnome.org/show_bug.cgi?id=571145
 
---- a/configure.ac
-+++ b/configure.ac
-@@ -260,6 +260,48 @@
+Index: gnome-settings-daemon-2.30.1/configure.ac
+===================================================================
+--- gnome-settings-daemon-2.30.1.orig/configure.ac	2010-04-27 19:30:55.000000000 +0200
++++ gnome-settings-daemon-2.30.1/configure.ac	2010-04-27 19:33:11.566029103 +0200
+@@ -254,6 +254,48 @@ AM_CONDITIONAL(HAVE_PULSE, test "x$have_
  AC_SUBST(PULSE_CFLAGS)
  AC_SUBST(PULSE_LIBS)
  
@@ -51,7 +53,7 @@ Bug: https://bugzilla.gnome.org/show_bug.cgi?id=571145
  # ---------------------------------------------------------------------------
  # Enable Profiling
  # ---------------------------------------------------------------------------
-@@ -398,6 +440,7 @@
+@@ -392,6 +434,7 @@ echo "
          dbus-1 system.d dir:      ${DBUS_SYS_DIR}
  
          Libnotify support:        ${have_libnotify}
@@ -59,9 +61,12 @@ Bug: https://bugzilla.gnome.org/show_bug.cgi?id=571145
          PulseAudio support:       ${have_pulse}
          Profiling support:        ${enable_profiling}
  "
---- a/plugins/media-keys/Makefile.am
-+++ b/plugins/media-keys/Makefile.am
-@@ -1,12 +1,7 @@
+Index: gnome-settings-daemon-2.30.1/plugins/media-keys/Makefile.am
+===================================================================
+--- gnome-settings-daemon-2.30.1.orig/plugins/media-keys/Makefile.am	2010-03-10 12:59:38.000000000 +0100
++++ gnome-settings-daemon-2.30.1/plugins/media-keys/Makefile.am	2010-04-27 19:36:09.273527404 +0200
+@@ -3,13 +3,8 @@ context = actions
+ 
  NULL =
  
 -SUBDIRS =
@@ -76,15 +81,7 @@ Bug: https://bugzilla.gnome.org/show_bug.cgi?id=571145
  
  BUILT_SOURCES = 			\
  	gsd-media-keys-manager-glue.h	\
-@@ -54,16 +49,14 @@
- 
- libmedia_keys_la_LIBADD  = 		\
- 	$(top_builddir)/plugins/common/libcommon.la			\
--	$(top_builddir)/plugins/media-keys/cut-n-paste/libgvc.la	\
-+	$(top_builddir)/plugins/media-keys/cut-n-paste/libgvc.la        \
- 	$(SETTINGS_PLUGIN_LIBS)						\
- 	$(XF86MISC_LIBS)
- 
+@@ -108,9 +103,7 @@ libmedia_keys_la_LIBADD  = 		\
  plugin_in_files = 		\
  	media-keys.gnome-settings-plugin.in
  
@@ -94,9 +91,9 @@ Bug: https://bugzilla.gnome.org/show_bug.cgi?id=571145
  
  noinst_PROGRAMS =				\
  	test-media-keys				\
-@@ -124,9 +117,7 @@
- 	$(XF86MISC_LIBS)			\
- 	$(GST_LIBS)
+@@ -176,9 +169,7 @@ test_media_keys_LDADD = \
+ 	$(GST_LIBS)				\
+ 	-lm
  
 -if HAVE_PULSE
  test_media_keys_LDADD += $(top_builddir)/plugins/media-keys/cut-n-paste/libgvc.la
@@ -104,9 +101,11 @@ Bug: https://bugzilla.gnome.org/show_bug.cgi?id=571145
  
  gtkbuilderdir = $(pkgdatadir)
  gtkbuilder_DATA =	\
---- a/plugins/media-keys/cut-n-paste/Makefile.am
-+++ b/plugins/media-keys/cut-n-paste/Makefile.am
-@@ -4,16 +4,24 @@
+Index: gnome-settings-daemon-2.30.1/plugins/media-keys/cut-n-paste/Makefile.am
+===================================================================
+--- gnome-settings-daemon-2.30.1.orig/plugins/media-keys/cut-n-paste/Makefile.am	2009-08-12 11:15:00.000000000 +0200
++++ gnome-settings-daemon-2.30.1/plugins/media-keys/cut-n-paste/Makefile.am	2010-04-27 19:33:11.566029103 +0200
+@@ -4,16 +4,24 @@ noinst_LTLIBRARIES = libgvc.la
  
  INCLUDES =					\
  	$(WARN_CFLAGS)				\
@@ -135,7 +134,7 @@ Bug: https://bugzilla.gnome.org/show_bug.cgi?id=571145
  	gvc-mixer-stream.h		\
  	gvc-mixer-stream.c		\
  	gvc-channel-map.h		\
-@@ -31,8 +39,22 @@
+@@ -31,8 +39,22 @@ libgvc_la_SOURCES =			\
  	gvc-mixer-event-role.h		\
  	gvc-mixer-event-role.c		\
  	gvc-mixer-control.h		\
@@ -160,8 +159,10 @@ Bug: https://bugzilla.gnome.org/show_bug.cgi?id=571145
  
  MAINTAINERCLEANFILES =                  \
          *~                              \
---- /dev/null
-+++ b/plugins/media-keys/cut-n-paste/gvc-gstreamer-acme-vol.c
+Index: gnome-settings-daemon-2.30.1/plugins/media-keys/cut-n-paste/gvc-gstreamer-acme-vol.c
+===================================================================
+--- /dev/null	1970-01-01 00:00:00.000000000 +0000
++++ gnome-settings-daemon-2.30.1/plugins/media-keys/cut-n-paste/gvc-gstreamer-acme-vol.c	2010-04-27 19:33:11.566029103 +0200
 @@ -0,0 +1,402 @@
 +/* -*- Mode: C; tab-width: 8; indent-tabs-mode: t; c-basic-offset: 8 -*- */
 +
@@ -565,8 +566,10 @@ Bug: https://bugzilla.gnome.org/show_bug.cgi?id=571145
 +	return ACME_VOLUME(acme_volume_object);
 +}
 +
---- /dev/null
-+++ b/plugins/media-keys/cut-n-paste/gvc-gstreamer-acme-vol.h
+Index: gnome-settings-daemon-2.30.1/plugins/media-keys/cut-n-paste/gvc-gstreamer-acme-vol.h
+===================================================================
+--- /dev/null	1970-01-01 00:00:00.000000000 +0000
++++ gnome-settings-daemon-2.30.1/plugins/media-keys/cut-n-paste/gvc-gstreamer-acme-vol.h	2010-04-27 19:33:11.566029103 +0200
 @@ -0,0 +1,56 @@
 +/* acme-volume.h
 +
@@ -624,8 +627,10 @@ Bug: https://bugzilla.gnome.org/show_bug.cgi?id=571145
 +gint        acme_volume_get_threshold (AcmeVolume *self);
 +
 +
---- a/plugins/media-keys/gsd-media-keys-manager.c
-+++ b/plugins/media-keys/gsd-media-keys-manager.c
+Index: gnome-settings-daemon-2.30.1/plugins/media-keys/gsd-media-keys-manager.c
+===================================================================
+--- gnome-settings-daemon-2.30.1.orig/plugins/media-keys/gsd-media-keys-manager.c	2010-03-29 10:15:04.000000000 +0200
++++ gnome-settings-daemon-2.30.1/plugins/media-keys/gsd-media-keys-manager.c	2010-04-27 19:52:58.941524596 +0200
 @@ -53,6 +53,8 @@
  #ifdef HAVE_PULSE
  #include <canberra-gtk.h>
@@ -635,7 +640,7 @@ Bug: https://bugzilla.gnome.org/show_bug.cgi?id=571145
  #endif /* HAVE_PULSE */
  
  #define GSD_DBUS_PATH "/org/gnome/SettingsDaemon"
-@@ -88,6 +90,8 @@
+@@ -78,6 +80,8 @@ struct GsdMediaKeysManagerPrivate
          /* Volume bits */
          GvcMixerControl *volume;
          GvcMixerStream  *stream;
@@ -644,9 +649,9 @@ Bug: https://bugzilla.gnome.org/show_bug.cgi?id=571145
  #endif /* HAVE_PULSE */
          GtkWidget       *dialog;
          GConfClient     *conf_client;
-@@ -633,7 +637,9 @@
-                                 CA_PROP_APPLICATION_ID, "org.gnome.VolumeControl",
-                                 NULL);
+@@ -675,7 +679,9 @@ update_dialog (GsdMediaKeysManager *mana
+                                         CA_PROP_APPLICATION_ID, "org.gnome.VolumeControl",
+                                         NULL);
  }
 +#endif /* HAVE_PULSE */
  
@@ -654,9 +659,9 @@ Bug: https://bugzilla.gnome.org/show_bug.cgi?id=571145
  static void
  do_sound_action (GsdMediaKeysManager *manager,
                   int                  type)
-@@ -642,8 +648,13 @@
-         guint vol, norm_vol_step;
+@@ -685,8 +691,13 @@ do_sound_action (GsdMediaKeysManager *ma
          int vol_step;
+         gboolean sound_changed;
  
 +#ifdef HAVE_PULSE
          if (manager->priv->stream == NULL)
@@ -668,7 +673,7 @@ Bug: https://bugzilla.gnome.org/show_bug.cgi?id=571145
  
          vol_step = gconf_client_get_int (manager->priv->conf_client,
                                           GCONF_MISC_DIR "/volume_step",
-@@ -652,18 +663,33 @@
+@@ -695,20 +706,36 @@ do_sound_action (GsdMediaKeysManager *ma
          if (vol_step <= 0 || vol_step > 100)
                  vol_step = VOLUME_STEP;
  
@@ -678,7 +683,6 @@ Bug: https://bugzilla.gnome.org/show_bug.cgi?id=571145
          /* FIXME: this is racy */
          vol = gvc_mixer_stream_get_volume (manager->priv->stream);
          muted = gvc_mixer_stream_get_is_muted (manager->priv->stream);
--
 +#else
 +        if (vol_step > 0) {
 +                gint threshold = acme_volume_get_threshold (manager->priv->volume);
@@ -689,11 +693,14 @@ Bug: https://bugzilla.gnome.org/show_bug.cgi?id=571145
 +        vol = acme_volume_get_volume (manager->priv->volume);
 +        muted = acme_volume_get_mute (manager->priv->volume);
 +#endif
+         sound_changed = FALSE;
+ 
          switch (type) {
          case MUTE_KEY:
 +#ifdef HAVE_PULSE
                  muted = !muted;
                  gvc_mixer_stream_change_is_muted (manager->priv->stream, muted);
+                 sound_changed = TRUE;
 +#else
 +                acme_volume_mute_toggle (manager->priv->volume);
 +#endif
@@ -703,9 +710,9 @@ Bug: https://bugzilla.gnome.org/show_bug.cgi?id=571145
                  if (!muted && (vol <= norm_vol_step)) {
                          muted = !muted;
                          vol = 0;
-@@ -675,11 +701,17 @@
-                         if (gvc_mixer_stream_set_volume (manager->priv->stream, vol) != FALSE)
-                                 gvc_mixer_stream_push_volume (manager->priv->stream);
+@@ -724,11 +751,17 @@ do_sound_action (GsdMediaKeysManager *ma
+                                 sound_changed = TRUE;
+                         }
                  }
 +#else
 +                if (!muted && (vol <= vol_step))
@@ -720,10 +727,10 @@ Bug: https://bugzilla.gnome.org/show_bug.cgi?id=571145
 +#ifdef HAVE_PULSE
                                 vol = vol + norm_vol_step;
                                 gvc_mixer_stream_change_is_muted (manager->priv->stream, muted);
-                                if (gvc_mixer_stream_set_volume (manager->priv->stream, vol) != FALSE)
-@@ -687,7 +719,14 @@
-                         } else {
+                                if (gvc_mixer_stream_set_volume (manager->priv->stream, vol) != FALSE) {
+@@ -739,7 +772,14 @@ do_sound_action (GsdMediaKeysManager *ma
                                  gvc_mixer_stream_change_is_muted (manager->priv->stream, muted);
+                                 sound_changed = TRUE;
                          }
 +#else
 +                                /* We need to unmute otherwise vol is blocked (and muted) */
@@ -734,11 +741,11 @@ Bug: https://bugzilla.gnome.org/show_bug.cgi?id=571145
                  } else {
 +#ifdef HAVE_PULSE
                          if (vol < MAX_VOLUME) {
-                                 gboolean set;
                                  if (vol + norm_vol_step >= MAX_VOLUME) {
-@@ -698,13 +737,34 @@
-                                 if (gvc_mixer_stream_set_volume (manager->priv->stream, vol) != FALSE)
-                                         gvc_mixer_stream_push_volume (manager->priv->stream);
+                                         vol = MAX_VOLUME;
+@@ -751,13 +791,34 @@ do_sound_action (GsdMediaKeysManager *ma
+                                         sound_changed = TRUE;
+                                 }
                          }
 +#else
 +                        acme_volume_set_volume (manager->priv->volume, vol + vol_step);
@@ -748,7 +755,7 @@ Bug: https://bugzilla.gnome.org/show_bug.cgi?id=571145
          }
  
 +#ifdef HAVE_PULSE
-         update_dialog (manager, vol, muted);
+         update_dialog (manager, vol, muted, sound_changed);
 +#else
 +        muted = acme_volume_get_mute (manager->priv->volume);
 +        vol = acme_volume_get_volume (manager->priv->volume);
@@ -771,7 +778,7 @@ Bug: https://bugzilla.gnome.org/show_bug.cgi?id=571145
  static void
  update_default_sink (GsdMediaKeysManager *manager)
  {
-@@ -863,9 +923,9 @@
+@@ -919,9 +980,9 @@ do_action (GsdMediaKeysManager *manager,
          case MUTE_KEY:
          case VOLUME_DOWN_KEY:
          case VOLUME_UP_KEY:
@@ -783,7 +790,7 @@ Bug: https://bugzilla.gnome.org/show_bug.cgi?id=571145
                  break;
          case POWER_KEY:
                  do_exit_action (manager);
-@@ -1068,6 +1128,10 @@
+@@ -1122,6 +1183,10 @@ gsd_media_keys_manager_start (GsdMediaKe
          gvc_mixer_control_open (manager->priv->volume);
  
          gnome_settings_profile_end ("gvc_mixer_control_new");
@@ -794,7 +801,7 @@ Bug: https://bugzilla.gnome.org/show_bug.cgi?id=571145
  #endif /* HAVE_PULSE */
          g_idle_add ((GSourceFunc) start_media_keys_idle_cb, manager);
  
-@@ -1140,12 +1204,14 @@
+@@ -1199,12 +1264,14 @@ gsd_media_keys_manager_stop (GsdMediaKey
                  g_object_unref (priv->stream);
                  priv->stream = NULL;
          }
