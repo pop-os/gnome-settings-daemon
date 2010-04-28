@@ -1,3 +1,14 @@
+gnome-settings-daemon (2.30.1-0ubuntu1) UNRELEASED; urgency=low
+
+  * New upstream version (LP: #571250):
+    - Introduce gconf key that allows hiding the indicator (LP: #519372)
+  * Refreshed 90_autoreconf.patch
+  * Dropped patches merged upstream:
+    - 08_multi_keyboard_layouts.patch
+    - 09_indicator-display.patch 
+
+ -- Chris Coulson <chris.coulson@canonical.com>  Wed, 28 Apr 2010 10:46:53 +0100
+
 gnome-settings-daemon (2.30.0-0ubuntu6) lucid; urgency=low
 
   * debian/patches/16_use_synchronous_notifications.patch:
