@@ -1,4 +1,4 @@
-gnome-settings-daemon (2.30.1-1ubuntu2) lucid; urgency=low
+gnome-settings-daemon (2.30.1-1ubuntu2) maverick; urgency=low
 
   * debian/control.in:
     - Build-depend on gnome-common for autotools
