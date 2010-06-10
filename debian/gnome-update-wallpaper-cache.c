@@ -15,6 +15,8 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * Authored by Didier Roche <didrocks@ubuntu.com>
+ * 
+ * Bug: https://bugs.launchpad.net/bugs/530024
  */
 
 #include <glib.h>

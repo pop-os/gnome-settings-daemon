@@ -1,3 +1,6 @@
+Description: Don't access free'd memory if a volume is unmounted whilst the dialog is displayed
+Author: ?
+
 diff -Nur -x '*.orig' -x '*~' gnome-settings-daemon-2.28.1/plugins/housekeeping/gsd-disk-space.c gnome-settings-daemon-2.28.1.new/plugins/housekeeping/gsd-disk-space.c
 --- gnome-settings-daemon-2.28.1/plugins/housekeeping/gsd-disk-space.c	2009-08-12 10:15:00.000000000 +0100
 +++ gnome-settings-daemon-2.28.1.new/plugins/housekeeping/gsd-disk-space.c	2009-11-04 00:09:42.505236169 +0000

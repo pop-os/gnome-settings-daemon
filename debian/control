@@ -8,7 +8,7 @@ Section: gnome
 Priority: optional
 Maintainer: Ubuntu Desktop Team <ubuntu-desktop@lists.ubuntu.com>
 XSBC-Original-Maintainer: Debian GNOME Maintainers <pkg-gnome-maintainers@lists.alioth.debian.org>
-Uploaders: Debian GNOME Maintainers <pkg-gnome-maintainers@lists.alioth.debian.org>
+Uploaders: Debian GNOME Maintainers <pkg-gnome-maintainers@lists.alioth.debian.org>, Emilio Pozuelo Monfort <pochu@debian.org>, Josselin Mouette <joss@debian.org>, Sjoerd Simons <sjoerd@debian.org>
 Build-Depends: cdbs,
                quilt,
                debhelper (>= 5),
@@ -24,7 +24,6 @@ Build-Depends: cdbs,
                libxt-dev,
                libxi-dev,
                libfontconfig1-dev,
-               libxxf86misc-dev,
                libxext-dev,
                libx11-dev,
                libgnomekbd-dev (>= 2.29.5),
@@ -41,7 +40,8 @@ Vcs-Bzr: https://code.launchpad.net/~ubuntu-desktop/gnome-settings-daemon/ubuntu
 Package: gnome-settings-daemon
 Architecture: any
 Depends: ${shlibs:Depends},
-         ${misc:Depends}
+         ${misc:Depends},
+         libgnome2-common
 Recommends: pulseaudio         
 Replaces: capplets-data (<< 1:2.21.5),
           gnome-control-center (<< 1:2.21.5)

@@ -1,6 +1,7 @@
-# Description: use correct touchpad svg icons
-# Upstream: https://bugzilla.gnome.org/show_bug.cgi?id=611348
-# Ubuntu: https://bugs.launchpad.net/gnome-settings-daemon/+bug/539025
+Description: Use correct touchpad svg icons
+Bug: https://bugzilla.gnome.org/show_bug.cgi?id=611348
+Bug-Ubuntu: https://bugs.launchpad.net/gnome-settings-daemon/+bug/539025
+
 diff -Nur gnome-settings-daemon-2.30.0/plugins/media-keys/touchpad-disabled.svg gnome-settings-daemon-2.30.0.ubuntu/plugins/media-keys/touchpad-disabled.svg
 --- gnome-settings-daemon-2.30.0/plugins/media-keys/touchpad-disabled.svg	2010-03-10 12:58:29.000000000 +0100
 +++ gnome-settings-daemon-2.30.0.ubuntu/plugins/media-keys/touchpad-disabled.svg	2010-03-31 11:57:34.000000000 +0200

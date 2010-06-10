@@ -1,380 +1,93 @@
-gnome-settings-daemon (2.30.1-0ubuntu1) lucid-proposed; urgency=low
+gnome-settings-daemon (2.30.1-1ubuntu1) maverick; urgency=low
 
-  * New upstream version (LP: #571250):
-    - Introduce gconf key that allows hiding the indicator (LP: #519372)
-  * Refreshed 90_autoreconf.patch
-  * Dropped patches merged upstream:
-    - 08_multi_keyboard_layouts.patch
-    - 09_indicator-display.patch 
-
- -- Chris Coulson <chris.coulson@canonical.com>  Wed, 28 Apr 2010 10:46:53 +0100
-
-gnome-settings-daemon (2.30.0-0ubuntu6) lucid; urgency=low
-
-  * debian/patches/16_use_synchronous_notifications.patch:
-    - Make sure the media keys plugin links with libnotify
-  * debian/patches/90_autoreconf.patch:
-    - Refreshed to pick up the change above
-
- -- Chris Coulson <chris.coulson@canonical.com>  Fri, 23 Apr 2010 17:16:35 +0100
-
-gnome-settings-daemon (2.30.0-0ubuntu5) lucid; urgency=low
-
-  * Revert the previous changes and use upstream's default settings for
-    multi-finger taps now that the synaptics driver behaves in the same
-    way.
-
- -- Alberto Milone <alberto.milone@canonical.com>  Thu, 15 Apr 2010 15:40:03 +0200
-
-gnome-settings-daemon (2.30.0-0ubuntu4) lucid; urgency=low
-
-  * Be compliant with the settings in the synaptics driver as regards
-    performing middle and right taps with multiple fingers (LP: #432814).
-
- -- Alberto Milone <alberto.milone@canonical.com>  Wed, 14 Apr 2010 16:22:46 +0200
-
-gnome-settings-daemon (2.30.0-0ubuntu3) lucid; urgency=low
-
-  * Fix handling of fn-F7 (xrandr) when xev timestamp is later than server
-    timestamp (LP: #484186)
-
- -- Chase Douglas <chase.douglas@ubuntu.com>  Thu, 01 Apr 2010 22:27:55 +0000
-
-gnome-settings-daemon (2.30.0-0ubuntu2) lucid; urgency=low
-
-  * debian/patches/91_bugzilla_update_touchpad_icons.patch:
-    - updated touchpad svg icons with the ones on 
-      https://bugzilla.gnome.org/show_bug.cgi?id=611348 (lp: #539025)
-
- -- Sebastien Bacher <seb128@ubuntu.com>  Wed, 31 Mar 2010 12:00:44 +0200
-
-gnome-settings-daemon (2.30.0-0ubuntu1) lucid; urgency=low
-
-  [ Didier Roche ]
-  * New upstream release:
-    - Protect XInput code by ifdefs if XInput isn't available (Daniel Macks)
-    - Don't play a sound when the volume doesn't change (Bastien Nocera)
-    - Fix linking with pedantic linkers (Bastien Nocera) (#610244)
-    - Remove unused do_sleep_action function (Bastien Nocera)
-    - Apply all keyboard settings to new keyboards (Bastien Nocera) (#610245)
-    - Ensure the window is realized before we invalidate it (Richard Hughes)
-    - Replace "eject" spawn with GIO code (Bastien Nocera) (#580779)
-    - Don't spawn xrdb (Martin Pitt) (#586276)
-    - Add translator hint (Jens Granseuer) (#613647)
-    - Disable font plugin by default (Bastien Nocera) (#613604)
-    - Updated translations
-  * remove debian/patches/04_dont_call_xrdb.patch: upstreamed
-  * debian/patches/16_use_synchronous_notifications.patch: refreshed
-  * debian/patches/90_autoreconf.patch: refreshed
-  * remove debian/patches/92_keyboard_settings_update.patch: from upstream
-
-  [ Chris Coulson ]
-  * debian/patches/16_use_synchronous_notifications.patch:
-    - Make sure that gsd-osd-notification.[c,h] are compiled
-    - Remove superfluous ca_gtk_play_for_widget_call
-    - Correctly update asynchronous notifications 
-    - Fix a compiler warning
-
- -- Didier Roche <didrocks@ubuntu.com>  Tue, 30 Mar 2010 17:32:08 +0200
-
-gnome-settings-daemon (2.29.92-0ubuntu4) lucid; urgency=low
-
-  * debian/patches/16_use_synchronous_notifications.patch:
-    - Update so that volume change event sounds work correctly (LP: #538761)
-
- -- Chris Coulson <chris.coulson@canonical.com>  Sun, 28 Mar 2010 02:07:56 +0100
-
-gnome-settings-daemon (2.29.92-0ubuntu3) lucid; urgency=low
-
-  * Add 08_multi_keyboard_layouts.patch: Default to system settings for
-    handling multiple keyboard layouts. (LP: #460328)
-  * Add 09_indicator-display.patch: Always call show_hide_icon() in
-    apply_xkb_settings(), not just when we set a different keyboard layout. We
-    always want to show the indicator if we have multiple keyboard layouts
-    available.
-
- -- Martin Pitt <martin.pitt@ubuntu.com>  Tue, 23 Mar 2010 17:09:20 +0100
-
-gnome-settings-daemon (2.29.92-0ubuntu2) lucid; urgency=low
-
-  * debian/patches/07_dont_display_autostart.patch:
-    - don't show the gnome-settings-daemon autostart in the session capplet,
-      the description is confusing and it's a required component (lp: #146918)
-  * debian/patches/92_keyboard_settings_update.patch:
-    - upstream change to apply xkb settings to newly connected keyboards
-      (lp: #427168)
-
- -- Sebastien Bacher <seb128@ubuntu.com>  Wed, 10 Mar 2010 00:15:32 +0100
-
-gnome-settings-daemon (2.29.92-0ubuntu1) lucid; urgency=low
-
-  * debian/patches/91_update_gvc_source.patch:
-    - update gvc copy using the current gnome-media version to fix a leak issue
-      (lp: #485923)
-
-  [ Didier Roche ]
+  * Merge with Debian unstable, remaining Ubuntu changes:
   * debian/control.in:
-    - bump libgnome-desktop-dev build-dep
-  * debian/patches/90_autoreconf.patch:
-    - refreshed
-
- -- Sebastien Bacher <seb128@ubuntu.com>  Tue, 09 Mar 2010 10:18:09 +0100
-
-gnome-settings-daemon (2.29.91.1-0ubuntu5) lucid; urgency=low
-
-  * debian/rules:
-    - install gnome-update-wallpaper-cache in install: and not in 
-      binary-install: target
-
- -- Didier Roche <didrocks@ubuntu.com>  Mon, 08 Mar 2010 09:47:00 +0100
-
-gnome-settings-daemon (2.29.91.1-0ubuntu4) lucid; urgency=low
-
-  * debian/patches/06_use_application_indicator.patch:
-    - update by Jan Arne Petersen to undo the keyboard indicator change since
-      the current indicator-application doesn't allow to use a label, which
-      would be required to indicate the selected keyboard layout 
-      (lp: #531173, #531290, #531296)
-  * debian/patches/90_autoreconf.patch:
-    - refreshed for the previous change
-
- -- Sebastien Bacher <seb128@ubuntu.com>  Wed, 03 Mar 2010 21:39:12 +0100
-
-gnome-settings-daemon (2.29.91.1-0ubuntu3) lucid; urgency=low
-
-  * debian/control.in:
-    - build-depends on libappindicator-dev
-  * debian/patches/06_use_application_indicator.patch:
-    - change by Jan Arne Petersen to use application indicators (lp: #497875)
-  * debian/patches/90_autoreconf.patch:
-    - refreshed for the previous change
-
- -- Sebastien Bacher <seb128@ubuntu.com>  Tue, 02 Mar 2010 17:37:58 +0100
-
-gnome-settings-daemon (2.29.91.1-0ubuntu2) lucid; urgency=low
-
-  * debian/gnome-update-cache-wallpaper.c:
-    - enable creating a cached wallpaper even when g-s-d or nautilus isn't
-      running. Used in ubiquity in install mode (LP: #530024)
-  * debian/rules:
-    - add rules to build it
-
- -- Didier Roche <didrocks@ubuntu.com>  Mon, 01 Mar 2010 14:07:19 +0100
-
-gnome-settings-daemon (2.29.91.1-0ubuntu1) lucid; urgency=low
-
-  * New upstream version
-    - Fn-F8 should disable/enable touch points (Peter Hutterer) (#594831)
-    - Always set the position of outputs, even if they are already turned 
-      on (Federico Mena Quintero)
-    - Apply keyboard settings to newly plugged in devices (Federico Mena 
-      Quintero) (#610245)
-  * debian/control:
     - Drop libxrandr-dev and libxrender-dev build-deps
-  * Refreshed patches:
-    - 02_fix_randr.patch
-    - 05_disable_corner_tapping.patch
-    - 70_migrate_touchpad_config.patch
-    - 90_autoreconf.patch
-  * 16_use_synchronous_notifications.patch:
-    - Refreshed to apply cleanly
-    - Add support for touchpad notification
-
- -- Chris Coulson <chrisccoulson@ubuntu.com>  Mon, 01 Mar 2010 10:12:50 +0000
-
-gnome-settings-daemon (2.29.90-0ubuntu2) lucid; urgency=low
-
-  * debian/patches/16_use_synchronous_notifications.patch:
-    - NULL terminate the list of properties passed to g_object_new, to
-      fix some memory errors and a warning (LP: #525220)
-
- -- Chris Coulson <chrisccoulson@ubuntu.com>  Tue, 23 Feb 2010 18:53:01 +0000
-
-gnome-settings-daemon (2.29.90-0ubuntu1) lucid; urgency=low
-
-  * New upstream version
-    - Add gthread-2.0 to required modules for the daemon
-    - Centralize the use of gnome_rr_config_apply_with_time
-  * Refreshed patches:
-    - 02_fix_randr.patch
-    - 02_missing_libs.patch
-    - 70_migrate_touchpad_config.patch
-    - 90_autoreconf.patch
-
- -- Chris Coulson <chrisccoulson@ubuntu.com>  Wed, 10 Feb 2010 00:29:16 +0000
-
-gnome-settings-daemon (2.29.6-0ubuntu4) lucid; urgency=low
-
-  * debian/patches/16_use_synchronous_notifications.patch:
-    - Create a new class for the volume notifications (makes the 
-      code more portable)
-    - Make the overshoot effects work again
-  * debian/patches/90_autoreconf.patch:
-    - Update 
-
- -- Chris Coulson <chrisccoulson@ubuntu.com>  Mon, 08 Feb 2010 10:29:00 +0100
-
-gnome-settings-daemon (2.29.6-0ubuntu3) lucid; urgency=low
-
-  * debian/patches/05_disable_corner_tapping.patch:
-    - upgraded previous change to change middle click too, 
-      thank Sebastian Keller (lp: #509724)
-
- -- Sebastien Bacher <seb128@ubuntu.com>  Tue, 02 Feb 2010 14:57:32 -0800
-
-gnome-settings-daemon (2.29.6-0ubuntu2) lucid; urgency=low
-
-  * debian/patches/16_use_synchronous_notifications.patch,
-    debian/patches/90_autoreconf.patch:
-    - use correct ldflags variable and fix unresolved symbols issues
-  * debian/patches/05_disable_corner_tapping.patch:
-    - disable corner tapping when disabling tap to clik, thank Sebastian Keller
-      (lp: #509724)
-
- -- Sebastien Bacher <seb128@ubuntu.com>  Fri, 29 Jan 2010 11:30:51 +0100
-
-gnome-settings-daemon (2.29.6-0ubuntu1) lucid; urgency=low
-
-  * New upstream version:
-    - Don't allow left-handed setting for single-button touchpads 
-    - Don't die on X servers without XKB
-  * debian/patches/90_autoreconf.patch:
-    - new version update
-    
- -- Sebastien Bacher <seb128@ubuntu.com>  Tue, 26 Jan 2010 10:22:02 +0100
-
-gnome-settings-daemon (2.29.5-0ubuntu2) lucid; urgency=low
-
-  * Add 04_dont_call_xrdb.patch: Use XLib calls to set the RESOURCE_MANAGER
-    Xft.* properties in the xsettings and font plugins, instead of calling
-    xrdb directly. This saves some startup time, since these plugins are in
-    the critical path and everything else needs to wait for it.
-  * 40_xres_lcddefault.patch: Update accordingly.
-
- -- Martin Pitt <martin.pitt@ubuntu.com>  Fri, 22 Jan 2010 00:16:05 +0100
-
-gnome-settings-daemon (2.29.5-0ubuntu1) lucid; urgency=low
-
-  * New upstream version (LP: #508216)
-    - Fix variant handling in $GDM_KEYBOARD_LAYOUT (Martin Pitt) (#596897)
-    - Tighten check for XInput (Jens Granseuer)
-    - Fix bluriness in level bar, and popup (Bastien Nocera) (#567249)
-    - Remove unused variable (Bastien Nocera) (#599904)
-    - Honour libexecdir when spawning gsd-locate-pointer (Jens Granseuer) 
-      (#599209)
-    - Allow left-handed setting for touchpads (Peter Hutterer) (LP: #479968)
-    - Use a rounded instead of curved rectangle (William Jon McCann)
-    - Improve the media keys overlay design (William Jon McCann) (#596136)
-    - Add brightness to the media-keys popup (Bastien Nocera) (#599677)
-    - Fix for GSEAL goal (Bastien Nocera) (#599861)
-    - Avoid volumes going over 100% (Bastien Nocera) (#600770)
-    - Make OSD display more generic (Bastien Nocera) (#600951)
-    - Support loading -rtl and -ltr variants of icons (Bastien Nocera) 
-      (#600984)
-    - Relicense gsd-media-keys-window.[ch] to LGPL (Bastien Nocera) (#600986)
-    - Hide the status icon before unreffing it (Matthias Clasen) (#601696)
-    - Make eject behave better on OpenBSD (Jasper Lievisse Adriaanse) 
-      (#598573)
-    - Export libexecdir in .pc file (DJ Lucas) (#596388)
-    - Run gnome-color-manager apply program when the outputs change
-      (Richard Hughes)
-    - Factor out function to get keycodes from keysym names (Federico Mena 
-      Quintero)
-    - Handle the XF86RotateWindows hotkey by rotating a laptop's display
-      (Federico Mena Quintero)
-    - Respond to monitor configuration changes when in charge (Matthias 
-      Clasen) (#601203)
-    - Filter invalid layouts before looking for the index of one passed by 
-      gdm (Vincent Untz) (#585868)
-    - Add linsysfs to list of virtual filesystems (Coleman Kane) (#604396)
-    - Remove sleep keybindings (Bastien Nocera) (LP: #490704, GNOME: #170175)
-    - Start an on-screen-display window (OSD) (Federico Mena Quintero)
-    - Split the composited and non-composited code for the expose-event 
-      handler (Federico Mena Quintero)
-    - Use a hand-drawn frame instead of a GtkBuilder frame (Federico Mena 
-      Quintero)
-    - Using GkbdStatus for the automatic notification icon (Sergey V. 
-      Udaltsov) (LP: #498839)
-    - Implement popup menu for the notification icon (Sergey V. Udaltsov)
-    - Add extra API required by GsdMediaKeysWindow (Federico Mena Quintero)
-    - Add timed exit option (William Jon McCann)
-    - Fixes for new libxklavier (Sergey V. Udaltsov)
-  * debian/control:
-    - Bump libxklavier-dev build-dep to >= 5.0
-    - Bump libgnomekbd-dev build-dep to >= 2.29.5
-  * Refreshed patches:
-    - 02_fix_randr.patch
-    - 02_missing_libs.patch
-    - 30_pkgconfig-path.patch
-    - 70_migrate_touchpad_config.patch
-    - 90_autoreconf.patch
-  * Dropped patches merged upstream:
-    - 03_gdm_keyboard_variant_handling.patch
-    - 91_gsd_locate_pointer_path_fix.patch
-  * Re-written 16_use_synchronous_notifications.patch - the patch now has
-    the more generic parts split in to plugins/common, as the xrandr plugin
-    may use this code in the future. The code can also be shared with other
-    packages
-    
- -- Chris Coulson <chrisccoulson@ubuntu.com>  Sun, 17 Jan 2010 18:45:07 +0000
-
-gnome-settings-daemon (2.28.1-1ubuntu2) lucid; urgency=low
-
-  * No change rebuild to use the new libgnome-desktop soname
-
- -- Sebastien Bacher <seb128@ubuntu.com>  Wed, 06 Jan 2010 19:57:06 +0100
-
-gnome-settings-daemon (2.28.1-1ubuntu1) lucid; urgency=low
-
-  * Sync on Debian
-  * debian/control.in:
-    - build-depends on libpulse and libcanberra
-    - recommends on pulseaudio
-    - set vcs location
+    - Build-depend on libpulse and libcanberra
+    - Build-depend on libappindicator-dev
+    - Add Vcs-Bzr link
+    - Recommend pulseaudio
+  * debian/rules:
+    - Run autotools on build
+    - Don't disable the pulseaudio use
+    - Build and install gnome-update-wallpaper-cache
   * debian/gnome-settings-daemon.gconf-defaults:
-    - enable tap_on_click and disable_while_typing on by default,
+    - Enable tap_on_click and disable_while_typing on by default,
       it's the less confusing behaviour for user and was the consensus
       during the discussion on the lists
-    - ensure that touchpad settings are migrated to the new
-      config where appropriate (LP#404219).
-    - use subpixel rendering and slight hinting as the default in jaunty 
-      (even on CRT monitors for now) (LP#332172)
-  * debian/gnome-settings-daemon.install:
-    - don't move the autostart to a non standard directory as debian
-    - install dbus service
-    debian/gnome-settings-daemon.postinst:
-    - don't move the autostart to a non standard directory as debian
-  * debian/patches/02_fix_randr.patch:
-    - correctly apply the xrandr settings.
-  * debian/patches/03_gdm_keyboard_variant_handling.patch:
-    - gdm's configuration and $GDM_KEYBOARD_LAYOUT separates layout and variant 
-      with a space, but GConf uses tabs. Convert spaces to tabs in 
-      $GDM_KEYBOARD_LAYOUT to work with either format, for more robustness.
-  * debian/patches/11_sleepkey.patch:
-    - there is no key assigned to sleep by default and gdm-signal does not 
-      exist on the default install
-  * debian/patches/16_use_synchronous_notifications.patch:
-    - use synchronous notifications when they are supported
-  * debian/patches/20_gstreamer.patch:
-    - don't use this debian change but rather the upstream code version
-  * debian/patches/40_xres_lcddefault.patch: 
-    - OpenOffice.org subpixel font rendering broken with new cairo (LP#271283)
-  * debian/patches/70_migrate_touchpad_config.patch:
-    - ensure that touchpad settings are migrated to the new
+    - Ensure that touchpad settings are migrated to the new
       config where appropriate
+    - Use subpixel rendering and slight hinting as the default
+  * debian/gnome-settings-daemon.install:
+    - Don't move the autostart to a non standard directory as debian
+    - Install dbus service
+    debian/gnome-settings-daemon.postinst:
+    - Don't move the autostart to a non standard directory as debian
+  * debian/gnome-update-cache-wallpaper.c:
+    - enable creating a cached wallpaper even when g-s-d or nautilus isn't
+      running. Used in ubiquity in install mode
+  * debian/patches/02_fix_randr.patch:
+    - Correctly apply the xrandr settings.
+  * debian/patches/05_disable_corner_tapping.patch:
+    - Disable corner tapping when disabling tap to click
+  * debian/patches/06_use_application_indicator.patch:
+    - Use the new application indicator system
+  * debian/patches/07_dont_display_autostart.patch:
+    - Don't show the gnome-settings-daemon autostart in the session capplet,
+      the description is confusing and it's a required component
+  * debian/patches/10_fn-F7.patch:
+    - Fix handling of fn-F7 (xrandr) when xev timestamp is later than server
+      timestamp
+  * debian/patches/16_use_synchronous_notifications.patch:
+    - Use synchronous notifications when they are supported
+  * debian/patches/20_gstreamer.patch:
+    - Don't use this debian change but rather the upstream code version
+  * debian/patches/40_xres_lcddefault.patch: 
+    - OpenOffice.org subpixel font rendering broken with new cairo
+  * debian/patches/70_migrate_touchpad_config.patch:
+    - Ensure that touchpad settings are migrated to the new
+      config where appropriate
+  * debian/patches/70_relibtoolize.patch:
+    - Not required, now run autotools on build
   * debian/patches/71_fix_ldsm_notification_crash.patch:
     - Don't access free'd memory if a volume is unmounted whilst the
       dialog is displayed
-  * debian/patches/90_autoreconf.patch:
-    - use autoreconf naming rather than relibtoolize it makes cleared what to do
-  * debian/patches/91_gsd_locate_pointer_path_fix.patch:
-    - Upstream GIT change to honour libexecdir when spawning gsd-locate-pointer
-  * debian/rules:
-    - don't disable the pulseaudio use 
+  * debian/patches/91_bugzilla_update_touchpad_icons.patch:
+    - Use correct touchpad svg icons
+  * debian/patches/91_update_gvc_source.patch:
+    - Update gvc copy using the current gnome-media version to fix a leak issue
   * debian/watch:
-    - watch unstable serie
+    - Watch unstable series
   
- -- Sebastien Bacher <seb128@ubuntu.com>  Mon, 07 Dec 2009 14:26:26 +0100
+ -- Robert Ancell <robert.ancell@canonical.com>  Thu, 10 Jun 2010 12:49:47 +1000
+
+gnome-settings-daemon (2.30.1-1) unstable; urgency=low
+
+  * New upstream release.
+  * Bump build-dependencies.
+  * 11_sleepkey.patch, 40_xklavier_5.0.patch: dropped, obsolete.
+  * 20_gstreamer.patch, 30_pkgconfig-path.patch, 70_relibtoolize.patch: 
+    updated for the new version.
+
+ -- Josselin Mouette <joss@debian.org>  Tue, 27 Apr 2010 20:00:27 +0200
+
+gnome-settings-daemon (2.28.1-3) unstable; urgency=low
+
+  * Depend on libgnome2-common for the GConf schemas.
+  * 40_xklavier_5.0.patch: new patch. Get 2.28 version to work with 
+    libxklavier 5.0.
+  * Require said version to build.
+
+ -- Josselin Mouette <joss@debian.org>  Fri, 09 Apr 2010 00:17:00 +0200
+
+gnome-settings-daemon (2.28.1-2) unstable; urgency=low
+
+  * Drop libxxf86misc-dev build-dependency. This extension is only used 
+    as a fallback to XKB. Closes: #559690.
+  * 12_monitor_network_fs.patch: new patch. Don’t monitor remote 
+    filesystems for their free size. Closes: #563592.
+
+ -- Josselin Mouette <joss@debian.org>  Sat, 09 Jan 2010 10:59:14 +0100
 
 gnome-settings-daemon (2.28.1-1) unstable; urgency=low
 

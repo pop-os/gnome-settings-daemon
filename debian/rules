@@ -7,6 +7,12 @@ include /usr/share/cdbs/1/class/gnome.mk
 include /usr/share/gnome-pkg-tools/1/rules/uploaders.mk
 -include /usr/share/gnome-pkg-tools/1/rules/gnome-get-source.mk
 
+DEB_AUTO_UPDATE_LIBTOOL=pre
+DEB_AUTO_UPDATE_ACLOCAL=1.11
+DEB_AUTO_UPDATE_AUTOCONF=1
+DEB_AUTO_UPDATE_AUTOHEADER=1
+DEB_AUTO_UPDATE_AUTOMAKE=1.11
+
 LDFLAGS += -Wl,-O1 -Wl,-z,defs -Wl,--warn-unresolved-symbols -Wl,--as-needed
 
 DEB_DH_MAKESHLIBS_ARGS_ALL += --no-act

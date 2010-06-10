@@ -1,19 +1,20 @@
-# Description: use the new application indicator system
-# Ubuntu: https://bugs.launchpad.net/ubuntu/+source/gnome-settings-daemon/+bug/497875
-# Upstream: https://bugzilla.gnome.org/show_bug.cgi?id=610867
-diff --git a/configure.ac b/configure.ac
-index 23959e6..24574f6 100644
---- a/configure.ac
-+++ b/configure.ac
+Description: Use the new application indicator system
+Bug: https://bugzilla.gnome.org/show_bug.cgi?id=610867
+Bug-Ubuntu: https://bugs.launchpad.net/ubuntu/+source/gnome-settings-daemon/+bug/497875
+
+Index: gnome-settings-daemon-2.30.1/configure.ac
+===================================================================
+--- gnome-settings-daemon-2.30.1.orig/configure.ac	2010-06-10 12:53:34.133995013 +1000
++++ gnome-settings-daemon-2.30.1/configure.ac	2010-06-10 12:53:36.293994954 +1000
 @@ -52,6 +52,7 @@
  GIO_REQUIRED_VERSION=2.17.3
- GNOME_DESKTOP_REQUIRED_VERSION=2.26.3
+ GNOME_DESKTOP_REQUIRED_VERSION=2.29.92
  LIBNOTIFY_REQUIRED_VERSION=0.4.3
 +APPINDICATOR_REQUIRED_VERSION=0.0.13
  
  EXTRA_COMPILE_WARNINGS(yes)
  
-@@ -105,6 +106,32 @@ fi
+@@ -108,6 +109,32 @@
  AC_SUBST(LIBNOTIFY_CFLAGS)
  AC_SUBST(LIBNOTIFY_LIBS)
  
@@ -46,7 +47,7 @@ index 23959e6..24574f6 100644
  dnl ---------------------------------------------------------------------------
  dnl - Check for D-Bus
  dnl ---------------------------------------------------------------------------
-@@ -386,6 +413,7 @@ echo "
+@@ -392,6 +419,7 @@
          dbus-1 system.d dir:      ${DBUS_SYS_DIR}
  
          Libnotify support:        ${have_libnotify}
@@ -54,11 +55,11 @@ index 23959e6..24574f6 100644
          PulseAudio support:       ${have_pulse}
          Profiling support:        ${enable_profiling}
  "
-diff --git a/plugins/a11y-keyboard/Makefile.am b/plugins/a11y-keyboard/Makefile.am
-index 99bfa90..5770c1f 100644
---- a/plugins/a11y-keyboard/Makefile.am
-+++ b/plugins/a11y-keyboard/Makefile.am
-@@ -53,6 +53,7 @@ liba11y_keyboard_la_CPPFLAGS = \
+Index: gnome-settings-daemon-2.30.1/plugins/a11y-keyboard/Makefile.am
+===================================================================
+--- gnome-settings-daemon-2.30.1.orig/plugins/a11y-keyboard/Makefile.am	2009-07-28 07:37:28.000000000 +1000
++++ gnome-settings-daemon-2.30.1/plugins/a11y-keyboard/Makefile.am	2010-06-10 12:53:36.293994954 +1000
+@@ -53,6 +53,7 @@
  liba11y_keyboard_la_CFLAGS = \
  	$(SETTINGS_PLUGIN_CFLAGS)	\
  	$(LIBNOTIFY_CFLAGS)		\
@@ -66,7 +67,7 @@ index 99bfa90..5770c1f 100644
  	$(AM_CFLAGS)
  
  liba11y_keyboard_la_LDFLAGS = 		\
-@@ -63,6 +64,7 @@ liba11y_keyboard_la_LIBADD  = 		\
+@@ -63,6 +64,7 @@
  	$(SETTINGS_PLUGIN_LIBS)		\
  	$(XF86MISC_LIBS)		\
  	$(LIBNOTIFY_LIBS)		\
@@ -74,10 +75,10 @@ index 99bfa90..5770c1f 100644
  	$(NULL)
  
  plugin_in_files = 		\
-diff --git a/plugins/a11y-keyboard/gsd-a11y-keyboard-manager.c b/plugins/a11y-keyboard/gsd-a11y-keyboard-manager.c
-index ba19b42..88d2038 100644
---- a/plugins/a11y-keyboard/gsd-a11y-keyboard-manager.c
-+++ b/plugins/a11y-keyboard/gsd-a11y-keyboard-manager.c
+Index: gnome-settings-daemon-2.30.1/plugins/a11y-keyboard/gsd-a11y-keyboard-manager.c
+===================================================================
+--- gnome-settings-daemon-2.30.1.orig/plugins/a11y-keyboard/gsd-a11y-keyboard-manager.c	2009-05-04 04:15:30.000000000 +1000
++++ gnome-settings-daemon-2.30.1/plugins/a11y-keyboard/gsd-a11y-keyboard-manager.c	2010-06-10 12:53:36.293994954 +1000
 @@ -45,6 +45,10 @@
  #include <libnotify/notify.h>
  #endif /* HAVE_LIBNOTIFY */
@@ -89,7 +90,7 @@ index ba19b42..88d2038 100644
  #include "gnome-settings-profile.h"
  #include "gsd-a11y-keyboard-manager.h"
  #include "gsd-a11y-preferences-dialog.h"
-@@ -62,7 +66,11 @@ struct GsdA11yKeyboardManagerPrivate
+@@ -62,7 +66,11 @@
          GtkWidget *stickykeys_alert;
          GtkWidget *slowkeys_alert;
          GtkWidget *preferences_dialog;
@@ -101,7 +102,7 @@ index ba19b42..88d2038 100644
          XkbDescRec *original_xkb_desc;
  
          guint      gconf_notify;
-@@ -435,11 +443,24 @@ maybe_show_status_icon (GsdA11yKeyboardManager *manager)
+@@ -435,11 +443,24 @@
          show = gconf_client_get_bool (client, CONFIG_ROOT "/enable", NULL);
          g_object_unref (client);
  
@@ -126,7 +127,7 @@ index ba19b42..88d2038 100644
  }
  
  #ifdef HAVE_LIBNOTIFY
-@@ -521,9 +542,11 @@ ax_slowkeys_warning_post_bubble (GsdA11yKeyboardManager *manager,
+@@ -521,9 +542,11 @@
          message = _("You just held down the Shift key for 8 seconds.  This is the shortcut "
                      "for the Slow Keys feature, which affects the way your keyboard works.");
  
@@ -138,7 +139,7 @@ index ba19b42..88d2038 100644
  
          if (manager->priv->slowkeys_alert != NULL) {
                  gtk_widget_destroy (manager->priv->slowkeys_alert);
-@@ -538,7 +561,9 @@ ax_slowkeys_warning_post_bubble (GsdA11yKeyboardManager *manager,
+@@ -538,7 +561,9 @@
                                                                 message,
                                                                 "preferences-desktop-accessibility",
                                                                 NULL);
@@ -148,7 +149,7 @@ index ba19b42..88d2038 100644
          notify_notification_set_timeout (manager->priv->notification, NOTIFICATION_TIMEOUT * 1000);
  
          notify_notification_add_action (manager->priv->notification,
-@@ -660,9 +685,11 @@ ax_stickykeys_warning_post_bubble (GsdA11yKeyboardManager *manager,
+@@ -660,9 +685,11 @@
                  _("You just pressed two keys at once, or pressed the Shift key 5 times in a row.  "
                    "This turns off the Sticky Keys feature, which affects the way your keyboard works.");
  
@@ -160,7 +161,7 @@ index ba19b42..88d2038 100644
  
          if (manager->priv->slowkeys_alert != NULL) {
                  gtk_widget_destroy (manager->priv->slowkeys_alert);
-@@ -677,7 +704,9 @@ ax_stickykeys_warning_post_bubble (GsdA11yKeyboardManager *manager,
+@@ -677,7 +704,9 @@
                                                                 message,
                                                                 "preferences-desktop-accessibility",
                                                                 NULL);
@@ -170,7 +171,7 @@ index ba19b42..88d2038 100644
          notify_notification_set_timeout (manager->priv->notification, NOTIFICATION_TIMEOUT * 1000);
  
          notify_notification_add_action (manager->priv->notification,
-@@ -1072,8 +1101,14 @@ gsd_a11y_keyboard_manager_stop (GsdA11yKeyboardManager *manager)
+@@ -1072,8 +1101,14 @@
  
          g_debug ("Stopping a11y_keyboard manager");
  
@@ -185,7 +186,7 @@ index ba19b42..88d2038 100644
  
          if (p->gconf_notify != 0) {
                  GConfClient *client = gconf_client_get_default ();
-@@ -1190,8 +1225,13 @@ on_preferences_dialog_response (GtkDialog              *dialog,
+@@ -1190,8 +1225,13 @@
  }
  
  static void
@@ -199,7 +200,7 @@ index ba19b42..88d2038 100644
  {
          if (manager->priv->preferences_dialog == NULL) {
                  manager->priv->preferences_dialog = gsd_a11y_preferences_dialog_new ();
-@@ -1215,6 +1255,26 @@ gsd_a11y_keyboard_manager_ensure_status_icon (GsdA11yKeyboardManager *manager)
+@@ -1215,6 +1255,26 @@
  {
          gnome_settings_profile_start (NULL);
  
@@ -226,7 +227,7 @@ index ba19b42..88d2038 100644
          if (!manager->priv->status_icon) {
  
                  manager->priv->status_icon = gtk_status_icon_new_from_icon_name ("preferences-desktop-accessibility");
-@@ -1223,6 +1283,7 @@ gsd_a11y_keyboard_manager_ensure_status_icon (GsdA11yKeyboardManager *manager)
+@@ -1223,6 +1283,7 @@
                                    G_CALLBACK (on_status_icon_activate),
                                    manager);
          }
@@ -234,11 +235,11 @@ index ba19b42..88d2038 100644
  
          gnome_settings_profile_end (NULL);
  }
-diff --git a/plugins/xrandr/Makefile.am b/plugins/xrandr/Makefile.am
-index c5d660d..d2dd91f 100644
---- a/plugins/xrandr/Makefile.am
-+++ b/plugins/xrandr/Makefile.am
-@@ -54,6 +54,7 @@ libxrandr_la_CPPFLAGS =						\
+Index: gnome-settings-daemon-2.30.1/plugins/xrandr/Makefile.am
+===================================================================
+--- gnome-settings-daemon-2.30.1.orig/plugins/xrandr/Makefile.am	2010-04-26 22:18:50.000000000 +1000
++++ gnome-settings-daemon-2.30.1/plugins/xrandr/Makefile.am	2010-06-10 12:53:36.293994954 +1000
+@@ -54,6 +54,7 @@
  libxrandr_la_CFLAGS =			\
  	$(SETTINGS_PLUGIN_CFLAGS)	\
  	$(LIBNOTIFY_CFLAGS)		\
@@ -246,7 +247,7 @@ index c5d660d..d2dd91f 100644
  	$(AM_CFLAGS)
  
  libxrandr_la_LDFLAGS = 			\
-@@ -61,7 +62,8 @@ libxrandr_la_LDFLAGS = 			\
+@@ -61,7 +62,8 @@
  
  libxrandr_la_LIBADD  =			\
  	$(SETTINGS_PLUGIN_LIBS)		\
@@ -256,10 +257,10 @@ index c5d660d..d2dd91f 100644
  
  plugin_in_files =			\
  	xrandr.gnome-settings-plugin.in
-diff --git a/plugins/xrandr/gsd-xrandr-manager.c b/plugins/xrandr/gsd-xrandr-manager.c
-index e78eb6b..0db025b 100644
---- a/plugins/xrandr/gsd-xrandr-manager.c
-+++ b/plugins/xrandr/gsd-xrandr-manager.c
+Index: gnome-settings-daemon-2.30.1/plugins/xrandr/gsd-xrandr-manager.c
+===================================================================
+--- gnome-settings-daemon-2.30.1.orig/plugins/xrandr/gsd-xrandr-manager.c	2010-06-10 12:53:28.456494521 +1000
++++ gnome-settings-daemon-2.30.1/plugins/xrandr/gsd-xrandr-manager.c	2010-06-10 12:53:36.293994954 +1000
 @@ -49,6 +49,10 @@
  #include <libnotify/notify.h>
  #endif
@@ -271,7 +272,7 @@ index e78eb6b..0db025b 100644
  #include "gnome-settings-profile.h"
  #include "gsd-xrandr-manager.h"
  
-@@ -93,7 +97,11 @@ struct GsdXrandrManagerPrivate
+@@ -93,7 +97,11 @@
          GnomeRRScreen *rw_screen;
          gboolean running;
  
@@ -283,7 +284,7 @@ index e78eb6b..0db025b 100644
          GtkWidget *popup_menu;
          GnomeRRConfig *configuration;
          GnomeRRLabeler *labeler;
-@@ -908,17 +916,21 @@ static void
+@@ -908,17 +916,21 @@
  error_message (GsdXrandrManager *mgr, const char *primary_text, GError *error_to_display, const char *secondary_text)
  {
  #ifdef HAVE_LIBNOTIFY
@@ -305,7 +306,7 @@ index e78eb6b..0db025b 100644
                  notification = notify_notification_new (primary_text,
                                                          error_to_display ? error_to_display->message : secondary_text,
                                                          GSD_XRANDR_ICON_NAME,
-@@ -1150,6 +1162,11 @@ refresh_tray_icon_menu_if_active (GsdXrandrManager *manager, guint32 timestamp)
+@@ -1150,6 +1162,11 @@
                  gtk_menu_shell_cancel (GTK_MENU_SHELL (priv->popup_menu)); /* status_icon_popup_menu_selection_done_cb() will free everything */
                  status_icon_popup_menu (manager, 0, timestamp);
          }
@@ -317,7 +318,7 @@ index e78eb6b..0db025b 100644
  }
  
  static void
-@@ -1464,6 +1481,8 @@ status_icon_popup_menu_selection_done_cb (GtkMenuShell *menu_shell, gpointer dat
+@@ -1464,6 +1481,8 @@
          priv->configuration = NULL;
  }
  
@@ -326,7 +327,7 @@ index e78eb6b..0db025b 100644
  #define OUTPUT_TITLE_ITEM_BORDER 2
  #define OUTPUT_TITLE_ITEM_PADDING 4
  
-@@ -1539,6 +1558,8 @@ output_title_label_after_expose_event_cb (GtkWidget *widget, GdkEventExpose *eve
+@@ -1539,6 +1558,8 @@
          return FALSE;
  }
  
@@ -335,7 +336,7 @@ index e78eb6b..0db025b 100644
  static void
  title_item_size_allocate_cb (GtkWidget *widget, GtkAllocation *allocation, gpointer data)
  {
-@@ -1596,6 +1617,7 @@ make_menu_item_for_output_title (GsdXrandrManager *manager, GnomeOutputInfo *out
+@@ -1596,6 +1617,7 @@
          gtk_label_set_markup (GTK_LABEL (label), str);
          g_free (str);
  
@@ -343,7 +344,7 @@ index e78eb6b..0db025b 100644
  	/* Make the label explicitly black.  We don't want it to follow the
  	 * theme's colors, since the label is always shown against a light
  	 * pastel background.  See bgo#556050
-@@ -1607,6 +1629,7 @@ make_menu_item_for_output_title (GsdXrandrManager *manager, GnomeOutputInfo *out
+@@ -1607,6 +1629,7 @@
          gtk_misc_set_padding (GTK_MISC (label),
                                OUTPUT_TITLE_ITEM_BORDER + OUTPUT_TITLE_ITEM_PADDING,
                                OUTPUT_TITLE_ITEM_BORDER + OUTPUT_TITLE_ITEM_PADDING);
@@ -351,7 +352,7 @@ index e78eb6b..0db025b 100644
  
          gtk_container_add (GTK_CONTAINER (item), label);
  
-@@ -1614,10 +1637,12 @@ make_menu_item_for_output_title (GsdXrandrManager *manager, GnomeOutputInfo *out
+@@ -1614,10 +1637,12 @@
           * to its expose-event signal.  See the comment in *** to see why need to connect
           * to the label both 'before' and 'after'.
           */
@@ -364,7 +365,7 @@ index e78eb6b..0db025b 100644
  
          g_object_set_data (G_OBJECT (label), "output", output);
  
-@@ -1856,6 +1881,13 @@ status_icon_popup_menu (GsdXrandrManager *manager, guint button, guint32 timesta
+@@ -1856,6 +1881,13 @@
          struct GsdXrandrManagerPrivate *priv = manager->priv;
          GtkWidget *item;
  
@@ -378,7 +379,7 @@ index e78eb6b..0db025b 100644
          g_assert (priv->configuration == NULL);
          priv->configuration = gnome_rr_config_new_current (priv->rw_screen);
  
-@@ -1863,6 +1895,7 @@ status_icon_popup_menu (GsdXrandrManager *manager, guint button, guint32 timesta
+@@ -1863,6 +1895,7 @@
          priv->labeler = gnome_rr_labeler_new (priv->configuration);
  
          g_assert (priv->popup_menu == NULL);
@@ -386,7 +387,7 @@ index e78eb6b..0db025b 100644
          priv->popup_menu = gtk_menu_new ();
  
          add_menu_items_for_outputs (manager);
-@@ -1877,14 +1910,20 @@ status_icon_popup_menu (GsdXrandrManager *manager, guint button, guint32 timesta
+@@ -1877,14 +1910,20 @@
          gtk_widget_show (item);
          gtk_menu_shell_append (GTK_MENU_SHELL (priv->popup_menu), item);
  
@@ -407,7 +408,7 @@ index e78eb6b..0db025b 100644
  static void
  status_icon_activate_cb (GtkStatusIcon *status_icon, gpointer data)
  {
-@@ -1901,12 +1940,23 @@ status_icon_popup_menu_cb (GtkStatusIcon *status_icon, guint button, guint32 tim
+@@ -1901,12 +1940,23 @@
  
          status_icon_popup_menu (manager, button, timestamp);
  }
@@ -431,7 +432,7 @@ index e78eb6b..0db025b 100644
          /* Ideally, we should detect if we are on a tablet and only display
           * the icon in that case.
           */
-@@ -1919,6 +1969,7 @@ status_icon_start (GsdXrandrManager *manager)
+@@ -1919,6 +1969,7 @@
                  g_signal_connect (priv->status_icon, "popup-menu",
                                    G_CALLBACK (status_icon_popup_menu_cb), manager);
          }
@@ -439,7 +440,7 @@ index e78eb6b..0db025b 100644
  }
  
  static void
-@@ -1926,6 +1977,14 @@ status_icon_stop (GsdXrandrManager *manager)
+@@ -1926,6 +1977,14 @@
  {
          struct GsdXrandrManagerPrivate *priv = manager->priv;
  
@@ -454,7 +455,7 @@ index e78eb6b..0db025b 100644
          if (priv->status_icon) {
                  g_signal_handlers_disconnect_by_func (
                          priv->status_icon, G_CALLBACK (status_icon_activate_cb), manager);
-@@ -1938,6 +1997,7 @@ status_icon_stop (GsdXrandrManager *manager)
+@@ -1938,6 +1997,7 @@
                  g_object_unref (priv->status_icon);
                  priv->status_icon = NULL;
          }

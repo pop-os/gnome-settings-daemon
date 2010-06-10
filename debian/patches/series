@@ -6,13 +6,12 @@
 06_use_application_indicator.patch
 07_dont_display_autostart.patch
 10_fn-F7.patch
-#11_change_tap_to_click_order.patch
+12_monitor_network_fs.patch
 16_use_synchronous_notifications.patch
 30_pkgconfig-path.patch
 40_xres_lcddefault.patch
 70_migrate_touchpad_config.patch
 71_fix_ldsm_notification_crash.patch
-90_autoreconf.patch
 91_bugzilla_update_touchpad_icons.patch
 91_update_gvc_source.patch
 99_ltmain_as-needed.patch
