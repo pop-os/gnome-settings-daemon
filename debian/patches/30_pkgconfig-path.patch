@@ -3,9 +3,9 @@ Index: gnome-settings-daemon-2.30.1/data/gnome-settings-daemon.pc.in
 --- gnome-settings-daemon-2.30.1.orig/data/gnome-settings-daemon.pc.in	2010-03-10 12:58:29.000000000 +0100
 +++ gnome-settings-daemon-2.30.1/data/gnome-settings-daemon.pc.in	2010-04-27 19:54:02.974028223 +0200
 @@ -3,6 +3,7 @@ exec_prefix=@exec_prefix@
- libdir=@libdir@
  includedir=@includedir@
  libexecdir=@libexecdir@
+ plugindir=@plugindir@
 +binary=${libexecdir}/gnome-settings-daemon
  
  Name: gnome-settings-daemon
