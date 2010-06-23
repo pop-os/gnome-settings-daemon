@@ -5,7 +5,6 @@
 05_disable_corner_tapping.patch
 06_use_application_indicator.patch
 07_dont_display_autostart.patch
-10_fn-F7.patch
 12_monitor_network_fs.patch
 16_use_synchronous_notifications.patch
 30_pkgconfig-path.patch

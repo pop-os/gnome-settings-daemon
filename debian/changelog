@@ -1,3 +1,10 @@
+gnome-settings-daemon (2.30.2-0ubuntu2) maverick; urgency=low
+
+  * debian/patches/10_fn-F7.patch:
+    - dropped, the change is in the new version
+
+ -- Sebastien Bacher <seb128@ubuntu.com>  Wed, 23 Jun 2010 23:06:13 +0200
+
 gnome-settings-daemon (2.30.2-0ubuntu1) maverick; urgency=low
 
   * New upstream release
