@@ -10,7 +10,6 @@ Maintainer: Debian GNOME Maintainers <pkg-gnome-maintainers@lists.alioth.debian.
 Uploaders: Emilio Pozuelo Monfort <pochu@debian.org>, Josselin Mouette <joss@debian.org>, Michael Biebl <biebl@debian.org>, Sjoerd Simons <sjoerd@debian.org>
 Build-Depends: cdbs,
                debhelper (>= 5),
-               dpkg-dev (>= 1.13.19),
                autotools-dev,
                intltool (>= 0.37.1),
                libdbus-glib-1-dev (>= 0.74),

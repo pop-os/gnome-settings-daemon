@@ -6,6 +6,9 @@ gnome-settings-daemon (2.30.2-1) UNRELEASED; urgency=low
     - Drop Build-Depends on quilt.
     - Remove /usr/share/cdbs/1/rules/patchsys-quilt.mk from debian/rules.
   * Refresh patches for new upstream release.
+  * debian/control.in
+    - Drop Build-Depends on dpkg-dev (>= 1.13.19) as even oldstable has a more
+      recent version.
 
  -- Michael Biebl <biebl@debian.org>  Fri, 23 Jul 2010 00:37:40 +0200
 
