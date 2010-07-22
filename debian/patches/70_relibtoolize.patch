@@ -5,11 +5,388 @@
  autoconf
  rm -rf autom4te.cache/ config.h.in~
 
-Index: gnome-settings-daemon-2.30.1/aclocal.m4
+Index: gnome-settings-daemon-2.30.2/INSTALL
 ===================================================================
---- gnome-settings-daemon-2.30.1.orig/aclocal.m4	2010-04-26 14:22:47.000000000 +0200
-+++ gnome-settings-daemon-2.30.1/aclocal.m4	2010-04-27 19:56:41.633528618 +0200
-@@ -19,2048 +19,2720 @@ You have another version of autoconf.  I
+--- gnome-settings-daemon-2.30.2.orig/INSTALL	2010-07-23 00:54:36.245452830 +0200
++++ gnome-settings-daemon-2.30.2/INSTALL	2010-07-23 00:54:16.765451189 +0200
+@@ -2,18 +2,24 @@
+ *************************
+ 
+ Copyright (C) 1994, 1995, 1996, 1999, 2000, 2001, 2002, 2004, 2005,
+-2006, 2007 Free Software Foundation, Inc.
++2006, 2007, 2008, 2009 Free Software Foundation, Inc.
+ 
+-This file is free documentation; the Free Software Foundation gives
+-unlimited permission to copy, distribute and modify it.
++   Copying and distribution of this file, with or without modification,
++are permitted in any medium without royalty provided the copyright
++notice and this notice are preserved.  This file is offered as-is,
++without warranty of any kind.
+ 
+ Basic Installation
+ ==================
+ 
+-Briefly, the shell commands `./configure; make; make install' should
++   Briefly, the shell commands `./configure; make; make install' should
+ configure, build, and install this package.  The following
+ more-detailed instructions are generic; see the `README' file for
+-instructions specific to this package.
++instructions specific to this package.  Some packages provide this
++`INSTALL' file but do not implement all of the features documented
++below.  The lack of an optional feature in a given package is not
++necessarily a bug.  More recommendations for GNU packages can be found
++in *note Makefile Conventions: (standards)Makefile Conventions.
+ 
+    The `configure' shell script attempts to guess correct values for
+ various system-dependent variables used during compilation.  It uses
+@@ -42,7 +48,7 @@
+ you want to change it or regenerate `configure' using a newer version
+ of `autoconf'.
+ 
+-The simplest way to compile this package is:
++   The simplest way to compile this package is:
+ 
+   1. `cd' to the directory containing the package's source code and type
+      `./configure' to configure the package for your system.
+@@ -53,12 +59,22 @@
+   2. Type `make' to compile the package.
+ 
+   3. Optionally, type `make check' to run any self-tests that come with
+-     the package.
++     the package, generally using the just-built uninstalled binaries.
+ 
+   4. Type `make install' to install the programs and any data files and
+-     documentation.
++     documentation.  When installing into a prefix owned by root, it is
++     recommended that the package be configured and built as a regular
++     user, and only the `make install' phase executed with root
++     privileges.
++
++  5. Optionally, type `make installcheck' to repeat any self-tests, but
++     this time using the binaries in their final installed location.
++     This target does not install anything.  Running this target as a
++     regular user, particularly if the prior `make install' required
++     root privileges, verifies that the installation completed
++     correctly.
+ 
+-  5. You can remove the program binaries and object files from the
++  6. You can remove the program binaries and object files from the
+      source code directory by typing `make clean'.  To also remove the
+      files that `configure' created (so you can compile the package for
+      a different kind of computer), type `make distclean'.  There is
+@@ -67,15 +83,22 @@
+      all sorts of other programs in order to regenerate files that came
+      with the distribution.
+ 
+-  6. Often, you can also type `make uninstall' to remove the installed
+-     files again.
++  7. Often, you can also type `make uninstall' to remove the installed
++     files again.  In practice, not all packages have tested that
++     uninstallation works correctly, even though it is required by the
++     GNU Coding Standards.
++
++  8. Some packages, particularly those that use Automake, provide `make
++     distcheck', which can by used by developers to test that all other
++     targets like `make install' and `make uninstall' work correctly.
++     This target is generally not run by end users.
+ 
+ Compilers and Options
+ =====================
+ 
+-Some systems require unusual options for compilation or linking that the
+-`configure' script does not know about.  Run `./configure --help' for
+-details on some of the pertinent environment variables.
++   Some systems require unusual options for compilation or linking that
++the `configure' script does not know about.  Run `./configure --help'
++for details on some of the pertinent environment variables.
+ 
+    You can give `configure' initial values for configuration parameters
+ by setting variables in the command line or in the environment.  Here
+@@ -88,25 +111,41 @@
+ Compiling For Multiple Architectures
+ ====================================
+ 
+-You can compile the package for more than one kind of computer at the
++   You can compile the package for more than one kind of computer at the
+ same time, by placing the object files for each architecture in their
+ own directory.  To do this, you can use GNU `make'.  `cd' to the
+ directory where you want the object files and executables to go and run
+ the `configure' script.  `configure' automatically checks for the
+-source code in the directory that `configure' is in and in `..'.
++source code in the directory that `configure' is in and in `..'.  This
++is known as a "VPATH" build.
+ 
+    With a non-GNU `make', it is safer to compile the package for one
+ architecture at a time in the source code directory.  After you have
+ installed the package for one architecture, use `make distclean' before
+ reconfiguring for another architecture.
+ 
++   On MacOS X 10.5 and later systems, you can create libraries and
++executables that work on multiple system types--known as "fat" or
++"universal" binaries--by specifying multiple `-arch' options to the
++compiler but only a single `-arch' option to the preprocessor.  Like
++this:
++
++     ./configure CC="gcc -arch i386 -arch x86_64 -arch ppc -arch ppc64" \
++                 CXX="g++ -arch i386 -arch x86_64 -arch ppc -arch ppc64" \
++                 CPP="gcc -E" CXXCPP="g++ -E"
++
++   This is not guaranteed to produce working output in all cases, you
++may have to build one architecture at a time and combine the results
++using the `lipo' tool if you have problems.
++
+ Installation Names
+ ==================
+ 
+-By default, `make install' installs the package's commands under
++   By default, `make install' installs the package's commands under
+ `/usr/local/bin', include files under `/usr/local/include', etc.  You
+ can specify an installation prefix other than `/usr/local' by giving
+-`configure' the option `--prefix=PREFIX'.
++`configure' the option `--prefix=PREFIX', where PREFIX must be an
++absolute file name.
+ 
+    You can specify separate installation prefixes for
+ architecture-specific files and architecture-independent files.  If you
+@@ -117,16 +156,47 @@
+    In addition, if you use an unusual directory layout you can give
+ options like `--bindir=DIR' to specify different values for particular
+ kinds of files.  Run `configure --help' for a list of the directories
+-you can set and what kinds of files go in them.
++you can set and what kinds of files go in them.  In general, the
++default for these options is expressed in terms of `${prefix}', so that
++specifying just `--prefix' will affect all of the other directory
++specifications that were not explicitly provided.
++
++   The most portable way to affect installation locations is to pass the
++correct locations to `configure'; however, many packages provide one or
++both of the following shortcuts of passing variable assignments to the
++`make install' command line to change installation locations without
++having to reconfigure or recompile.
++
++   The first method involves providing an override variable for each
++affected directory.  For example, `make install
++prefix=/alternate/directory' will choose an alternate location for all
++directory configuration variables that were expressed in terms of
++`${prefix}'.  Any directories that were specified during `configure',
++but not in terms of `${prefix}', must each be overridden at install
++time for the entire installation to be relocated.  The approach of
++makefile variable overrides for each directory variable is required by
++the GNU Coding Standards, and ideally causes no recompilation.
++However, some platforms have known limitations with the semantics of
++shared libraries that end up requiring recompilation when using this
++method, particularly noticeable in packages that use GNU Libtool.
++
++   The second method involves providing the `DESTDIR' variable.  For
++example, `make install DESTDIR=/alternate/directory' will prepend
++`/alternate/directory' before all installation names.  The approach of
++`DESTDIR' overrides is not required by the GNU Coding Standards, and
++does not work on platforms that have drive letters.  On the other hand,
++it does better at avoiding recompilation issues, and works well even
++when some directory options were not specified in terms of `${prefix}'
++at `configure' time.
++
++Optional Features
++=================
+ 
+    If the package supports it, you can cause programs to be installed
+ with an extra prefix or suffix on their names by giving `configure' the
+ option `--program-prefix=PREFIX' or `--program-suffix=SUFFIX'.
+ 
+-Optional Features
+-=================
+-
+-Some packages pay attention to `--enable-FEATURE' options to
++   Some packages pay attention to `--enable-FEATURE' options to
+ `configure', where FEATURE indicates an optional part of the package.
+ They may also pay attention to `--with-PACKAGE' options, where PACKAGE
+ is something like `gnu-as' or `x' (for the X Window System).  The
+@@ -138,14 +208,53 @@
+ you can use the `configure' options `--x-includes=DIR' and
+ `--x-libraries=DIR' to specify their locations.
+ 
++   Some packages offer the ability to configure how verbose the
++execution of `make' will be.  For these packages, running `./configure
++--enable-silent-rules' sets the default to minimal output, which can be
++overridden with `make V=1'; while running `./configure
++--disable-silent-rules' sets the default to verbose, which can be
++overridden with `make V=0'.
++
++Particular systems
++==================
++
++   On HP-UX, the default C compiler is not ANSI C compatible.  If GNU
++CC is not installed, it is recommended to use the following options in
++order to use an ANSI C compiler:
++
++     ./configure CC="cc -Ae -D_XOPEN_SOURCE=500"
++
++and if that doesn't work, install pre-built binaries of GCC for HP-UX.
++
++   On OSF/1 a.k.a. Tru64, some versions of the default C compiler cannot
++parse its `<wchar.h>' header file.  The option `-nodtk' can be used as
++a workaround.  If GNU CC is not installed, it is therefore recommended
++to try
++
++     ./configure CC="cc"
++
++and if that doesn't work, try
++
++     ./configure CC="cc -nodtk"
++
++   On Solaris, don't put `/usr/ucb' early in your `PATH'.  This
++directory contains several dysfunctional programs; working variants of
++these programs are available in `/usr/bin'.  So, if you need `/usr/ucb'
++in your `PATH', put it _after_ `/usr/bin'.
++
++   On Haiku, software installed for all users goes in `/boot/common',
++not `/usr/local'.  It is recommended to use the following options:
++
++     ./configure --prefix=/boot/common
++
+ Specifying the System Type
+ ==========================
+ 
+-There may be some features `configure' cannot figure out automatically,
+-but needs to determine by the type of machine the package will run on.
+-Usually, assuming the package is built to be run on the _same_
+-architectures, `configure' can figure that out, but if it prints a
+-message saying it cannot guess the machine type, give it the
++   There may be some features `configure' cannot figure out
++automatically, but needs to determine by the type of machine the package
++will run on.  Usually, assuming the package is built to be run on the
++_same_ architectures, `configure' can figure that out, but if it prints
++a message saying it cannot guess the machine type, give it the
+ `--build=TYPE' option.  TYPE can either be a short name for the system
+ type, such as `sun4', or a canonical name which has the form:
+ 
+@@ -153,7 +262,8 @@
+ 
+ where SYSTEM can have one of these forms:
+ 
+-     OS KERNEL-OS
++     OS
++     KERNEL-OS
+ 
+    See the file `config.sub' for the possible values of each field.  If
+ `config.sub' isn't included in this package, then this package doesn't
+@@ -171,9 +281,9 @@
+ Sharing Defaults
+ ================
+ 
+-If you want to set default values for `configure' scripts to share, you
+-can create a site shell script called `config.site' that gives default
+-values for variables like `CC', `cache_file', and `prefix'.
++   If you want to set default values for `configure' scripts to share,
++you can create a site shell script called `config.site' that gives
++default values for variables like `CC', `cache_file', and `prefix'.
+ `configure' looks for `PREFIX/share/config.site' if it exists, then
+ `PREFIX/etc/config.site' if it exists.  Or, you can set the
+ `CONFIG_SITE' environment variable to the location of the site script.
+@@ -182,7 +292,7 @@
+ Defining Variables
+ ==================
+ 
+-Variables not defined in a site shell script can be set in the
++   Variables not defined in a site shell script can be set in the
+ environment passed to `configure'.  However, some packages may run
+ configure again during the build, and the customized values of these
+ variables may be lost.  In order to avoid this problem, you should set
+@@ -201,11 +311,19 @@
+ `configure' Invocation
+ ======================
+ 
+-`configure' recognizes the following options to control how it operates.
++   `configure' recognizes the following options to control how it
++operates.
+ 
+ `--help'
+ `-h'
+-     Print a summary of the options to `configure', and exit.
++     Print a summary of all of the options to `configure', and exit.
++
++`--help=short'
++`--help=recursive'
++     Print a summary of the options unique to this package's
++     `configure', and exit.  The `short' variant lists options used
++     only in the top level, while the `recursive' variant lists options
++     also present in any nested packages.
+ 
+ `--version'
+ `-V'
+@@ -232,6 +350,16 @@
+      Look for the package's source code in directory DIR.  Usually
+      `configure' can determine that directory automatically.
+ 
++`--prefix=DIR'
++     Use DIR as the installation prefix.  *note Installation Names::
++     for more details, including other options available for fine-tuning
++     the installation locations.
++
++`--no-create'
++`-n'
++     Run the configure checks, but stop before creating any output
++     files.
++
+ `configure' also accepts some other, not widely useful, options.  Run
+ `configure --help' for more details.
+ 
+Index: gnome-settings-daemon-2.30.2/Makefile.in
+===================================================================
+--- gnome-settings-daemon-2.30.2.orig/Makefile.in	2010-07-23 00:54:34.269454475 +0200
++++ gnome-settings-daemon-2.30.2/Makefile.in	2010-07-23 00:54:16.853446481 +0200
+@@ -151,6 +151,8 @@
+ GREP = @GREP@
+ GSD_INTLTOOL_PLUGIN_RULE = @GSD_INTLTOOL_PLUGIN_RULE@
+ GSD_PLUGIN_LDFLAGS = @GSD_PLUGIN_LDFLAGS@
++GST_CFLAGS = @GST_CFLAGS@
++GST_LIBS = @GST_LIBS@
+ INSTALL = @INSTALL@
+ INSTALL_DATA = @INSTALL_DATA@
+ INSTALL_PROGRAM = @INSTALL_PROGRAM@
+@@ -175,6 +177,7 @@
+ LIPO = @LIPO@
+ LN_S = @LN_S@
+ LTLIBOBJS = @LTLIBOBJS@
++MAINT = @MAINT@
+ MAKEINFO = @MAKEINFO@
+ MKDIR_P = @MKDIR_P@
+ MKINSTALLDIRS = @MKINSTALLDIRS@
+@@ -302,7 +305,7 @@
+ .SUFFIXES:
+ am--refresh:
+ 	@:
+-$(srcdir)/Makefile.in:  $(srcdir)/Makefile.am  $(am__configure_deps)
++$(srcdir)/Makefile.in: @MAINTAINER_MODE_TRUE@ $(srcdir)/Makefile.am  $(am__configure_deps)
+ 	@for dep in $?; do \
+ 	  case '$(am__configure_deps)' in \
+ 	    *$$dep*) \
+@@ -329,9 +332,9 @@
+ $(top_builddir)/config.status: $(top_srcdir)/configure $(CONFIG_STATUS_DEPENDENCIES)
+ 	$(SHELL) ./config.status --recheck
+ 
+-$(top_srcdir)/configure:  $(am__configure_deps)
++$(top_srcdir)/configure: @MAINTAINER_MODE_TRUE@ $(am__configure_deps)
+ 	$(am__cd) $(srcdir) && $(AUTOCONF)
+-$(ACLOCAL_M4):  $(am__aclocal_m4_deps)
++$(ACLOCAL_M4): @MAINTAINER_MODE_TRUE@ $(am__aclocal_m4_deps)
+ 	$(am__cd) $(srcdir) && $(ACLOCAL) $(ACLOCAL_AMFLAGS)
+ $(am__aclocal_m4_deps):
+ 
+@@ -344,7 +347,7 @@
+ stamp-h1: $(srcdir)/config.h.in $(top_builddir)/config.status
+ 	@rm -f stamp-h1
+ 	cd $(top_builddir) && $(SHELL) ./config.status config.h
+-$(srcdir)/config.h.in:  $(am__configure_deps) 
++$(srcdir)/config.h.in: @MAINTAINER_MODE_TRUE@ $(am__configure_deps) 
+ 	($(am__cd) $(top_srcdir) && $(AUTOHEADER))
+ 	rm -f stamp-h1
+ 	touch $@
+Index: gnome-settings-daemon-2.30.2/aclocal.m4
+===================================================================
+--- gnome-settings-daemon-2.30.2.orig/aclocal.m4	2010-07-23 00:54:34.397558510 +0200
++++ gnome-settings-daemon-2.30.2/aclocal.m4	2010-07-23 00:54:08.381450608 +0200
+@@ -19,2048 +19,2720 @@
  If you have problems, you may need to regenerate the build system entirely.
  To do so, use the procedure documented by the package, typically `autoreconf'.])])
  
@@ -4508,10 +4885,13 @@ Index: gnome-settings-daemon-2.30.1/aclocal.m4
    if $ECHO "$lt_search_path_spec" | $GREP ';' >/dev/null ; then
      # if the path contains ";" then we assume it to be the separator
      # otherwise default to the standard path separator (i.e. ":") - it is
-@@ -7232,2601 +7904,1969 @@ func_stripname ()
-   # positional parameters, so assign one to ordinary parameter first.
-   func_stripname_result=${3}
-   func_stripname_result=${func_stripname_result#"${1}"}
+@@ -7229,2604 +7901,1973 @@
+ func_stripname ()
+ {
+   # pdksh 5.2.14 does not do ${X%$Y} correctly if both X and Y are
+-  # positional parameters, so assign one to ordinary parameter first.
+-  func_stripname_result=${3}
+-  func_stripname_result=${func_stripname_result#"${1}"}
 -  func_stripname_result=${func_stripname_result%"${2}"}
 -}
 -
@@ -4593,14 +4973,16 @@ Index: gnome-settings-daemon-2.30.1/aclocal.m4
 -    *)  func_stripname_result=`$ECHO "X${3}" \
 -           | $Xsed -e "s%^${1}%%" -e "s%${2}\$%%"`;;
 -  esac
--}
--
++  # positional parameters, so assign one to ordinary parameter first.
++  func_stripname_result=${3}
++  func_stripname_result=${func_stripname_result#"${1}"}
++  func_stripname_result=${func_stripname_result%"${2}"}
+ }
+ 
 -# sed scripts:
 -my_sed_long_opt='1s/^\(-[[^=]]*\)=.*/\1/;q'
 -my_sed_long_arg='1s/^-[[^=]]*=//'
-+  func_stripname_result=${func_stripname_result%"${2}"}
-+}
- 
+-
  # func_opt_split
  func_opt_split ()
  {
@@ -4873,12 +5255,21 @@ Index: gnome-settings-daemon-2.30.1/aclocal.m4
 -    _LT_DECL([build_libtool_libs], [enable_shared], [0],
 -	[Whether or not to build shared libraries])
 -])# _LT_ENABLE_SHARED
+-
+-LT_OPTION_DEFINE([LT_INIT], [shared], [_LT_ENABLE_SHARED([yes])])
+-LT_OPTION_DEFINE([LT_INIT], [disable-shared], [_LT_ENABLE_SHARED([no])])
+-
+-# Old names:
+-AC_DEFUN([AC_ENABLE_SHARED],
+-[_LT_SET_OPTION([LT_INIT], m4_if([$1], [no], [disable-])[shared])
+-])
 +dnl func_dirname_and_basename
 +dnl A portable version of this function is already defined in general.m4sh
 +dnl so there is no need for it here.
  
--LT_OPTION_DEFINE([LT_INIT], [shared], [_LT_ENABLE_SHARED([yes])])
--LT_OPTION_DEFINE([LT_INIT], [disable-shared], [_LT_ENABLE_SHARED([no])])
+-AC_DEFUN([AC_DISABLE_SHARED],
+-[_LT_SET_OPTION([LT_INIT], [disable-shared])
+-])
 +# func_stripname prefix suffix name
 +# strip PREFIX and SUFFIX off of NAME.
 +# PREFIX and SUFFIX must not contain globbing or regex special
@@ -4895,17 +5286,15 @@ Index: gnome-settings-daemon-2.30.1/aclocal.m4
 +  esac
 +}
  
--# Old names:
--AC_DEFUN([AC_ENABLE_SHARED],
--[_LT_SET_OPTION([LT_INIT], m4_if([$1], [no], [disable-])[shared])
--])
+-AU_DEFUN([AM_ENABLE_SHARED], [AC_ENABLE_SHARED($@)])
+-AU_DEFUN([AM_DISABLE_SHARED], [AC_DISABLE_SHARED($@)])
 +# sed scripts:
 +my_sed_long_opt='1s/^\(-[[^=]]*\)=.*/\1/;q'
 +my_sed_long_arg='1s/^-[[^=]]*=//'
  
--AC_DEFUN([AC_DISABLE_SHARED],
--[_LT_SET_OPTION([LT_INIT], [disable-shared])
--])
+-dnl aclocal-1.4 backwards compatibility:
+-dnl AC_DEFUN([AM_ENABLE_SHARED], [])
+-dnl AC_DEFUN([AM_DISABLE_SHARED], [])
 +# func_opt_split
 +func_opt_split ()
 +{
@@ -4913,34 +5302,16 @@ Index: gnome-settings-daemon-2.30.1/aclocal.m4
 +  func_opt_split_arg=`$ECHO "X${1}" | $Xsed -e "$my_sed_long_arg"`
 +}
  
--AU_DEFUN([AM_ENABLE_SHARED], [AC_ENABLE_SHARED($@)])
--AU_DEFUN([AM_DISABLE_SHARED], [AC_DISABLE_SHARED($@)])
 +# func_lo2o object
 +func_lo2o ()
 +{
 +  func_lo2o_result=`$ECHO "X${1}" | $Xsed -e "$lo2o"`
 +}
  
--dnl aclocal-1.4 backwards compatibility:
--dnl AC_DEFUN([AM_ENABLE_SHARED], [])
--dnl AC_DEFUN([AM_DISABLE_SHARED], [])
 +# func_xform libobj-or-source
 +func_xform ()
 +{
 +  func_xform_result=`$ECHO "X${1}" | $Xsed -e 's/\.[[^.]]*$/.lo/'`
-+}
- 
-+# func_arith arithmetic-term...
-+func_arith ()
-+{
-+  func_arith_result=`expr "$[@]"`
-+}
- 
-+# func_len string
-+# STRING may not start with a hyphen.
-+func_len ()
-+{
-+  func_len_result=`expr "$[1]" : ".*" 2>/dev/null || echo $max_cmd_len`
 +}
  
 -# _LT_ENABLE_STATIC([DEFAULT])
@@ -4971,18 +5342,38 @@ Index: gnome-settings-daemon-2.30.1/aclocal.m4
 -      ;;
 -    esac],
 -    [enable_static=]_LT_ENABLE_STATIC_DEFAULT)
-+_LT_EOF
-+esac
++# func_arith arithmetic-term...
++func_arith ()
++{
++  func_arith_result=`expr "$[@]"`
++}
  
 -    _LT_DECL([build_old_libs], [enable_static], [0],
 -	[Whether or not to build static libraries])
 -])# _LT_ENABLE_STATIC
++# func_len string
++# STRING may not start with a hyphen.
++func_len ()
++{
++  func_len_result=`expr "$[1]" : ".*" 2>/dev/null || echo $max_cmd_len`
++}
+ 
+-LT_OPTION_DEFINE([LT_INIT], [static], [_LT_ENABLE_STATIC([yes])])
+-LT_OPTION_DEFINE([LT_INIT], [disable-static], [_LT_ENABLE_STATIC([no])])
++_LT_EOF
++esac
+ 
+-# Old names:
+-AC_DEFUN([AC_ENABLE_STATIC],
+-[_LT_SET_OPTION([LT_INIT], m4_if([$1], [no], [disable-])[static])
+-])
 +case $lt_shell_append in
 +  yes)
 +    cat << \_LT_EOF >> "$cfgfile"
  
--LT_OPTION_DEFINE([LT_INIT], [static], [_LT_ENABLE_STATIC([yes])])
--LT_OPTION_DEFINE([LT_INIT], [disable-static], [_LT_ENABLE_STATIC([no])])
+-AC_DEFUN([AC_DISABLE_STATIC],
+-[_LT_SET_OPTION([LT_INIT], [disable-static])
+-])
 +# func_append var value
 +# Append VALUE to the end of shell variable VAR.
 +func_append ()
@@ -4994,10 +5385,8 @@ Index: gnome-settings-daemon-2.30.1/aclocal.m4
 +  *)
 +    cat << \_LT_EOF >> "$cfgfile"
  
--# Old names:
--AC_DEFUN([AC_ENABLE_STATIC],
--[_LT_SET_OPTION([LT_INIT], m4_if([$1], [no], [disable-])[static])
--])
+-AU_DEFUN([AM_ENABLE_STATIC], [AC_ENABLE_STATIC($@)])
+-AU_DEFUN([AM_DISABLE_STATIC], [AC_DISABLE_STATIC($@)])
 +# func_append var value
 +# Append VALUE to the end of shell variable VAR.
 +func_append ()
@@ -5005,20 +5394,14 @@ Index: gnome-settings-daemon-2.30.1/aclocal.m4
 +  eval "$[1]=\$$[1]\$[2]"
 +}
  
--AC_DEFUN([AC_DISABLE_STATIC],
--[_LT_SET_OPTION([LT_INIT], [disable-static])
-+_LT_EOF
-+    ;;
-+  esac
- ])
- 
--AU_DEFUN([AM_ENABLE_STATIC], [AC_ENABLE_STATIC($@)])
--AU_DEFUN([AM_DISABLE_STATIC], [AC_DISABLE_STATIC($@)])
--
 -dnl aclocal-1.4 backwards compatibility:
 -dnl AC_DEFUN([AM_ENABLE_STATIC], [])
 -dnl AC_DEFUN([AM_DISABLE_STATIC], [])
--
++_LT_EOF
++    ;;
++  esac
++])
+ 
 +# Helper functions for option handling.                    -*- Autoconf -*-
 +#
 +#   Copyright (C) 2004, 2005, 2007, 2008 Free Software Foundation, Inc.
@@ -5651,6 +6034,7 @@ Index: gnome-settings-daemon-2.30.1/aclocal.m4
  ])
  
 -# pkg.m4 - Macros to locate and utilise pkg-config.            -*- Autoconf -*-
+-# serial 1 (pkg-config-0.24)
 -# 
 -# Copyright © 2004 Scott James Remnant <scott@netsplit.com>.
 -#
@@ -5681,7 +6065,10 @@ Index: gnome-settings-daemon-2.30.1/aclocal.m4
 -AC_DEFUN([PKG_PROG_PKG_CONFIG],
 -[m4_pattern_forbid([^_?PKG_[A-Z_]+$])
 -m4_pattern_allow([^PKG_CONFIG(_PATH)?$])
--AC_ARG_VAR([PKG_CONFIG], [path to pkg-config utility])dnl
+-AC_ARG_VAR([PKG_CONFIG], [path to pkg-config utility])
+-AC_ARG_VAR([PKG_CONFIG_PATH], [directories to add to pkg-config's search path])
+-AC_ARG_VAR([PKG_CONFIG_LIBDIR], [path overriding pkg-config's built-in search path])
+ 
 -if test "x$ac_cv_env_PKG_CONFIG_set" != "xset"; then
 -	AC_PATH_TOOL([PKG_CONFIG], [pkg-config])
 -fi
@@ -5694,28 +6081,8 @@ Index: gnome-settings-daemon-2.30.1/aclocal.m4
 -		AC_MSG_RESULT([no])
 -		PKG_CONFIG=""
 -	fi
--		
 -fi[]dnl
 -])# PKG_PROG_PKG_CONFIG
- 
--# PKG_CHECK_EXISTS(MODULES, [ACTION-IF-FOUND], [ACTION-IF-NOT-FOUND])
--#
--# Check to see whether a particular set of modules exists.  Similar
--# to PKG_CHECK_MODULES(), but does not set variables or print errors.
--#
--#
--# Similar to PKG_CHECK_MODULES, make sure that the first instance of
--# this or PKG_CHECK_MODULES is called, or make sure to call
--# PKG_CHECK_EXISTS manually
--# --------------------------------------------------------------
--AC_DEFUN([PKG_CHECK_EXISTS],
--[AC_REQUIRE([PKG_PROG_PKG_CONFIG])dnl
--if test -n "$PKG_CONFIG" && \
--    AC_RUN_LOG([$PKG_CONFIG --exists --print-errors "$1"]); then
--  m4_ifval([$2], [$2], [:])
--m4_ifvaln([$3], [else
--  $3])dnl
--fi])
 +# _LT_WITH_PIC([MODE])
 +# --------------------
 +# implement the --with-pic flag, and support the `pic-only' and `no-pic'
@@ -5727,37 +6094,42 @@ Index: gnome-settings-daemon-2.30.1/aclocal.m4
 +	[try to use only PIC/non-PIC objects @<:@default=use both@:>@])],
 +    [pic_mode="$withval"],
 +    [pic_mode=default])
-+
-+test -z "$pic_mode" && pic_mode=m4_default([$1], [default])
-+
-+_LT_DECL([], [pic_mode], [0], [What type of objects to build])dnl
-+])# _LT_WITH_PIC
  
-+LT_OPTION_DEFINE([LT_INIT], [pic-only], [_LT_WITH_PIC([yes])])
-+LT_OPTION_DEFINE([LT_INIT], [no-pic], [_LT_WITH_PIC([no])])
+-# PKG_CHECK_EXISTS(MODULES, [ACTION-IF-FOUND], [ACTION-IF-NOT-FOUND])
+-#
+-# Check to see whether a particular set of modules exists.  Similar
+-# to PKG_CHECK_MODULES(), but does not set variables or print errors.
+-#
+-# Please remember that m4 expands AC_REQUIRE([PKG_PROG_PKG_CONFIG])
+-# only at the first occurence in configure.ac, so if the first place
+-# it's called might be skipped (such as if it is within an "if", you
+-# have to call PKG_CHECK_EXISTS manually
+-# --------------------------------------------------------------
+-AC_DEFUN([PKG_CHECK_EXISTS],
+-[AC_REQUIRE([PKG_PROG_PKG_CONFIG])dnl
+-if test -n "$PKG_CONFIG" && \
+-    AC_RUN_LOG([$PKG_CONFIG --exists --print-errors "$1"]); then
+-  m4_default([$2], [:])
+-m4_ifvaln([$3], [else
+-  $3])dnl
+-fi])
++test -z "$pic_mode" && pic_mode=m4_default([$1], [default])
  
 -# _PKG_CONFIG([VARIABLE], [COMMAND], [MODULES])
 -# ---------------------------------------------
 -m4_define([_PKG_CONFIG],
--[if test -n "$PKG_CONFIG"; then
--    if test -n "$$1"; then
--        pkg_cv_[]$1="$$1"
--    else
--        PKG_CHECK_EXISTS([$3],
--                         [pkg_cv_[]$1=`$PKG_CONFIG --[]$2 "$3" 2>/dev/null`],
--			 [pkg_failed=yes])
--    fi
--else
--	pkg_failed=untried
+-[if test -n "$$1"; then
+-    pkg_cv_[]$1="$$1"
+- elif test -n "$PKG_CONFIG"; then
+-    PKG_CHECK_EXISTS([$3],
+-                     [pkg_cv_[]$1=`$PKG_CONFIG --[]$2 "$3" 2>/dev/null`],
+-		     [pkg_failed=yes])
+- else
+-    pkg_failed=untried
 -fi[]dnl
 -])# _PKG_CONFIG
-+# Old name:
-+AU_DEFUN([AC_LIBTOOL_PICMODE],
-+[_LT_SET_OPTION([LT_INIT], [pic-only])
-+AC_DIAGNOSE([obsolete],
-+[$0: Remove this warning and the call to _LT_SET_OPTION when you
-+put the `pic-only' option into LT_INIT's first parameter.])
-+])
++_LT_DECL([], [pic_mode], [0], [What type of objects to build])dnl
++])# _LT_WITH_PIC
  
 -# _PKG_SHORT_ERRORS_SUPPORTED
 -# -----------------------------
@@ -5769,9 +6141,19 @@ Index: gnome-settings-daemon-2.30.1/aclocal.m4
 -        _pkg_short_errors_supported=no
 -fi[]dnl
 -])# _PKG_SHORT_ERRORS_SUPPORTED
++LT_OPTION_DEFINE([LT_INIT], [pic-only], [_LT_WITH_PIC([yes])])
++LT_OPTION_DEFINE([LT_INIT], [no-pic], [_LT_WITH_PIC([no])])
++
++# Old name:
++AU_DEFUN([AC_LIBTOOL_PICMODE],
++[_LT_SET_OPTION([LT_INIT], [pic-only])
++AC_DIAGNOSE([obsolete],
++[$0: Remove this warning and the call to _LT_SET_OPTION when you
++put the `pic-only' option into LT_INIT's first parameter.])
++])
+ 
 +dnl aclocal-1.4 backwards compatibility:
 +dnl AC_DEFUN([AC_LIBTOOL_PICMODE], [])
- 
  
 -# PKG_CHECK_MODULES(VARIABLE-PREFIX, MODULES, [ACTION-IF-FOUND],
 -# [ACTION-IF-NOT-FOUND])
@@ -5780,6 +6162,7 @@ Index: gnome-settings-daemon-2.30.1/aclocal.m4
 -# Note that if there is a possibility the first call to
 -# PKG_CHECK_MODULES might not happen, you should be sure to include an
 -# explicit call to PKG_PROG_PKG_CONFIG in your configure.ac
++
 +m4_define([_LTDL_MODE], [])
 +LT_OPTION_DEFINE([LTDL_INIT], [nonrecursive],
 +		 [m4_define([_LTDL_MODE], [nonrecursive])])
@@ -5822,11 +6205,12 @@ Index: gnome-settings-daemon-2.30.1/aclocal.m4
 -See the pkg-config man page for more details.])
  
 -if test $pkg_failed = yes; then
+-   	AC_MSG_RESULT([no])
 -        _PKG_SHORT_ERRORS_SUPPORTED
 -        if test $_pkg_short_errors_supported = yes; then
--	        $1[]_PKG_ERRORS=`$PKG_CONFIG --short-errors --errors-to-stdout --print-errors "$2"`
+-	        $1[]_PKG_ERRORS=`$PKG_CONFIG --short-errors --print-errors "$2" 2>&1`
 -        else 
--	        $1[]_PKG_ERRORS=`$PKG_CONFIG --errors-to-stdout --print-errors "$2"`
+-	        $1[]_PKG_ERRORS=`$PKG_CONFIG --print-errors "$2" 2>&1`
 -        fi
 -	# Put the nasty error message in config.log where it belongs
 -	echo "$$1[]_PKG_ERRORS" >&AS_MESSAGE_LOG_FD
@@ -5844,7 +6228,7 @@ Index: gnome-settings-daemon-2.30.1/aclocal.m4
 +[m4_if([$#$2], [2], [],
 +       [m4_if([$2], [], [], [[$1$2]])$0([$1], m4_shift(m4_shift($@)))])])
  
--	ifelse([$4], , [AC_MSG_ERROR(dnl
+-	m4_default([$4], [AC_MSG_ERROR(
 -[Package requirements ($2) were not met:
  
 -$$1_PKG_ERRORS
@@ -5864,12 +6248,11 @@ Index: gnome-settings-daemon-2.30.1/aclocal.m4
 -Consider adjusting the PKG_CONFIG_PATH environment variable if you
 -installed software in a non-standard prefix.
  
--_PKG_TEXT
--])],
--		[AC_MSG_RESULT([no])
--                $4])
+-_PKG_TEXT])dnl
+-        ])
 -elif test $pkg_failed = untried; then
--	ifelse([$4], , [AC_MSG_FAILURE(dnl
+-     	AC_MSG_RESULT([no])
+-	m4_default([$4], [AC_MSG_FAILURE(
 -[The pkg-config script could not be found or is too old.  Make sure it
 -is in your PATH or set the PKG_CONFIG environment variable to the full
 -path to pkg-config.
@@ -5889,13 +6272,13 @@ Index: gnome-settings-daemon-2.30.1/aclocal.m4
  
 -_PKG_TEXT
  
--To get pkg-config, see <http://pkg-config.freedesktop.org/>.])],
--		[$4])
+-To get pkg-config, see <http://pkg-config.freedesktop.org/>.])dnl
+-        ])
 -else
 -	$1[]_CFLAGS=$pkg_cv_[]$1[]_CFLAGS
 -	$1[]_LIBS=$pkg_cv_[]$1[]_LIBS
 -        AC_MSG_RESULT([yes])
--	ifelse([$3], , :, [$3])
+-	$3
 -fi[]dnl
 -])# PKG_CHECK_MODULES
  
@@ -6011,7 +6394,6 @@ Index: gnome-settings-daemon-2.30.1/aclocal.m4
 +# --------------------------------------------
 +m4_define([lt_dict_add_subkey],
 +[m4_define([$1($2:$3)], [$4])])
-+
  
 -AC_DEFUN([AM_AUX_DIR_EXPAND],
 -[dnl Rely on autoconf to set up CDPATH properly.
@@ -6019,6 +6401,8 @@ Index: gnome-settings-daemon-2.30.1/aclocal.m4
 -# expand $ac_aux_dir to an absolute path
 -am_aux_dir=`cd $ac_aux_dir && pwd`
 -])
+ 
+-# AM_CONDITIONAL                                            -*- Autoconf -*-
 +# lt_dict_fetch(DICT, KEY, [SUBKEY])
 +# ----------------------------------
 +m4_define([lt_dict_fetch],
@@ -6026,22 +6410,20 @@ Index: gnome-settings-daemon-2.30.1/aclocal.m4
 +	m4_ifdef([$1($2:$3)], [m4_defn([$1($2:$3)])]),
 +    m4_ifdef([$1($2)], [m4_defn([$1($2)])]))])
  
--# AM_CONDITIONAL                                            -*- Autoconf -*-
- 
 -# Copyright (C) 1997, 2000, 2001, 2003, 2004, 2005, 2006, 2008
 -# Free Software Foundation, Inc.
 -#
 -# This file is free software; the Free Software Foundation
 -# gives unlimited permission to copy and/or distribute it,
 -# with or without modifications, as long as this notice is preserved.
+ 
+-# serial 9
 +# lt_if_dict_fetch(DICT, KEY, [SUBKEY], VALUE, IF-TRUE, [IF-FALSE])
 +# -----------------------------------------------------------------
 +m4_define([lt_if_dict_fetch],
 +[m4_if(lt_dict_fetch([$1], [$2], [$3]), [$4],
 +	[$5],
 +    [$6])])
- 
--# serial 9
  
 -# AM_CONDITIONAL(NAME, SHELL-CONDITION)
 -# -------------------------------------
@@ -6067,6 +6449,9 @@ Index: gnome-settings-daemon-2.30.1/aclocal.m4
 -  AC_MSG_ERROR([[conditional "$1" was never defined.
 -Usually this means the macro was only invoked conditionally.]])
 -fi])])
+ 
+-# Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2009
+-# Free Software Foundation, Inc.
 +# lt_dict_filter(DICT, [SUBKEY], VALUE, [SEPARATOR], KEY, [...])
 +# --------------------------------------------------------------
 +m4_define([lt_dict_filter],
@@ -6075,9 +6460,7 @@ Index: gnome-settings-daemon-2.30.1/aclocal.m4
 +           lt_unquote(m4_split(m4_normalize(m4_foreach(_Lt_key, lt_car([m4_shiftn(4, $@)]),
 +		      [lt_if_dict_fetch([$1], _Lt_key, [$2], [$3], [_Lt_key ])])))))])[]dnl
 +])
- 
--# Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2009
--# Free Software Foundation, Inc.
++
 +# ltversion.m4 -- version numbers			-*- Autoconf -*-
  #
 -# This file is free software; the Free Software Foundation
@@ -6337,8 +6720,9 @@ Index: gnome-settings-daemon-2.30.1/aclocal.m4
 -  test "x$enable_dependency_tracking" != xno \
 -  && test "$am_cv_$1_dependencies_compiler_type" = gcc3])
 -])
-+# nls.m4 serial 3 (gettext-0.15)
-+dnl Copyright (C) 1995-2003, 2005-2006 Free Software Foundation, Inc.
++# nls.m4 serial 5 (gettext-0.18)
++dnl Copyright (C) 1995-2003, 2005-2006, 2008-2010 Free Software Foundation,
++dnl Inc.
 +dnl This file is free software; the Free Software Foundation
 +dnl gives unlimited permission to copy and/or distribute it,
 +dnl with or without modifications, as long as this notice is preserved.
@@ -6363,20 +6747,21 @@ Index: gnome-settings-daemon-2.30.1/aclocal.m4
 -AC_DEFUN([AM_SET_DEPDIR],
 -[AC_REQUIRE([AM_SET_LEADING_DOT])dnl
 -AC_SUBST([DEPDIR], ["${am__leading_dot}deps"])dnl
-+AC_PREREQ(2.50)
++AC_PREREQ([2.50])
 +
 +AC_DEFUN([AM_NLS],
 +[
 +  AC_MSG_CHECKING([whether NLS is requested])
 +  dnl Default is enabled NLS
-+  AC_ARG_ENABLE(nls,
++  AC_ARG_ENABLE([nls],
 +    [  --disable-nls           do not use Native Language Support],
 +    USE_NLS=$enableval, USE_NLS=yes)
-+  AC_MSG_RESULT($USE_NLS)
-+  AC_SUBST(USE_NLS)
++  AC_MSG_RESULT([$USE_NLS])
++  AC_SUBST([USE_NLS])
  ])
  
 +# pkg.m4 - Macros to locate and utilise pkg-config.            -*- Autoconf -*-
++# serial 1 (pkg-config-0.24)
 +# 
 +# Copyright © 2004 Scott James Remnant <scott@netsplit.com>.
 +#
@@ -6408,21 +6793,24 @@ Index: gnome-settings-daemon-2.30.1/aclocal.m4
 -if test "x$enable_dependency_tracking" != xno; then
 -  am_depcomp="$ac_aux_dir/depcomp"
 -  AMDEPBACKSLASH='\'
+-fi
+-AM_CONDITIONAL([AMDEP], [test "x$enable_dependency_tracking" != xno])
+-AC_SUBST([AMDEPBACKSLASH])dnl
+-_AM_SUBST_NOTMAKE([AMDEPBACKSLASH])dnl
+-])
 +# PKG_PROG_PKG_CONFIG([MIN-VERSION])
 +# ----------------------------------
 +AC_DEFUN([PKG_PROG_PKG_CONFIG],
 +[m4_pattern_forbid([^_?PKG_[A-Z_]+$])
 +m4_pattern_allow([^PKG_CONFIG(_PATH)?$])
-+AC_ARG_VAR([PKG_CONFIG], [path to pkg-config utility])dnl
++AC_ARG_VAR([PKG_CONFIG], [path to pkg-config utility])
++AC_ARG_VAR([PKG_CONFIG_PATH], [directories to add to pkg-config's search path])
++AC_ARG_VAR([PKG_CONFIG_LIBDIR], [path overriding pkg-config's built-in search path])
+ 
+-# Generate code to set up dependency tracking.              -*- Autoconf -*-
 +if test "x$ac_cv_env_PKG_CONFIG_set" != "xset"; then
 +	AC_PATH_TOOL([PKG_CONFIG], [pkg-config])
- fi
--AM_CONDITIONAL([AMDEP], [test "x$enable_dependency_tracking" != xno])
--AC_SUBST([AMDEPBACKSLASH])dnl
--_AM_SUBST_NOTMAKE([AMDEPBACKSLASH])dnl
--])
--
--# Generate code to set up dependency tracking.              -*- Autoconf -*-
++fi
 +if test -n "$PKG_CONFIG"; then
 +	_pkg_min_version=m4_default([$1], [0.9.0])
 +	AC_MSG_CHECKING([pkg-config is at least version $_pkg_min_version])
@@ -6432,7 +6820,6 @@ Index: gnome-settings-daemon-2.30.1/aclocal.m4
 +		AC_MSG_RESULT([no])
 +		PKG_CONFIG=""
 +	fi
-+		
 +fi[]dnl
 +])# PKG_PROG_PKG_CONFIG
  
@@ -6446,21 +6833,34 @@ Index: gnome-settings-daemon-2.30.1/aclocal.m4
 +# Check to see whether a particular set of modules exists.  Similar
 +# to PKG_CHECK_MODULES(), but does not set variables or print errors.
 +#
-+#
-+# Similar to PKG_CHECK_MODULES, make sure that the first instance of
-+# this or PKG_CHECK_MODULES is called, or make sure to call
-+# PKG_CHECK_EXISTS manually
++# Please remember that m4 expands AC_REQUIRE([PKG_PROG_PKG_CONFIG])
++# only at the first occurence in configure.ac, so if the first place
++# it's called might be skipped (such as if it is within an "if", you
++# have to call PKG_CHECK_EXISTS manually
 +# --------------------------------------------------------------
 +AC_DEFUN([PKG_CHECK_EXISTS],
 +[AC_REQUIRE([PKG_PROG_PKG_CONFIG])dnl
 +if test -n "$PKG_CONFIG" && \
 +    AC_RUN_LOG([$PKG_CONFIG --exists --print-errors "$1"]); then
-+  m4_ifval([$2], [$2], [:])
++  m4_default([$2], [:])
 +m4_ifvaln([$3], [else
 +  $3])dnl
 +fi])
  
 -#serial 5
++# _PKG_CONFIG([VARIABLE], [COMMAND], [MODULES])
++# ---------------------------------------------
++m4_define([_PKG_CONFIG],
++[if test -n "$$1"; then
++    pkg_cv_[]$1="$$1"
++ elif test -n "$PKG_CONFIG"; then
++    PKG_CHECK_EXISTS([$3],
++                     [pkg_cv_[]$1=`$PKG_CONFIG --[]$2 "$3" 2>/dev/null`],
++		     [pkg_failed=yes])
++ else
++    pkg_failed=untried
++fi[]dnl
++])# _PKG_CONFIG
  
 -# _AM_OUTPUT_DEPENDENCY_COMMANDS
 -# ------------------------------
@@ -6487,18 +6887,9 @@ Index: gnome-settings-daemon-2.30.1/aclocal.m4
 -    # limit of 2048, but all sed's we know have understand at least 4000.
 -    if sed -n 's,^#.*generated by automake.*,X,p' "$mf" | grep X >/dev/null 2>&1; then
 -      dirpart=`AS_DIRNAME("$mf")`
-+# _PKG_CONFIG([VARIABLE], [COMMAND], [MODULES])
-+# ---------------------------------------------
-+m4_define([_PKG_CONFIG],
-+[if test -n "$PKG_CONFIG"; then
-+    if test -n "$$1"; then
-+        pkg_cv_[]$1="$$1"
-     else
+-    else
 -      continue
-+        PKG_CHECK_EXISTS([$3],
-+                         [pkg_cv_[]$1=`$PKG_CONFIG --[]$2 "$3" 2>/dev/null`],
-+			 [pkg_failed=yes])
-     fi
+-    fi
 -    # Extract the definition of DEPDIR, am__include, and am__quote
 -    # from the Makefile without running `make'.
 -    DEPDIR=`sed -n 's/^DEPDIR = //p' < "$mf"`
@@ -6525,11 +6916,6 @@ Index: gnome-settings-daemon-2.30.1/aclocal.m4
 -  done
 -}
 -])# _AM_OUTPUT_DEPENDENCY_COMMANDS
-+else
-+	pkg_failed=untried
-+fi[]dnl
-+])# _PKG_CONFIG
-+
 +# _PKG_SHORT_ERRORS_SUPPORTED
 +# -----------------------------
 +AC_DEFUN([_PKG_SHORT_ERRORS_SUPPORTED],
@@ -6587,17 +6973,18 @@ Index: gnome-settings-daemon-2.30.1/aclocal.m4
 -# gives unlimited permission to copy and/or distribute it,
 -# with or without modifications, as long as this notice is preserved.
 +if test $pkg_failed = yes; then
++   	AC_MSG_RESULT([no])
 +        _PKG_SHORT_ERRORS_SUPPORTED
 +        if test $_pkg_short_errors_supported = yes; then
-+	        $1[]_PKG_ERRORS=`$PKG_CONFIG --short-errors --errors-to-stdout --print-errors "$2"`
++	        $1[]_PKG_ERRORS=`$PKG_CONFIG --short-errors --print-errors "$2" 2>&1`
 +        else 
-+	        $1[]_PKG_ERRORS=`$PKG_CONFIG --errors-to-stdout --print-errors "$2"`
++	        $1[]_PKG_ERRORS=`$PKG_CONFIG --print-errors "$2" 2>&1`
 +        fi
 +	# Put the nasty error message in config.log where it belongs
 +	echo "$$1[]_PKG_ERRORS" >&AS_MESSAGE_LOG_FD
  
 -# serial 16
-+	ifelse([$4], , [AC_MSG_ERROR(dnl
++	m4_default([$4], [AC_MSG_ERROR(
 +[Package requirements ($2) were not met:
  
 -# This macro actually does too much.  Some checks are only needed if
@@ -6643,12 +7030,11 @@ Index: gnome-settings-daemon-2.30.1/aclocal.m4
 -  fi
 -fi
 -AC_SUBST([CYGPATH_W])
-+_PKG_TEXT
-+])],
-+		[AC_MSG_RESULT([no])
-+                $4])
++_PKG_TEXT])dnl
++        ])
 +elif test $pkg_failed = untried; then
-+	ifelse([$4], , [AC_MSG_FAILURE(dnl
++     	AC_MSG_RESULT([no])
++	m4_default([$4], [AC_MSG_FAILURE(
 +[The pkg-config script could not be found or is too old.  Make sure it
 +is in your PATH or set the PKG_CONFIG environment variable to the full
 +path to pkg-config.
@@ -6670,13 +7056,13 @@ Index: gnome-settings-daemon-2.30.1/aclocal.m4
 -_AM_IF_OPTION([no-define],,
 -[AC_DEFINE_UNQUOTED(PACKAGE, "$PACKAGE", [Name of package])
 - AC_DEFINE_UNQUOTED(VERSION, "$VERSION", [Version number of package])])dnl
-+To get pkg-config, see <http://pkg-config.freedesktop.org/>.])],
-+		[$4])
++To get pkg-config, see <http://pkg-config.freedesktop.org/>.])dnl
++        ])
 +else
 +	$1[]_CFLAGS=$pkg_cv_[]$1[]_CFLAGS
 +	$1[]_LIBS=$pkg_cv_[]$1[]_LIBS
 +        AC_MSG_RESULT([yes])
-+	ifelse([$3], , :, [$3])
++	$3
 +fi[]dnl
 +])# PKG_CHECK_MODULES
  
@@ -8770,259 +9156,10 @@ Index: gnome-settings-daemon-2.30.1/aclocal.m4
 +]) # _AM_PROG_TAR
  
  m4_include([acinclude.m4])
-Index: gnome-settings-daemon-2.30.1/config.guess
+Index: gnome-settings-daemon-2.30.2/config.h.in
 ===================================================================
---- gnome-settings-daemon-2.30.1.orig/config.guess	2010-04-27 19:56:48.634028254 +0200
-+++ gnome-settings-daemon-2.30.1/config.guess	2010-04-27 19:56:42.905524783 +0200
-@@ -1,10 +1,10 @@
- #! /bin/sh
- # Attempt to guess a canonical system name.
- #   Copyright (C) 1992, 1993, 1994, 1995, 1996, 1997, 1998, 1999,
--#   2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009
-+#   2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010
- #   Free Software Foundation, Inc.
- 
--timestamp='2009-06-10'
-+timestamp='2009-12-30'
- 
- # This file is free software; you can redistribute it and/or modify it
- # under the terms of the GNU General Public License as published by
-@@ -27,16 +27,16 @@ timestamp='2009-06-10'
- # the same distribution terms that you use for the rest of that program.
- 
- 
--# Originally written by Per Bothner <per@bothner.com>.
--# Please send patches to <config-patches@gnu.org>.  Submit a context
--# diff and a properly formatted ChangeLog entry.
-+# Originally written by Per Bothner.  Please send patches (context
-+# diff format) to <config-patches@gnu.org> and include a ChangeLog
-+# entry.
- #
- # This script attempts to guess a canonical system name similar to
- # config.sub.  If it succeeds, it prints the system name on stdout, and
- # exits with 0.  Otherwise, it exits with 1.
- #
--# The plan is that this can be called by configure scripts if you
--# don't specify an explicit build system type.
-+# You can get the latest version of this script from:
-+# http://git.savannah.gnu.org/gitweb/?p=config.git;a=blob_plain;f=config.guess;hb=HEAD
- 
- me=`echo "$0" | sed -e 's,.*/,,'`
- 
-@@ -56,8 +56,9 @@ version="\
- GNU config.guess ($timestamp)
- 
- Originally written by Per Bothner.
--Copyright (C) 1992, 1993, 1994, 1995, 1996, 1997, 1998, 1999, 2000, 2001,
--2002, 2003, 2004, 2005, 2006, 2007, 2008 Free Software Foundation, Inc.
-+Copyright (C) 1992, 1993, 1994, 1995, 1996, 1997, 1998, 1999, 2000,
-+2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010 Free
-+Software Foundation, Inc.
- 
- This is free software; see the source for copying conditions.  There is NO
- warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE."
-@@ -333,6 +334,9 @@ case "${UNAME_MACHINE}:${UNAME_SYSTEM}:$
-     sun4*:SunOS:5.*:* | tadpole*:SunOS:5.*:*)
- 	echo sparc-sun-solaris2`echo ${UNAME_RELEASE}|sed -e 's/[^.]*//'`
- 	exit ;;
-+    i86pc:AuroraUX:5.*:* | i86xen:AuroraUX:5.*:*)
-+	echo i386-pc-auroraux${UNAME_RELEASE}
-+	exit ;;
-     i86pc:SunOS:5.*:* | i86xen:SunOS:5.*:*)
- 	eval $set_cc_for_build
- 	SUN_ARCH="i386"
-@@ -807,12 +811,12 @@ EOF
-     i*:PW*:*)
- 	echo ${UNAME_MACHINE}-pc-pw32
- 	exit ;;
--    *:Interix*:[3456]*)
-+    *:Interix*:*)
-     	case ${UNAME_MACHINE} in
- 	    x86)
- 		echo i586-pc-interix${UNAME_RELEASE}
- 		exit ;;
--	    EM64T | authenticamd | genuineintel)
-+	    authenticamd | genuineintel | EM64T)
- 		echo x86_64-unknown-interix${UNAME_RELEASE}
- 		exit ;;
- 	    IA64)
-@@ -854,6 +858,20 @@ EOF
-     i*86:Minix:*:*)
- 	echo ${UNAME_MACHINE}-pc-minix
- 	exit ;;
-+    alpha:Linux:*:*)
-+	case `sed -n '/^cpu model/s/^.*: \(.*\)/\1/p' < /proc/cpuinfo` in
-+	  EV5)   UNAME_MACHINE=alphaev5 ;;
-+	  EV56)  UNAME_MACHINE=alphaev56 ;;
-+	  PCA56) UNAME_MACHINE=alphapca56 ;;
-+	  PCA57) UNAME_MACHINE=alphapca56 ;;
-+	  EV6)   UNAME_MACHINE=alphaev6 ;;
-+	  EV67)  UNAME_MACHINE=alphaev67 ;;
-+	  EV68*) UNAME_MACHINE=alphaev68 ;;
-+        esac
-+	objdump --private-headers /bin/sh | grep -q ld.so.1
-+	if test "$?" = 0 ; then LIBC="libc1" ; else LIBC="" ; fi
-+	echo ${UNAME_MACHINE}-unknown-linux-gnu${LIBC}
-+	exit ;;
-     arm*:Linux:*:*)
- 	eval $set_cc_for_build
- 	if echo __ARM_EABI__ | $CC_FOR_BUILD -E - 2>/dev/null \
-@@ -876,6 +894,17 @@ EOF
-     frv:Linux:*:*)
-     	echo frv-unknown-linux-gnu
- 	exit ;;
-+    i*86:Linux:*:*)
-+	LIBC=gnu
-+	eval $set_cc_for_build
-+	sed 's/^	//' << EOF >$dummy.c
-+	#ifdef __dietlibc__
-+	LIBC=dietlibc
-+	#endif
-+EOF
-+	eval `$CC_FOR_BUILD -E $dummy.c 2>/dev/null | grep '^LIBC'`
-+	echo "${UNAME_MACHINE}-pc-linux-${LIBC}"
-+	exit ;;
-     ia64:Linux:*:*)
- 	echo ${UNAME_MACHINE}-unknown-linux-gnu
- 	exit ;;
-@@ -901,39 +930,18 @@ EOF
- 	#endif
- 	#endif
- EOF
--	eval "`$CC_FOR_BUILD -E $dummy.c 2>/dev/null | sed -n '
--	    /^CPU/{
--		s: ::g
--		p
--	    }'`"
-+	eval `$CC_FOR_BUILD -E $dummy.c 2>/dev/null | grep '^CPU'`
- 	test x"${CPU}" != x && { echo "${CPU}-unknown-linux-gnu"; exit; }
- 	;;
-     or32:Linux:*:*)
- 	echo or32-unknown-linux-gnu
- 	exit ;;
--    ppc:Linux:*:*)
--	echo powerpc-unknown-linux-gnu
--	exit ;;
--    ppc64:Linux:*:*)
--	echo powerpc64-unknown-linux-gnu
--	exit ;;
--    alpha:Linux:*:*)
--	case `sed -n '/^cpu model/s/^.*: \(.*\)/\1/p' < /proc/cpuinfo` in
--	  EV5)   UNAME_MACHINE=alphaev5 ;;
--	  EV56)  UNAME_MACHINE=alphaev56 ;;
--	  PCA56) UNAME_MACHINE=alphapca56 ;;
--	  PCA57) UNAME_MACHINE=alphapca56 ;;
--	  EV6)   UNAME_MACHINE=alphaev6 ;;
--	  EV67)  UNAME_MACHINE=alphaev67 ;;
--	  EV68*) UNAME_MACHINE=alphaev68 ;;
--        esac
--	objdump --private-headers /bin/sh | grep -q ld.so.1
--	if test "$?" = 0 ; then LIBC="libc1" ; else LIBC="" ; fi
--	echo ${UNAME_MACHINE}-unknown-linux-gnu${LIBC}
--	exit ;;
-     padre:Linux:*:*)
- 	echo sparc-unknown-linux-gnu
- 	exit ;;
-+    parisc64:Linux:*:* | hppa64:Linux:*:*)
-+	echo hppa64-unknown-linux-gnu
-+	exit ;;
-     parisc:Linux:*:* | hppa:Linux:*:*)
- 	# Look for CPU level
- 	case `grep '^cpu[^a-z]*:' /proc/cpuinfo 2>/dev/null | cut -d' ' -f2` in
-@@ -942,8 +950,11 @@ EOF
- 	  *)    echo hppa-unknown-linux-gnu ;;
- 	esac
- 	exit ;;
--    parisc64:Linux:*:* | hppa64:Linux:*:*)
--	echo hppa64-unknown-linux-gnu
-+    ppc64:Linux:*:*)
-+	echo powerpc64-unknown-linux-gnu
-+	exit ;;
-+    ppc:Linux:*:*)
-+	echo powerpc-unknown-linux-gnu
- 	exit ;;
-     s390:Linux:*:* | s390x:Linux:*:*)
- 	echo ${UNAME_MACHINE}-ibm-linux
-@@ -966,58 +977,6 @@ EOF
-     xtensa*:Linux:*:*)
-     	echo ${UNAME_MACHINE}-unknown-linux-gnu
- 	exit ;;
--    i*86:Linux:*:*)
--	# The BFD linker knows what the default object file format is, so
--	# first see if it will tell us. cd to the root directory to prevent
--	# problems with other programs or directories called `ld' in the path.
--	# Set LC_ALL=C to ensure ld outputs messages in English.
--	ld_supported_targets=`cd /; LC_ALL=C ld --help 2>&1 \
--			 | sed -ne '/supported targets:/!d
--				    s/[ 	][ 	]*/ /g
--				    s/.*supported targets: *//
--				    s/ .*//
--				    p'`
--        case "$ld_supported_targets" in
--	  elf32-i386)
--		TENTATIVE="${UNAME_MACHINE}-pc-linux-gnu"
--		;;
--	esac
--	# Determine whether the default compiler is a.out or elf
--	eval $set_cc_for_build
--	sed 's/^	//' << EOF >$dummy.c
--	#include <features.h>
--	#ifdef __ELF__
--	# ifdef __GLIBC__
--	#  if __GLIBC__ >= 2
--	LIBC=gnu
--	#  else
--	LIBC=gnulibc1
--	#  endif
--	# else
--	LIBC=gnulibc1
--	# endif
--	#else
--	#if defined(__INTEL_COMPILER) || defined(__PGI) || defined(__SUNPRO_C) || defined(__SUNPRO_CC)
--	LIBC=gnu
--	#else
--	LIBC=gnuaout
--	#endif
--	#endif
--	#ifdef __dietlibc__
--	LIBC=dietlibc
--	#endif
--EOF
--	eval "`$CC_FOR_BUILD -E $dummy.c 2>/dev/null | sed -n '
--	    /^LIBC/{
--		s: ::g
--		p
--	    }'`"
--	test x"${LIBC}" != x && {
--		echo "${UNAME_MACHINE}-pc-linux-${LIBC}"
--		exit
--	}
--	test x"${TENTATIVE}" != x && { echo "${TENTATIVE}"; exit; }
--	;;
-     i*86:DYNIX/ptx:4*:*)
- 	# ptx 4.0 does uname -s correctly, with DYNIX/ptx in there.
- 	# earlier versions are messed up and put the nodename in both
-@@ -1247,6 +1206,16 @@ EOF
-     *:Darwin:*:*)
- 	UNAME_PROCESSOR=`uname -p` || UNAME_PROCESSOR=unknown
- 	case $UNAME_PROCESSOR in
-+	    i386)
-+		eval $set_cc_for_build
-+		if [ "$CC_FOR_BUILD" != 'no_compiler_found' ]; then
-+		  if (echo '#ifdef __LP64__'; echo IS_64BIT_ARCH; echo '#endif') | \
-+		      (CCOPTS= $CC_FOR_BUILD -E - 2>/dev/null) | \
-+		      grep IS_64BIT_ARCH >/dev/null
-+		  then
-+		      UNAME_PROCESSOR="x86_64"
-+		  fi
-+		fi ;;
- 	    unknown) UNAME_PROCESSOR=powerpc ;;
- 	esac
- 	echo ${UNAME_PROCESSOR}-apple-darwin${UNAME_RELEASE}
-Index: gnome-settings-daemon-2.30.1/config.h.in
-===================================================================
---- gnome-settings-daemon-2.30.1.orig/config.h.in	2010-04-26 14:22:48.000000000 +0200
-+++ gnome-settings-daemon-2.30.1/config.h.in	2010-04-27 19:56:45.885527341 +0200
+--- gnome-settings-daemon-2.30.2.orig/config.h.in	2010-07-23 00:54:34.481453276 +0200
++++ gnome-settings-daemon-2.30.2/config.h.in	2010-07-23 00:54:20.041448358 +0200
 @@ -24,6 +24,9 @@
  /* Define if the GNU gettext() function is already present or preinstalled. */
  #undef HAVE_GETTEXT
@@ -9033,11 +9170,11 @@ Index: gnome-settings-daemon-2.30.1/config.h.in
  /* Define to 1 if you have the <inttypes.h> header file. */
  #undef HAVE_INTTYPES_H
  
-Index: gnome-settings-daemon-2.30.1/configure
+Index: gnome-settings-daemon-2.30.2/configure
 ===================================================================
---- gnome-settings-daemon-2.30.1.orig/configure	2010-04-26 14:22:48.000000000 +0200
-+++ gnome-settings-daemon-2.30.1/configure	2010-04-27 19:56:46.729523229 +0200
-@@ -750,6 +750,10 @@ LTLIBOBJS
+--- gnome-settings-daemon-2.30.2.orig/configure	2010-07-23 00:54:36.925449788 +0200
++++ gnome-settings-daemon-2.30.2/configure	2010-07-23 00:54:24.589447485 +0200
+@@ -750,6 +750,10 @@
  LIBOBJS
  DEBUG_CFLAGS
  plugindir
@@ -9048,7 +9185,7 @@ Index: gnome-settings-daemon-2.30.1/configure
  HAVE_PULSE_FALSE
  HAVE_PULSE_TRUE
  PULSE_LIBS
-@@ -884,6 +888,9 @@ CPPFLAGS
+@@ -886,6 +890,9 @@
  LDFLAGS
  CFLAGS
  CC
@@ -9058,7 +9195,7 @@ Index: gnome-settings-daemon-2.30.1/configure
  am__untar
  am__tar
  AMTAR
-@@ -948,6 +955,7 @@ SHELL'
+@@ -950,6 +957,7 @@
  ac_subst_files=''
  ac_user_opts='
  enable_option_checking
@@ -9066,7 +9203,7 @@ Index: gnome-settings-daemon-2.30.1/configure
  enable_dependency_tracking
  enable_shared
  enable_static
-@@ -966,6 +974,7 @@ with_dbus_sys
+@@ -968,6 +976,7 @@
  with_dbus_services
  with_x
  enable_pulse
@@ -9074,7 +9211,7 @@ Index: gnome-settings-daemon-2.30.1/configure
  enable_profiling
  enable_more_warnings
  enable_debug
-@@ -998,7 +1007,9 @@ LIBGNOMEKBDUI_LIBS
+@@ -1002,7 +1011,9 @@
  GIOUNIX_CFLAGS
  GIOUNIX_LIBS
  PULSE_CFLAGS
@@ -9085,7 +9222,7 @@ Index: gnome-settings-daemon-2.30.1/configure
  
  
  # Initialize some variables set by options.
-@@ -1623,6 +1634,8 @@ Optional Features:
+@@ -1627,6 +1638,8 @@
    --disable-option-checking  ignore unrecognized --enable/--with options
    --disable-FEATURE       do not include FEATURE (same as --enable-FEATURE=no)
    --enable-FEATURE[=ARG]  include FEATURE [ARG=yes]
@@ -9094,7 +9231,7 @@ Index: gnome-settings-daemon-2.30.1/configure
    --disable-dependency-tracking  speeds up one-time build
    --enable-dependency-tracking   do not reject slow dependency extractors
    --enable-shared[=PKGS]  build shared libraries [default=yes]
-@@ -1637,6 +1650,8 @@ Optional Features:
+@@ -1641,6 +1654,8 @@
    --disable-schemas-install
                            Disable the schemas installation
    --disable-pulse         turn off PulseAudio support
@@ -9103,7 +9240,7 @@ Index: gnome-settings-daemon-2.30.1/configure
    --enable-profiling      turn on profiling
    --enable-more-warnings  Maximum compiler warnings
    --enable-debug          turn on debugging
-@@ -1698,6 +1713,8 @@ Some influential environment variables:
+@@ -1706,6 +1721,8 @@
    PULSE_CFLAGS
                C compiler flags for PULSE, overriding pkg-config
    PULSE_LIBS  linker flags for PULSE, overriding pkg-config
@@ -9112,7 +9249,7 @@ Index: gnome-settings-daemon-2.30.1/configure
  
  Use these variables to override the choices made by `configure' or to help
  it to find libraries and programs with nonstandard names/locations.
-@@ -3244,6 +3261,29 @@ $as_echo "$am_cv_prog_tar_ustar" >&6; }
+@@ -3252,6 +3269,29 @@
  
  
  
@@ -9142,149 +9279,149 @@ Index: gnome-settings-daemon-2.30.1/configure
  DEPDIR="${am__leading_dot}deps"
  
  ac_config_commands="$ac_config_commands depfiles"
-@@ -5665,13 +5705,13 @@ if test "${lt_cv_nm_interface+set}" = se
+@@ -5673,13 +5713,13 @@
  else
    lt_cv_nm_interface="BSD nm"
    echo "int some_variable = 0;" > conftest.$ac_ext
--  (eval echo "\"\$as_me:5668: $ac_compile\"" >&5)
-+  (eval echo "\"\$as_me:5708: $ac_compile\"" >&5)
+-  (eval echo "\"\$as_me:5676: $ac_compile\"" >&5)
++  (eval echo "\"\$as_me:5716: $ac_compile\"" >&5)
    (eval "$ac_compile" 2>conftest.err)
    cat conftest.err >&5
--  (eval echo "\"\$as_me:5671: $NM \\\"conftest.$ac_objext\\\"\"" >&5)
-+  (eval echo "\"\$as_me:5711: $NM \\\"conftest.$ac_objext\\\"\"" >&5)
+-  (eval echo "\"\$as_me:5679: $NM \\\"conftest.$ac_objext\\\"\"" >&5)
++  (eval echo "\"\$as_me:5719: $NM \\\"conftest.$ac_objext\\\"\"" >&5)
    (eval "$NM \"conftest.$ac_objext\"" 2>conftest.err > conftest.out)
    cat conftest.err >&5
--  (eval echo "\"\$as_me:5674: output\"" >&5)
-+  (eval echo "\"\$as_me:5714: output\"" >&5)
+-  (eval echo "\"\$as_me:5682: output\"" >&5)
++  (eval echo "\"\$as_me:5722: output\"" >&5)
    cat conftest.out >&5
    if $GREP 'External.*some_variable' conftest.out > /dev/null; then
      lt_cv_nm_interface="MS dumpbin"
-@@ -6876,7 +6916,7 @@ ia64-*-hpux*)
+@@ -6884,7 +6924,7 @@
    ;;
  *-*-irix6*)
    # Find out which ABI we are using.
--  echo '#line 6879 "configure"' > conftest.$ac_ext
-+  echo '#line 6919 "configure"' > conftest.$ac_ext
+-  echo '#line 6887 "configure"' > conftest.$ac_ext
++  echo '#line 6927 "configure"' > conftest.$ac_ext
    if { { eval echo "\"\$as_me\":${as_lineno-$LINENO}: \"$ac_compile\""; } >&5
    (eval $ac_compile) 2>&5
    ac_status=$?
-@@ -8679,11 +8719,11 @@ else
+@@ -8687,11 +8727,11 @@
     -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
     -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
     -e 's:$: $lt_compiler_flag:'`
--   (eval echo "\"\$as_me:8682: $lt_compile\"" >&5)
-+   (eval echo "\"\$as_me:8722: $lt_compile\"" >&5)
+-   (eval echo "\"\$as_me:8690: $lt_compile\"" >&5)
++   (eval echo "\"\$as_me:8730: $lt_compile\"" >&5)
     (eval "$lt_compile" 2>conftest.err)
     ac_status=$?
     cat conftest.err >&5
--   echo "$as_me:8686: \$? = $ac_status" >&5
-+   echo "$as_me:8726: \$? = $ac_status" >&5
+-   echo "$as_me:8694: \$? = $ac_status" >&5
++   echo "$as_me:8734: \$? = $ac_status" >&5
     if (exit $ac_status) && test -s "$ac_outfile"; then
       # The compiler can only warn and ignore the option if not recognized
       # So say no if there are warnings other than the usual output.
-@@ -9018,11 +9058,11 @@ else
+@@ -9026,11 +9066,11 @@
     -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
     -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
     -e 's:$: $lt_compiler_flag:'`
--   (eval echo "\"\$as_me:9021: $lt_compile\"" >&5)
-+   (eval echo "\"\$as_me:9061: $lt_compile\"" >&5)
+-   (eval echo "\"\$as_me:9029: $lt_compile\"" >&5)
++   (eval echo "\"\$as_me:9069: $lt_compile\"" >&5)
     (eval "$lt_compile" 2>conftest.err)
     ac_status=$?
     cat conftest.err >&5
--   echo "$as_me:9025: \$? = $ac_status" >&5
-+   echo "$as_me:9065: \$? = $ac_status" >&5
+-   echo "$as_me:9033: \$? = $ac_status" >&5
++   echo "$as_me:9073: \$? = $ac_status" >&5
     if (exit $ac_status) && test -s "$ac_outfile"; then
       # The compiler can only warn and ignore the option if not recognized
       # So say no if there are warnings other than the usual output.
-@@ -9123,11 +9163,11 @@ else
+@@ -9131,11 +9171,11 @@
     -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
     -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
     -e 's:$: $lt_compiler_flag:'`
--   (eval echo "\"\$as_me:9126: $lt_compile\"" >&5)
-+   (eval echo "\"\$as_me:9166: $lt_compile\"" >&5)
+-   (eval echo "\"\$as_me:9134: $lt_compile\"" >&5)
++   (eval echo "\"\$as_me:9174: $lt_compile\"" >&5)
     (eval "$lt_compile" 2>out/conftest.err)
     ac_status=$?
     cat out/conftest.err >&5
--   echo "$as_me:9130: \$? = $ac_status" >&5
-+   echo "$as_me:9170: \$? = $ac_status" >&5
+-   echo "$as_me:9138: \$? = $ac_status" >&5
++   echo "$as_me:9178: \$? = $ac_status" >&5
     if (exit $ac_status) && test -s out/conftest2.$ac_objext
     then
       # The compiler can only warn and ignore the option if not recognized
-@@ -9178,11 +9218,11 @@ else
+@@ -9186,11 +9226,11 @@
     -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
     -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
     -e 's:$: $lt_compiler_flag:'`
--   (eval echo "\"\$as_me:9181: $lt_compile\"" >&5)
-+   (eval echo "\"\$as_me:9221: $lt_compile\"" >&5)
+-   (eval echo "\"\$as_me:9189: $lt_compile\"" >&5)
++   (eval echo "\"\$as_me:9229: $lt_compile\"" >&5)
     (eval "$lt_compile" 2>out/conftest.err)
     ac_status=$?
     cat out/conftest.err >&5
--   echo "$as_me:9185: \$? = $ac_status" >&5
-+   echo "$as_me:9225: \$? = $ac_status" >&5
+-   echo "$as_me:9193: \$? = $ac_status" >&5
++   echo "$as_me:9233: \$? = $ac_status" >&5
     if (exit $ac_status) && test -s out/conftest2.$ac_objext
     then
       # The compiler can only warn and ignore the option if not recognized
-@@ -11562,7 +11602,7 @@ else
+@@ -11570,7 +11610,7 @@
    lt_dlunknown=0; lt_dlno_uscore=1; lt_dlneed_uscore=2
    lt_status=$lt_dlunknown
    cat > conftest.$ac_ext <<_LT_EOF
--#line 11565 "configure"
-+#line 11605 "configure"
+-#line 11573 "configure"
++#line 11613 "configure"
  #include "confdefs.h"
  
  #if HAVE_DLFCN_H
-@@ -11658,7 +11698,7 @@ else
+@@ -11666,7 +11706,7 @@
    lt_dlunknown=0; lt_dlno_uscore=1; lt_dlneed_uscore=2
    lt_status=$lt_dlunknown
    cat > conftest.$ac_ext <<_LT_EOF
--#line 11661 "configure"
-+#line 11701 "configure"
+-#line 11669 "configure"
++#line 11709 "configure"
  #include "confdefs.h"
  
  #if HAVE_DLFCN_H
-@@ -13614,11 +13654,11 @@ else
+@@ -13622,11 +13662,11 @@
     -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
     -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
     -e 's:$: $lt_compiler_flag:'`
--   (eval echo "\"\$as_me:13617: $lt_compile\"" >&5)
-+   (eval echo "\"\$as_me:13657: $lt_compile\"" >&5)
+-   (eval echo "\"\$as_me:13625: $lt_compile\"" >&5)
++   (eval echo "\"\$as_me:13665: $lt_compile\"" >&5)
     (eval "$lt_compile" 2>conftest.err)
     ac_status=$?
     cat conftest.err >&5
--   echo "$as_me:13621: \$? = $ac_status" >&5
-+   echo "$as_me:13661: \$? = $ac_status" >&5
+-   echo "$as_me:13629: \$? = $ac_status" >&5
++   echo "$as_me:13669: \$? = $ac_status" >&5
     if (exit $ac_status) && test -s "$ac_outfile"; then
       # The compiler can only warn and ignore the option if not recognized
       # So say no if there are warnings other than the usual output.
-@@ -13713,11 +13753,11 @@ else
+@@ -13721,11 +13761,11 @@
     -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
     -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
     -e 's:$: $lt_compiler_flag:'`
--   (eval echo "\"\$as_me:13716: $lt_compile\"" >&5)
-+   (eval echo "\"\$as_me:13756: $lt_compile\"" >&5)
+-   (eval echo "\"\$as_me:13724: $lt_compile\"" >&5)
++   (eval echo "\"\$as_me:13764: $lt_compile\"" >&5)
     (eval "$lt_compile" 2>out/conftest.err)
     ac_status=$?
     cat out/conftest.err >&5
--   echo "$as_me:13720: \$? = $ac_status" >&5
-+   echo "$as_me:13760: \$? = $ac_status" >&5
+-   echo "$as_me:13728: \$? = $ac_status" >&5
++   echo "$as_me:13768: \$? = $ac_status" >&5
     if (exit $ac_status) && test -s out/conftest2.$ac_objext
     then
       # The compiler can only warn and ignore the option if not recognized
-@@ -13765,11 +13805,11 @@ else
+@@ -13773,11 +13813,11 @@
     -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
     -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
     -e 's:$: $lt_compiler_flag:'`
--   (eval echo "\"\$as_me:13768: $lt_compile\"" >&5)
-+   (eval echo "\"\$as_me:13808: $lt_compile\"" >&5)
+-   (eval echo "\"\$as_me:13776: $lt_compile\"" >&5)
++   (eval echo "\"\$as_me:13816: $lt_compile\"" >&5)
     (eval "$lt_compile" 2>out/conftest.err)
     ac_status=$?
     cat out/conftest.err >&5
--   echo "$as_me:13772: \$? = $ac_status" >&5
-+   echo "$as_me:13812: \$? = $ac_status" >&5
+-   echo "$as_me:13780: \$? = $ac_status" >&5
++   echo "$as_me:13820: \$? = $ac_status" >&5
     if (exit $ac_status) && test -s out/conftest2.$ac_objext
     then
       # The compiler can only warn and ignore the option if not recognized
-@@ -16550,12 +16590,16 @@ if test -n "$PKG_CONFIG"; then
+@@ -16559,12 +16599,16 @@
          gnome-desktop-2.0 >= \$GNOME_DESKTOP_REQUIRED_VERSION
          gio-2.0 >= \$GIO_REQUIRED_VERSION
          dbus-glib-1 >= \$DBUS_GLIB_REQUIRED_VERSION
@@ -9301,7 +9438,7 @@ Index: gnome-settings-daemon-2.30.1/configure
  ") 2>&5
    ac_status=$?
    $as_echo "$as_me:${as_lineno-$LINENO}: \$? = $ac_status" >&5
-@@ -16565,6 +16609,8 @@ if test -n "$PKG_CONFIG"; then
+@@ -16574,6 +16618,8 @@
          gnome-desktop-2.0 >= $GNOME_DESKTOP_REQUIRED_VERSION
          gio-2.0 >= $GIO_REQUIRED_VERSION
          dbus-glib-1 >= $DBUS_GLIB_REQUIRED_VERSION
@@ -9310,7 +9447,7 @@ Index: gnome-settings-daemon-2.30.1/configure
  " 2>/dev/null`
  else
    pkg_failed=yes
-@@ -16583,12 +16629,16 @@ if test -n "$PKG_CONFIG"; then
+@@ -16590,12 +16636,16 @@
          gnome-desktop-2.0 >= \$GNOME_DESKTOP_REQUIRED_VERSION
          gio-2.0 >= \$GIO_REQUIRED_VERSION
          dbus-glib-1 >= \$DBUS_GLIB_REQUIRED_VERSION
@@ -9327,7 +9464,7 @@ Index: gnome-settings-daemon-2.30.1/configure
  ") 2>&5
    ac_status=$?
    $as_echo "$as_me:${as_lineno-$LINENO}: \$? = $ac_status" >&5
-@@ -16598,6 +16648,8 @@ if test -n "$PKG_CONFIG"; then
+@@ -16605,6 +16655,8 @@
          gnome-desktop-2.0 >= $GNOME_DESKTOP_REQUIRED_VERSION
          gio-2.0 >= $GIO_REQUIRED_VERSION
          dbus-glib-1 >= $DBUS_GLIB_REQUIRED_VERSION
@@ -9336,25 +9473,25 @@ Index: gnome-settings-daemon-2.30.1/configure
  " 2>/dev/null`
  else
    pkg_failed=yes
-@@ -16622,6 +16674,8 @@ fi
+@@ -16630,6 +16682,8 @@
          gnome-desktop-2.0 >= $GNOME_DESKTOP_REQUIRED_VERSION
          gio-2.0 >= $GIO_REQUIRED_VERSION
          dbus-glib-1 >= $DBUS_GLIB_REQUIRED_VERSION
 +        xext
 +        x11
- "`
+ " 2>&1`
          else
- 	        SETTINGS_PLUGIN_PKG_ERRORS=`$PKG_CONFIG --errors-to-stdout --print-errors "gtk+-2.0 >= $GTK_REQUIRED_VERSION
-@@ -16629,6 +16683,8 @@ fi
+ 	        SETTINGS_PLUGIN_PKG_ERRORS=`$PKG_CONFIG --print-errors "gtk+-2.0 >= $GTK_REQUIRED_VERSION
+@@ -16637,6 +16691,8 @@
          gnome-desktop-2.0 >= $GNOME_DESKTOP_REQUIRED_VERSION
          gio-2.0 >= $GIO_REQUIRED_VERSION
          dbus-glib-1 >= $DBUS_GLIB_REQUIRED_VERSION
 +        xext
 +        x11
- "`
+ " 2>&1`
          fi
  	# Put the nasty error message in config.log where it belongs
-@@ -16639,6 +16695,8 @@ fi
+@@ -16647,6 +16703,8 @@
          gnome-desktop-2.0 >= $GNOME_DESKTOP_REQUIRED_VERSION
          gio-2.0 >= $GIO_REQUIRED_VERSION
          dbus-glib-1 >= $DBUS_GLIB_REQUIRED_VERSION
@@ -9363,7 +9500,7 @@ Index: gnome-settings-daemon-2.30.1/configure
  ) were not met:
  
  $SETTINGS_PLUGIN_PKG_ERRORS
-@@ -18211,6 +18269,128 @@ fi
+@@ -18212,6 +18270,126 @@
  
  
  
@@ -9395,11 +9532,10 @@ Index: gnome-settings-daemon-2.30.1/configure
 +{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for GST" >&5
 +$as_echo_n "checking for GST... " >&6; }
 +
-+if test -n "$PKG_CONFIG"; then
-+    if test -n "$GST_CFLAGS"; then
-+        pkg_cv_GST_CFLAGS="$GST_CFLAGS"
-+    else
-+        if test -n "$PKG_CONFIG" && \
++if test -n "$GST_CFLAGS"; then
++    pkg_cv_GST_CFLAGS="$GST_CFLAGS"
++ elif test -n "$PKG_CONFIG"; then
++    if test -n "$PKG_CONFIG" && \
 +    { { $as_echo "$as_me:${as_lineno-$LINENO}: \$PKG_CONFIG --exists --print-errors \"\$PKGS\""; } >&5
 +  ($PKG_CONFIG --exists --print-errors "$PKGS") 2>&5
 +  ac_status=$?
@@ -9409,15 +9545,13 @@ Index: gnome-settings-daemon-2.30.1/configure
 +else
 +  pkg_failed=yes
 +fi
-+    fi
-+else
-+	pkg_failed=untried
++ else
++    pkg_failed=untried
 +fi
-+if test -n "$PKG_CONFIG"; then
-+    if test -n "$GST_LIBS"; then
-+        pkg_cv_GST_LIBS="$GST_LIBS"
-+    else
-+        if test -n "$PKG_CONFIG" && \
++if test -n "$GST_LIBS"; then
++    pkg_cv_GST_LIBS="$GST_LIBS"
++ elif test -n "$PKG_CONFIG"; then
++    if test -n "$PKG_CONFIG" && \
 +    { { $as_echo "$as_me:${as_lineno-$LINENO}: \$PKG_CONFIG --exists --print-errors \"\$PKGS\""; } >&5
 +  ($PKG_CONFIG --exists --print-errors "$PKGS") 2>&5
 +  ac_status=$?
@@ -9427,14 +9561,15 @@ Index: gnome-settings-daemon-2.30.1/configure
 +else
 +  pkg_failed=yes
 +fi
-+    fi
-+else
-+	pkg_failed=untried
++ else
++    pkg_failed=untried
 +fi
 +
 +
 +
 +if test $pkg_failed = yes; then
++   	{ $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
++$as_echo "no" >&6; }
 +
 +if $PKG_CONFIG --atleast-pkgconfig-version 0.20; then
 +        _pkg_short_errors_supported=yes
@@ -9442,18 +9577,18 @@ Index: gnome-settings-daemon-2.30.1/configure
 +        _pkg_short_errors_supported=no
 +fi
 +        if test $_pkg_short_errors_supported = yes; then
-+	        GST_PKG_ERRORS=`$PKG_CONFIG --short-errors --errors-to-stdout --print-errors "$PKGS"`
++	        GST_PKG_ERRORS=`$PKG_CONFIG --short-errors --print-errors "$PKGS" 2>&1`
 +        else
-+	        GST_PKG_ERRORS=`$PKG_CONFIG --errors-to-stdout --print-errors "$PKGS"`
++	        GST_PKG_ERRORS=`$PKG_CONFIG --print-errors "$PKGS" 2>&1`
 +        fi
 +	# Put the nasty error message in config.log where it belongs
 +	echo "$GST_PKG_ERRORS" >&5
 +
 +	{ $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
 +$as_echo "no" >&6; }
-+                { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
-+$as_echo "no" >&6; }
 +elif test $pkg_failed = untried; then
++     	{ $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
++$as_echo "no" >&6; }
 +	{ $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
 +$as_echo "no" >&6; }
 +else
@@ -9492,7 +9627,7 @@ Index: gnome-settings-daemon-2.30.1/configure
  # ---------------------------------------------------------------------------
  # Enable Profiling
  # ---------------------------------------------------------------------------
-@@ -18428,6 +18608,10 @@ else
+@@ -18429,6 +18607,10 @@
    am__EXEEXT_FALSE=
  fi
  
@@ -9503,7 +9638,7 @@ Index: gnome-settings-daemon-2.30.1/configure
  if test -z "${AMDEP_TRUE}" && test -z "${AMDEP_FALSE}"; then
    as_fn_error "conditional \"AMDEP\" was never defined.
  Usually this means the macro was only invoked conditionally." "$LINENO" 5
-@@ -18464,6 +18648,10 @@ if test -z "${HAVE_PULSE_TRUE}" && test
+@@ -18465,6 +18647,10 @@
    as_fn_error "conditional \"HAVE_PULSE\" was never defined.
  Usually this means the macro was only invoked conditionally." "$LINENO" 5
  fi
@@ -9514,7 +9649,7 @@ Index: gnome-settings-daemon-2.30.1/configure
  
  : ${CONFIG_STATUS=./config.status}
  ac_write_fail=0
-@@ -21010,6 +21198,7 @@ echo "
+@@ -21011,6 +21197,7 @@
          dbus-1 system.d dir:      ${DBUS_SYS_DIR}
  
          Libnotify support:        ${have_libnotify}
@@ -9522,11 +9657,11 @@ Index: gnome-settings-daemon-2.30.1/configure
          PulseAudio support:       ${have_pulse}
          Profiling support:        ${enable_profiling}
  "
-Index: gnome-settings-daemon-2.30.1/data/Makefile.in
+Index: gnome-settings-daemon-2.30.2/data/Makefile.in
 ===================================================================
---- gnome-settings-daemon-2.30.1.orig/data/Makefile.in	2010-04-26 14:22:48.000000000 +0200
-+++ gnome-settings-daemon-2.30.1/data/Makefile.in	2010-04-27 19:56:29.389522399 +0200
-@@ -126,6 +126,8 @@ GNOME_KEYBINDINGS_KEYSDIR = @GNOME_KEYBI
+--- gnome-settings-daemon-2.30.2.orig/data/Makefile.in	2010-07-23 00:54:34.537451189 +0200
++++ gnome-settings-daemon-2.30.2/data/Makefile.in	2010-07-23 00:54:13.581447306 +0200
+@@ -126,6 +126,8 @@
  GREP = @GREP@
  GSD_INTLTOOL_PLUGIN_RULE = @GSD_INTLTOOL_PLUGIN_RULE@
  GSD_PLUGIN_LDFLAGS = @GSD_PLUGIN_LDFLAGS@
@@ -9535,7 +9670,7 @@ Index: gnome-settings-daemon-2.30.1/data/Makefile.in
  INSTALL = @INSTALL@
  INSTALL_DATA = @INSTALL_DATA@
  INSTALL_PROGRAM = @INSTALL_PROGRAM@
-@@ -150,6 +152,7 @@ LIBTOOL = @LIBTOOL@
+@@ -150,6 +152,7 @@
  LIPO = @LIPO@
  LN_S = @LN_S@
  LTLIBOBJS = @LTLIBOBJS@
@@ -9543,7 +9678,7 @@ Index: gnome-settings-daemon-2.30.1/data/Makefile.in
  MAKEINFO = @MAKEINFO@
  MKDIR_P = @MKDIR_P@
  MKINSTALLDIRS = @MKINSTALLDIRS@
-@@ -298,7 +301,7 @@ MAINTAINERCLEANFILES = \
+@@ -300,7 +303,7 @@
  all: all-am
  
  .SUFFIXES:
@@ -9552,7 +9687,7 @@ Index: gnome-settings-daemon-2.30.1/data/Makefile.in
  	@for dep in $?; do \
  	  case '$(am__configure_deps)' in \
  	    *$$dep*) \
-@@ -323,9 +326,9 @@ Makefile: $(srcdir)/Makefile.in $(top_bu
+@@ -325,9 +328,9 @@
  $(top_builddir)/config.status: $(top_srcdir)/configure $(CONFIG_STATUS_DEPENDENCIES)
  	cd $(top_builddir) && $(MAKE) $(AM_MAKEFLAGS) am--refresh
  
@@ -9564,11 +9699,11 @@ Index: gnome-settings-daemon-2.30.1/data/Makefile.in
  	cd $(top_builddir) && $(MAKE) $(AM_MAKEFLAGS) am--refresh
  $(am__aclocal_m4_deps):
  gnome-settings-daemon.desktop.in: $(top_builddir)/config.status $(srcdir)/gnome-settings-daemon.desktop.in.in
-Index: gnome-settings-daemon-2.30.1/gnome-settings-daemon/Makefile.in
+Index: gnome-settings-daemon-2.30.2/gnome-settings-daemon/Makefile.in
 ===================================================================
---- gnome-settings-daemon-2.30.1.orig/gnome-settings-daemon/Makefile.in	2010-04-26 14:22:48.000000000 +0200
-+++ gnome-settings-daemon-2.30.1/gnome-settings-daemon/Makefile.in	2010-04-27 19:56:29.389522399 +0200
-@@ -165,6 +165,8 @@ GNOME_KEYBINDINGS_KEYSDIR = @GNOME_KEYBI
+--- gnome-settings-daemon-2.30.2.orig/gnome-settings-daemon/Makefile.in	2010-07-23 00:54:36.305450142 +0200
++++ gnome-settings-daemon-2.30.2/gnome-settings-daemon/Makefile.in	2010-07-23 00:54:13.805447348 +0200
+@@ -165,6 +165,8 @@
  GREP = @GREP@
  GSD_INTLTOOL_PLUGIN_RULE = @GSD_INTLTOOL_PLUGIN_RULE@
  GSD_PLUGIN_LDFLAGS = @GSD_PLUGIN_LDFLAGS@
@@ -9577,7 +9712,7 @@ Index: gnome-settings-daemon-2.30.1/gnome-settings-daemon/Makefile.in
  INSTALL = @INSTALL@
  INSTALL_DATA = @INSTALL_DATA@
  INSTALL_PROGRAM = @INSTALL_PROGRAM@
-@@ -189,6 +191,7 @@ LIBTOOL = @LIBTOOL@
+@@ -189,6 +191,7 @@
  LIPO = @LIPO@
  LN_S = @LN_S@
  LTLIBOBJS = @LTLIBOBJS@
@@ -9585,7 +9720,7 @@ Index: gnome-settings-daemon-2.30.1/gnome-settings-daemon/Makefile.in
  MAKEINFO = @MAKEINFO@
  MKDIR_P = @MKDIR_P@
  MKINSTALLDIRS = @MKINSTALLDIRS@
-@@ -376,7 +379,7 @@ all: $(BUILT_SOURCES)
+@@ -378,7 +381,7 @@
  
  .SUFFIXES:
  .SUFFIXES: .c .lo .o .obj
@@ -9594,7 +9729,7 @@ Index: gnome-settings-daemon-2.30.1/gnome-settings-daemon/Makefile.in
  	@for dep in $?; do \
  	  case '$(am__configure_deps)' in \
  	    *$$dep*) \
-@@ -401,9 +404,9 @@ Makefile: $(srcdir)/Makefile.in $(top_bu
+@@ -403,9 +406,9 @@
  $(top_builddir)/config.status: $(top_srcdir)/configure $(CONFIG_STATUS_DEPENDENCIES)
  	cd $(top_builddir) && $(MAKE) $(AM_MAKEFLAGS) am--refresh
  
@@ -9606,10 +9741,10 @@ Index: gnome-settings-daemon-2.30.1/gnome-settings-daemon/Makefile.in
  	cd $(top_builddir) && $(MAKE) $(AM_MAKEFLAGS) am--refresh
  $(am__aclocal_m4_deps):
  
-Index: gnome-settings-daemon-2.30.1/ltmain.sh
+Index: gnome-settings-daemon-2.30.2/ltmain.sh
 ===================================================================
---- gnome-settings-daemon-2.30.1.orig/ltmain.sh	2010-04-26 14:22:44.000000000 +0200
-+++ gnome-settings-daemon-2.30.1/ltmain.sh	2010-04-27 19:56:34.998024654 +0200
+--- gnome-settings-daemon-2.30.2.orig/ltmain.sh	2010-07-23 00:54:34.713451257 +0200
++++ gnome-settings-daemon-2.30.2/ltmain.sh	2010-07-23 00:53:56.485449887 +0200
 @@ -65,7 +65,7 @@
  #       compiler:		$LTCC
  #       compiler flags:		$LTCFLAGS
@@ -9628,11 +9763,11 @@ Index: gnome-settings-daemon-2.30.1/ltmain.sh
  TIMESTAMP=""
  package_revision=1.3017
  
-Index: gnome-settings-daemon-2.30.1/Makefile.in
+Index: gnome-settings-daemon-2.30.2/plugins/Makefile.in
 ===================================================================
---- gnome-settings-daemon-2.30.1.orig/Makefile.in	2010-04-26 14:22:50.000000000 +0200
-+++ gnome-settings-daemon-2.30.1/Makefile.in	2010-04-27 19:56:29.393526888 +0200
-@@ -151,6 +151,8 @@ GNOME_KEYBINDINGS_KEYSDIR = @GNOME_KEYBI
+--- gnome-settings-daemon-2.30.2.orig/plugins/Makefile.in	2010-07-23 00:54:34.777452153 +0200
++++ gnome-settings-daemon-2.30.2/plugins/Makefile.in	2010-07-23 00:54:13.901446451 +0200
+@@ -135,6 +135,8 @@
  GREP = @GREP@
  GSD_INTLTOOL_PLUGIN_RULE = @GSD_INTLTOOL_PLUGIN_RULE@
  GSD_PLUGIN_LDFLAGS = @GSD_PLUGIN_LDFLAGS@
@@ -9641,7 +9776,7 @@ Index: gnome-settings-daemon-2.30.1/Makefile.in
  INSTALL = @INSTALL@
  INSTALL_DATA = @INSTALL_DATA@
  INSTALL_PROGRAM = @INSTALL_PROGRAM@
-@@ -175,6 +177,7 @@ LIBTOOL = @LIBTOOL@
+@@ -159,6 +161,7 @@
  LIPO = @LIPO@
  LN_S = @LN_S@
  LTLIBOBJS = @LTLIBOBJS@
@@ -9649,436 +9784,7 @@ Index: gnome-settings-daemon-2.30.1/Makefile.in
  MAKEINFO = @MAKEINFO@
  MKDIR_P = @MKDIR_P@
  MKINSTALLDIRS = @MKINSTALLDIRS@
-@@ -300,7 +303,7 @@ all: config.h
- .SUFFIXES:
- am--refresh:
- 	@:
--$(srcdir)/Makefile.in:  $(srcdir)/Makefile.am  $(am__configure_deps)
-+$(srcdir)/Makefile.in: @MAINTAINER_MODE_TRUE@ $(srcdir)/Makefile.am  $(am__configure_deps)
- 	@for dep in $?; do \
- 	  case '$(am__configure_deps)' in \
- 	    *$$dep*) \
-@@ -327,9 +330,9 @@ Makefile: $(srcdir)/Makefile.in $(top_bu
- $(top_builddir)/config.status: $(top_srcdir)/configure $(CONFIG_STATUS_DEPENDENCIES)
- 	$(SHELL) ./config.status --recheck
- 
--$(top_srcdir)/configure:  $(am__configure_deps)
-+$(top_srcdir)/configure: @MAINTAINER_MODE_TRUE@ $(am__configure_deps)
- 	$(am__cd) $(srcdir) && $(AUTOCONF)
--$(ACLOCAL_M4):  $(am__aclocal_m4_deps)
-+$(ACLOCAL_M4): @MAINTAINER_MODE_TRUE@ $(am__aclocal_m4_deps)
- 	$(am__cd) $(srcdir) && $(ACLOCAL) $(ACLOCAL_AMFLAGS)
- $(am__aclocal_m4_deps):
- 
-@@ -342,7 +345,7 @@ config.h: stamp-h1
- stamp-h1: $(srcdir)/config.h.in $(top_builddir)/config.status
- 	@rm -f stamp-h1
- 	cd $(top_builddir) && $(SHELL) ./config.status config.h
--$(srcdir)/config.h.in:  $(am__configure_deps) 
-+$(srcdir)/config.h.in: @MAINTAINER_MODE_TRUE@ $(am__configure_deps) 
- 	($(am__cd) $(top_srcdir) && $(AUTOHEADER))
- 	rm -f stamp-h1
- 	touch $@
-Index: gnome-settings-daemon-2.30.1/plugins/a11y-keyboard/Makefile.in
-===================================================================
---- gnome-settings-daemon-2.30.1.orig/plugins/a11y-keyboard/Makefile.in	2010-04-26 14:22:49.000000000 +0200
-+++ gnome-settings-daemon-2.30.1/plugins/a11y-keyboard/Makefile.in	2010-04-27 19:56:29.397525999 +0200
-@@ -170,6 +170,8 @@ GNOME_KEYBINDINGS_KEYSDIR = @GNOME_KEYBI
- GREP = @GREP@
- GSD_INTLTOOL_PLUGIN_RULE = @GSD_INTLTOOL_PLUGIN_RULE@
- GSD_PLUGIN_LDFLAGS = @GSD_PLUGIN_LDFLAGS@
-+GST_CFLAGS = @GST_CFLAGS@
-+GST_LIBS = @GST_LIBS@
- INSTALL = @INSTALL@
- INSTALL_DATA = @INSTALL_DATA@
- INSTALL_PROGRAM = @INSTALL_PROGRAM@
-@@ -194,6 +196,7 @@ LIBTOOL = @LIBTOOL@
- LIPO = @LIPO@
- LN_S = @LN_S@
- LTLIBOBJS = @LTLIBOBJS@
-+MAINT = @MAINT@
- MAKEINFO = @MAKEINFO@
- MKDIR_P = @MKDIR_P@
- MKINSTALLDIRS = @MKINSTALLDIRS@
-@@ -380,7 +383,7 @@ all: all-am
- 
- .SUFFIXES:
- .SUFFIXES: .c .lo .o .obj
--$(srcdir)/Makefile.in:  $(srcdir)/Makefile.am  $(am__configure_deps)
-+$(srcdir)/Makefile.in: @MAINTAINER_MODE_TRUE@ $(srcdir)/Makefile.am  $(am__configure_deps)
- 	@for dep in $?; do \
- 	  case '$(am__configure_deps)' in \
- 	    *$$dep*) \
-@@ -405,9 +408,9 @@ Makefile: $(srcdir)/Makefile.in $(top_bu
- $(top_builddir)/config.status: $(top_srcdir)/configure $(CONFIG_STATUS_DEPENDENCIES)
- 	cd $(top_builddir) && $(MAKE) $(AM_MAKEFLAGS) am--refresh
- 
--$(top_srcdir)/configure:  $(am__configure_deps)
-+$(top_srcdir)/configure: @MAINTAINER_MODE_TRUE@ $(am__configure_deps)
- 	cd $(top_builddir) && $(MAKE) $(AM_MAKEFLAGS) am--refresh
--$(ACLOCAL_M4):  $(am__aclocal_m4_deps)
-+$(ACLOCAL_M4): @MAINTAINER_MODE_TRUE@ $(am__aclocal_m4_deps)
- 	cd $(top_builddir) && $(MAKE) $(AM_MAKEFLAGS) am--refresh
- $(am__aclocal_m4_deps):
- install-pluginLTLIBRARIES: $(plugin_LTLIBRARIES)
-Index: gnome-settings-daemon-2.30.1/plugins/background/Makefile.in
-===================================================================
---- gnome-settings-daemon-2.30.1.orig/plugins/background/Makefile.in	2010-04-26 14:22:49.000000000 +0200
-+++ gnome-settings-daemon-2.30.1/plugins/background/Makefile.in	2010-04-27 19:56:29.397525999 +0200
-@@ -163,6 +163,8 @@ GNOME_KEYBINDINGS_KEYSDIR = @GNOME_KEYBI
- GREP = @GREP@
- GSD_INTLTOOL_PLUGIN_RULE = @GSD_INTLTOOL_PLUGIN_RULE@
- GSD_PLUGIN_LDFLAGS = @GSD_PLUGIN_LDFLAGS@
-+GST_CFLAGS = @GST_CFLAGS@
-+GST_LIBS = @GST_LIBS@
- INSTALL = @INSTALL@
- INSTALL_DATA = @INSTALL_DATA@
- INSTALL_PROGRAM = @INSTALL_PROGRAM@
-@@ -187,6 +189,7 @@ LIBTOOL = @LIBTOOL@
- LIPO = @LIPO@
- LN_S = @LN_S@
- LTLIBOBJS = @LTLIBOBJS@
-+MAINT = @MAINT@
- MAKEINFO = @MAKEINFO@
- MKDIR_P = @MKDIR_P@
- MKINSTALLDIRS = @MKINSTALLDIRS@
-@@ -361,7 +364,7 @@ all: all-am
- 
- .SUFFIXES:
- .SUFFIXES: .c .lo .o .obj
--$(srcdir)/Makefile.in:  $(srcdir)/Makefile.am  $(am__configure_deps)
-+$(srcdir)/Makefile.in: @MAINTAINER_MODE_TRUE@ $(srcdir)/Makefile.am  $(am__configure_deps)
- 	@for dep in $?; do \
- 	  case '$(am__configure_deps)' in \
- 	    *$$dep*) \
-@@ -386,9 +389,9 @@ Makefile: $(srcdir)/Makefile.in $(top_bu
- $(top_builddir)/config.status: $(top_srcdir)/configure $(CONFIG_STATUS_DEPENDENCIES)
- 	cd $(top_builddir) && $(MAKE) $(AM_MAKEFLAGS) am--refresh
- 
--$(top_srcdir)/configure:  $(am__configure_deps)
-+$(top_srcdir)/configure: @MAINTAINER_MODE_TRUE@ $(am__configure_deps)
- 	cd $(top_builddir) && $(MAKE) $(AM_MAKEFLAGS) am--refresh
--$(ACLOCAL_M4):  $(am__aclocal_m4_deps)
-+$(ACLOCAL_M4): @MAINTAINER_MODE_TRUE@ $(am__aclocal_m4_deps)
- 	cd $(top_builddir) && $(MAKE) $(AM_MAKEFLAGS) am--refresh
- $(am__aclocal_m4_deps):
- install-pluginLTLIBRARIES: $(plugin_LTLIBRARIES)
-Index: gnome-settings-daemon-2.30.1/plugins/clipboard/Makefile.in
-===================================================================
---- gnome-settings-daemon-2.30.1.orig/plugins/clipboard/Makefile.in	2010-04-26 14:22:49.000000000 +0200
-+++ gnome-settings-daemon-2.30.1/plugins/clipboard/Makefile.in	2010-04-27 19:56:29.397525999 +0200
-@@ -148,6 +148,8 @@ GNOME_KEYBINDINGS_KEYSDIR = @GNOME_KEYBI
- GREP = @GREP@
- GSD_INTLTOOL_PLUGIN_RULE = @GSD_INTLTOOL_PLUGIN_RULE@
- GSD_PLUGIN_LDFLAGS = @GSD_PLUGIN_LDFLAGS@
-+GST_CFLAGS = @GST_CFLAGS@
-+GST_LIBS = @GST_LIBS@
- INSTALL = @INSTALL@
- INSTALL_DATA = @INSTALL_DATA@
- INSTALL_PROGRAM = @INSTALL_PROGRAM@
-@@ -172,6 +174,7 @@ LIBTOOL = @LIBTOOL@
- LIPO = @LIPO@
- LN_S = @LN_S@
- LTLIBOBJS = @LTLIBOBJS@
-+MAINT = @MAINT@
- MAKEINFO = @MAKEINFO@
- MKDIR_P = @MKDIR_P@
- MKINSTALLDIRS = @MKINSTALLDIRS@
-@@ -328,7 +331,7 @@ all: all-am
- 
- .SUFFIXES:
- .SUFFIXES: .c .lo .o .obj
--$(srcdir)/Makefile.in:  $(srcdir)/Makefile.am  $(am__configure_deps)
-+$(srcdir)/Makefile.in: @MAINTAINER_MODE_TRUE@ $(srcdir)/Makefile.am  $(am__configure_deps)
- 	@for dep in $?; do \
- 	  case '$(am__configure_deps)' in \
- 	    *$$dep*) \
-@@ -353,9 +356,9 @@ Makefile: $(srcdir)/Makefile.in $(top_bu
- $(top_builddir)/config.status: $(top_srcdir)/configure $(CONFIG_STATUS_DEPENDENCIES)
- 	cd $(top_builddir) && $(MAKE) $(AM_MAKEFLAGS) am--refresh
- 
--$(top_srcdir)/configure:  $(am__configure_deps)
-+$(top_srcdir)/configure: @MAINTAINER_MODE_TRUE@ $(am__configure_deps)
- 	cd $(top_builddir) && $(MAKE) $(AM_MAKEFLAGS) am--refresh
--$(ACLOCAL_M4):  $(am__aclocal_m4_deps)
-+$(ACLOCAL_M4): @MAINTAINER_MODE_TRUE@ $(am__aclocal_m4_deps)
- 	cd $(top_builddir) && $(MAKE) $(AM_MAKEFLAGS) am--refresh
- $(am__aclocal_m4_deps):
- install-pluginLTLIBRARIES: $(plugin_LTLIBRARIES)
-Index: gnome-settings-daemon-2.30.1/plugins/common/Makefile.in
-===================================================================
---- gnome-settings-daemon-2.30.1.orig/plugins/common/Makefile.in	2010-04-26 14:22:49.000000000 +0200
-+++ gnome-settings-daemon-2.30.1/plugins/common/Makefile.in	2010-04-27 19:56:29.397525999 +0200
-@@ -120,6 +120,8 @@ GNOME_KEYBINDINGS_KEYSDIR = @GNOME_KEYBI
- GREP = @GREP@
- GSD_INTLTOOL_PLUGIN_RULE = @GSD_INTLTOOL_PLUGIN_RULE@
- GSD_PLUGIN_LDFLAGS = @GSD_PLUGIN_LDFLAGS@
-+GST_CFLAGS = @GST_CFLAGS@
-+GST_LIBS = @GST_LIBS@
- INSTALL = @INSTALL@
- INSTALL_DATA = @INSTALL_DATA@
- INSTALL_PROGRAM = @INSTALL_PROGRAM@
-@@ -144,6 +146,7 @@ LIBTOOL = @LIBTOOL@
- LIPO = @LIPO@
- LN_S = @LN_S@
- LTLIBOBJS = @LTLIBOBJS@
-+MAINT = @MAINT@
- MAKEINFO = @MAKEINFO@
- MKDIR_P = @MKDIR_P@
- MKINSTALLDIRS = @MKINSTALLDIRS@
-@@ -272,7 +275,7 @@ all: all-am
- 
- .SUFFIXES:
- .SUFFIXES: .c .lo .o .obj
--$(srcdir)/Makefile.in:  $(srcdir)/Makefile.am  $(am__configure_deps)
-+$(srcdir)/Makefile.in: @MAINTAINER_MODE_TRUE@ $(srcdir)/Makefile.am  $(am__configure_deps)
- 	@for dep in $?; do \
- 	  case '$(am__configure_deps)' in \
- 	    *$$dep*) \
-@@ -297,9 +300,9 @@ Makefile: $(srcdir)/Makefile.in $(top_bu
- $(top_builddir)/config.status: $(top_srcdir)/configure $(CONFIG_STATUS_DEPENDENCIES)
- 	cd $(top_builddir) && $(MAKE) $(AM_MAKEFLAGS) am--refresh
- 
--$(top_srcdir)/configure:  $(am__configure_deps)
-+$(top_srcdir)/configure: @MAINTAINER_MODE_TRUE@ $(am__configure_deps)
- 	cd $(top_builddir) && $(MAKE) $(AM_MAKEFLAGS) am--refresh
--$(ACLOCAL_M4):  $(am__aclocal_m4_deps)
-+$(ACLOCAL_M4): @MAINTAINER_MODE_TRUE@ $(am__aclocal_m4_deps)
- 	cd $(top_builddir) && $(MAKE) $(AM_MAKEFLAGS) am--refresh
- $(am__aclocal_m4_deps):
- 
-Index: gnome-settings-daemon-2.30.1/plugins/dummy/Makefile.in
-===================================================================
---- gnome-settings-daemon-2.30.1.orig/plugins/dummy/Makefile.in	2010-04-26 14:22:49.000000000 +0200
-+++ gnome-settings-daemon-2.30.1/plugins/dummy/Makefile.in	2010-04-27 19:56:29.397525999 +0200
-@@ -144,6 +144,8 @@ GNOME_KEYBINDINGS_KEYSDIR = @GNOME_KEYBI
- GREP = @GREP@
- GSD_INTLTOOL_PLUGIN_RULE = @GSD_INTLTOOL_PLUGIN_RULE@
- GSD_PLUGIN_LDFLAGS = @GSD_PLUGIN_LDFLAGS@
-+GST_CFLAGS = @GST_CFLAGS@
-+GST_LIBS = @GST_LIBS@
- INSTALL = @INSTALL@
- INSTALL_DATA = @INSTALL_DATA@
- INSTALL_PROGRAM = @INSTALL_PROGRAM@
-@@ -168,6 +170,7 @@ LIBTOOL = @LIBTOOL@
- LIPO = @LIPO@
- LN_S = @LN_S@
- LTLIBOBJS = @LTLIBOBJS@
-+MAINT = @MAINT@
- MAKEINFO = @MAKEINFO@
- MKDIR_P = @MKDIR_P@
- MKINSTALLDIRS = @MKINSTALLDIRS@
-@@ -311,7 +314,7 @@ all: all-am
- 
- .SUFFIXES:
- .SUFFIXES: .c .lo .o .obj
--$(srcdir)/Makefile.in:  $(srcdir)/Makefile.am  $(am__configure_deps)
-+$(srcdir)/Makefile.in: @MAINTAINER_MODE_TRUE@ $(srcdir)/Makefile.am  $(am__configure_deps)
- 	@for dep in $?; do \
- 	  case '$(am__configure_deps)' in \
- 	    *$$dep*) \
-@@ -336,9 +339,9 @@ Makefile: $(srcdir)/Makefile.in $(top_bu
- $(top_builddir)/config.status: $(top_srcdir)/configure $(CONFIG_STATUS_DEPENDENCIES)
- 	cd $(top_builddir) && $(MAKE) $(AM_MAKEFLAGS) am--refresh
- 
--$(top_srcdir)/configure:  $(am__configure_deps)
-+$(top_srcdir)/configure: @MAINTAINER_MODE_TRUE@ $(am__configure_deps)
- 	cd $(top_builddir) && $(MAKE) $(AM_MAKEFLAGS) am--refresh
--$(ACLOCAL_M4):  $(am__aclocal_m4_deps)
-+$(ACLOCAL_M4): @MAINTAINER_MODE_TRUE@ $(am__aclocal_m4_deps)
- 	cd $(top_builddir) && $(MAKE) $(AM_MAKEFLAGS) am--refresh
- $(am__aclocal_m4_deps):
- 
-Index: gnome-settings-daemon-2.30.1/plugins/font/Makefile.in
-===================================================================
---- gnome-settings-daemon-2.30.1.orig/plugins/font/Makefile.in	2010-04-26 14:22:49.000000000 +0200
-+++ gnome-settings-daemon-2.30.1/plugins/font/Makefile.in	2010-04-27 19:56:29.397525999 +0200
-@@ -146,6 +146,8 @@ GNOME_KEYBINDINGS_KEYSDIR = @GNOME_KEYBI
- GREP = @GREP@
- GSD_INTLTOOL_PLUGIN_RULE = @GSD_INTLTOOL_PLUGIN_RULE@
- GSD_PLUGIN_LDFLAGS = @GSD_PLUGIN_LDFLAGS@
-+GST_CFLAGS = @GST_CFLAGS@
-+GST_LIBS = @GST_LIBS@
- INSTALL = @INSTALL@
- INSTALL_DATA = @INSTALL_DATA@
- INSTALL_PROGRAM = @INSTALL_PROGRAM@
-@@ -170,6 +172,7 @@ LIBTOOL = @LIBTOOL@
- LIPO = @LIPO@
- LN_S = @LN_S@
- LTLIBOBJS = @LTLIBOBJS@
-+MAINT = @MAINT@
- MAKEINFO = @MAKEINFO@
- MKDIR_P = @MKDIR_P@
- MKINSTALLDIRS = @MKINSTALLDIRS@
-@@ -324,7 +327,7 @@ all: all-am
- 
- .SUFFIXES:
- .SUFFIXES: .c .lo .o .obj
--$(srcdir)/Makefile.in:  $(srcdir)/Makefile.am  $(am__configure_deps)
-+$(srcdir)/Makefile.in: @MAINTAINER_MODE_TRUE@ $(srcdir)/Makefile.am  $(am__configure_deps)
- 	@for dep in $?; do \
- 	  case '$(am__configure_deps)' in \
- 	    *$$dep*) \
-@@ -349,9 +352,9 @@ Makefile: $(srcdir)/Makefile.in $(top_bu
- $(top_builddir)/config.status: $(top_srcdir)/configure $(CONFIG_STATUS_DEPENDENCIES)
- 	cd $(top_builddir) && $(MAKE) $(AM_MAKEFLAGS) am--refresh
- 
--$(top_srcdir)/configure:  $(am__configure_deps)
-+$(top_srcdir)/configure: @MAINTAINER_MODE_TRUE@ $(am__configure_deps)
- 	cd $(top_builddir) && $(MAKE) $(AM_MAKEFLAGS) am--refresh
--$(ACLOCAL_M4):  $(am__aclocal_m4_deps)
-+$(ACLOCAL_M4): @MAINTAINER_MODE_TRUE@ $(am__aclocal_m4_deps)
- 	cd $(top_builddir) && $(MAKE) $(AM_MAKEFLAGS) am--refresh
- $(am__aclocal_m4_deps):
- install-pluginLTLIBRARIES: $(plugin_LTLIBRARIES)
-Index: gnome-settings-daemon-2.30.1/plugins/housekeeping/Makefile.in
-===================================================================
---- gnome-settings-daemon-2.30.1.orig/plugins/housekeeping/Makefile.in	2010-04-26 14:22:49.000000000 +0200
-+++ gnome-settings-daemon-2.30.1/plugins/housekeeping/Makefile.in	2010-04-27 19:56:29.397525999 +0200
-@@ -149,6 +149,8 @@ GNOME_KEYBINDINGS_KEYSDIR = @GNOME_KEYBI
- GREP = @GREP@
- GSD_INTLTOOL_PLUGIN_RULE = @GSD_INTLTOOL_PLUGIN_RULE@
- GSD_PLUGIN_LDFLAGS = @GSD_PLUGIN_LDFLAGS@
-+GST_CFLAGS = @GST_CFLAGS@
-+GST_LIBS = @GST_LIBS@
- INSTALL = @INSTALL@
- INSTALL_DATA = @INSTALL_DATA@
- INSTALL_PROGRAM = @INSTALL_PROGRAM@
-@@ -173,6 +175,7 @@ LIBTOOL = @LIBTOOL@
- LIPO = @LIPO@
- LN_S = @LN_S@
- LTLIBOBJS = @LTLIBOBJS@
-+MAINT = @MAINT@
- MAKEINFO = @MAKEINFO@
- MKDIR_P = @MKDIR_P@
- MKINSTALLDIRS = @MKINSTALLDIRS@
-@@ -310,7 +313,7 @@ all: all-am
- 
- .SUFFIXES:
- .SUFFIXES: .c .lo .o .obj
--$(srcdir)/Makefile.in:  $(srcdir)/Makefile.am  $(am__configure_deps)
-+$(srcdir)/Makefile.in: @MAINTAINER_MODE_TRUE@ $(srcdir)/Makefile.am  $(am__configure_deps)
- 	@for dep in $?; do \
- 	  case '$(am__configure_deps)' in \
- 	    *$$dep*) \
-@@ -335,9 +338,9 @@ Makefile: $(srcdir)/Makefile.in $(top_bu
- $(top_builddir)/config.status: $(top_srcdir)/configure $(CONFIG_STATUS_DEPENDENCIES)
- 	cd $(top_builddir) && $(MAKE) $(AM_MAKEFLAGS) am--refresh
- 
--$(top_srcdir)/configure:  $(am__configure_deps)
-+$(top_srcdir)/configure: @MAINTAINER_MODE_TRUE@ $(am__configure_deps)
- 	cd $(top_builddir) && $(MAKE) $(AM_MAKEFLAGS) am--refresh
--$(ACLOCAL_M4):  $(am__aclocal_m4_deps)
-+$(ACLOCAL_M4): @MAINTAINER_MODE_TRUE@ $(am__aclocal_m4_deps)
- 	cd $(top_builddir) && $(MAKE) $(AM_MAKEFLAGS) am--refresh
- $(am__aclocal_m4_deps):
- install-pluginLTLIBRARIES: $(plugin_LTLIBRARIES)
-Index: gnome-settings-daemon-2.30.1/plugins/keybindings/Makefile.in
-===================================================================
---- gnome-settings-daemon-2.30.1.orig/plugins/keybindings/Makefile.in	2010-04-26 14:22:49.000000000 +0200
-+++ gnome-settings-daemon-2.30.1/plugins/keybindings/Makefile.in	2010-04-27 19:56:29.397525999 +0200
-@@ -149,6 +149,8 @@ GNOME_KEYBINDINGS_KEYSDIR = @GNOME_KEYBI
- GREP = @GREP@
- GSD_INTLTOOL_PLUGIN_RULE = @GSD_INTLTOOL_PLUGIN_RULE@
- GSD_PLUGIN_LDFLAGS = @GSD_PLUGIN_LDFLAGS@
-+GST_CFLAGS = @GST_CFLAGS@
-+GST_LIBS = @GST_LIBS@
- INSTALL = @INSTALL@
- INSTALL_DATA = @INSTALL_DATA@
- INSTALL_PROGRAM = @INSTALL_PROGRAM@
-@@ -173,6 +175,7 @@ LIBTOOL = @LIBTOOL@
- LIPO = @LIPO@
- LN_S = @LN_S@
- LTLIBOBJS = @LTLIBOBJS@
-+MAINT = @MAINT@
- MAKEINFO = @MAKEINFO@
- MKDIR_P = @MKDIR_P@
- MKINSTALLDIRS = @MKINSTALLDIRS@
-@@ -327,7 +330,7 @@ all: all-am
- 
- .SUFFIXES:
- .SUFFIXES: .c .lo .o .obj
--$(srcdir)/Makefile.in:  $(srcdir)/Makefile.am  $(am__configure_deps)
-+$(srcdir)/Makefile.in: @MAINTAINER_MODE_TRUE@ $(srcdir)/Makefile.am  $(am__configure_deps)
- 	@for dep in $?; do \
- 	  case '$(am__configure_deps)' in \
- 	    *$$dep*) \
-@@ -352,9 +355,9 @@ Makefile: $(srcdir)/Makefile.in $(top_bu
- $(top_builddir)/config.status: $(top_srcdir)/configure $(CONFIG_STATUS_DEPENDENCIES)
- 	cd $(top_builddir) && $(MAKE) $(AM_MAKEFLAGS) am--refresh
- 
--$(top_srcdir)/configure:  $(am__configure_deps)
-+$(top_srcdir)/configure: @MAINTAINER_MODE_TRUE@ $(am__configure_deps)
- 	cd $(top_builddir) && $(MAKE) $(AM_MAKEFLAGS) am--refresh
--$(ACLOCAL_M4):  $(am__aclocal_m4_deps)
-+$(ACLOCAL_M4): @MAINTAINER_MODE_TRUE@ $(am__aclocal_m4_deps)
- 	cd $(top_builddir) && $(MAKE) $(AM_MAKEFLAGS) am--refresh
- $(am__aclocal_m4_deps):
- install-pluginLTLIBRARIES: $(plugin_LTLIBRARIES)
-Index: gnome-settings-daemon-2.30.1/plugins/keyboard/Makefile.in
-===================================================================
---- gnome-settings-daemon-2.30.1.orig/plugins/keyboard/Makefile.in	2010-04-26 14:22:49.000000000 +0200
-+++ gnome-settings-daemon-2.30.1/plugins/keyboard/Makefile.in	2010-04-27 19:56:29.397525999 +0200
-@@ -151,6 +151,8 @@ GNOME_KEYBINDINGS_KEYSDIR = @GNOME_KEYBI
- GREP = @GREP@
- GSD_INTLTOOL_PLUGIN_RULE = @GSD_INTLTOOL_PLUGIN_RULE@
- GSD_PLUGIN_LDFLAGS = @GSD_PLUGIN_LDFLAGS@
-+GST_CFLAGS = @GST_CFLAGS@
-+GST_LIBS = @GST_LIBS@
- INSTALL = @INSTALL@
- INSTALL_DATA = @INSTALL_DATA@
- INSTALL_PROGRAM = @INSTALL_PROGRAM@
-@@ -175,6 +177,7 @@ LIBTOOL = @LIBTOOL@
- LIPO = @LIPO@
- LN_S = @LN_S@
- LTLIBOBJS = @LTLIBOBJS@
-+MAINT = @MAINT@
- MAKEINFO = @MAKEINFO@
- MKDIR_P = @MKDIR_P@
- MKINSTALLDIRS = @MKINSTALLDIRS@
-@@ -340,7 +343,7 @@ all: all-am
- 
- .SUFFIXES:
- .SUFFIXES: .c .lo .o .obj
--$(srcdir)/Makefile.in:  $(srcdir)/Makefile.am  $(am__configure_deps)
-+$(srcdir)/Makefile.in: @MAINTAINER_MODE_TRUE@ $(srcdir)/Makefile.am  $(am__configure_deps)
- 	@for dep in $?; do \
- 	  case '$(am__configure_deps)' in \
- 	    *$$dep*) \
-@@ -365,9 +368,9 @@ Makefile: $(srcdir)/Makefile.in $(top_bu
- $(top_builddir)/config.status: $(top_srcdir)/configure $(CONFIG_STATUS_DEPENDENCIES)
- 	cd $(top_builddir) && $(MAKE) $(AM_MAKEFLAGS) am--refresh
- 
--$(top_srcdir)/configure:  $(am__configure_deps)
-+$(top_srcdir)/configure: @MAINTAINER_MODE_TRUE@ $(am__configure_deps)
- 	cd $(top_builddir) && $(MAKE) $(AM_MAKEFLAGS) am--refresh
--$(ACLOCAL_M4):  $(am__aclocal_m4_deps)
-+$(ACLOCAL_M4): @MAINTAINER_MODE_TRUE@ $(am__aclocal_m4_deps)
- 	cd $(top_builddir) && $(MAKE) $(AM_MAKEFLAGS) am--refresh
- $(am__aclocal_m4_deps):
- install-pluginLTLIBRARIES: $(plugin_LTLIBRARIES)
-Index: gnome-settings-daemon-2.30.1/plugins/Makefile.in
-===================================================================
---- gnome-settings-daemon-2.30.1.orig/plugins/Makefile.in	2010-04-26 14:22:48.000000000 +0200
-+++ gnome-settings-daemon-2.30.1/plugins/Makefile.in	2010-04-27 19:56:29.397525999 +0200
-@@ -135,6 +135,8 @@ GNOME_KEYBINDINGS_KEYSDIR = @GNOME_KEYBI
- GREP = @GREP@
- GSD_INTLTOOL_PLUGIN_RULE = @GSD_INTLTOOL_PLUGIN_RULE@
- GSD_PLUGIN_LDFLAGS = @GSD_PLUGIN_LDFLAGS@
-+GST_CFLAGS = @GST_CFLAGS@
-+GST_LIBS = @GST_LIBS@
- INSTALL = @INSTALL@
- INSTALL_DATA = @INSTALL_DATA@
- INSTALL_PROGRAM = @INSTALL_PROGRAM@
-@@ -159,6 +161,7 @@ LIBTOOL = @LIBTOOL@
- LIPO = @LIPO@
- LN_S = @LN_S@
- LTLIBOBJS = @LTLIBOBJS@
-+MAINT = @MAINT@
- MAKEINFO = @MAKEINFO@
- MKDIR_P = @MKDIR_P@
- MKINSTALLDIRS = @MKINSTALLDIRS@
-@@ -284,7 +287,7 @@ SUBDIRS = \
+@@ -286,7 +289,7 @@
  all: all-recursive
  
  .SUFFIXES:
@@ -10087,7 +9793,7 @@ Index: gnome-settings-daemon-2.30.1/plugins/Makefile.in
  	@for dep in $?; do \
  	  case '$(am__configure_deps)' in \
  	    *$$dep*) \
-@@ -309,9 +312,9 @@ Makefile: $(srcdir)/Makefile.in $(top_bu
+@@ -311,9 +314,9 @@
  $(top_builddir)/config.status: $(top_srcdir)/configure $(CONFIG_STATUS_DEPENDENCIES)
  	cd $(top_builddir) && $(MAKE) $(AM_MAKEFLAGS) am--refresh
  
@@ -10099,615 +9805,509 @@ Index: gnome-settings-daemon-2.30.1/plugins/Makefile.in
  	cd $(top_builddir) && $(MAKE) $(AM_MAKEFLAGS) am--refresh
  $(am__aclocal_m4_deps):
  
-Index: gnome-settings-daemon-2.30.1/plugins/media-keys/actions/Makefile.in
+Index: gnome-settings-daemon-2.30.2/plugins/a11y-keyboard/Makefile.in
 ===================================================================
---- /dev/null	1970-01-01 00:00:00.000000000 +0000
-+++ gnome-settings-daemon-2.30.1/plugins/media-keys/actions/Makefile.in	2010-04-27 19:56:29.397525999 +0200
-@@ -0,0 +1,599 @@
-+# Makefile.in generated by automake 1.10.2 from Makefile.am.
-+# @configure_input@
-+
-+# Copyright (C) 1994, 1995, 1996, 1997, 1998, 1999, 2000, 2001, 2002,
-+# 2003, 2004, 2005, 2006, 2007, 2008  Free Software Foundation, Inc.
-+# This Makefile.in is free software; the Free Software Foundation
-+# gives unlimited permission to copy and/or distribute it,
-+# with or without modifications, as long as this notice is preserved.
-+
-+# This program is distributed in the hope that it will be useful,
-+# but WITHOUT ANY WARRANTY, to the extent permitted by law; without
-+# even the implied warranty of MERCHANTABILITY or FITNESS FOR A
-+# PARTICULAR PURPOSE.
-+
-+@SET_MAKE@
-+
-+
-+VPATH = @srcdir@
-+pkgdatadir = $(datadir)/@PACKAGE@
-+pkglibdir = $(libdir)/@PACKAGE@
-+pkgincludedir = $(includedir)/@PACKAGE@
-+am__cd = CDPATH="$${ZSH_VERSION+.}$(PATH_SEPARATOR)" && cd
-+install_sh_DATA = $(install_sh) -c -m 644
-+install_sh_PROGRAM = $(install_sh) -c
-+install_sh_SCRIPT = $(install_sh) -c
-+INSTALL_HEADER = $(INSTALL_DATA)
-+transform = $(program_transform_name)
-+NORMAL_INSTALL = :
-+PRE_INSTALL = :
-+POST_INSTALL = :
-+NORMAL_UNINSTALL = :
-+PRE_UNINSTALL = :
-+POST_UNINSTALL = :
-+build_triplet = @build@
-+host_triplet = @host@
-+@HAVE_GSTREAMER_TRUE@am__append_1 = \
-+@HAVE_GSTREAMER_TRUE@	acme-volume.c \
-+@HAVE_GSTREAMER_TRUE@	acme-volume.h \
-+@HAVE_GSTREAMER_TRUE@	$(NULL)
-+
-+@HAVE_GSTREAMER_TRUE@am__append_2 = $(GST_CFLAGS)
-+@HAVE_GSTREAMER_TRUE@am__append_3 = $(GST_LIBS)
-+subdir = plugins/media-keys/actions
-+DIST_COMMON = $(srcdir)/Makefile.am $(srcdir)/Makefile.in
-+ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
-+am__aclocal_m4_deps = $(top_srcdir)/acinclude.m4 \
-+	$(top_srcdir)/configure.ac
-+am__configure_deps = $(am__aclocal_m4_deps) $(CONFIGURE_DEPENDENCIES) \
-+	$(ACLOCAL_M4)
-+mkinstalldirs = $(SHELL) $(top_srcdir)/mkinstalldirs
-+CONFIG_HEADER = $(top_builddir)/config.h
-+CONFIG_CLEAN_FILES =
-+LTLIBRARIES = $(noinst_LTLIBRARIES)
-+am__DEPENDENCIES_1 =
-+@HAVE_GSTREAMER_TRUE@am__DEPENDENCIES_2 = $(am__DEPENDENCIES_1)
-+libacme_la_DEPENDENCIES = $(am__DEPENDENCIES_1) $(am__DEPENDENCIES_2)
-+am__libacme_la_SOURCES_DIST = ../acme.h acme-volume.c acme-volume.h
-+am__objects_1 =
-+@HAVE_GSTREAMER_TRUE@am__objects_2 = libacme_la-acme-volume.lo \
-+@HAVE_GSTREAMER_TRUE@	$(am__objects_1)
-+am_libacme_la_OBJECTS = $(am__objects_1) $(am__objects_2)
-+libacme_la_OBJECTS = $(am_libacme_la_OBJECTS)
-+libacme_la_LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) \
-+	$(LIBTOOLFLAGS) --mode=link $(CCLD) $(libacme_la_CFLAGS) \
-+	$(CFLAGS) $(AM_LDFLAGS) $(LDFLAGS) -o $@
-+DEFAULT_INCLUDES = -I.@am__isrc@ -I$(top_builddir)
-+depcomp = $(SHELL) $(top_srcdir)/depcomp
-+am__depfiles_maybe = depfiles
-+COMPILE = $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) \
-+	$(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
-+LTCOMPILE = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) \
-+	--mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) \
-+	$(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
-+CCLD = $(CC)
-+LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) \
-+	--mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) $(AM_LDFLAGS) \
-+	$(LDFLAGS) -o $@
-+SOURCES = $(libacme_la_SOURCES)
-+DIST_SOURCES = $(am__libacme_la_SOURCES_DIST)
-+am__vpath_adj_setup = srcdirstrip=`echo "$(srcdir)" | sed 's|.|.|g'`;
-+am__vpath_adj = case $$p in \
-+    $(srcdir)/*) f=`echo "$$p" | sed "s|^$$srcdirstrip/||"`;; \
-+    *) f=$$p;; \
-+  esac;
-+am__strip_dir = `echo $$p | sed -e 's|^.*/||'`;
-+am__installdirs = "$(DESTDIR)$(gladedir)" "$(DESTDIR)$(pixmapsdir)"
-+gladeDATA_INSTALL = $(INSTALL_DATA)
-+pixmapsDATA_INSTALL = $(INSTALL_DATA)
-+DATA = $(glade_DATA) $(pixmaps_DATA)
-+ETAGS = etags
-+CTAGS = ctags
-+DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
-+ACLOCAL = @ACLOCAL@
-+ALL_LINGUAS = @ALL_LINGUAS@
-+AMTAR = @AMTAR@
-+AR = @AR@
-+AUTOCONF = @AUTOCONF@
-+AUTOHEADER = @AUTOHEADER@
-+AUTOMAKE = @AUTOMAKE@
-+AWK = @AWK@
-+CATALOGS = @CATALOGS@
-+CATOBJEXT = @CATOBJEXT@
-+CC = @CC@
-+CCDEPMODE = @CCDEPMODE@
-+CFLAGS = @CFLAGS@
-+CPP = @CPP@
-+CPPFLAGS = @CPPFLAGS@
-+CXX = @CXX@
-+CXXCPP = @CXXCPP@
-+CXXDEPMODE = @CXXDEPMODE@
-+CXXFLAGS = @CXXFLAGS@
-+CYGPATH_W = @CYGPATH_W@
-+DATADIRNAME = @DATADIRNAME@
-+DBUS_SYS_DIR = @DBUS_SYS_DIR@
-+DEBUG_CFLAGS = @DEBUG_CFLAGS@
-+DEFS = @DEFS@
-+DEPDIR = @DEPDIR@
-+DSYMUTIL = @DSYMUTIL@
-+DUMPBIN = @DUMPBIN@
-+ECHO_C = @ECHO_C@
-+ECHO_N = @ECHO_N@
-+ECHO_T = @ECHO_T@
-+EGREP = @EGREP@
-+EXEEXT = @EXEEXT@
-+FGREP = @FGREP@
-+FONTCONFIG_CFLAGS = @FONTCONFIG_CFLAGS@
-+FONTCONFIG_LIBS = @FONTCONFIG_LIBS@
-+GCONFTOOL = @GCONFTOOL@
-+GCONF_SCHEMA_CONFIG_SOURCE = @GCONF_SCHEMA_CONFIG_SOURCE@
-+GCONF_SCHEMA_FILE_DIR = @GCONF_SCHEMA_FILE_DIR@
-+GETTEXT_PACKAGE = @GETTEXT_PACKAGE@
-+GIOUNIX_CFLAGS = @GIOUNIX_CFLAGS@
-+GIOUNIX_LIBS = @GIOUNIX_LIBS@
-+GLIB_GENMARSHAL = @GLIB_GENMARSHAL@
-+GMOFILES = @GMOFILES@
-+GMSGFMT = @GMSGFMT@
-+GNOME_KEYBINDINGS_KEYSDIR = @GNOME_KEYBINDINGS_KEYSDIR@
-+GREP = @GREP@
-+GSD_INTLTOOL_PLUGIN_RULE = @GSD_INTLTOOL_PLUGIN_RULE@
-+GSD_PLUGIN_LDFLAGS = @GSD_PLUGIN_LDFLAGS@
+--- gnome-settings-daemon-2.30.2.orig/plugins/a11y-keyboard/Makefile.in	2010-07-23 00:54:35.565448618 +0200
++++ gnome-settings-daemon-2.30.2/plugins/a11y-keyboard/Makefile.in	2010-07-23 00:54:14.085446698 +0200
+@@ -170,6 +170,8 @@
+ GREP = @GREP@
+ GSD_INTLTOOL_PLUGIN_RULE = @GSD_INTLTOOL_PLUGIN_RULE@
+ GSD_PLUGIN_LDFLAGS = @GSD_PLUGIN_LDFLAGS@
 +GST_CFLAGS = @GST_CFLAGS@
 +GST_LIBS = @GST_LIBS@
-+INSTALL = @INSTALL@
-+INSTALL_DATA = @INSTALL_DATA@
-+INSTALL_PROGRAM = @INSTALL_PROGRAM@
-+INSTALL_SCRIPT = @INSTALL_SCRIPT@
-+INSTALL_STRIP_PROGRAM = @INSTALL_STRIP_PROGRAM@
-+INSTOBJEXT = @INSTOBJEXT@
-+INTLLIBS = @INTLLIBS@
-+INTLTOOL_EXTRACT = @INTLTOOL_EXTRACT@
-+INTLTOOL_MERGE = @INTLTOOL_MERGE@
-+INTLTOOL_PERL = @INTLTOOL_PERL@
-+INTLTOOL_UPDATE = @INTLTOOL_UPDATE@
-+LD = @LD@
-+LDFLAGS = @LDFLAGS@
-+LIBEXECDIR = @LIBEXECDIR@
-+LIBGNOMEKBD_CFLAGS = @LIBGNOMEKBD_CFLAGS@
-+LIBGNOMEKBD_LIBS = @LIBGNOMEKBD_LIBS@
-+LIBNOTIFY_CFLAGS = @LIBNOTIFY_CFLAGS@
-+LIBNOTIFY_LIBS = @LIBNOTIFY_LIBS@
-+LIBOBJS = @LIBOBJS@
-+LIBS = @LIBS@
-+LIBTOOL = @LIBTOOL@
-+LIPO = @LIPO@
-+LN_S = @LN_S@
-+LTLIBOBJS = @LTLIBOBJS@
+ INSTALL = @INSTALL@
+ INSTALL_DATA = @INSTALL_DATA@
+ INSTALL_PROGRAM = @INSTALL_PROGRAM@
+@@ -194,6 +196,7 @@
+ LIPO = @LIPO@
+ LN_S = @LN_S@
+ LTLIBOBJS = @LTLIBOBJS@
 +MAINT = @MAINT@
-+MAKEINFO = @MAKEINFO@
-+MKDIR_P = @MKDIR_P@
-+MKINSTALLDIRS = @MKINSTALLDIRS@
-+MSGFMT = @MSGFMT@
-+MSGFMT_OPTS = @MSGFMT_OPTS@
-+MSGMERGE = @MSGMERGE@
-+NM = @NM@
-+NMEDIT = @NMEDIT@
-+OBJDUMP = @OBJDUMP@
-+OBJEXT = @OBJEXT@
-+OTOOL = @OTOOL@
-+OTOOL64 = @OTOOL64@
-+PACKAGE = @PACKAGE@
-+PACKAGE_BUGREPORT = @PACKAGE_BUGREPORT@
-+PACKAGE_NAME = @PACKAGE_NAME@
-+PACKAGE_STRING = @PACKAGE_STRING@
-+PACKAGE_TARNAME = @PACKAGE_TARNAME@
-+PACKAGE_VERSION = @PACKAGE_VERSION@
-+PATH_SEPARATOR = @PATH_SEPARATOR@
-+PKG_CONFIG = @PKG_CONFIG@
-+POFILES = @POFILES@
-+POSUB = @POSUB@
-+PO_IN_DATADIR_FALSE = @PO_IN_DATADIR_FALSE@
-+PO_IN_DATADIR_TRUE = @PO_IN_DATADIR_TRUE@
-+PULSE_CFLAGS = @PULSE_CFLAGS@
-+PULSE_LIBS = @PULSE_LIBS@
-+RANDR_LIBS = @RANDR_LIBS@
-+RANLIB = @RANLIB@
-+SED = @SED@
-+SETTINGS_DAEMON_CFLAGS = @SETTINGS_DAEMON_CFLAGS@
-+SETTINGS_DAEMON_LIBS = @SETTINGS_DAEMON_LIBS@
-+SETTINGS_PLUGIN_CFLAGS = @SETTINGS_PLUGIN_CFLAGS@
-+SETTINGS_PLUGIN_LIBS = @SETTINGS_PLUGIN_LIBS@
-+SET_MAKE = @SET_MAKE@
-+SHELL = @SHELL@
-+STRIP = @STRIP@
-+USE_NLS = @USE_NLS@
-+VERSION = @VERSION@
-+WARN_CFLAGS = @WARN_CFLAGS@
-+XF86MISC_LIBS = @XF86MISC_LIBS@
-+XGETTEXT = @XGETTEXT@
-+XINPUT_LIBS = @XINPUT_LIBS@
-+XMKMF = @XMKMF@
-+X_CFLAGS = @X_CFLAGS@
-+X_EXTRA_LIBS = @X_EXTRA_LIBS@
-+X_LIBS = @X_LIBS@
-+X_PRE_LIBS = @X_PRE_LIBS@
-+abs_builddir = @abs_builddir@
-+abs_srcdir = @abs_srcdir@
-+abs_top_builddir = @abs_top_builddir@
-+abs_top_srcdir = @abs_top_srcdir@
-+ac_ct_CC = @ac_ct_CC@
-+ac_ct_CXX = @ac_ct_CXX@
-+ac_ct_DUMPBIN = @ac_ct_DUMPBIN@
-+am__include = @am__include@
-+am__leading_dot = @am__leading_dot@
-+am__quote = @am__quote@
-+am__tar = @am__tar@
-+am__untar = @am__untar@
-+bindir = @bindir@
-+build = @build@
-+build_alias = @build_alias@
-+build_cpu = @build_cpu@
-+build_os = @build_os@
-+build_vendor = @build_vendor@
-+builddir = @builddir@
-+datadir = @datadir@
-+datarootdir = @datarootdir@
-+docdir = @docdir@
-+dvidir = @dvidir@
-+exec_prefix = @exec_prefix@
-+host = @host@
-+host_alias = @host_alias@
-+host_cpu = @host_cpu@
-+host_os = @host_os@
-+host_vendor = @host_vendor@
-+htmldir = @htmldir@
-+includedir = @includedir@
-+infodir = @infodir@
-+install_sh = @install_sh@
-+libdir = @libdir@
-+libexecdir = @libexecdir@
-+localedir = @localedir@
-+localstatedir = @localstatedir@
-+lt_ECHO = @lt_ECHO@
-+mandir = @mandir@
-+mkdir_p = @mkdir_p@
-+oldincludedir = @oldincludedir@
-+pdfdir = @pdfdir@
-+plugindir = @plugindir@
-+prefix = @prefix@
-+program_transform_name = @program_transform_name@
-+psdir = @psdir@
-+sbindir = @sbindir@
-+sharedstatedir = @sharedstatedir@
-+srcdir = @srcdir@
-+sysconfdir = @sysconfdir@
-+target_alias = @target_alias@
-+top_build_prefix = @top_build_prefix@
-+top_builddir = @top_builddir@
-+top_srcdir = @top_srcdir@
-+NULL = 
-+noinst_LTLIBRARIES = libacme.la
-+libacme_la_SOURCES = ../acme.h $(NULL) $(am__append_1)
-+libacme_la_CPPFLAGS = \
-+	-I$(top_srcdir)/gnome-settings-daemon		\
-+	-I$(top_srcdir)/plugins/common			\
-+	-DGNOME_SETTINGS_LOCALEDIR=\""$(datadir)/locale"\" \
-+	$(AM_CPPFLAGS)
-+
-+libacme_la_CFLAGS = $(SETTINGS_PLUGIN_CFLAGS) $(AM_CFLAGS) \
-+	$(am__append_2)
-+libacme_la_LIBADD = $(NULL) $(am__append_3)
-+gladedir = $(pkgdatadir)
-+glade_DATA = \
-+	../acme.glade	\
-+	$(NULL)
-+
-+pixmapsdir = $(pkgdatadir)
-+pixmaps_DATA = \
-+	../acme-eject.png	\
-+	$(NULL)
-+
-+EXTRA_DIST = \
-+	$(glade_DATA)		\
-+	$(pixmaps_DATA)		\
-+	$(NULL)
-+
-+all: all-am
-+
-+.SUFFIXES:
-+.SUFFIXES: .c .lo .o .obj
+ MAKEINFO = @MAKEINFO@
+ MKDIR_P = @MKDIR_P@
+ MKINSTALLDIRS = @MKINSTALLDIRS@
+@@ -382,7 +385,7 @@
+ 
+ .SUFFIXES:
+ .SUFFIXES: .c .lo .o .obj
+-$(srcdir)/Makefile.in:  $(srcdir)/Makefile.am  $(am__configure_deps)
 +$(srcdir)/Makefile.in: @MAINTAINER_MODE_TRUE@ $(srcdir)/Makefile.am  $(am__configure_deps)
-+	@for dep in $?; do \
-+	  case '$(am__configure_deps)' in \
-+	    *$$dep*) \
-+	      ( cd $(top_builddir) && $(MAKE) $(AM_MAKEFLAGS) am--refresh ) \
-+	        && { if test -f $@; then exit 0; else break; fi; }; \
-+	      exit 1;; \
-+	  esac; \
-+	done; \
-+	echo ' cd $(top_srcdir) && $(AUTOMAKE) --gnu  plugins/media-keys/actions/Makefile'; \
-+	cd $(top_srcdir) && \
-+	  $(AUTOMAKE) --gnu  plugins/media-keys/actions/Makefile
-+.PRECIOUS: Makefile
-+Makefile: $(srcdir)/Makefile.in $(top_builddir)/config.status
-+	@case '$?' in \
-+	  *config.status*) \
-+	    cd $(top_builddir) && $(MAKE) $(AM_MAKEFLAGS) am--refresh;; \
-+	  *) \
-+	    echo ' cd $(top_builddir) && $(SHELL) ./config.status $(subdir)/$@ $(am__depfiles_maybe)'; \
-+	    cd $(top_builddir) && $(SHELL) ./config.status $(subdir)/$@ $(am__depfiles_maybe);; \
-+	esac;
-+
-+$(top_builddir)/config.status: $(top_srcdir)/configure $(CONFIG_STATUS_DEPENDENCIES)
-+	cd $(top_builddir) && $(MAKE) $(AM_MAKEFLAGS) am--refresh
-+
+ 	@for dep in $?; do \
+ 	  case '$(am__configure_deps)' in \
+ 	    *$$dep*) \
+@@ -407,9 +410,9 @@
+ $(top_builddir)/config.status: $(top_srcdir)/configure $(CONFIG_STATUS_DEPENDENCIES)
+ 	cd $(top_builddir) && $(MAKE) $(AM_MAKEFLAGS) am--refresh
+ 
+-$(top_srcdir)/configure:  $(am__configure_deps)
 +$(top_srcdir)/configure: @MAINTAINER_MODE_TRUE@ $(am__configure_deps)
-+	cd $(top_builddir) && $(MAKE) $(AM_MAKEFLAGS) am--refresh
+ 	cd $(top_builddir) && $(MAKE) $(AM_MAKEFLAGS) am--refresh
+-$(ACLOCAL_M4):  $(am__aclocal_m4_deps)
 +$(ACLOCAL_M4): @MAINTAINER_MODE_TRUE@ $(am__aclocal_m4_deps)
-+	cd $(top_builddir) && $(MAKE) $(AM_MAKEFLAGS) am--refresh
-+
-+clean-noinstLTLIBRARIES:
-+	-test -z "$(noinst_LTLIBRARIES)" || rm -f $(noinst_LTLIBRARIES)
-+	@list='$(noinst_LTLIBRARIES)'; for p in $$list; do \
-+	  dir="`echo $$p | sed -e 's|/[^/]*$$||'`"; \
-+	  test "$$dir" != "$$p" || dir=.; \
-+	  echo "rm -f \"$${dir}/so_locations\""; \
-+	  rm -f "$${dir}/so_locations"; \
-+	done
-+libacme.la: $(libacme_la_OBJECTS) $(libacme_la_DEPENDENCIES) 
-+	$(libacme_la_LINK)  $(libacme_la_OBJECTS) $(libacme_la_LIBADD) $(LIBS)
-+
-+mostlyclean-compile:
-+	-rm -f *.$(OBJEXT)
-+
-+distclean-compile:
-+	-rm -f *.tab.c
-+
-+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libacme_la-acme-volume.Plo@am__quote@
-+
-+.c.o:
-+@am__fastdepCC_TRUE@	$(COMPILE) -MT $@ -MD -MP -MF $(DEPDIR)/$*.Tpo -c -o $@ $<
-+@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/$*.Tpo $(DEPDIR)/$*.Po
-+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='$<' object='$@' libtool=no @AMDEPBACKSLASH@
-+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-+@am__fastdepCC_FALSE@	$(COMPILE) -c $<
-+
-+.c.obj:
-+@am__fastdepCC_TRUE@	$(COMPILE) -MT $@ -MD -MP -MF $(DEPDIR)/$*.Tpo -c -o $@ `$(CYGPATH_W) '$<'`
-+@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/$*.Tpo $(DEPDIR)/$*.Po
-+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='$<' object='$@' libtool=no @AMDEPBACKSLASH@
-+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-+@am__fastdepCC_FALSE@	$(COMPILE) -c `$(CYGPATH_W) '$<'`
-+
-+.c.lo:
-+@am__fastdepCC_TRUE@	$(LTCOMPILE) -MT $@ -MD -MP -MF $(DEPDIR)/$*.Tpo -c -o $@ $<
-+@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/$*.Tpo $(DEPDIR)/$*.Plo
-+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='$<' object='$@' libtool=yes @AMDEPBACKSLASH@
-+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-+@am__fastdepCC_FALSE@	$(LTCOMPILE) -c -o $@ $<
-+
-+libacme_la-acme-volume.lo: acme-volume.c
-+@am__fastdepCC_TRUE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libacme_la_CPPFLAGS) $(CPPFLAGS) $(libacme_la_CFLAGS) $(CFLAGS) -MT libacme_la-acme-volume.lo -MD -MP -MF $(DEPDIR)/libacme_la-acme-volume.Tpo -c -o libacme_la-acme-volume.lo `test -f 'acme-volume.c' || echo '$(srcdir)/'`acme-volume.c
-+@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/libacme_la-acme-volume.Tpo $(DEPDIR)/libacme_la-acme-volume.Plo
-+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='acme-volume.c' object='libacme_la-acme-volume.lo' libtool=yes @AMDEPBACKSLASH@
-+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-+@am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libacme_la_CPPFLAGS) $(CPPFLAGS) $(libacme_la_CFLAGS) $(CFLAGS) -c -o libacme_la-acme-volume.lo `test -f 'acme-volume.c' || echo '$(srcdir)/'`acme-volume.c
-+
-+mostlyclean-libtool:
-+	-rm -f *.lo
-+
-+clean-libtool:
-+	-rm -rf .libs _libs
-+install-gladeDATA: $(glade_DATA)
-+	@$(NORMAL_INSTALL)
-+	test -z "$(gladedir)" || $(MKDIR_P) "$(DESTDIR)$(gladedir)"
-+	@list='$(glade_DATA)'; for p in $$list; do \
-+	  if test -f "$$p"; then d=; else d="$(srcdir)/"; fi; \
-+	  f=$(am__strip_dir) \
-+	  echo " $(gladeDATA_INSTALL) '$$d$$p' '$(DESTDIR)$(gladedir)/$$f'"; \
-+	  $(gladeDATA_INSTALL) "$$d$$p" "$(DESTDIR)$(gladedir)/$$f"; \
-+	done
-+
-+uninstall-gladeDATA:
-+	@$(NORMAL_UNINSTALL)
-+	@list='$(glade_DATA)'; for p in $$list; do \
-+	  f=$(am__strip_dir) \
-+	  echo " rm -f '$(DESTDIR)$(gladedir)/$$f'"; \
-+	  rm -f "$(DESTDIR)$(gladedir)/$$f"; \
-+	done
-+install-pixmapsDATA: $(pixmaps_DATA)
-+	@$(NORMAL_INSTALL)
-+	test -z "$(pixmapsdir)" || $(MKDIR_P) "$(DESTDIR)$(pixmapsdir)"
-+	@list='$(pixmaps_DATA)'; for p in $$list; do \
-+	  if test -f "$$p"; then d=; else d="$(srcdir)/"; fi; \
-+	  f=$(am__strip_dir) \
-+	  echo " $(pixmapsDATA_INSTALL) '$$d$$p' '$(DESTDIR)$(pixmapsdir)/$$f'"; \
-+	  $(pixmapsDATA_INSTALL) "$$d$$p" "$(DESTDIR)$(pixmapsdir)/$$f"; \
-+	done
-+
-+uninstall-pixmapsDATA:
-+	@$(NORMAL_UNINSTALL)
-+	@list='$(pixmaps_DATA)'; for p in $$list; do \
-+	  f=$(am__strip_dir) \
-+	  echo " rm -f '$(DESTDIR)$(pixmapsdir)/$$f'"; \
-+	  rm -f "$(DESTDIR)$(pixmapsdir)/$$f"; \
-+	done
-+
-+ID: $(HEADERS) $(SOURCES) $(LISP) $(TAGS_FILES)
-+	list='$(SOURCES) $(HEADERS) $(LISP) $(TAGS_FILES)'; \
-+	unique=`for i in $$list; do \
-+	    if test -f "$$i"; then echo $$i; else echo $(srcdir)/$$i; fi; \
-+	  done | \
-+	  $(AWK) '{ files[$$0] = 1; nonempty = 1; } \
-+	      END { if (nonempty) { for (i in files) print i; }; }'`; \
-+	mkid -fID $$unique
-+tags: TAGS
-+
-+TAGS:  $(HEADERS) $(SOURCES)  $(TAGS_DEPENDENCIES) \
-+		$(TAGS_FILES) $(LISP)
-+	tags=; \
-+	here=`pwd`; \
-+	list='$(SOURCES) $(HEADERS)  $(LISP) $(TAGS_FILES)'; \
-+	unique=`for i in $$list; do \
-+	    if test -f "$$i"; then echo $$i; else echo $(srcdir)/$$i; fi; \
-+	  done | \
-+	  $(AWK) '{ files[$$0] = 1; nonempty = 1; } \
-+	      END { if (nonempty) { for (i in files) print i; }; }'`; \
-+	if test -z "$(ETAGS_ARGS)$$tags$$unique"; then :; else \
-+	  test -n "$$unique" || unique=$$empty_fix; \
-+	  $(ETAGS) $(ETAGSFLAGS) $(AM_ETAGSFLAGS) $(ETAGS_ARGS) \
-+	    $$tags $$unique; \
-+	fi
-+ctags: CTAGS
-+CTAGS:  $(HEADERS) $(SOURCES)  $(TAGS_DEPENDENCIES) \
-+		$(TAGS_FILES) $(LISP)
-+	tags=; \
-+	list='$(SOURCES) $(HEADERS)  $(LISP) $(TAGS_FILES)'; \
-+	unique=`for i in $$list; do \
-+	    if test -f "$$i"; then echo $$i; else echo $(srcdir)/$$i; fi; \
-+	  done | \
-+	  $(AWK) '{ files[$$0] = 1; nonempty = 1; } \
-+	      END { if (nonempty) { for (i in files) print i; }; }'`; \
-+	test -z "$(CTAGS_ARGS)$$tags$$unique" \
-+	  || $(CTAGS) $(CTAGSFLAGS) $(AM_CTAGSFLAGS) $(CTAGS_ARGS) \
-+	     $$tags $$unique
-+
-+GTAGS:
-+	here=`$(am__cd) $(top_builddir) && pwd` \
-+	  && cd $(top_srcdir) \
-+	  && gtags -i $(GTAGS_ARGS) $$here
-+
-+distclean-tags:
-+	-rm -f TAGS ID GTAGS GRTAGS GSYMS GPATH tags
-+
-+distdir: $(DISTFILES)
-+	@srcdirstrip=`echo "$(srcdir)" | sed 's/[].[^$$\\*]/\\\\&/g'`; \
-+	topsrcdirstrip=`echo "$(top_srcdir)" | sed 's/[].[^$$\\*]/\\\\&/g'`; \
-+	list='$(DISTFILES)'; \
-+	  dist_files=`for file in $$list; do echo $$file; done | \
-+	  sed -e "s|^$$srcdirstrip/||;t" \
-+	      -e "s|^$$topsrcdirstrip/|$(top_builddir)/|;t"`; \
-+	case $$dist_files in \
-+	  */*) $(MKDIR_P) `echo "$$dist_files" | \
-+			   sed '/\//!d;s|^|$(distdir)/|;s,/[^/]*$$,,' | \
-+			   sort -u` ;; \
-+	esac; \
-+	for file in $$dist_files; do \
-+	  if test -f $$file || test -d $$file; then d=.; else d=$(srcdir); fi; \
-+	  if test -d $$d/$$file; then \
-+	    dir=`echo "/$$file" | sed -e 's,/[^/]*$$,,'`; \
-+	    if test -d $(srcdir)/$$file && test $$d != $(srcdir); then \
-+	      cp -pR $(srcdir)/$$file $(distdir)$$dir || exit 1; \
-+	    fi; \
-+	    cp -pR $$d/$$file $(distdir)$$dir || exit 1; \
-+	  else \
-+	    test -f $(distdir)/$$file \
-+	    || cp -p $$d/$$file $(distdir)/$$file \
-+	    || exit 1; \
-+	  fi; \
-+	done
-+check-am: all-am
-+check: check-am
-+all-am: Makefile $(LTLIBRARIES) $(DATA)
-+installdirs:
-+	for dir in "$(DESTDIR)$(gladedir)" "$(DESTDIR)$(pixmapsdir)"; do \
-+	  test -z "$$dir" || $(MKDIR_P) "$$dir"; \
-+	done
-+install: install-am
-+install-exec: install-exec-am
-+install-data: install-data-am
-+uninstall: uninstall-am
-+
-+install-am: all-am
-+	@$(MAKE) $(AM_MAKEFLAGS) install-exec-am install-data-am
-+
-+installcheck: installcheck-am
-+install-strip:
-+	$(MAKE) $(AM_MAKEFLAGS) INSTALL_PROGRAM="$(INSTALL_STRIP_PROGRAM)" \
-+	  install_sh_PROGRAM="$(INSTALL_STRIP_PROGRAM)" INSTALL_STRIP_FLAG=-s \
-+	  `test -z '$(STRIP)' || \
-+	    echo "INSTALL_PROGRAM_ENV=STRIPPROG='$(STRIP)'"` install
-+mostlyclean-generic:
-+
-+clean-generic:
-+
-+distclean-generic:
-+	-test -z "$(CONFIG_CLEAN_FILES)" || rm -f $(CONFIG_CLEAN_FILES)
-+
-+maintainer-clean-generic:
-+	@echo "This command is intended for maintainers to use"
-+	@echo "it deletes files that may require special tools to rebuild."
-+clean: clean-am
-+
-+clean-am: clean-generic clean-libtool clean-noinstLTLIBRARIES \
-+	mostlyclean-am
-+
-+distclean: distclean-am
-+	-rm -rf ./$(DEPDIR)
-+	-rm -f Makefile
-+distclean-am: clean-am distclean-compile distclean-generic \
-+	distclean-tags
-+
-+dvi: dvi-am
-+
-+dvi-am:
-+
-+html: html-am
-+
-+info: info-am
-+
-+info-am:
-+
-+install-data-am: install-gladeDATA install-pixmapsDATA
-+
-+install-dvi: install-dvi-am
-+
-+install-exec-am:
-+
-+install-html: install-html-am
-+
-+install-info: install-info-am
-+
-+install-man:
-+
-+install-pdf: install-pdf-am
-+
-+install-ps: install-ps-am
-+
-+installcheck-am:
-+
-+maintainer-clean: maintainer-clean-am
-+	-rm -rf ./$(DEPDIR)
-+	-rm -f Makefile
-+maintainer-clean-am: distclean-am maintainer-clean-generic
-+
-+mostlyclean: mostlyclean-am
-+
-+mostlyclean-am: mostlyclean-compile mostlyclean-generic \
-+	mostlyclean-libtool
-+
-+pdf: pdf-am
-+
-+pdf-am:
-+
-+ps: ps-am
-+
-+ps-am:
-+
-+uninstall-am: uninstall-gladeDATA uninstall-pixmapsDATA
-+
-+.MAKE: install-am install-strip
-+
-+.PHONY: CTAGS GTAGS all all-am check check-am clean clean-generic \
-+	clean-libtool clean-noinstLTLIBRARIES ctags distclean \
-+	distclean-compile distclean-generic distclean-libtool \
-+	distclean-tags distdir dvi dvi-am html html-am info info-am \
-+	install install-am install-data install-data-am install-dvi \
-+	install-dvi-am install-exec install-exec-am install-gladeDATA \
-+	install-html install-html-am install-info install-info-am \
-+	install-man install-pdf install-pdf-am install-pixmapsDATA \
-+	install-ps install-ps-am install-strip installcheck \
-+	installcheck-am installdirs maintainer-clean \
-+	maintainer-clean-generic mostlyclean mostlyclean-compile \
-+	mostlyclean-generic mostlyclean-libtool pdf pdf-am ps ps-am \
-+	tags uninstall uninstall-am uninstall-gladeDATA \
-+	uninstall-pixmapsDATA
-+
-+# Tell versions [3.59,3.63) of GNU make to not export all variables.
-+# Otherwise a system limit (for SysV at least) may be exceeded.
-+.NOEXPORT:
-Index: gnome-settings-daemon-2.30.1/plugins/media-keys/cut-n-paste/Makefile.in
+ 	cd $(top_builddir) && $(MAKE) $(AM_MAKEFLAGS) am--refresh
+ $(am__aclocal_m4_deps):
+ install-pluginLTLIBRARIES: $(plugin_LTLIBRARIES)
+Index: gnome-settings-daemon-2.30.2/plugins/background/Makefile.in
 ===================================================================
---- gnome-settings-daemon-2.30.1.orig/plugins/media-keys/cut-n-paste/Makefile.in	2010-04-26 14:22:49.000000000 +0200
-+++ gnome-settings-daemon-2.30.1/plugins/media-keys/cut-n-paste/Makefile.in	2010-04-27 19:56:29.401527067 +0200
-@@ -34,6 +34,46 @@ PRE_UNINSTALL = :
+--- gnome-settings-daemon-2.30.2.orig/plugins/background/Makefile.in	2010-07-23 00:54:35.705452479 +0200
++++ gnome-settings-daemon-2.30.2/plugins/background/Makefile.in	2010-07-23 00:54:14.257449611 +0200
+@@ -163,6 +163,8 @@
+ GREP = @GREP@
+ GSD_INTLTOOL_PLUGIN_RULE = @GSD_INTLTOOL_PLUGIN_RULE@
+ GSD_PLUGIN_LDFLAGS = @GSD_PLUGIN_LDFLAGS@
++GST_CFLAGS = @GST_CFLAGS@
++GST_LIBS = @GST_LIBS@
+ INSTALL = @INSTALL@
+ INSTALL_DATA = @INSTALL_DATA@
+ INSTALL_PROGRAM = @INSTALL_PROGRAM@
+@@ -187,6 +189,7 @@
+ LIPO = @LIPO@
+ LN_S = @LN_S@
+ LTLIBOBJS = @LTLIBOBJS@
++MAINT = @MAINT@
+ MAKEINFO = @MAKEINFO@
+ MKDIR_P = @MKDIR_P@
+ MKINSTALLDIRS = @MKINSTALLDIRS@
+@@ -363,7 +366,7 @@
+ 
+ .SUFFIXES:
+ .SUFFIXES: .c .lo .o .obj
+-$(srcdir)/Makefile.in:  $(srcdir)/Makefile.am  $(am__configure_deps)
++$(srcdir)/Makefile.in: @MAINTAINER_MODE_TRUE@ $(srcdir)/Makefile.am  $(am__configure_deps)
+ 	@for dep in $?; do \
+ 	  case '$(am__configure_deps)' in \
+ 	    *$$dep*) \
+@@ -388,9 +391,9 @@
+ $(top_builddir)/config.status: $(top_srcdir)/configure $(CONFIG_STATUS_DEPENDENCIES)
+ 	cd $(top_builddir) && $(MAKE) $(AM_MAKEFLAGS) am--refresh
+ 
+-$(top_srcdir)/configure:  $(am__configure_deps)
++$(top_srcdir)/configure: @MAINTAINER_MODE_TRUE@ $(am__configure_deps)
+ 	cd $(top_builddir) && $(MAKE) $(AM_MAKEFLAGS) am--refresh
+-$(ACLOCAL_M4):  $(am__aclocal_m4_deps)
++$(ACLOCAL_M4): @MAINTAINER_MODE_TRUE@ $(am__aclocal_m4_deps)
+ 	cd $(top_builddir) && $(MAKE) $(AM_MAKEFLAGS) am--refresh
+ $(am__aclocal_m4_deps):
+ install-pluginLTLIBRARIES: $(plugin_LTLIBRARIES)
+Index: gnome-settings-daemon-2.30.2/plugins/clipboard/Makefile.in
+===================================================================
+--- gnome-settings-daemon-2.30.2.orig/plugins/clipboard/Makefile.in	2010-07-23 00:54:34.829453194 +0200
++++ gnome-settings-daemon-2.30.2/plugins/clipboard/Makefile.in	2010-07-23 00:54:14.413450215 +0200
+@@ -148,6 +148,8 @@
+ GREP = @GREP@
+ GSD_INTLTOOL_PLUGIN_RULE = @GSD_INTLTOOL_PLUGIN_RULE@
+ GSD_PLUGIN_LDFLAGS = @GSD_PLUGIN_LDFLAGS@
++GST_CFLAGS = @GST_CFLAGS@
++GST_LIBS = @GST_LIBS@
+ INSTALL = @INSTALL@
+ INSTALL_DATA = @INSTALL_DATA@
+ INSTALL_PROGRAM = @INSTALL_PROGRAM@
+@@ -172,6 +174,7 @@
+ LIPO = @LIPO@
+ LN_S = @LN_S@
+ LTLIBOBJS = @LTLIBOBJS@
++MAINT = @MAINT@
+ MAKEINFO = @MAKEINFO@
+ MKDIR_P = @MKDIR_P@
+ MKINSTALLDIRS = @MKINSTALLDIRS@
+@@ -330,7 +333,7 @@
+ 
+ .SUFFIXES:
+ .SUFFIXES: .c .lo .o .obj
+-$(srcdir)/Makefile.in:  $(srcdir)/Makefile.am  $(am__configure_deps)
++$(srcdir)/Makefile.in: @MAINTAINER_MODE_TRUE@ $(srcdir)/Makefile.am  $(am__configure_deps)
+ 	@for dep in $?; do \
+ 	  case '$(am__configure_deps)' in \
+ 	    *$$dep*) \
+@@ -355,9 +358,9 @@
+ $(top_builddir)/config.status: $(top_srcdir)/configure $(CONFIG_STATUS_DEPENDENCIES)
+ 	cd $(top_builddir) && $(MAKE) $(AM_MAKEFLAGS) am--refresh
+ 
+-$(top_srcdir)/configure:  $(am__configure_deps)
++$(top_srcdir)/configure: @MAINTAINER_MODE_TRUE@ $(am__configure_deps)
+ 	cd $(top_builddir) && $(MAKE) $(AM_MAKEFLAGS) am--refresh
+-$(ACLOCAL_M4):  $(am__aclocal_m4_deps)
++$(ACLOCAL_M4): @MAINTAINER_MODE_TRUE@ $(am__aclocal_m4_deps)
+ 	cd $(top_builddir) && $(MAKE) $(AM_MAKEFLAGS) am--refresh
+ $(am__aclocal_m4_deps):
+ install-pluginLTLIBRARIES: $(plugin_LTLIBRARIES)
+Index: gnome-settings-daemon-2.30.2/plugins/common/Makefile.in
+===================================================================
+--- gnome-settings-daemon-2.30.2.orig/plugins/common/Makefile.in	2010-07-23 00:54:35.281454063 +0200
++++ gnome-settings-daemon-2.30.2/plugins/common/Makefile.in	2010-07-23 00:54:14.549446584 +0200
+@@ -120,6 +120,8 @@
+ GREP = @GREP@
+ GSD_INTLTOOL_PLUGIN_RULE = @GSD_INTLTOOL_PLUGIN_RULE@
+ GSD_PLUGIN_LDFLAGS = @GSD_PLUGIN_LDFLAGS@
++GST_CFLAGS = @GST_CFLAGS@
++GST_LIBS = @GST_LIBS@
+ INSTALL = @INSTALL@
+ INSTALL_DATA = @INSTALL_DATA@
+ INSTALL_PROGRAM = @INSTALL_PROGRAM@
+@@ -144,6 +146,7 @@
+ LIPO = @LIPO@
+ LN_S = @LN_S@
+ LTLIBOBJS = @LTLIBOBJS@
++MAINT = @MAINT@
+ MAKEINFO = @MAKEINFO@
+ MKDIR_P = @MKDIR_P@
+ MKINSTALLDIRS = @MKINSTALLDIRS@
+@@ -274,7 +277,7 @@
+ 
+ .SUFFIXES:
+ .SUFFIXES: .c .lo .o .obj
+-$(srcdir)/Makefile.in:  $(srcdir)/Makefile.am  $(am__configure_deps)
++$(srcdir)/Makefile.in: @MAINTAINER_MODE_TRUE@ $(srcdir)/Makefile.am  $(am__configure_deps)
+ 	@for dep in $?; do \
+ 	  case '$(am__configure_deps)' in \
+ 	    *$$dep*) \
+@@ -299,9 +302,9 @@
+ $(top_builddir)/config.status: $(top_srcdir)/configure $(CONFIG_STATUS_DEPENDENCIES)
+ 	cd $(top_builddir) && $(MAKE) $(AM_MAKEFLAGS) am--refresh
+ 
+-$(top_srcdir)/configure:  $(am__configure_deps)
++$(top_srcdir)/configure: @MAINTAINER_MODE_TRUE@ $(am__configure_deps)
+ 	cd $(top_builddir) && $(MAKE) $(AM_MAKEFLAGS) am--refresh
+-$(ACLOCAL_M4):  $(am__aclocal_m4_deps)
++$(ACLOCAL_M4): @MAINTAINER_MODE_TRUE@ $(am__aclocal_m4_deps)
+ 	cd $(top_builddir) && $(MAKE) $(AM_MAKEFLAGS) am--refresh
+ $(am__aclocal_m4_deps):
+ 
+Index: gnome-settings-daemon-2.30.2/plugins/dummy/Makefile.in
+===================================================================
+--- gnome-settings-daemon-2.30.2.orig/plugins/dummy/Makefile.in	2010-07-23 00:54:36.121449604 +0200
++++ gnome-settings-daemon-2.30.2/plugins/dummy/Makefile.in	2010-07-23 00:54:14.689447925 +0200
+@@ -144,6 +144,8 @@
+ GREP = @GREP@
+ GSD_INTLTOOL_PLUGIN_RULE = @GSD_INTLTOOL_PLUGIN_RULE@
+ GSD_PLUGIN_LDFLAGS = @GSD_PLUGIN_LDFLAGS@
++GST_CFLAGS = @GST_CFLAGS@
++GST_LIBS = @GST_LIBS@
+ INSTALL = @INSTALL@
+ INSTALL_DATA = @INSTALL_DATA@
+ INSTALL_PROGRAM = @INSTALL_PROGRAM@
+@@ -168,6 +170,7 @@
+ LIPO = @LIPO@
+ LN_S = @LN_S@
+ LTLIBOBJS = @LTLIBOBJS@
++MAINT = @MAINT@
+ MAKEINFO = @MAKEINFO@
+ MKDIR_P = @MKDIR_P@
+ MKINSTALLDIRS = @MKINSTALLDIRS@
+@@ -313,7 +316,7 @@
+ 
+ .SUFFIXES:
+ .SUFFIXES: .c .lo .o .obj
+-$(srcdir)/Makefile.in:  $(srcdir)/Makefile.am  $(am__configure_deps)
++$(srcdir)/Makefile.in: @MAINTAINER_MODE_TRUE@ $(srcdir)/Makefile.am  $(am__configure_deps)
+ 	@for dep in $?; do \
+ 	  case '$(am__configure_deps)' in \
+ 	    *$$dep*) \
+@@ -338,9 +341,9 @@
+ $(top_builddir)/config.status: $(top_srcdir)/configure $(CONFIG_STATUS_DEPENDENCIES)
+ 	cd $(top_builddir) && $(MAKE) $(AM_MAKEFLAGS) am--refresh
+ 
+-$(top_srcdir)/configure:  $(am__configure_deps)
++$(top_srcdir)/configure: @MAINTAINER_MODE_TRUE@ $(am__configure_deps)
+ 	cd $(top_builddir) && $(MAKE) $(AM_MAKEFLAGS) am--refresh
+-$(ACLOCAL_M4):  $(am__aclocal_m4_deps)
++$(ACLOCAL_M4): @MAINTAINER_MODE_TRUE@ $(am__aclocal_m4_deps)
+ 	cd $(top_builddir) && $(MAKE) $(AM_MAKEFLAGS) am--refresh
+ $(am__aclocal_m4_deps):
+ 
+Index: gnome-settings-daemon-2.30.2/plugins/font/Makefile.in
+===================================================================
+--- gnome-settings-daemon-2.30.2.orig/plugins/font/Makefile.in	2010-07-23 00:54:34.981453843 +0200
++++ gnome-settings-daemon-2.30.2/plugins/font/Makefile.in	2010-07-23 00:54:14.837447515 +0200
+@@ -146,6 +146,8 @@
+ GREP = @GREP@
+ GSD_INTLTOOL_PLUGIN_RULE = @GSD_INTLTOOL_PLUGIN_RULE@
+ GSD_PLUGIN_LDFLAGS = @GSD_PLUGIN_LDFLAGS@
++GST_CFLAGS = @GST_CFLAGS@
++GST_LIBS = @GST_LIBS@
+ INSTALL = @INSTALL@
+ INSTALL_DATA = @INSTALL_DATA@
+ INSTALL_PROGRAM = @INSTALL_PROGRAM@
+@@ -170,6 +172,7 @@
+ LIPO = @LIPO@
+ LN_S = @LN_S@
+ LTLIBOBJS = @LTLIBOBJS@
++MAINT = @MAINT@
+ MAKEINFO = @MAKEINFO@
+ MKDIR_P = @MKDIR_P@
+ MKINSTALLDIRS = @MKINSTALLDIRS@
+@@ -326,7 +329,7 @@
+ 
+ .SUFFIXES:
+ .SUFFIXES: .c .lo .o .obj
+-$(srcdir)/Makefile.in:  $(srcdir)/Makefile.am  $(am__configure_deps)
++$(srcdir)/Makefile.in: @MAINTAINER_MODE_TRUE@ $(srcdir)/Makefile.am  $(am__configure_deps)
+ 	@for dep in $?; do \
+ 	  case '$(am__configure_deps)' in \
+ 	    *$$dep*) \
+@@ -351,9 +354,9 @@
+ $(top_builddir)/config.status: $(top_srcdir)/configure $(CONFIG_STATUS_DEPENDENCIES)
+ 	cd $(top_builddir) && $(MAKE) $(AM_MAKEFLAGS) am--refresh
+ 
+-$(top_srcdir)/configure:  $(am__configure_deps)
++$(top_srcdir)/configure: @MAINTAINER_MODE_TRUE@ $(am__configure_deps)
+ 	cd $(top_builddir) && $(MAKE) $(AM_MAKEFLAGS) am--refresh
+-$(ACLOCAL_M4):  $(am__aclocal_m4_deps)
++$(ACLOCAL_M4): @MAINTAINER_MODE_TRUE@ $(am__aclocal_m4_deps)
+ 	cd $(top_builddir) && $(MAKE) $(AM_MAKEFLAGS) am--refresh
+ $(am__aclocal_m4_deps):
+ install-pluginLTLIBRARIES: $(plugin_LTLIBRARIES)
+Index: gnome-settings-daemon-2.30.2/plugins/housekeeping/Makefile.in
+===================================================================
+--- gnome-settings-daemon-2.30.2.orig/plugins/housekeeping/Makefile.in	2010-07-23 00:54:35.353454858 +0200
++++ gnome-settings-daemon-2.30.2/plugins/housekeeping/Makefile.in	2010-07-23 00:54:15.013446749 +0200
+@@ -149,6 +149,8 @@
+ GREP = @GREP@
+ GSD_INTLTOOL_PLUGIN_RULE = @GSD_INTLTOOL_PLUGIN_RULE@
+ GSD_PLUGIN_LDFLAGS = @GSD_PLUGIN_LDFLAGS@
++GST_CFLAGS = @GST_CFLAGS@
++GST_LIBS = @GST_LIBS@
+ INSTALL = @INSTALL@
+ INSTALL_DATA = @INSTALL_DATA@
+ INSTALL_PROGRAM = @INSTALL_PROGRAM@
+@@ -173,6 +175,7 @@
+ LIPO = @LIPO@
+ LN_S = @LN_S@
+ LTLIBOBJS = @LTLIBOBJS@
++MAINT = @MAINT@
+ MAKEINFO = @MAKEINFO@
+ MKDIR_P = @MKDIR_P@
+ MKINSTALLDIRS = @MKINSTALLDIRS@
+@@ -312,7 +315,7 @@
+ 
+ .SUFFIXES:
+ .SUFFIXES: .c .lo .o .obj
+-$(srcdir)/Makefile.in:  $(srcdir)/Makefile.am  $(am__configure_deps)
++$(srcdir)/Makefile.in: @MAINTAINER_MODE_TRUE@ $(srcdir)/Makefile.am  $(am__configure_deps)
+ 	@for dep in $?; do \
+ 	  case '$(am__configure_deps)' in \
+ 	    *$$dep*) \
+@@ -337,9 +340,9 @@
+ $(top_builddir)/config.status: $(top_srcdir)/configure $(CONFIG_STATUS_DEPENDENCIES)
+ 	cd $(top_builddir) && $(MAKE) $(AM_MAKEFLAGS) am--refresh
+ 
+-$(top_srcdir)/configure:  $(am__configure_deps)
++$(top_srcdir)/configure: @MAINTAINER_MODE_TRUE@ $(am__configure_deps)
+ 	cd $(top_builddir) && $(MAKE) $(AM_MAKEFLAGS) am--refresh
+-$(ACLOCAL_M4):  $(am__aclocal_m4_deps)
++$(ACLOCAL_M4): @MAINTAINER_MODE_TRUE@ $(am__aclocal_m4_deps)
+ 	cd $(top_builddir) && $(MAKE) $(AM_MAKEFLAGS) am--refresh
+ $(am__aclocal_m4_deps):
+ install-pluginLTLIBRARIES: $(plugin_LTLIBRARIES)
+Index: gnome-settings-daemon-2.30.2/plugins/keybindings/Makefile.in
+===================================================================
+--- gnome-settings-daemon-2.30.2.orig/plugins/keybindings/Makefile.in	2010-07-23 00:54:35.429452529 +0200
++++ gnome-settings-daemon-2.30.2/plugins/keybindings/Makefile.in	2010-07-23 00:54:15.157446923 +0200
+@@ -149,6 +149,8 @@
+ GREP = @GREP@
+ GSD_INTLTOOL_PLUGIN_RULE = @GSD_INTLTOOL_PLUGIN_RULE@
+ GSD_PLUGIN_LDFLAGS = @GSD_PLUGIN_LDFLAGS@
++GST_CFLAGS = @GST_CFLAGS@
++GST_LIBS = @GST_LIBS@
+ INSTALL = @INSTALL@
+ INSTALL_DATA = @INSTALL_DATA@
+ INSTALL_PROGRAM = @INSTALL_PROGRAM@
+@@ -173,6 +175,7 @@
+ LIPO = @LIPO@
+ LN_S = @LN_S@
+ LTLIBOBJS = @LTLIBOBJS@
++MAINT = @MAINT@
+ MAKEINFO = @MAKEINFO@
+ MKDIR_P = @MKDIR_P@
+ MKINSTALLDIRS = @MKINSTALLDIRS@
+@@ -329,7 +332,7 @@
+ 
+ .SUFFIXES:
+ .SUFFIXES: .c .lo .o .obj
+-$(srcdir)/Makefile.in:  $(srcdir)/Makefile.am  $(am__configure_deps)
++$(srcdir)/Makefile.in: @MAINTAINER_MODE_TRUE@ $(srcdir)/Makefile.am  $(am__configure_deps)
+ 	@for dep in $?; do \
+ 	  case '$(am__configure_deps)' in \
+ 	    *$$dep*) \
+@@ -354,9 +357,9 @@
+ $(top_builddir)/config.status: $(top_srcdir)/configure $(CONFIG_STATUS_DEPENDENCIES)
+ 	cd $(top_builddir) && $(MAKE) $(AM_MAKEFLAGS) am--refresh
+ 
+-$(top_srcdir)/configure:  $(am__configure_deps)
++$(top_srcdir)/configure: @MAINTAINER_MODE_TRUE@ $(am__configure_deps)
+ 	cd $(top_builddir) && $(MAKE) $(AM_MAKEFLAGS) am--refresh
+-$(ACLOCAL_M4):  $(am__aclocal_m4_deps)
++$(ACLOCAL_M4): @MAINTAINER_MODE_TRUE@ $(am__aclocal_m4_deps)
+ 	cd $(top_builddir) && $(MAKE) $(AM_MAKEFLAGS) am--refresh
+ $(am__aclocal_m4_deps):
+ install-pluginLTLIBRARIES: $(plugin_LTLIBRARIES)
+Index: gnome-settings-daemon-2.30.2/plugins/keyboard/Makefile.in
+===================================================================
+--- gnome-settings-daemon-2.30.2.orig/plugins/keyboard/Makefile.in	2010-07-23 00:54:34.905453939 +0200
++++ gnome-settings-daemon-2.30.2/plugins/keyboard/Makefile.in	2010-07-23 00:54:15.321447711 +0200
+@@ -151,6 +151,8 @@
+ GREP = @GREP@
+ GSD_INTLTOOL_PLUGIN_RULE = @GSD_INTLTOOL_PLUGIN_RULE@
+ GSD_PLUGIN_LDFLAGS = @GSD_PLUGIN_LDFLAGS@
++GST_CFLAGS = @GST_CFLAGS@
++GST_LIBS = @GST_LIBS@
+ INSTALL = @INSTALL@
+ INSTALL_DATA = @INSTALL_DATA@
+ INSTALL_PROGRAM = @INSTALL_PROGRAM@
+@@ -175,6 +177,7 @@
+ LIPO = @LIPO@
+ LN_S = @LN_S@
+ LTLIBOBJS = @LTLIBOBJS@
++MAINT = @MAINT@
+ MAKEINFO = @MAKEINFO@
+ MKDIR_P = @MKDIR_P@
+ MKINSTALLDIRS = @MKINSTALLDIRS@
+@@ -342,7 +345,7 @@
+ 
+ .SUFFIXES:
+ .SUFFIXES: .c .lo .o .obj
+-$(srcdir)/Makefile.in:  $(srcdir)/Makefile.am  $(am__configure_deps)
++$(srcdir)/Makefile.in: @MAINTAINER_MODE_TRUE@ $(srcdir)/Makefile.am  $(am__configure_deps)
+ 	@for dep in $?; do \
+ 	  case '$(am__configure_deps)' in \
+ 	    *$$dep*) \
+@@ -367,9 +370,9 @@
+ $(top_builddir)/config.status: $(top_srcdir)/configure $(CONFIG_STATUS_DEPENDENCIES)
+ 	cd $(top_builddir) && $(MAKE) $(AM_MAKEFLAGS) am--refresh
+ 
+-$(top_srcdir)/configure:  $(am__configure_deps)
++$(top_srcdir)/configure: @MAINTAINER_MODE_TRUE@ $(am__configure_deps)
+ 	cd $(top_builddir) && $(MAKE) $(AM_MAKEFLAGS) am--refresh
+-$(ACLOCAL_M4):  $(am__aclocal_m4_deps)
++$(ACLOCAL_M4): @MAINTAINER_MODE_TRUE@ $(am__aclocal_m4_deps)
+ 	cd $(top_builddir) && $(MAKE) $(AM_MAKEFLAGS) am--refresh
+ $(am__aclocal_m4_deps):
+ install-pluginLTLIBRARIES: $(plugin_LTLIBRARIES)
+Index: gnome-settings-daemon-2.30.2/plugins/media-keys/Makefile.in
+===================================================================
+--- gnome-settings-daemon-2.30.2.orig/plugins/media-keys/Makefile.in	2010-07-23 00:54:35.773448297 +0200
++++ gnome-settings-daemon-2.30.2/plugins/media-keys/Makefile.in	2010-07-23 00:54:15.565447225 +0200
+@@ -36,11 +36,8 @@
+ POST_UNINSTALL = :
+ build_triplet = @build@
+ host_triplet = @host@
+-@HAVE_PULSE_TRUE@am__append_1 = cut-n-paste
+-@HAVE_PULSE_TRUE@am__append_2 = libmedia-keys.la
+ noinst_PROGRAMS = test-media-keys$(EXEEXT) test-media-window$(EXEEXT) \
+ 	$(am__EXEEXT_1)
+-@HAVE_PULSE_TRUE@am__append_3 = $(top_builddir)/plugins/media-keys/cut-n-paste/libgvc.la
+ subdir = plugins/media-keys
+ DIST_COMMON = $(srcdir)/Makefile.am $(srcdir)/Makefile.in
+ ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
+@@ -92,7 +89,6 @@
+ libmedia_keys_la_LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) \
+ 	$(LIBTOOLFLAGS) --mode=link $(CCLD) $(libmedia_keys_la_CFLAGS) \
+ 	$(CFLAGS) $(libmedia_keys_la_LDFLAGS) $(LDFLAGS) -o $@
+-@HAVE_PULSE_TRUE@am_libmedia_keys_la_rpath = -rpath $(plugindir)
+ am__EXEEXT_1 =
+ PROGRAMS = $(noinst_PROGRAMS)
+ am__objects_3 = test_media_keys-gsd-marshal.$(OBJEXT) $(am__objects_1)
+@@ -106,7 +102,8 @@
+ 	$(top_builddir)/gnome-settings-daemon/libgsd-profile.la \
+ 	$(top_builddir)/plugins/common/libcommon.la \
+ 	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
+-	$(am__DEPENDENCIES_1) $(am__append_3)
++	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
++	$(top_builddir)/plugins/media-keys/cut-n-paste/libgvc.la
+ test_media_keys_LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) \
+ 	$(LIBTOOLFLAGS) --mode=link $(CCLD) $(test_media_keys_CFLAGS) \
+ 	$(CFLAGS) $(AM_LDFLAGS) $(LDFLAGS) -o $@
+@@ -117,7 +114,7 @@
+ test_media_window_DEPENDENCIES =  \
+ 	$(top_builddir)/plugins/common/libcommon.la \
+ 	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
+-	$(am__DEPENDENCIES_1)
++	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1)
+ test_media_window_LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) \
+ 	$(LIBTOOLFLAGS) --mode=link $(CCLD) \
+ 	$(test_media_window_CFLAGS) $(CFLAGS) $(AM_LDFLAGS) $(LDFLAGS) \
+@@ -228,6 +225,8 @@
+ GREP = @GREP@
+ GSD_INTLTOOL_PLUGIN_RULE = @GSD_INTLTOOL_PLUGIN_RULE@
+ GSD_PLUGIN_LDFLAGS = @GSD_PLUGIN_LDFLAGS@
++GST_CFLAGS = @GST_CFLAGS@
++GST_LIBS = @GST_LIBS@
+ INSTALL = @INSTALL@
+ INSTALL_DATA = @INSTALL_DATA@
+ INSTALL_PROGRAM = @INSTALL_PROGRAM@
+@@ -252,6 +251,7 @@
+ LIPO = @LIPO@
+ LN_S = @LN_S@
+ LTLIBOBJS = @LTLIBOBJS@
++MAINT = @MAINT@
+ MAKEINFO = @MAKEINFO@
+ MKDIR_P = @MKDIR_P@
+ MKINSTALLDIRS = @MKINSTALLDIRS@
+@@ -359,8 +359,8 @@
+ icondir = $(datadir)/icons/hicolor
+ context = actions
+ NULL = 
+-SUBDIRS = $(am__append_1)
+-plugin_LTLIBRARIES = $(am__append_2)
++SUBDIRS = cut-n-paste
++plugin_LTLIBRARIES = libmedia-keys.la
+ BUILT_SOURCES = \
+ 	gsd-media-keys-manager-glue.h	\
+ 	gsd-marshal.h			\
+@@ -418,7 +418,7 @@
+ plugin_in_files = \
+ 	media-keys.gnome-settings-plugin.in
+ 
+-@HAVE_PULSE_TRUE@plugin_DATA = $(plugin_in_files:.gnome-settings-plugin.in=.gnome-settings-plugin)
++plugin_DATA = $(plugin_in_files:.gnome-settings-plugin.in=.gnome-settings-plugin)
+ test_media_window_SOURCES = \
+ 	gsd-media-keys-window.c			\
+ 	gsd-media-keys-window.h			\
+@@ -473,7 +473,8 @@
+ 	$(top_builddir)/gnome-settings-daemon/libgsd-profile.la \
+ 	$(top_builddir)/plugins/common/libcommon.la \
+ 	$(SETTINGS_DAEMON_LIBS) $(SETTINGS_PLUGIN_LIBS) \
+-	$(XF86MISC_LIBS) $(GST_LIBS) -lm $(am__append_3)
++	$(XF86MISC_LIBS) $(GST_LIBS) -lm \
++	$(top_builddir)/plugins/media-keys/cut-n-paste/libgvc.la
+ gtkbuilderdir = $(pkgdatadir)
+ gtkbuilder_DATA = \
+ 	acme.ui		\
+@@ -500,7 +501,7 @@
+ 
+ .SUFFIXES:
+ .SUFFIXES: .c .lo .o .obj
+-$(srcdir)/Makefile.in:  $(srcdir)/Makefile.am  $(am__configure_deps)
++$(srcdir)/Makefile.in: @MAINTAINER_MODE_TRUE@ $(srcdir)/Makefile.am  $(am__configure_deps)
+ 	@for dep in $?; do \
+ 	  case '$(am__configure_deps)' in \
+ 	    *$$dep*) \
+@@ -525,9 +526,9 @@
+ $(top_builddir)/config.status: $(top_srcdir)/configure $(CONFIG_STATUS_DEPENDENCIES)
+ 	cd $(top_builddir) && $(MAKE) $(AM_MAKEFLAGS) am--refresh
+ 
+-$(top_srcdir)/configure:  $(am__configure_deps)
++$(top_srcdir)/configure: @MAINTAINER_MODE_TRUE@ $(am__configure_deps)
+ 	cd $(top_builddir) && $(MAKE) $(AM_MAKEFLAGS) am--refresh
+-$(ACLOCAL_M4):  $(am__aclocal_m4_deps)
++$(ACLOCAL_M4): @MAINTAINER_MODE_TRUE@ $(am__aclocal_m4_deps)
+ 	cd $(top_builddir) && $(MAKE) $(AM_MAKEFLAGS) am--refresh
+ $(am__aclocal_m4_deps):
+ install-pluginLTLIBRARIES: $(plugin_LTLIBRARIES)
+@@ -562,7 +563,7 @@
+ 	  rm -f "$${dir}/so_locations"; \
+ 	done
+ libmedia-keys.la: $(libmedia_keys_la_OBJECTS) $(libmedia_keys_la_DEPENDENCIES) 
+-	$(libmedia_keys_la_LINK) $(am_libmedia_keys_la_rpath) $(libmedia_keys_la_OBJECTS) $(libmedia_keys_la_LIBADD) $(LIBS)
++	$(libmedia_keys_la_LINK) -rpath $(plugindir) $(libmedia_keys_la_OBJECTS) $(libmedia_keys_la_LIBADD) $(LIBS)
+ 
+ clean-noinstPROGRAMS:
+ 	@list='$(noinst_PROGRAMS)'; test -n "$$list" || exit 0; \
+Index: gnome-settings-daemon-2.30.2/plugins/media-keys/cut-n-paste/Makefile.in
+===================================================================
+--- gnome-settings-daemon-2.30.2.orig/plugins/media-keys/cut-n-paste/Makefile.in	2010-07-23 00:54:35.861453087 +0200
++++ gnome-settings-daemon-2.30.2/plugins/media-keys/cut-n-paste/Makefile.in	2010-07-23 00:54:15.701448338 +0200
+@@ -34,6 +34,46 @@
  POST_UNINSTALL = :
  build_triplet = @build@
  host_triplet = @host@
@@ -10754,7 +10354,7 @@ Index: gnome-settings-daemon-2.30.1/plugins/media-keys/cut-n-paste/Makefile.in
  subdir = plugins/media-keys/cut-n-paste
  DIST_COMMON = $(srcdir)/Makefile.am $(srcdir)/Makefile.in
  ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
-@@ -47,12 +87,28 @@ CONFIG_CLEAN_FILES =
+@@ -47,12 +87,28 @@
  CONFIG_CLEAN_VPATH_FILES =
  LTLIBRARIES = $(noinst_LTLIBRARIES)
  am__DEPENDENCIES_1 =
@@ -10788,7 +10388,7 @@ Index: gnome-settings-daemon-2.30.1/plugins/media-keys/cut-n-paste/Makefile.in
  libgvc_la_OBJECTS = $(am_libgvc_la_OBJECTS)
  DEFAULT_INCLUDES = -I.@am__isrc@ -I$(top_builddir)
  depcomp = $(SHELL) $(top_srcdir)/depcomp
-@@ -68,7 +124,7 @@ LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLF
+@@ -68,7 +124,7 @@
  	--mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) $(AM_LDFLAGS) \
  	$(LDFLAGS) -o $@
  SOURCES = $(libgvc_la_SOURCES)
@@ -10797,7 +10397,7 @@ Index: gnome-settings-daemon-2.30.1/plugins/media-keys/cut-n-paste/Makefile.in
  ETAGS = etags
  CTAGS = ctags
  DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
-@@ -120,6 +176,8 @@ GNOME_KEYBINDINGS_KEYSDIR = @GNOME_KEYBI
+@@ -120,6 +176,8 @@
  GREP = @GREP@
  GSD_INTLTOOL_PLUGIN_RULE = @GSD_INTLTOOL_PLUGIN_RULE@
  GSD_PLUGIN_LDFLAGS = @GSD_PLUGIN_LDFLAGS@
@@ -10806,7 +10406,7 @@ Index: gnome-settings-daemon-2.30.1/plugins/media-keys/cut-n-paste/Makefile.in
  INSTALL = @INSTALL@
  INSTALL_DATA = @INSTALL_DATA@
  INSTALL_PROGRAM = @INSTALL_PROGRAM@
-@@ -144,6 +202,7 @@ LIBTOOL = @LIBTOOL@
+@@ -144,6 +202,7 @@
  LIPO = @LIPO@
  LN_S = @LN_S@
  LTLIBOBJS = @LTLIBOBJS@
@@ -10814,7 +10414,7 @@ Index: gnome-settings-daemon-2.30.1/plugins/media-keys/cut-n-paste/Makefile.in
  MAKEINFO = @MAKEINFO@
  MKDIR_P = @MKDIR_P@
  MKINSTALLDIRS = @MKINSTALLDIRS@
-@@ -248,38 +307,9 @@ top_builddir = @top_builddir@
+@@ -250,38 +309,9 @@
  top_srcdir = @top_srcdir@
  NULL = 
  noinst_LTLIBRARIES = libgvc.la
@@ -10856,7 +10456,7 @@ Index: gnome-settings-daemon-2.30.1/plugins/media-keys/cut-n-paste/Makefile.in
  MAINTAINERCLEANFILES = \
          *~                              \
          Makefile.in
-@@ -288,7 +318,7 @@ all: all-am
+@@ -290,7 +320,7 @@
  
  .SUFFIXES:
  .SUFFIXES: .c .lo .o .obj
@@ -10865,7 +10465,7 @@ Index: gnome-settings-daemon-2.30.1/plugins/media-keys/cut-n-paste/Makefile.in
  	@for dep in $?; do \
  	  case '$(am__configure_deps)' in \
  	    *$$dep*) \
-@@ -313,9 +343,9 @@ Makefile: $(srcdir)/Makefile.in $(top_bu
+@@ -315,9 +345,9 @@
  $(top_builddir)/config.status: $(top_srcdir)/configure $(CONFIG_STATUS_DEPENDENCIES)
  	cd $(top_builddir) && $(MAKE) $(AM_MAKEFLAGS) am--refresh
  
@@ -10877,7 +10477,7 @@ Index: gnome-settings-daemon-2.30.1/plugins/media-keys/cut-n-paste/Makefile.in
  	cd $(top_builddir) && $(MAKE) $(AM_MAKEFLAGS) am--refresh
  $(am__aclocal_m4_deps):
  
-@@ -337,6 +367,7 @@ distclean-compile:
+@@ -339,6 +369,7 @@
  	-rm -f *.tab.c
  
  @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/gvc-channel-map.Plo@am__quote@
@@ -10885,50 +10485,11 @@ Index: gnome-settings-daemon-2.30.1/plugins/media-keys/cut-n-paste/Makefile.in
  @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/gvc-mixer-card.Plo@am__quote@
  @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/gvc-mixer-control.Plo@am__quote@
  @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/gvc-mixer-event-role.Plo@am__quote@
-Index: gnome-settings-daemon-2.30.1/plugins/media-keys/Makefile.in
+Index: gnome-settings-daemon-2.30.2/plugins/mouse/Makefile.in
 ===================================================================
---- gnome-settings-daemon-2.30.1.orig/plugins/media-keys/Makefile.in	2010-04-26 14:22:49.000000000 +0200
-+++ gnome-settings-daemon-2.30.1/plugins/media-keys/Makefile.in	2010-04-27 19:56:44.501528178 +0200
-@@ -36,11 +36,8 @@ PRE_UNINSTALL = :
- POST_UNINSTALL = :
- build_triplet = @build@
- host_triplet = @host@
--@HAVE_PULSE_TRUE@am__append_1 = cut-n-paste
--@HAVE_PULSE_TRUE@am__append_2 = libmedia-keys.la
- noinst_PROGRAMS = test-media-keys$(EXEEXT) test-media-window$(EXEEXT) \
- 	$(am__EXEEXT_1)
--@HAVE_PULSE_TRUE@am__append_3 = $(top_builddir)/plugins/media-keys/cut-n-paste/libgvc.la
- subdir = plugins/media-keys
- DIST_COMMON = $(srcdir)/Makefile.am $(srcdir)/Makefile.in
- ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
-@@ -92,7 +89,6 @@ libmedia_keys_la_OBJECTS = $(am_libmedia
- libmedia_keys_la_LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) \
- 	$(LIBTOOLFLAGS) --mode=link $(CCLD) $(libmedia_keys_la_CFLAGS) \
- 	$(CFLAGS) $(libmedia_keys_la_LDFLAGS) $(LDFLAGS) -o $@
--@HAVE_PULSE_TRUE@am_libmedia_keys_la_rpath = -rpath $(plugindir)
- am__EXEEXT_1 =
- PROGRAMS = $(noinst_PROGRAMS)
- am__objects_3 = test_media_keys-gsd-marshal.$(OBJEXT) $(am__objects_1)
-@@ -106,7 +102,8 @@ test_media_keys_DEPENDENCIES =  \
- 	$(top_builddir)/gnome-settings-daemon/libgsd-profile.la \
- 	$(top_builddir)/plugins/common/libcommon.la \
- 	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
--	$(am__DEPENDENCIES_1) $(am__append_3)
-+	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
-+	$(top_builddir)/plugins/media-keys/cut-n-paste/libgvc.la
- test_media_keys_LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) \
- 	$(LIBTOOLFLAGS) --mode=link $(CCLD) $(test_media_keys_CFLAGS) \
- 	$(CFLAGS) $(AM_LDFLAGS) $(LDFLAGS) -o $@
-@@ -117,7 +114,7 @@ test_media_window_OBJECTS = $(am_test_me
- test_media_window_DEPENDENCIES =  \
- 	$(top_builddir)/plugins/common/libcommon.la \
- 	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
--	$(am__DEPENDENCIES_1)
-+	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1)
- test_media_window_LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) \
- 	$(LIBTOOLFLAGS) --mode=link $(CCLD) \
- 	$(test_media_window_CFLAGS) $(CFLAGS) $(AM_LDFLAGS) $(LDFLAGS) \
-@@ -228,6 +225,8 @@ GNOME_KEYBINDINGS_KEYSDIR = @GNOME_KEYBI
+--- gnome-settings-daemon-2.30.2.orig/plugins/mouse/Makefile.in	2010-07-23 00:54:35.133450290 +0200
++++ gnome-settings-daemon-2.30.2/plugins/mouse/Makefile.in	2010-07-23 00:54:15.861448059 +0200
+@@ -159,6 +159,8 @@
  GREP = @GREP@
  GSD_INTLTOOL_PLUGIN_RULE = @GSD_INTLTOOL_PLUGIN_RULE@
  GSD_PLUGIN_LDFLAGS = @GSD_PLUGIN_LDFLAGS@
@@ -10937,7 +10498,7 @@ Index: gnome-settings-daemon-2.30.1/plugins/media-keys/Makefile.in
  INSTALL = @INSTALL@
  INSTALL_DATA = @INSTALL_DATA@
  INSTALL_PROGRAM = @INSTALL_PROGRAM@
-@@ -252,6 +251,7 @@ LIBTOOL = @LIBTOOL@
+@@ -183,6 +185,7 @@
  LIPO = @LIPO@
  LN_S = @LN_S@
  LTLIBOBJS = @LTLIBOBJS@
@@ -10945,37 +10506,7 @@ Index: gnome-settings-daemon-2.30.1/plugins/media-keys/Makefile.in
  MAKEINFO = @MAKEINFO@
  MKDIR_P = @MKDIR_P@
  MKINSTALLDIRS = @MKINSTALLDIRS@
-@@ -357,8 +357,8 @@ top_srcdir = @top_srcdir@
- icondir = $(datadir)/icons/hicolor
- context = actions
- NULL = 
--SUBDIRS = $(am__append_1)
--plugin_LTLIBRARIES = $(am__append_2)
-+SUBDIRS = cut-n-paste
-+plugin_LTLIBRARIES = libmedia-keys.la
- BUILT_SOURCES = \
- 	gsd-media-keys-manager-glue.h	\
- 	gsd-marshal.h			\
-@@ -416,7 +416,7 @@ libmedia_keys_la_LIBADD = \
- plugin_in_files = \
- 	media-keys.gnome-settings-plugin.in
- 
--@HAVE_PULSE_TRUE@plugin_DATA = $(plugin_in_files:.gnome-settings-plugin.in=.gnome-settings-plugin)
-+plugin_DATA = $(plugin_in_files:.gnome-settings-plugin.in=.gnome-settings-plugin)
- test_media_window_SOURCES = \
- 	gsd-media-keys-window.c			\
- 	gsd-media-keys-window.h			\
-@@ -471,7 +471,8 @@ test_media_keys_LDADD =  \
- 	$(top_builddir)/gnome-settings-daemon/libgsd-profile.la \
- 	$(top_builddir)/plugins/common/libcommon.la \
- 	$(SETTINGS_DAEMON_LIBS) $(SETTINGS_PLUGIN_LIBS) \
--	$(XF86MISC_LIBS) $(GST_LIBS) -lm $(am__append_3)
-+	$(XF86MISC_LIBS) $(GST_LIBS) -lm \
-+	$(top_builddir)/plugins/media-keys/cut-n-paste/libgvc.la
- gtkbuilderdir = $(pkgdatadir)
- gtkbuilder_DATA = \
- 	acme.ui		\
-@@ -498,7 +499,7 @@ all: $(BUILT_SOURCES)
+@@ -336,7 +339,7 @@
  
  .SUFFIXES:
  .SUFFIXES: .c .lo .o .obj
@@ -10984,7 +10515,7 @@ Index: gnome-settings-daemon-2.30.1/plugins/media-keys/Makefile.in
  	@for dep in $?; do \
  	  case '$(am__configure_deps)' in \
  	    *$$dep*) \
-@@ -523,9 +524,9 @@ Makefile: $(srcdir)/Makefile.in $(top_bu
+@@ -361,9 +364,9 @@
  $(top_builddir)/config.status: $(top_srcdir)/configure $(CONFIG_STATUS_DEPENDENCIES)
  	cd $(top_builddir) && $(MAKE) $(AM_MAKEFLAGS) am--refresh
  
@@ -10996,20 +10527,11 @@ Index: gnome-settings-daemon-2.30.1/plugins/media-keys/Makefile.in
  	cd $(top_builddir) && $(MAKE) $(AM_MAKEFLAGS) am--refresh
  $(am__aclocal_m4_deps):
  install-pluginLTLIBRARIES: $(plugin_LTLIBRARIES)
-@@ -560,7 +561,7 @@ clean-pluginLTLIBRARIES:
- 	  rm -f "$${dir}/so_locations"; \
- 	done
- libmedia-keys.la: $(libmedia_keys_la_OBJECTS) $(libmedia_keys_la_DEPENDENCIES) 
--	$(libmedia_keys_la_LINK) $(am_libmedia_keys_la_rpath) $(libmedia_keys_la_OBJECTS) $(libmedia_keys_la_LIBADD) $(LIBS)
-+	$(libmedia_keys_la_LINK) -rpath $(plugindir) $(libmedia_keys_la_OBJECTS) $(libmedia_keys_la_LIBADD) $(LIBS)
- 
- clean-noinstPROGRAMS:
- 	@list='$(noinst_PROGRAMS)'; test -n "$$list" || exit 0; \
-Index: gnome-settings-daemon-2.30.1/plugins/mouse/Makefile.in
+Index: gnome-settings-daemon-2.30.2/plugins/sound/Makefile.in
 ===================================================================
---- gnome-settings-daemon-2.30.1.orig/plugins/mouse/Makefile.in	2010-04-26 14:22:49.000000000 +0200
-+++ gnome-settings-daemon-2.30.1/plugins/mouse/Makefile.in	2010-04-27 19:56:29.401527067 +0200
-@@ -159,6 +159,8 @@ GNOME_KEYBINDINGS_KEYSDIR = @GNOME_KEYBI
+--- gnome-settings-daemon-2.30.2.orig/plugins/sound/Makefile.in	2010-07-23 00:54:35.497452810 +0200
++++ gnome-settings-daemon-2.30.2/plugins/sound/Makefile.in	2010-07-23 00:54:16.005451876 +0200
+@@ -144,6 +144,8 @@
  GREP = @GREP@
  GSD_INTLTOOL_PLUGIN_RULE = @GSD_INTLTOOL_PLUGIN_RULE@
  GSD_PLUGIN_LDFLAGS = @GSD_PLUGIN_LDFLAGS@
@@ -11018,7 +10540,7 @@ Index: gnome-settings-daemon-2.30.1/plugins/mouse/Makefile.in
  INSTALL = @INSTALL@
  INSTALL_DATA = @INSTALL_DATA@
  INSTALL_PROGRAM = @INSTALL_PROGRAM@
-@@ -183,6 +185,7 @@ LIBTOOL = @LIBTOOL@
+@@ -168,6 +170,7 @@
  LIPO = @LIPO@
  LN_S = @LN_S@
  LTLIBOBJS = @LTLIBOBJS@
@@ -11026,7 +10548,7 @@ Index: gnome-settings-daemon-2.30.1/plugins/mouse/Makefile.in
  MAKEINFO = @MAKEINFO@
  MKDIR_P = @MKDIR_P@
  MKINSTALLDIRS = @MKINSTALLDIRS@
-@@ -334,7 +337,7 @@ all: all-am
+@@ -316,7 +319,7 @@
  
  .SUFFIXES:
  .SUFFIXES: .c .lo .o .obj
@@ -11035,7 +10557,7 @@ Index: gnome-settings-daemon-2.30.1/plugins/mouse/Makefile.in
  	@for dep in $?; do \
  	  case '$(am__configure_deps)' in \
  	    *$$dep*) \
-@@ -359,9 +362,9 @@ Makefile: $(srcdir)/Makefile.in $(top_bu
+@@ -341,9 +344,9 @@
  $(top_builddir)/config.status: $(top_srcdir)/configure $(CONFIG_STATUS_DEPENDENCIES)
  	cd $(top_builddir) && $(MAKE) $(AM_MAKEFLAGS) am--refresh
  
@@ -11047,11 +10569,11 @@ Index: gnome-settings-daemon-2.30.1/plugins/mouse/Makefile.in
  	cd $(top_builddir) && $(MAKE) $(AM_MAKEFLAGS) am--refresh
  $(am__aclocal_m4_deps):
  install-pluginLTLIBRARIES: $(plugin_LTLIBRARIES)
-Index: gnome-settings-daemon-2.30.1/plugins/sound/Makefile.in
+Index: gnome-settings-daemon-2.30.2/plugins/typing-break/Makefile.in
 ===================================================================
---- gnome-settings-daemon-2.30.1.orig/plugins/sound/Makefile.in	2010-04-26 14:22:50.000000000 +0200
-+++ gnome-settings-daemon-2.30.1/plugins/sound/Makefile.in	2010-04-27 19:56:29.401527067 +0200
-@@ -144,6 +144,8 @@ GNOME_KEYBINDINGS_KEYSDIR = @GNOME_KEYBI
+--- gnome-settings-daemon-2.30.2.orig/plugins/typing-break/Makefile.in	2010-07-23 00:54:35.641453265 +0200
++++ gnome-settings-daemon-2.30.2/plugins/typing-break/Makefile.in	2010-07-23 00:54:16.153446973 +0200
+@@ -149,6 +149,8 @@
  GREP = @GREP@
  GSD_INTLTOOL_PLUGIN_RULE = @GSD_INTLTOOL_PLUGIN_RULE@
  GSD_PLUGIN_LDFLAGS = @GSD_PLUGIN_LDFLAGS@
@@ -11060,7 +10582,7 @@ Index: gnome-settings-daemon-2.30.1/plugins/sound/Makefile.in
  INSTALL = @INSTALL@
  INSTALL_DATA = @INSTALL_DATA@
  INSTALL_PROGRAM = @INSTALL_PROGRAM@
-@@ -168,6 +170,7 @@ LIBTOOL = @LIBTOOL@
+@@ -173,6 +175,7 @@
  LIPO = @LIPO@
  LN_S = @LN_S@
  LTLIBOBJS = @LTLIBOBJS@
@@ -11068,7 +10590,7 @@ Index: gnome-settings-daemon-2.30.1/plugins/sound/Makefile.in
  MAKEINFO = @MAKEINFO@
  MKDIR_P = @MKDIR_P@
  MKINSTALLDIRS = @MKINSTALLDIRS@
-@@ -314,7 +317,7 @@ all: all-am
+@@ -327,7 +330,7 @@
  
  .SUFFIXES:
  .SUFFIXES: .c .lo .o .obj
@@ -11077,7 +10599,7 @@ Index: gnome-settings-daemon-2.30.1/plugins/sound/Makefile.in
  	@for dep in $?; do \
  	  case '$(am__configure_deps)' in \
  	    *$$dep*) \
-@@ -339,9 +342,9 @@ Makefile: $(srcdir)/Makefile.in $(top_bu
+@@ -352,9 +355,9 @@
  $(top_builddir)/config.status: $(top_srcdir)/configure $(CONFIG_STATUS_DEPENDENCIES)
  	cd $(top_builddir) && $(MAKE) $(AM_MAKEFLAGS) am--refresh
  
@@ -11089,11 +10611,11 @@ Index: gnome-settings-daemon-2.30.1/plugins/sound/Makefile.in
  	cd $(top_builddir) && $(MAKE) $(AM_MAKEFLAGS) am--refresh
  $(am__aclocal_m4_deps):
  install-pluginLTLIBRARIES: $(plugin_LTLIBRARIES)
-Index: gnome-settings-daemon-2.30.1/plugins/typing-break/Makefile.in
+Index: gnome-settings-daemon-2.30.2/plugins/xrandr/Makefile.in
 ===================================================================
---- gnome-settings-daemon-2.30.1.orig/plugins/typing-break/Makefile.in	2010-04-26 14:22:50.000000000 +0200
-+++ gnome-settings-daemon-2.30.1/plugins/typing-break/Makefile.in	2010-04-27 19:56:29.401527067 +0200
-@@ -149,6 +149,8 @@ GNOME_KEYBINDINGS_KEYSDIR = @GNOME_KEYBI
+--- gnome-settings-daemon-2.30.2.orig/plugins/xrandr/Makefile.in	2010-07-23 00:54:35.053454631 +0200
++++ gnome-settings-daemon-2.30.2/plugins/xrandr/Makefile.in	2010-07-23 00:54:16.309447299 +0200
+@@ -147,6 +147,8 @@
  GREP = @GREP@
  GSD_INTLTOOL_PLUGIN_RULE = @GSD_INTLTOOL_PLUGIN_RULE@
  GSD_PLUGIN_LDFLAGS = @GSD_PLUGIN_LDFLAGS@
@@ -11102,7 +10624,7 @@ Index: gnome-settings-daemon-2.30.1/plugins/typing-break/Makefile.in
  INSTALL = @INSTALL@
  INSTALL_DATA = @INSTALL_DATA@
  INSTALL_PROGRAM = @INSTALL_PROGRAM@
-@@ -173,6 +175,7 @@ LIBTOOL = @LIBTOOL@
+@@ -171,6 +173,7 @@
  LIPO = @LIPO@
  LN_S = @LN_S@
  LTLIBOBJS = @LTLIBOBJS@
@@ -11110,7 +10632,7 @@ Index: gnome-settings-daemon-2.30.1/plugins/typing-break/Makefile.in
  MAKEINFO = @MAKEINFO@
  MKDIR_P = @MKDIR_P@
  MKINSTALLDIRS = @MKINSTALLDIRS@
-@@ -325,7 +328,7 @@ all: all-am
+@@ -327,7 +330,7 @@
  
  .SUFFIXES:
  .SUFFIXES: .c .lo .o .obj
@@ -11119,7 +10641,7 @@ Index: gnome-settings-daemon-2.30.1/plugins/typing-break/Makefile.in
  	@for dep in $?; do \
  	  case '$(am__configure_deps)' in \
  	    *$$dep*) \
-@@ -350,9 +353,9 @@ Makefile: $(srcdir)/Makefile.in $(top_bu
+@@ -352,9 +355,9 @@
  $(top_builddir)/config.status: $(top_srcdir)/configure $(CONFIG_STATUS_DEPENDENCIES)
  	cd $(top_builddir) && $(MAKE) $(AM_MAKEFLAGS) am--refresh
  
@@ -11131,11 +10653,11 @@ Index: gnome-settings-daemon-2.30.1/plugins/typing-break/Makefile.in
  	cd $(top_builddir) && $(MAKE) $(AM_MAKEFLAGS) am--refresh
  $(am__aclocal_m4_deps):
  install-pluginLTLIBRARIES: $(plugin_LTLIBRARIES)
-Index: gnome-settings-daemon-2.30.1/plugins/xrandr/Makefile.in
+Index: gnome-settings-daemon-2.30.2/plugins/xrdb/Makefile.in
 ===================================================================
---- gnome-settings-daemon-2.30.1.orig/plugins/xrandr/Makefile.in	2010-04-26 14:22:50.000000000 +0200
-+++ gnome-settings-daemon-2.30.1/plugins/xrandr/Makefile.in	2010-04-27 19:56:29.401527067 +0200
-@@ -147,6 +147,8 @@ GNOME_KEYBINDINGS_KEYSDIR = @GNOME_KEYBI
+--- gnome-settings-daemon-2.30.2.orig/plugins/xrdb/Makefile.in	2010-07-23 00:54:35.969449805 +0200
++++ gnome-settings-daemon-2.30.2/plugins/xrdb/Makefile.in	2010-07-23 00:54:16.461447669 +0200
+@@ -183,6 +183,8 @@
  GREP = @GREP@
  GSD_INTLTOOL_PLUGIN_RULE = @GSD_INTLTOOL_PLUGIN_RULE@
  GSD_PLUGIN_LDFLAGS = @GSD_PLUGIN_LDFLAGS@
@@ -11144,7 +10666,7 @@ Index: gnome-settings-daemon-2.30.1/plugins/xrandr/Makefile.in
  INSTALL = @INSTALL@
  INSTALL_DATA = @INSTALL_DATA@
  INSTALL_PROGRAM = @INSTALL_PROGRAM@
-@@ -171,6 +173,7 @@ LIBTOOL = @LIBTOOL@
+@@ -207,6 +209,7 @@
  LIPO = @LIPO@
  LN_S = @LN_S@
  LTLIBOBJS = @LTLIBOBJS@
@@ -11152,7 +10674,7 @@ Index: gnome-settings-daemon-2.30.1/plugins/xrandr/Makefile.in
  MAKEINFO = @MAKEINFO@
  MKDIR_P = @MKDIR_P@
  MKINSTALLDIRS = @MKINSTALLDIRS@
-@@ -325,7 +328,7 @@ all: $(BUILT_SOURCES)
+@@ -366,7 +369,7 @@
  
  .SUFFIXES:
  .SUFFIXES: .c .lo .o .obj
@@ -11161,7 +10683,7 @@ Index: gnome-settings-daemon-2.30.1/plugins/xrandr/Makefile.in
  	@for dep in $?; do \
  	  case '$(am__configure_deps)' in \
  	    *$$dep*) \
-@@ -350,9 +353,9 @@ Makefile: $(srcdir)/Makefile.in $(top_bu
+@@ -391,9 +394,9 @@
  $(top_builddir)/config.status: $(top_srcdir)/configure $(CONFIG_STATUS_DEPENDENCIES)
  	cd $(top_builddir) && $(MAKE) $(AM_MAKEFLAGS) am--refresh
  
@@ -11173,11 +10695,11 @@ Index: gnome-settings-daemon-2.30.1/plugins/xrandr/Makefile.in
  	cd $(top_builddir) && $(MAKE) $(AM_MAKEFLAGS) am--refresh
  $(am__aclocal_m4_deps):
  install-pluginLTLIBRARIES: $(plugin_LTLIBRARIES)
-Index: gnome-settings-daemon-2.30.1/plugins/xrdb/data/Makefile.in
+Index: gnome-settings-daemon-2.30.2/plugins/xrdb/data/Makefile.in
 ===================================================================
---- gnome-settings-daemon-2.30.1.orig/plugins/xrdb/data/Makefile.in	2010-04-26 14:22:50.000000000 +0200
-+++ gnome-settings-daemon-2.30.1/plugins/xrdb/data/Makefile.in	2010-04-27 19:56:29.401527067 +0200
-@@ -119,6 +119,8 @@ GNOME_KEYBINDINGS_KEYSDIR = @GNOME_KEYBI
+--- gnome-settings-daemon-2.30.2.orig/plugins/xrdb/data/Makefile.in	2010-07-23 00:54:36.029449624 +0200
++++ gnome-settings-daemon-2.30.2/plugins/xrdb/data/Makefile.in	2010-07-23 00:54:16.557446485 +0200
+@@ -119,6 +119,8 @@
  GREP = @GREP@
  GSD_INTLTOOL_PLUGIN_RULE = @GSD_INTLTOOL_PLUGIN_RULE@
  GSD_PLUGIN_LDFLAGS = @GSD_PLUGIN_LDFLAGS@
@@ -11186,7 +10708,7 @@ Index: gnome-settings-daemon-2.30.1/plugins/xrdb/data/Makefile.in
  INSTALL = @INSTALL@
  INSTALL_DATA = @INSTALL_DATA@
  INSTALL_PROGRAM = @INSTALL_PROGRAM@
-@@ -143,6 +145,7 @@ LIBTOOL = @LIBTOOL@
+@@ -143,6 +145,7 @@
  LIPO = @LIPO@
  LN_S = @LN_S@
  LTLIBOBJS = @LTLIBOBJS@
@@ -11194,7 +10716,7 @@ Index: gnome-settings-daemon-2.30.1/plugins/xrdb/data/Makefile.in
  MAKEINFO = @MAKEINFO@
  MKDIR_P = @MKDIR_P@
  MKINSTALLDIRS = @MKINSTALLDIRS@
-@@ -263,7 +266,7 @@ EXTRA_DIST = \
+@@ -265,7 +268,7 @@
  all: all-am
  
  .SUFFIXES:
@@ -11203,7 +10725,7 @@ Index: gnome-settings-daemon-2.30.1/plugins/xrdb/data/Makefile.in
  	@for dep in $?; do \
  	  case '$(am__configure_deps)' in \
  	    *$$dep*) \
-@@ -288,9 +291,9 @@ Makefile: $(srcdir)/Makefile.in $(top_bu
+@@ -290,9 +293,9 @@
  $(top_builddir)/config.status: $(top_srcdir)/configure $(CONFIG_STATUS_DEPENDENCIES)
  	cd $(top_builddir) && $(MAKE) $(AM_MAKEFLAGS) am--refresh
  
@@ -11215,11 +10737,11 @@ Index: gnome-settings-daemon-2.30.1/plugins/xrdb/data/Makefile.in
  	cd $(top_builddir) && $(MAKE) $(AM_MAKEFLAGS) am--refresh
  $(am__aclocal_m4_deps):
  
-Index: gnome-settings-daemon-2.30.1/plugins/xrdb/Makefile.in
+Index: gnome-settings-daemon-2.30.2/plugins/xsettings/Makefile.in
 ===================================================================
---- gnome-settings-daemon-2.30.1.orig/plugins/xrdb/Makefile.in	2010-04-26 14:22:50.000000000 +0200
-+++ gnome-settings-daemon-2.30.1/plugins/xrdb/Makefile.in	2010-04-27 19:56:29.401527067 +0200
-@@ -183,6 +183,8 @@ GNOME_KEYBINDINGS_KEYSDIR = @GNOME_KEYBI
+--- gnome-settings-daemon-2.30.2.orig/plugins/xsettings/Makefile.in	2010-07-23 00:54:35.205457224 +0200
++++ gnome-settings-daemon-2.30.2/plugins/xsettings/Makefile.in	2010-07-23 00:54:16.725447208 +0200
+@@ -169,6 +169,8 @@
  GREP = @GREP@
  GSD_INTLTOOL_PLUGIN_RULE = @GSD_INTLTOOL_PLUGIN_RULE@
  GSD_PLUGIN_LDFLAGS = @GSD_PLUGIN_LDFLAGS@
@@ -11228,7 +10750,7 @@ Index: gnome-settings-daemon-2.30.1/plugins/xrdb/Makefile.in
  INSTALL = @INSTALL@
  INSTALL_DATA = @INSTALL_DATA@
  INSTALL_PROGRAM = @INSTALL_PROGRAM@
-@@ -207,6 +209,7 @@ LIBTOOL = @LIBTOOL@
+@@ -193,6 +195,7 @@
  LIPO = @LIPO@
  LN_S = @LN_S@
  LTLIBOBJS = @LTLIBOBJS@
@@ -11236,7 +10758,7 @@ Index: gnome-settings-daemon-2.30.1/plugins/xrdb/Makefile.in
  MAKEINFO = @MAKEINFO@
  MKDIR_P = @MKDIR_P@
  MKINSTALLDIRS = @MKINSTALLDIRS@
-@@ -364,7 +367,7 @@ all: all-recursive
+@@ -341,7 +344,7 @@
  
  .SUFFIXES:
  .SUFFIXES: .c .lo .o .obj
@@ -11245,7 +10767,7 @@ Index: gnome-settings-daemon-2.30.1/plugins/xrdb/Makefile.in
  	@for dep in $?; do \
  	  case '$(am__configure_deps)' in \
  	    *$$dep*) \
-@@ -389,9 +392,9 @@ Makefile: $(srcdir)/Makefile.in $(top_bu
+@@ -366,9 +369,9 @@
  $(top_builddir)/config.status: $(top_srcdir)/configure $(CONFIG_STATUS_DEPENDENCIES)
  	cd $(top_builddir) && $(MAKE) $(AM_MAKEFLAGS) am--refresh
  
@@ -11257,541 +10779,3 @@ Index: gnome-settings-daemon-2.30.1/plugins/xrdb/Makefile.in
  	cd $(top_builddir) && $(MAKE) $(AM_MAKEFLAGS) am--refresh
  $(am__aclocal_m4_deps):
  install-pluginLTLIBRARIES: $(plugin_LTLIBRARIES)
-Index: gnome-settings-daemon-2.30.1/plugins/xsettings/Makefile.in
-===================================================================
---- gnome-settings-daemon-2.30.1.orig/plugins/xsettings/Makefile.in	2010-04-26 14:22:50.000000000 +0200
-+++ gnome-settings-daemon-2.30.1/plugins/xsettings/Makefile.in	2010-04-27 19:56:29.401527067 +0200
-@@ -169,6 +169,8 @@ GNOME_KEYBINDINGS_KEYSDIR = @GNOME_KEYBI
- GREP = @GREP@
- GSD_INTLTOOL_PLUGIN_RULE = @GSD_INTLTOOL_PLUGIN_RULE@
- GSD_PLUGIN_LDFLAGS = @GSD_PLUGIN_LDFLAGS@
-+GST_CFLAGS = @GST_CFLAGS@
-+GST_LIBS = @GST_LIBS@
- INSTALL = @INSTALL@
- INSTALL_DATA = @INSTALL_DATA@
- INSTALL_PROGRAM = @INSTALL_PROGRAM@
-@@ -193,6 +195,7 @@ LIBTOOL = @LIBTOOL@
- LIPO = @LIPO@
- LN_S = @LN_S@
- LTLIBOBJS = @LTLIBOBJS@
-+MAINT = @MAINT@
- MAKEINFO = @MAKEINFO@
- MKDIR_P = @MKDIR_P@
- MKINSTALLDIRS = @MKINSTALLDIRS@
-@@ -339,7 +342,7 @@ all: all-am
- 
- .SUFFIXES:
- .SUFFIXES: .c .lo .o .obj
--$(srcdir)/Makefile.in:  $(srcdir)/Makefile.am  $(am__configure_deps)
-+$(srcdir)/Makefile.in: @MAINTAINER_MODE_TRUE@ $(srcdir)/Makefile.am  $(am__configure_deps)
- 	@for dep in $?; do \
- 	  case '$(am__configure_deps)' in \
- 	    *$$dep*) \
-@@ -364,9 +367,9 @@ Makefile: $(srcdir)/Makefile.in $(top_bu
- $(top_builddir)/config.status: $(top_srcdir)/configure $(CONFIG_STATUS_DEPENDENCIES)
- 	cd $(top_builddir) && $(MAKE) $(AM_MAKEFLAGS) am--refresh
- 
--$(top_srcdir)/configure:  $(am__configure_deps)
-+$(top_srcdir)/configure: @MAINTAINER_MODE_TRUE@ $(am__configure_deps)
- 	cd $(top_builddir) && $(MAKE) $(AM_MAKEFLAGS) am--refresh
--$(ACLOCAL_M4):  $(am__aclocal_m4_deps)
-+$(ACLOCAL_M4): @MAINTAINER_MODE_TRUE@ $(am__aclocal_m4_deps)
- 	cd $(top_builddir) && $(MAKE) $(AM_MAKEFLAGS) am--refresh
- $(am__aclocal_m4_deps):
- install-pluginLTLIBRARIES: $(plugin_LTLIBRARIES)
-Index: gnome-settings-daemon-2.30.1/INSTALL
-===================================================================
---- gnome-settings-daemon-2.30.1.orig/INSTALL	2009-07-28 00:27:02.000000000 +0200
-+++ gnome-settings-daemon-2.30.1/INSTALL	2010-04-27 19:56:45.461526169 +0200
-@@ -2,18 +2,24 @@ Installation Instructions
- *************************
- 
- Copyright (C) 1994, 1995, 1996, 1999, 2000, 2001, 2002, 2004, 2005,
--2006, 2007 Free Software Foundation, Inc.
-+2006, 2007, 2008, 2009 Free Software Foundation, Inc.
- 
--This file is free documentation; the Free Software Foundation gives
--unlimited permission to copy, distribute and modify it.
-+   Copying and distribution of this file, with or without modification,
-+are permitted in any medium without royalty provided the copyright
-+notice and this notice are preserved.  This file is offered as-is,
-+without warranty of any kind.
- 
- Basic Installation
- ==================
- 
--Briefly, the shell commands `./configure; make; make install' should
-+   Briefly, the shell commands `./configure; make; make install' should
- configure, build, and install this package.  The following
- more-detailed instructions are generic; see the `README' file for
--instructions specific to this package.
-+instructions specific to this package.  Some packages provide this
-+`INSTALL' file but do not implement all of the features documented
-+below.  The lack of an optional feature in a given package is not
-+necessarily a bug.  More recommendations for GNU packages can be found
-+in *note Makefile Conventions: (standards)Makefile Conventions.
- 
-    The `configure' shell script attempts to guess correct values for
- various system-dependent variables used during compilation.  It uses
-@@ -42,7 +48,7 @@ may remove or edit it.
- you want to change it or regenerate `configure' using a newer version
- of `autoconf'.
- 
--The simplest way to compile this package is:
-+   The simplest way to compile this package is:
- 
-   1. `cd' to the directory containing the package's source code and type
-      `./configure' to configure the package for your system.
-@@ -53,12 +59,22 @@ The simplest way to compile this package
-   2. Type `make' to compile the package.
- 
-   3. Optionally, type `make check' to run any self-tests that come with
--     the package.
-+     the package, generally using the just-built uninstalled binaries.
- 
-   4. Type `make install' to install the programs and any data files and
--     documentation.
-+     documentation.  When installing into a prefix owned by root, it is
-+     recommended that the package be configured and built as a regular
-+     user, and only the `make install' phase executed with root
-+     privileges.
-+
-+  5. Optionally, type `make installcheck' to repeat any self-tests, but
-+     this time using the binaries in their final installed location.
-+     This target does not install anything.  Running this target as a
-+     regular user, particularly if the prior `make install' required
-+     root privileges, verifies that the installation completed
-+     correctly.
- 
--  5. You can remove the program binaries and object files from the
-+  6. You can remove the program binaries and object files from the
-      source code directory by typing `make clean'.  To also remove the
-      files that `configure' created (so you can compile the package for
-      a different kind of computer), type `make distclean'.  There is
-@@ -67,15 +83,22 @@ The simplest way to compile this package
-      all sorts of other programs in order to regenerate files that came
-      with the distribution.
- 
--  6. Often, you can also type `make uninstall' to remove the installed
--     files again.
-+  7. Often, you can also type `make uninstall' to remove the installed
-+     files again.  In practice, not all packages have tested that
-+     uninstallation works correctly, even though it is required by the
-+     GNU Coding Standards.
-+
-+  8. Some packages, particularly those that use Automake, provide `make
-+     distcheck', which can by used by developers to test that all other
-+     targets like `make install' and `make uninstall' work correctly.
-+     This target is generally not run by end users.
- 
- Compilers and Options
- =====================
- 
--Some systems require unusual options for compilation or linking that the
--`configure' script does not know about.  Run `./configure --help' for
--details on some of the pertinent environment variables.
-+   Some systems require unusual options for compilation or linking that
-+the `configure' script does not know about.  Run `./configure --help'
-+for details on some of the pertinent environment variables.
- 
-    You can give `configure' initial values for configuration parameters
- by setting variables in the command line or in the environment.  Here
-@@ -88,25 +111,41 @@ is an example:
- Compiling For Multiple Architectures
- ====================================
- 
--You can compile the package for more than one kind of computer at the
-+   You can compile the package for more than one kind of computer at the
- same time, by placing the object files for each architecture in their
- own directory.  To do this, you can use GNU `make'.  `cd' to the
- directory where you want the object files and executables to go and run
- the `configure' script.  `configure' automatically checks for the
--source code in the directory that `configure' is in and in `..'.
-+source code in the directory that `configure' is in and in `..'.  This
-+is known as a "VPATH" build.
- 
-    With a non-GNU `make', it is safer to compile the package for one
- architecture at a time in the source code directory.  After you have
- installed the package for one architecture, use `make distclean' before
- reconfiguring for another architecture.
- 
-+   On MacOS X 10.5 and later systems, you can create libraries and
-+executables that work on multiple system types--known as "fat" or
-+"universal" binaries--by specifying multiple `-arch' options to the
-+compiler but only a single `-arch' option to the preprocessor.  Like
-+this:
-+
-+     ./configure CC="gcc -arch i386 -arch x86_64 -arch ppc -arch ppc64" \
-+                 CXX="g++ -arch i386 -arch x86_64 -arch ppc -arch ppc64" \
-+                 CPP="gcc -E" CXXCPP="g++ -E"
-+
-+   This is not guaranteed to produce working output in all cases, you
-+may have to build one architecture at a time and combine the results
-+using the `lipo' tool if you have problems.
-+
- Installation Names
- ==================
- 
--By default, `make install' installs the package's commands under
-+   By default, `make install' installs the package's commands under
- `/usr/local/bin', include files under `/usr/local/include', etc.  You
- can specify an installation prefix other than `/usr/local' by giving
--`configure' the option `--prefix=PREFIX'.
-+`configure' the option `--prefix=PREFIX', where PREFIX must be an
-+absolute file name.
- 
-    You can specify separate installation prefixes for
- architecture-specific files and architecture-independent files.  If you
-@@ -117,16 +156,47 @@ Documentation and other data files still
-    In addition, if you use an unusual directory layout you can give
- options like `--bindir=DIR' to specify different values for particular
- kinds of files.  Run `configure --help' for a list of the directories
--you can set and what kinds of files go in them.
-+you can set and what kinds of files go in them.  In general, the
-+default for these options is expressed in terms of `${prefix}', so that
-+specifying just `--prefix' will affect all of the other directory
-+specifications that were not explicitly provided.
-+
-+   The most portable way to affect installation locations is to pass the
-+correct locations to `configure'; however, many packages provide one or
-+both of the following shortcuts of passing variable assignments to the
-+`make install' command line to change installation locations without
-+having to reconfigure or recompile.
-+
-+   The first method involves providing an override variable for each
-+affected directory.  For example, `make install
-+prefix=/alternate/directory' will choose an alternate location for all
-+directory configuration variables that were expressed in terms of
-+`${prefix}'.  Any directories that were specified during `configure',
-+but not in terms of `${prefix}', must each be overridden at install
-+time for the entire installation to be relocated.  The approach of
-+makefile variable overrides for each directory variable is required by
-+the GNU Coding Standards, and ideally causes no recompilation.
-+However, some platforms have known limitations with the semantics of
-+shared libraries that end up requiring recompilation when using this
-+method, particularly noticeable in packages that use GNU Libtool.
-+
-+   The second method involves providing the `DESTDIR' variable.  For
-+example, `make install DESTDIR=/alternate/directory' will prepend
-+`/alternate/directory' before all installation names.  The approach of
-+`DESTDIR' overrides is not required by the GNU Coding Standards, and
-+does not work on platforms that have drive letters.  On the other hand,
-+it does better at avoiding recompilation issues, and works well even
-+when some directory options were not specified in terms of `${prefix}'
-+at `configure' time.
-+
-+Optional Features
-+=================
- 
-    If the package supports it, you can cause programs to be installed
- with an extra prefix or suffix on their names by giving `configure' the
- option `--program-prefix=PREFIX' or `--program-suffix=SUFFIX'.
- 
--Optional Features
--=================
--
--Some packages pay attention to `--enable-FEATURE' options to
-+   Some packages pay attention to `--enable-FEATURE' options to
- `configure', where FEATURE indicates an optional part of the package.
- They may also pay attention to `--with-PACKAGE' options, where PACKAGE
- is something like `gnu-as' or `x' (for the X Window System).  The
-@@ -138,14 +208,53 @@ find the X include and library files aut
- you can use the `configure' options `--x-includes=DIR' and
- `--x-libraries=DIR' to specify their locations.
- 
-+   Some packages offer the ability to configure how verbose the
-+execution of `make' will be.  For these packages, running `./configure
-+--enable-silent-rules' sets the default to minimal output, which can be
-+overridden with `make V=1'; while running `./configure
-+--disable-silent-rules' sets the default to verbose, which can be
-+overridden with `make V=0'.
-+
-+Particular systems
-+==================
-+
-+   On HP-UX, the default C compiler is not ANSI C compatible.  If GNU
-+CC is not installed, it is recommended to use the following options in
-+order to use an ANSI C compiler:
-+
-+     ./configure CC="cc -Ae -D_XOPEN_SOURCE=500"
-+
-+and if that doesn't work, install pre-built binaries of GCC for HP-UX.
-+
-+   On OSF/1 a.k.a. Tru64, some versions of the default C compiler cannot
-+parse its `<wchar.h>' header file.  The option `-nodtk' can be used as
-+a workaround.  If GNU CC is not installed, it is therefore recommended
-+to try
-+
-+     ./configure CC="cc"
-+
-+and if that doesn't work, try
-+
-+     ./configure CC="cc -nodtk"
-+
-+   On Solaris, don't put `/usr/ucb' early in your `PATH'.  This
-+directory contains several dysfunctional programs; working variants of
-+these programs are available in `/usr/bin'.  So, if you need `/usr/ucb'
-+in your `PATH', put it _after_ `/usr/bin'.
-+
-+   On Haiku, software installed for all users goes in `/boot/common',
-+not `/usr/local'.  It is recommended to use the following options:
-+
-+     ./configure --prefix=/boot/common
-+
- Specifying the System Type
- ==========================
- 
--There may be some features `configure' cannot figure out automatically,
--but needs to determine by the type of machine the package will run on.
--Usually, assuming the package is built to be run on the _same_
--architectures, `configure' can figure that out, but if it prints a
--message saying it cannot guess the machine type, give it the
-+   There may be some features `configure' cannot figure out
-+automatically, but needs to determine by the type of machine the package
-+will run on.  Usually, assuming the package is built to be run on the
-+_same_ architectures, `configure' can figure that out, but if it prints
-+a message saying it cannot guess the machine type, give it the
- `--build=TYPE' option.  TYPE can either be a short name for the system
- type, such as `sun4', or a canonical name which has the form:
- 
-@@ -153,7 +262,8 @@ type, such as `sun4', or a canonical nam
- 
- where SYSTEM can have one of these forms:
- 
--     OS KERNEL-OS
-+     OS
-+     KERNEL-OS
- 
-    See the file `config.sub' for the possible values of each field.  If
- `config.sub' isn't included in this package, then this package doesn't
-@@ -171,9 +281,9 @@ eventually be run) with `--host=TYPE'.
- Sharing Defaults
- ================
- 
--If you want to set default values for `configure' scripts to share, you
--can create a site shell script called `config.site' that gives default
--values for variables like `CC', `cache_file', and `prefix'.
-+   If you want to set default values for `configure' scripts to share,
-+you can create a site shell script called `config.site' that gives
-+default values for variables like `CC', `cache_file', and `prefix'.
- `configure' looks for `PREFIX/share/config.site' if it exists, then
- `PREFIX/etc/config.site' if it exists.  Or, you can set the
- `CONFIG_SITE' environment variable to the location of the site script.
-@@ -182,7 +292,7 @@ A warning: not all `configure' scripts l
- Defining Variables
- ==================
- 
--Variables not defined in a site shell script can be set in the
-+   Variables not defined in a site shell script can be set in the
- environment passed to `configure'.  However, some packages may run
- configure again during the build, and the customized values of these
- variables may be lost.  In order to avoid this problem, you should set
-@@ -201,11 +311,19 @@ an Autoconf bug.  Until the bug is fixed
- `configure' Invocation
- ======================
- 
--`configure' recognizes the following options to control how it operates.
-+   `configure' recognizes the following options to control how it
-+operates.
- 
- `--help'
- `-h'
--     Print a summary of the options to `configure', and exit.
-+     Print a summary of all of the options to `configure', and exit.
-+
-+`--help=short'
-+`--help=recursive'
-+     Print a summary of the options unique to this package's
-+     `configure', and exit.  The `short' variant lists options used
-+     only in the top level, while the `recursive' variant lists options
-+     also present in any nested packages.
- 
- `--version'
- `-V'
-@@ -232,6 +350,16 @@ an Autoconf bug.  Until the bug is fixed
-      Look for the package's source code in directory DIR.  Usually
-      `configure' can determine that directory automatically.
- 
-+`--prefix=DIR'
-+     Use DIR as the installation prefix.  *note Installation Names::
-+     for more details, including other options available for fine-tuning
-+     the installation locations.
-+
-+`--no-create'
-+`-n'
-+     Run the configure checks, but stop before creating any output
-+     files.
-+
- `configure' also accepts some other, not widely useful, options.  Run
- `configure --help' for more details.
- 
-Index: gnome-settings-daemon-2.30.1/config.sub
-===================================================================
---- gnome-settings-daemon-2.30.1.orig/config.sub	2010-04-27 19:56:48.541528506 +0200
-+++ gnome-settings-daemon-2.30.1/config.sub	2010-04-27 19:56:42.909525360 +0200
-@@ -1,10 +1,10 @@
- #! /bin/sh
- # Configuration validation subroutine script.
- #   Copyright (C) 1992, 1993, 1994, 1995, 1996, 1997, 1998, 1999,
--#   2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009
-+#   2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010
- #   Free Software Foundation, Inc.
- 
--timestamp='2009-06-11'
-+timestamp='2010-01-22'
- 
- # This file is (in principle) common to ALL GNU software.
- # The presence of a machine in this file suggests that SOME GNU software
-@@ -32,13 +32,16 @@ timestamp='2009-06-11'
- 
- 
- # Please send patches to <config-patches@gnu.org>.  Submit a context
--# diff and a properly formatted ChangeLog entry.
-+# diff and a properly formatted GNU ChangeLog entry.
- #
- # Configuration subroutine to validate and canonicalize a configuration type.
- # Supply the specified configuration type as an argument.
- # If it is invalid, we print an error message on stderr and exit with code 1.
- # Otherwise, we print the canonical config type on stdout and succeed.
- 
-+# You can get the latest version of this script from:
-+# http://git.savannah.gnu.org/gitweb/?p=config.git;a=blob_plain;f=config.sub;hb=HEAD
-+
- # This file is supposed to be the same for all GNU packages
- # and recognize all the CPU types, system types and aliases
- # that are meaningful with *any* GNU software.
-@@ -72,8 +75,9 @@ Report bugs and patches to <config-patch
- version="\
- GNU config.sub ($timestamp)
- 
--Copyright (C) 1992, 1993, 1994, 1995, 1996, 1997, 1998, 1999, 2000, 2001,
--2002, 2003, 2004, 2005, 2006, 2007, 2008 Free Software Foundation, Inc.
-+Copyright (C) 1992, 1993, 1994, 1995, 1996, 1997, 1998, 1999, 2000,
-+2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010 Free
-+Software Foundation, Inc.
- 
- This is free software; see the source for copying conditions.  There is NO
- warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE."
-@@ -149,7 +153,7 @@ case $os in
- 	-convergent* | -ncr* | -news | -32* | -3600* | -3100* | -hitachi* |\
- 	-c[123]* | -convex* | -sun | -crds | -omron* | -dg | -ultra | -tti* | \
- 	-harris | -dolphin | -highlevel | -gould | -cbm | -ns | -masscomp | \
--	-apple | -axis | -knuth | -cray)
-+	-apple | -axis | -knuth | -cray | -microblaze)
- 		os=
- 		basic_machine=$1
- 		;;
-@@ -284,6 +288,7 @@ case $basic_machine in
- 	| pdp10 | pdp11 | pj | pjl \
- 	| powerpc | powerpc64 | powerpc64le | powerpcle | ppcbe \
- 	| pyramid \
-+	| rx \
- 	| score \
- 	| sh | sh[1234] | sh[24]a | sh[24]aeb | sh[23]e | sh[34]eb | sheb | shbe | shle | sh[1234]le | sh3ele \
- 	| sh64 | sh64le \
-@@ -291,13 +296,14 @@ case $basic_machine in
- 	| sparcv8 | sparcv9 | sparcv9b | sparcv9v \
- 	| spu | strongarm \
- 	| tahoe | thumb | tic4x | tic80 | tron \
-+	| ubicom32 \
- 	| v850 | v850e \
- 	| we32k \
- 	| x86 | xc16x | xscale | xscalee[bl] | xstormy16 | xtensa \
- 	| z8k | z80)
- 		basic_machine=$basic_machine-unknown
- 		;;
--	m6811 | m68hc11 | m6812 | m68hc12)
-+	m6811 | m68hc11 | m6812 | m68hc12 | picochip)
- 		# Motorola 68HC11/12.
- 		basic_machine=$basic_machine-unknown
- 		os=-none
-@@ -340,7 +346,7 @@ case $basic_machine in
- 	| lm32-* \
- 	| m32c-* | m32r-* | m32rle-* \
- 	| m68000-* | m680[012346]0-* | m68360-* | m683?2-* | m68k-* \
--	| m88110-* | m88k-* | maxq-* | mcore-* | metag-* \
-+	| m88110-* | m88k-* | maxq-* | mcore-* | metag-* | microblaze-* \
- 	| mips-* | mipsbe-* | mipseb-* | mipsel-* | mipsle-* \
- 	| mips16-* \
- 	| mips64-* | mips64el-* \
-@@ -368,15 +374,17 @@ case $basic_machine in
- 	| pdp10-* | pdp11-* | pj-* | pjl-* | pn-* | power-* \
- 	| powerpc-* | powerpc64-* | powerpc64le-* | powerpcle-* | ppcbe-* \
- 	| pyramid-* \
--	| romp-* | rs6000-* \
-+	| romp-* | rs6000-* | rx-* \
- 	| sh-* | sh[1234]-* | sh[24]a-* | sh[24]aeb-* | sh[23]e-* | sh[34]eb-* | sheb-* | shbe-* \
- 	| shle-* | sh[1234]le-* | sh3ele-* | sh64-* | sh64le-* \
- 	| sparc-* | sparc64-* | sparc64b-* | sparc64v-* | sparc86x-* | sparclet-* \
- 	| sparclite-* \
- 	| sparcv8-* | sparcv9-* | sparcv9b-* | sparcv9v-* | strongarm-* | sv1-* | sx?-* \
- 	| tahoe-* | thumb-* \
--	| tic30-* | tic4x-* | tic54x-* | tic55x-* | tic6x-* | tic80-* | tile-* \
-+	| tic30-* | tic4x-* | tic54x-* | tic55x-* | tic6x-* | tic80-* \
-+	| tile-* | tilegx-* \
- 	| tron-* \
-+	| ubicom32-* \
- 	| v850-* | v850e-* | vax-* \
- 	| we32k-* \
- 	| x86-* | x86_64-* | xc16x-* | xps100-* | xscale-* | xscalee[bl]-* \
-@@ -726,6 +734,9 @@ case $basic_machine in
- 		basic_machine=ns32k-utek
- 		os=-sysv
- 		;;
-+        microblaze)
-+		basic_machine=microblaze-xilinx
-+		;;
- 	mingw32)
- 		basic_machine=i386-pc
- 		os=-mingw32
-@@ -1076,6 +1087,11 @@ case $basic_machine in
- 		basic_machine=tic6x-unknown
- 		os=-coff
- 		;;
-+        # This must be matched before tile*.
-+        tilegx*)
-+		basic_machine=tilegx-unknown
-+		os=-linux-gnu
-+		;;
- 	tile*)
- 		basic_machine=tile-unknown
- 		os=-linux-gnu
-@@ -1247,6 +1263,9 @@ case $os in
-         # First match some system type aliases
-         # that might get confused with valid system types.
- 	# -solaris* is a basic system type, with this one exception.
-+        -auroraux)
-+	        os=-auroraux
-+		;;
- 	-solaris1 | -solaris1.*)
- 		os=`echo $os | sed -e 's|solaris1|sunos4|'`
- 		;;
-@@ -1268,8 +1287,8 @@ case $os in
- 	# -sysv* is not here because it comes later, after sysvr4.
- 	-gnu* | -bsd* | -mach* | -minix* | -genix* | -ultrix* | -irix* \
- 	      | -*vms* | -sco* | -esix* | -isc* | -aix* | -cnk* | -sunos | -sunos[34]*\
--	      | -hpux* | -unos* | -osf* | -luna* | -dgux* | -solaris* | -sym* \
--	      | -kopensolaris* \
-+	      | -hpux* | -unos* | -osf* | -luna* | -dgux* | -auroraux* | -solaris* \
-+	      | -sym* | -kopensolaris* \
- 	      | -amigaos* | -amigados* | -msdos* | -newsos* | -unicos* | -aof* \
- 	      | -aos* | -aros* \
- 	      | -nindy* | -vxsim* | -vxworks* | -ebmon* | -hms* | -mvs* \
-@@ -1290,7 +1309,7 @@ case $os in
- 	      | -os2* | -vos* | -palmos* | -uclinux* | -nucleus* \
- 	      | -morphos* | -superux* | -rtmk* | -rtmk-nova* | -windiss* \
- 	      | -powermax* | -dnix* | -nx6 | -nx7 | -sei* | -dragonfly* \
--	      | -skyos* | -haiku* | -rdos* | -toppers* | -drops*)
-+	      | -skyos* | -haiku* | -rdos* | -toppers* | -drops* | -es*)
- 	# Remember, each alternative MUST END IN *, to match a version number.
- 		;;
- 	-qnx*)
-@@ -1423,6 +1442,8 @@ case $os in
- 	-dicos*)
- 		os=-dicos
- 		;;
-+        -nacl*)
-+	        ;;
- 	-none)
- 		;;
- 	*)
