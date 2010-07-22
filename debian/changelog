@@ -1,6 +1,10 @@
 gnome-settings-daemon (2.30.2-1) UNRELEASED; urgency=low
 
   * New upstream stable release.
+  * Switch to source format 3.0 (quilt).
+    - Add debian/source/format.
+    - Drop Build-Depends on quilt.
+    - Remove /usr/share/cdbs/1/rules/patchsys-quilt.mk from debian/rules.
 
  -- Michael Biebl <biebl@debian.org>  Fri, 23 Jul 2010 00:37:40 +0200
 
