@@ -10,6 +10,8 @@ gnome-settings-daemon (2.30.2-1) UNRELEASED; urgency=low
     - Drop Build-Depends on dpkg-dev (>= 1.13.19) as even oldstable has a more
       recent version.
     - Add Vcs-Browser and Vcs-Svn fields.
+    - Bump Standards-Version to 3.9.0.
+    - Use Breaks as recommended by the new policy.
 
  -- Michael Biebl <biebl@debian.org>  Fri, 23 Jul 2010 00:37:40 +0200
 
