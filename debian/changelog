@@ -1,3 +1,15 @@
+gnome-settings-daemon (2.30.2-0ubuntu3) maverick; urgency=low
+
+  * debian/control.in:
+    - requires libindicator-application 0.2.4 for label support
+  * debian/patches/06_use_application_indicator.patch:
+    - updated version by Karl Lattimer porting the keyboard layout to indicators
+      now that indicator-application supports labels (lp: #599844)
+  * debian/control.in, debian/rules:
+    - use dh-autoreconf
+
+ -- Sebastien Bacher <seb128@ubuntu.com>  Tue, 17 Aug 2010 19:21:57 +0200
+
 gnome-settings-daemon (2.30.2-0ubuntu2) maverick; urgency=low
 
   * debian/patches/10_fn-F7.patch:

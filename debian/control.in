@@ -6,6 +6,7 @@ XSBC-Original-Maintainer: Debian GNOME Maintainers <pkg-gnome-maintainers@lists.
 Uploaders: @GNOME_TEAM@
 Build-Depends: cdbs,
                quilt,
+               dh-autoreconf,
                debhelper (>= 5),
                dpkg-dev (>= 1.13.19),
                gnome-common,
@@ -29,8 +30,8 @@ Build-Depends: cdbs,
                gnome-pkg-tools,
                libpulse-dev (>= 0.9.15),
                libcanberra-gtk-dev,
-               libappindicator-dev
-Standards-Version: 3.8.3
+               libappindicator-dev (>= 0.2.4) 
+Standards-Version: 3.9.1
 Vcs-Bzr: https://code.launchpad.net/~ubuntu-desktop/gnome-settings-daemon/ubuntu
 
 Package: gnome-settings-daemon
