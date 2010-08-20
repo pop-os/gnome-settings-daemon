@@ -1,3 +1,12 @@
+gnome-settings-daemon (2.30.2-0ubuntu4) maverick; urgency=low
+
+  * 06_use_application_indicator.patch: update by Karl Lattimer to fix those
+    - keyboard indicator does not react to layout changes (lp: #531290)
+    - indicator variants in a same layout displayed the same way (lp: #620334)
+    - move keyboard layouts out of the submenu (lp: #620571)
+
+ -- Sebastien Bacher <seb128@ubuntu.com>  Fri, 20 Aug 2010 11:12:10 +0200
+
 gnome-settings-daemon (2.30.2-0ubuntu3) maverick; urgency=low
 
   * debian/control.in:
