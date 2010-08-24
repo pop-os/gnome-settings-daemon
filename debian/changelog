@@ -1,3 +1,10 @@
+gnome-settings-daemon (2.30.2-0ubuntu5) maverick; urgency=low
+
+  * debian/patches/06_use_application_indicator.patch:
+    - updated version by Karl Lattimer to improve the space computing
+
+ -- Sebastien Bacher <seb128@ubuntu.com>  Tue, 24 Aug 2010 21:51:21 +0200
+
 gnome-settings-daemon (2.30.2-0ubuntu4) maverick; urgency=low
 
   * 06_use_application_indicator.patch: update by Karl Lattimer to fix those

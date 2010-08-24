@@ -662,7 +662,7 @@ diff -uNr -x .pc gnome-settings-daemon-2.30.2.orig/plugins/keyboard/gkbd-configu
 +#endif
 diff -uNr -x .pc gnome-settings-daemon-2.30.2.orig/plugins/keyboard/gsd-keyboard-xkb.c gnome-settings-daemon-2.30.2/plugins/keyboard/gsd-keyboard-xkb.c
 --- gnome-settings-daemon-2.30.2.orig/plugins/keyboard/gsd-keyboard-xkb.c	2010-08-19 11:17:16.719361002 +0100
-+++ gnome-settings-daemon-2.30.2/plugins/keyboard/gsd-keyboard-xkb.c	2010-08-20 09:33:11.573645651 +0100
++++ gnome-settings-daemon-2.30.2/plugins/keyboard/gsd-keyboard-xkb.c	2010-08-20 10:56:01.639738001 +0100
 @@ -31,12 +31,20 @@
  #include <gtk/gtk.h>
  #include <gconf/gconf-client.h>
@@ -709,7 +709,7 @@ diff -uNr -x .pc gnome-settings-daemon-2.30.2.orig/plugins/keyboard/gsd-keyboard
  	gpointer p = g_hash_table_lookup (preview_dialogs,
  					  GINT_TO_POINTER
  					  (xkl_state->group));
-@@ -361,37 +378,154 @@
+@@ -361,37 +378,156 @@
  popup_menu_set_group (GtkMenuItem * item, gpointer param)
  {
  	gint group_number = GPOINTER_TO_INT (param);
@@ -757,6 +757,7 @@ diff -uNr -x .pc gnome-settings-daemon-2.30.2.orig/plugins/keyboard/gsd-keyboard
 +	xkl_config_registry_load (registry, current_config.load_extra_items);
 +
 +	int g;
++        gchar * guide = "XXX";
 +	gchar ** shortnames;
 +	gchar ** longnames;
 +	gchar * layout_name;
@@ -805,6 +806,7 @@ diff -uNr -x .pc gnome-settings-daemon-2.30.2.orig/plugins/keyboard/gsd-keyboard
 +		if (g_hash_table_lookup_extended (ln2cnt_map, lname, (gpointer *) & prev_layout_name, &pcounter)) {
 +			/* "next" same description */
 +			counter = GPOINTER_TO_INT (pcounter);
++                        guide = "XXX1";
 +		}
 +		g_hash_table_insert (ln2cnt_map, lname, GINT_TO_POINTER (counter+1));
 +
@@ -826,7 +828,7 @@ diff -uNr -x .pc gnome-settings-daemon-2.30.2.orig/plugins/keyboard/gsd-keyboard
 +	}
 +
 +	// Guide of 3 wide-ish and one thin
-+	app_indicator_set_label(app_indicator, layout_name, "XXX1");
++	app_indicator_set_label(app_indicator, layout_name, guide);
 +	g_hash_table_destroy(ln2cnt_map);
 +
 +	// Deallocate memory so we don't leak wildly
@@ -871,7 +873,7 @@ diff -uNr -x .pc gnome-settings-daemon-2.30.2.orig/plugins/keyboard/gsd-keyboard
  	GtkWidget *item = gtk_menu_item_new_with_mnemonic (_("_Groups"));
  	gtk_widget_show (item);
  	gtk_menu_shell_append (GTK_MENU_SHELL (popup_menu), item);
-@@ -409,8 +543,23 @@
+@@ -409,8 +545,23 @@
  	gtk_widget_show (item);
  	g_signal_connect (item, "activate", popup_menu_show_layout, NULL);
  	gtk_menu_shell_append (GTK_MENU_SHELL (popup_menu), item);
@@ -896,7 +898,7 @@ diff -uNr -x .pc gnome-settings-daemon-2.30.2.orig/plugins/keyboard/gsd-keyboard
  		gchar *image_file = gkbd_status_get_image_filename (i);
  
  		if (image_file == NULL) {
-@@ -438,17 +587,62 @@
+@@ -438,17 +589,62 @@
  		g_signal_connect (item, "activate",
  				  G_CALLBACK (popup_menu_set_group),
  				  GINT_TO_POINTER (i));
@@ -959,7 +961,7 @@ diff -uNr -x .pc gnome-settings-daemon-2.30.2.orig/plugins/keyboard/gsd-keyboard
  		if (icon == NULL) {
  			GConfClient *conf_client =
  			    gconf_client_get_default ();
-@@ -468,12 +662,20 @@
+@@ -468,12 +664,20 @@
  					  NULL);
  
  		}
@@ -980,7 +982,7 @@ diff -uNr -x .pc gnome-settings-daemon-2.30.2.orig/plugins/keyboard/gsd-keyboard
  	}
  }
  
-@@ -814,6 +1016,22 @@
+@@ -814,6 +1018,22 @@
  	gsd_load_modmap_files ();
  }
  
@@ -1003,7 +1005,7 @@ diff -uNr -x .pc gnome-settings-daemon-2.30.2.orig/plugins/keyboard/gsd-keyboard
  void
  gsd_keyboard_xkb_set_post_activation_callback (PostActivationCallback fun,
  					       void *user_data)
-@@ -858,6 +1076,13 @@
+@@ -858,6 +1078,13 @@
  	logfile = fopen ("/tmp/gsdkx.log", "a");
  	xkl_set_log_appender (gsd_keyboard_log_appender);
  #endif
@@ -1017,7 +1019,7 @@ diff -uNr -x .pc gnome-settings-daemon-2.30.2.orig/plugins/keyboard/gsd-keyboard
  	manager = kbd_manager;
  	gnome_settings_profile_start ("xkl_engine_get_instance");
  	xkl_engine = xkl_engine_get_instance (GDK_DISPLAY ());
-@@ -891,6 +1116,9 @@
+@@ -891,6 +1118,9 @@
  					      (GConfClientNotifyFunc)
  					      apply_xkb_settings);
  
@@ -1027,7 +1029,7 @@ diff -uNr -x .pc gnome-settings-daemon-2.30.2.orig/plugins/keyboard/gsd-keyboard
  		gdk_window_add_filter (NULL, (GdkFilterFunc)
  				       gsd_keyboard_xkb_evt_filter, NULL);
  
-@@ -962,5 +1190,13 @@
+@@ -962,5 +1192,13 @@
  	g_object_unref (xkl_engine);
  
  	xkl_engine = NULL;
