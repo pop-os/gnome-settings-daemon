@@ -1,3 +1,11 @@
+gnome-settings-daemon (2.31.91-0ubuntu1) maverick; urgency=low
+
+  * New upstream release
+  * debian/patches/91_bugzilla_update_touchpad_icons.patch:
+    - Applied upstream
+
+ -- Robert Ancell <robert.ancell@canonical.com>  Wed, 01 Sep 2010 18:52:24 +1000
+
 gnome-settings-daemon (2.30.2-0ubuntu5) maverick; urgency=low
 
   * debian/patches/06_use_application_indicator.patch:

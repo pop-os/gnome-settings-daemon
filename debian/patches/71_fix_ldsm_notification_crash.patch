@@ -1,12 +1,13 @@
 Description: Don't access free'd memory if a volume is unmounted whilst the dialog is displayed
 Author: ?
 
-diff -Nur -x '*.orig' -x '*~' gnome-settings-daemon-2.28.1/plugins/housekeeping/gsd-disk-space.c gnome-settings-daemon-2.28.1.new/plugins/housekeeping/gsd-disk-space.c
---- gnome-settings-daemon-2.28.1/plugins/housekeeping/gsd-disk-space.c	2009-08-12 10:15:00.000000000 +0100
-+++ gnome-settings-daemon-2.28.1.new/plugins/housekeeping/gsd-disk-space.c	2009-11-04 00:09:42.505236169 +0000
+Index: gnome-settings-daemon-2.31.91/plugins/housekeeping/gsd-disk-space.c
+===================================================================
+--- gnome-settings-daemon-2.31.91.orig/plugins/housekeeping/gsd-disk-space.c	2010-09-01 19:01:09.452617000 +1000
++++ gnome-settings-daemon-2.31.91/plugins/housekeeping/gsd-disk-space.c	2010-09-01 19:01:53.952617002 +1000
 @@ -181,7 +181,7 @@
-         gint response;
          gboolean has_trash;
+         gboolean has_disk_analyzer;
          gboolean retval = TRUE;
 -        const gchar *path;
 +        gchar *path;
@@ -20,9 +21,9 @@ diff -Nur -x '*.orig' -x '*~' gnome-settings-daemon-2.28.1/plugins/housekeeping/
 -        path = g_unix_mount_get_mount_path (mount->mount);
 +        path = g_strdup (g_unix_mount_get_mount_path (mount->mount));
  
-         dialog = gsd_ldsm_dialog_new (other_usable_volumes,
-                                       multiple_volumes,
-@@ -214,7 +214,7 @@
+         program = g_find_program_in_path (DISK_SPACE_ANALYZER);
+         has_disk_analyzer = (program != NULL);
+@@ -218,7 +218,7 @@
                  break;
          case GSD_LDSM_DIALOG_RESPONSE_ANALYZE:
                  retval = FALSE;
@@ -31,7 +32,7 @@ diff -Nur -x '*.orig' -x '*~' gnome-settings-daemon-2.28.1/plugins/housekeeping/
                  break;
          case GSD_LDSM_DIALOG_RESPONSE_EMPTY_TRASH:
                  retval = TRUE;
-@@ -228,6 +228,8 @@
+@@ -232,6 +232,8 @@
                  g_assert_not_reached ();
          }
  
