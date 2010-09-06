@@ -1,3 +1,14 @@
+gnome-settings-daemon (2.31.91-0ubuntu2) maverick; urgency=low
+
+  * debian/patches/08_xrandr_command.patch:
+    - still call gnome-display-properties to configure the display, the
+      control center changes didn't land this cycle (lp: #631761)
+  * 06_use_application_indicator.patch: updated version by Karl Lattimer
+    - don't start using cpu when switching layout (lp: #624477)
+    - respect the option to display flag icons (lp: #623435)
+
+ -- Sebastien Bacher <seb128@ubuntu.com>  Mon, 06 Sep 2010 19:38:10 +0200
+
 gnome-settings-daemon (2.31.91-0ubuntu1) maverick; urgency=low
 
   * New upstream release
