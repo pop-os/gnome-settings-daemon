@@ -1,3 +1,10 @@
+gnome-settings-daemon (2.31.91-0ubuntu3) maverick; urgency=low
+
+  * debian/gnome-settings-daemon.gconf-defaults:
+    - turn on external screens by default
+
+ -- Sebastien Bacher <seb128@ubuntu.com>  Fri, 10 Sep 2010 22:24:49 +0200
+
 gnome-settings-daemon (2.31.91-0ubuntu2) maverick; urgency=low
 
   * debian/patches/08_xrandr_command.patch:
