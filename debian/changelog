@@ -1,3 +1,14 @@
+gnome-settings-daemon (2.31.92-0ubuntu1) UNRELEASED; urgency=low
+
+  * New upstream release:
+    - Don't use the Stored/custom configuration type in the XF86Display cycle
+      (Federico Mena Quintero)
+    - Basic infrastructure for RANDR logging (Federico Mena Quintero)
+    - Log when handling RANDR events (Gabriel Burt)
+    - Updated translations
+
+ -- Didier Roche <didrocks@ubuntu.com>  Tue, 14 Sep 2010 12:31:55 +0200
+
 gnome-settings-daemon (2.31.91-0ubuntu3) maverick; urgency=low
 
   * debian/gnome-settings-daemon.gconf-defaults:
