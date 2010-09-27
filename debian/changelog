@@ -1,3 +1,9 @@
+gnome-settings-daemon (2.32.0-0ubuntu1) maverick; urgency=low
+
+  * New upstream release.
+
+ -- Michael Terry <mike@mterry.name>  Mon, 27 Sep 2010 10:15:53 -0400
+
 gnome-settings-daemon (2.31.92-0ubuntu1) maverick; urgency=low
 
   * New upstream release:
