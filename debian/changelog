@@ -7,6 +7,10 @@ gnome-settings-daemon (2.32.0-0ubuntu2) UNRELEASED; urgency=low
     apply_default_boot_configuration(), in which case the XRandR configuration
     will not be touched unless there is a global or per-user configuration
     file.
+  * debian/gnome-settings-daemon.gconf-defaults: Set use_xorg_monitor_settings
+    to true. This disables g-s-d's rather new default XRandR configuration and
+    reverts back to what we had up to Maverick beta. This avoids a lot of
+    monitor misconfigurations. (LP: #640807)
 
  -- Martin Pitt <martin.pitt@ubuntu.com>  Tue, 05 Oct 2010 11:42:43 +0200
 

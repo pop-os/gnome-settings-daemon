@@ -1,4 +1,5 @@
 /apps/gnome_settings_daemon/xrandr/turn_on_external_monitors_at_startup true
+/apps/gnome_settings_daemon/xrandr/use_xorg_monitor_settings true
 /desktop/gnome/font_rendering/antialiasing rgba
 /desktop/gnome/font_rendering/hinting slight
 /desktop/gnome/peripherals/touchpad/config_migration_needed true
