@@ -1,0 +1,75 @@
+From dbdae12723569a721563d9ad666443d7bb5bb9b1 Mon Sep 17 00:00:00 2001
+From: Martin Pitt <martin.pitt@ubuntu.com>
+Date: Tue, 5 Oct 2010 11:30:46 +0200
+Subject: [PATCH] RANDR - Add gconf key for disabling boot time configuration
+
+In a lot of situations it is undesirable to have g-s-d change the XRandR
+settings, because it overrides X.org customizations, leads to unnecessary mode
+switches, or increases boot time.
+
+Add a gconf key "use_xorg_monitor_settings" to disable
+apply_default_boot_configuration(), in which case the XRandR configuration will
+not be touched unless there is a global or per-user configuration file.
+
+Bug: https://bugzilla.gnome.org/show_bug.cgi?id=631388
+Bug-Ubuntu: https://launchpad.net/bugs/640807
+---
+ data/apps_gnome_settings_daemon_xrandr.schemas.in |   19 +++++++++++++++++++
+ plugins/xrandr/gsd-xrandr-manager.c               |    4 +++-
+ 2 files changed, 22 insertions(+), 1 deletions(-)
+
+diff --git a/data/apps_gnome_settings_daemon_xrandr.schemas.in b/data/apps_gnome_settings_daemon_xrandr.schemas.in
+index d8442ae..082197e 100644
+--- a/data/apps_gnome_settings_daemon_xrandr.schemas.in
++++ b/data/apps_gnome_settings_daemon_xrandr.schemas.in
+@@ -15,6 +15,25 @@
+             </locale>
+         </schema>
+ 	<schema>
++	    <key>/schemas/apps/gnome_settings_daemon/xrandr/use_xorg_monitor_settings</key>
++	    <applyto>/apps/gnome_settings_daemon/xrandr/use_xorg_monitor_settings</applyto>
++            <owner>gnome</owner>
++	    <type>bool</type>
++            <default>false</default>
++            <locale name="C">
++	        <short>Do not touch monitor configuration</short>
++		<long>Usually, gnome-settings-daemon configures internal and
++		    external monitors according to the
++		    turn_on_external_monitors_at_startup and
++		    turn_on_laptop_monitor_at_startup settings and determines
++		    an appropriate cloning/side-by-side mode. Setting this key
++		    to True disables this, and the monitor settings are not
++		    touched at all (unless there is an explicit user
++		    configuration).
++		</long>
++            </locale>
++        </schema>
++	<schema>
+ 	    <key>/schemas/apps/gnome_settings_daemon/xrandr/turn_on_external_monitors_at_startup</key>
+ 	    <applyto>/apps/gnome_settings_daemon/xrandr/turn_on_external_monitors_at_startup</applyto>
+             <owner>gnome</owner>
+diff --git a/plugins/xrandr/gsd-xrandr-manager.c b/plugins/xrandr/gsd-xrandr-manager.c
+index 0aef5de..363e295 100644
+--- a/plugins/xrandr/gsd-xrandr-manager.c
++++ b/plugins/xrandr/gsd-xrandr-manager.c
+@@ -61,6 +61,7 @@
+ 
+ #define CONF_DIR "/apps/gnome_settings_daemon/xrandr"
+ #define CONF_KEY_SHOW_NOTIFICATION_ICON (CONF_DIR "/show_notification_icon")
++#define CONF_KEY_USE_XORG_MONITOR_SETTINGS		(CONF_DIR "/use_xorg_monitor_settings")
+ #define CONF_KEY_TURN_ON_EXTERNAL_MONITORS_AT_STARTUP	(CONF_DIR "/turn_on_external_monitors_at_startup")
+ #define CONF_KEY_TURN_ON_LAPTOP_MONITOR_AT_STARTUP	(CONF_DIR "/turn_on_laptop_monitor_at_startup")
+ #define CONF_KEY_DEFAULT_CONFIGURATION_FILE             (CONF_DIR "/default_configuration_file")
+@@ -2349,7 +2350,8 @@ gsd_xrandr_manager_start (GsdXrandrManager *manager,
+         show_timestamps_dialog (manager, "Startup");
+         if (!apply_stored_configuration_at_startup (manager, GDK_CURRENT_TIME)) /* we don't have a real timestamp at startup anyway */
+                 if (!apply_default_configuration_from_file (manager, GDK_CURRENT_TIME))
+-                        apply_default_boot_configuration (manager, GDK_CURRENT_TIME);
++                        if (!gconf_client_get_bool (manager->priv->client, CONF_KEY_USE_XORG_MONITOR_SETTINGS, NULL))
++                                apply_default_boot_configuration (manager, GDK_CURRENT_TIME);
+ 
+         log_msg ("State of screen after initial configuration:\n");
+         log_screen (manager->priv->rw_screen);
+-- 
+1.7.1
+

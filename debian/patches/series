@@ -14,3 +14,4 @@
 71_fix_ldsm_notification_crash.patch
 91_update_gvc_source.patch
 99_ltmain_as-needed.patch
+09_gconfify_default_xrandr.patch

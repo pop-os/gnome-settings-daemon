@@ -1,3 +1,15 @@
+gnome-settings-daemon (2.32.0-0ubuntu2) UNRELEASED; urgency=low
+
+  * Add 09_gconfify_default_xrandr.patch: In a lot of situations it is
+    undesirable to have g-s-d change the XRandR settings, because it overrides
+    X.org customizations, leads to unnecessary mode switches, or increases
+    boot time. Add a gconf key "use_xorg_monitor_settings" to disable
+    apply_default_boot_configuration(), in which case the XRandR configuration
+    will not be touched unless there is a global or per-user configuration
+    file.
+
+ -- Martin Pitt <martin.pitt@ubuntu.com>  Tue, 05 Oct 2010 11:42:43 +0200
+
 gnome-settings-daemon (2.32.0-0ubuntu1) maverick; urgency=low
 
   * New upstream release.
