@@ -1,3 +1,18 @@
+gnome-settings-daemon (2.32.0-0ubuntu3) UNRELEASED; urgency=low
+
+  * Fix LP: #625793 - Multiple Keyboard Layouts unusable: continuously 
+    changes layout + 100% CPU usage. Don't call xkl_engine_lock_group in 
+    response to XKB events, as XkbLockGroup generates another event
+    - update debian/patches/06_use_application_indicator.patch 
+  * Fix LP: #658777 - In popup_menu_set_group() - after adding new entries to 
+    the hash table, don't free the keys else we end up with a hash table full 
+    of keys pointing to invalid memory. Instead, create the hash table with 
+    g_hash_table_new_full, and have the keys freed when the hash table is 
+    destroyed
+    - update debian/patches/06_use_application_indicator.patch 
+
+ -- Chris Coulson <chris.coulson@canonical.com>  Mon, 11 Oct 2010 20:30:37 +0100
+
 gnome-settings-daemon (2.32.0-0ubuntu2) maverick; urgency=low
 
   * Add 09_gconfify_default_xrandr.patch: In a lot of situations it is
