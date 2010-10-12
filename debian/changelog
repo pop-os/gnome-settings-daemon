@@ -1,4 +1,4 @@
-gnome-settings-daemon (2.32.0-0ubuntu3) UNRELEASED; urgency=low
+gnome-settings-daemon (2.32.0-0ubuntu3) maverick-proposed; urgency=low
 
   * Fix LP: #625793 - Multiple Keyboard Layouts unusable: continuously 
     changes layout + 100% CPU usage. Don't call xkl_engine_lock_group in 
@@ -11,7 +11,7 @@ gnome-settings-daemon (2.32.0-0ubuntu3) UNRELEASED; urgency=low
     destroyed
     - update debian/patches/06_use_application_indicator.patch 
 
- -- Chris Coulson <chris.coulson@canonical.com>  Mon, 11 Oct 2010 20:30:37 +0100
+ -- Chris Coulson <chris.coulson@canonical.com>  Tue, 12 Oct 2010 11:03:40 +0100
 
 gnome-settings-daemon (2.32.0-0ubuntu2) maverick; urgency=low
 
