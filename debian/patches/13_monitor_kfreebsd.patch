@@ -1,0 +1,12 @@
+Index: gnome-settings-daemon-2.30.2/plugins/housekeeping/gsd-disk-space.c
+===================================================================
+--- gnome-settings-daemon-2.30.2.orig/plugins/housekeeping/gsd-disk-space.c	2010-10-20 00:44:46.946684561 +0200
++++ gnome-settings-daemon-2.30.2/plugins/housekeeping/gsd-disk-space.c	2010-10-20 00:45:11.782683265 +0200
+@@ -316,6 +316,7 @@ ldsm_mount_should_ignore (GUnixMountEntr
+                 "devfs",
+                 "devpts",
+                 "ecryptfs",
++                "fdescfs",
+                 "kernfs",
+                 "linprocfs",
+                 "proc",
