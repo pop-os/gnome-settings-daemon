@@ -1,11 +1,11 @@
-gnome-settings-daemon (2.30.2-2) UNRELEASED; urgency=low
+gnome-settings-daemon (2.30.2-2) unstable; urgency=low
 
   * 13_monitor_kfreebsd.patch: new patch. Don’t monitor fdescfs.
     Closes: #594891.
   * 10_clipboard_crash.patch: stolen from upstream git. Fixes a crash in 
     the clipboard manager. Closes: #588308.
 
- -- Josselin Mouette <joss@debian.org>  Wed, 20 Oct 2010 00:45:32 +0200
+ -- Josselin Mouette <joss@debian.org>  Wed, 20 Oct 2010 01:29:10 +0200
 
 gnome-settings-daemon (2.30.2-1) unstable; urgency=low
 
