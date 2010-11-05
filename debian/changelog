@@ -1,3 +1,14 @@
+gnome-settings-daemon (2.32.0-0ubuntu4) natty; urgency=low
+
+  * debian/gnome-settings-daemon.install:
+    - install the icons and polkit files which were not in the binaries
+  * debian/patches/70_migrate_touchpad_config.patch:
+    - dropped, it was just required for migration until lucid
+  * debian/patches/99_ltmain_as-needed.patch:
+    - dropped, it's not required with as-needed being default in natty
+  
+ -- Sebastien Bacher <seb128@ubuntu.com>  Fri, 05 Nov 2010 10:25:40 +0100
+
 gnome-settings-daemon (2.32.0-0ubuntu3) maverick-proposed; urgency=low
 
   * Fix LP: #625793 - Multiple Keyboard Layouts unusable: continuously 
