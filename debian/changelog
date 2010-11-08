@@ -1,3 +1,10 @@
+gnome-settings-daemon (2.91.2-0ubuntu1) natty; urgency=low
+
+  * debian/patches/*:
+    - Remove upstreamed and obsolete patches
+
+ -- Rodrigo Moya <rodrigo.moya@canonical.com>  Thu, 04 Nov 2010 18:35:40 +0100
+
 gnome-settings-daemon (2.32.0-0ubuntu3) maverick-proposed; urgency=low
 
   * Fix LP: #625793 - Multiple Keyboard Layouts unusable: continuously 
