@@ -8,8 +8,6 @@
 16_use_synchronous_notifications.patch
 30_pkgconfig-path.patch
 40_xres_lcddefault.patch
-70_migrate_touchpad_config.patch
 71_fix_ldsm_notification_crash.patch
 91_update_gvc_source.patch
-99_ltmain_as-needed.patch
 09_gconfify_default_xrandr.patch
