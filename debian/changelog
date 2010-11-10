@@ -1,5 +1,6 @@
 gnome-settings-daemon (2.91.2-0ubuntu1) natty; urgency=low
 
+  * New upstream release
   * debian/patches/*:
     - Remove upstreamed and obsolete patches
 
