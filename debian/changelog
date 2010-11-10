@@ -1,8 +1,13 @@
-gnome-settings-daemon (2.91.2-0ubuntu1) natty; urgency=low
+gnome-settings-daemon (2.91.2.1-0ubuntu1) natty; urgency=low
 
   * New upstream release
   * debian/patches/*:
     - Remove upstreamed and obsolete patches
+  * debian/patches/05_disable_corner_tapping.patch:
+  * debian/patches/02_missing_libs.patch:
+    - Rebase patch to apply to current sources
+  * debian/patches/series:
+    - Disable a couple of patches temporarily
 
  -- Rodrigo Moya <rodrigo.moya@canonical.com>  Thu, 04 Nov 2010 18:35:40 +0100
 

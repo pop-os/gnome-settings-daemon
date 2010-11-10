@@ -19,23 +19,24 @@ Build-Depends: cdbs,
                intltool (>= 0.37.1),
                libdbus-glib-1-dev (>= 0.74),
                libglib2.0-dev (>= 2.17.3),
-               libgtk2.0-dev (>= 2.16.0),
+               libgtk3.0-dev (>= 2.91.0),
                libgconf2-dev (>= 2.6.1),
-               libgnome-desktop-dev (>= 2.29.92),
+               libgnome-desktop-3-dev (>= 2.91.1),
                libnotify-dev (>= 0.4.3),
                libxt-dev,
                libxi-dev,
                libfontconfig1-dev,
                libxext-dev,
                libx11-dev,
-               libgnomekbd-dev (>= 2.29.5),
+               libgnomekbd-dev (>= 2.91.2),
                libxklavier-dev (>= 5.0),
                libgstreamer0.10-dev (>= 0.10.1.2),
                libgstreamer-plugins-base0.10-dev (>= 0.10.1.2),
                gnome-pkg-tools,
                libpulse-dev (>= 0.9.15),
                libcanberra-gtk-dev,
-               libappindicator-dev (>= 0.2.4) 
+               libappindicator-dev (>= 0.2.4),
+               gsettings-desktop-schemas-dev 
 Standards-Version: 3.9.1
 Vcs-Bzr: https://code.launchpad.net/~ubuntu-desktop/gnome-settings-daemon/ubuntu
 
