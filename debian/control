@@ -38,7 +38,7 @@ Build-Depends: cdbs,
                libappindicator-dev (>= 0.2.4),
                gsettings-desktop-schemas-dev 
 Standards-Version: 3.9.1
-Vcs-Bzr: https://code.launchpad.net/~ubuntu-desktop/gnome-settings-daemon/gnome3
+Vcs-Bzr: https://code.launchpad.net/~ubuntu-desktop/gnome-settings-daemon/ubuntugtk3
 
 Package: gnome-settings-daemon
 Architecture: any
