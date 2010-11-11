@@ -1,3 +1,10 @@
+gnome-settings-daemon (2.91.2.1-0ubuntu3) natty; urgency=low
+
+  * debian/rules: 
+    - Compile gnome-update-wallpaper-cache against gnome-desktop-3
+
+ -- Rodrigo Moya <rodrigo.moya@canonical.com>  Thu, 11 Nov 2010 23:04:01 +0100
+
 gnome-settings-daemon (2.91.2.1-0ubuntu2) natty; urgency=low
 
   * debian/control.in:
