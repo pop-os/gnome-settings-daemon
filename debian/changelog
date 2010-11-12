@@ -1,3 +1,10 @@
+gnome-settings-daemon (2.91.2.1-0ubuntu4) natty; urgency=low
+
+  * debian/gnome-settings-daemon.install:
+    - Add GSettings schemas to package 
+
+ -- Rodrigo Moya <rodrigo.moya@canonical.com>  Fri, 12 Nov 2010 10:49:31 +0100
+
 gnome-settings-daemon (2.91.2.1-0ubuntu3) natty; urgency=low
 
   * debian/rules: 

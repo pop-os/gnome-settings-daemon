@@ -1,5 +1,6 @@
 debian/tmp/etc
 debian/tmp/usr/lib/gnome-settings-daemon*
+debian/tmp/usr/share/glib-2.0/schemas
 debian/tmp/usr/share/icons
 debian/tmp/usr/share/locale
 debian/tmp/usr/share/gnome-settings-daemon/icons
