@@ -5,11 +5,9 @@
 05_disable_corner_tapping.patch
 06_use_application_indicator.patch
 07_dont_display_autostart.patch
-08_xrandr_command.patch
 12_monitor_network_fs.patch
 16_use_synchronous_notifications.patch
 30_pkgconfig-path.patch
 40_xres_lcddefault.patch
-71_fix_ldsm_notification_crash.patch
 91_update_gvc_source.patch
-09_gconfify_default_xrandr.patch
+

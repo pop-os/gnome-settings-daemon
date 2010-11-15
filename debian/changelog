@@ -1,3 +1,24 @@
+gnome-settings-daemon (2.32.1-0ubuntu1) natty; urgency=low
+
+  * New upstream version:
+    - Revert calling g-c-c 3.0's display configuration tool
+    - Use the fallback configurations if the stored 
+      configuration fails at startup
+    - Don't access free'd memory if a volume is unmounted whilst the dialog is
+      displayed
+    - Add gconf key for disabling boot time configuration
+    - Use Xorg monitor settings by default
+  * debian/patches/08_xrandr_command.patch:
+    - dropped, the fix is in the new version
+  * debian/patches/09_gconfify_default_xrandr.patch:
+    - dropped, the fix is in the new version
+  * debian/patches/71_fix_ldsm_notification_crash.patch
+    - dropped, the fix is in the new version
+  * debian/gnome-settings-daemon.gconf-defaults:
+    - don't set xrandr keys since upstream default to using the xorg config
+
+ -- Sebastien Bacher <seb128@ubuntu.com>  Mon, 15 Nov 2010 18:08:08 +0100
+
 gnome-settings-daemon (2.32.0-0ubuntu4) natty; urgency=low
 
   * debian/gnome-settings-daemon.install:
