@@ -1,3 +1,10 @@
+gnome-settings-daemon (2.32.1-0ubuntu3) UNRELEASED; urgency=low
+
+  * debian/rules: list the objects to build before the libraries to fix the 
+    build issues which was workarounded in the previous upload (lp: #676519)
+
+ -- Sebastien Bacher <seb128@ubuntu.com>  Wed, 17 Nov 2010 17:26:17 +0100
+
 gnome-settings-daemon (2.32.1-0ubuntu2) natty; urgency=low
 
   * debian/rules:
