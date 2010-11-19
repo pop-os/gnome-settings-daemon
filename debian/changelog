@@ -1,3 +1,11 @@
+gnome-settings-daemon (2.91.3-0ubuntu1~build2) natty; urgency=low
+
+  * debian/gnome-update-wallpaper-cache.c:
+  * debian/rules:
+    - Make it compile and link against the correct libraries
+
+ -- Rodrigo Moya <rodrigo.moya@canonical.com>  Fri, 19 Nov 2010 10:08:58 +0100
+
 gnome-settings-daemon (2.91.3-0ubuntu1~build1) natty; urgency=low
 
   * New upstream release
