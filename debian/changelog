@@ -1,3 +1,11 @@
+gnome-settings-daemon (2.91.3-0ubuntu1~build3) natty; urgency=low
+
+  [Sebastien Bacher ]
+  * debian/rules: list the objects to build before the libraries to fix the
+    build issues which was workarounded in the previous upload (lp: #676519)
+
+ -- Rodrigo Moya <rodrigo.moya@canonical.com>  Fri, 19 Nov 2010 12:28:38 +0100
+
 gnome-settings-daemon (2.91.3-0ubuntu1~build2) natty; urgency=low
 
   * debian/gnome-update-wallpaper-cache.c:
