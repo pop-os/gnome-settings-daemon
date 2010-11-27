@@ -1,0 +1,26 @@
+From b7a9fd528253af16456cf7c0dc1f48bfd0dcbfbc Mon Sep 17 00:00:00 2001
+From: Krzysztof Klimonda <kklimonda@ubuntu.com>
+Date: Wed, 15 Sep 2010 10:29:17 +0000
+Subject: Check whether XGetWindowProperty returns no items, and return if so.
+
+Fixes https://bugzilla.gnome.org/show_bug.cgi?id=628526
+---
+diff --git a/plugins/clipboard/gsd-clipboard-manager.c b/plugins/clipboard/gsd-clipboard-manager.c
+index f8cb7ec..d0d28c3 100644
+--- a/plugins/clipboard/gsd-clipboard-manager.c
++++ b/plugins/clipboard/gsd-clipboard-manager.c
+@@ -599,8 +599,11 @@ convert_clipboard (GsdClipboardManager *manager,
+                                     &type, &format, &nitems, &remaining,
+                                     (unsigned char **) &multiple);
+ 
+-                if (type != XA_ATOM_PAIR)
++                if (type != XA_ATOM_PAIR || nitems == 0) {
++                        if (multiple)
++                                free (multiple);
+                         return;
++                }
+ 
+                 for (i = 0; i < nitems; i += 2) {
+                         rdata = (IncrConversion *) malloc (sizeof (IncrConversion));
+--
+cgit v0.8.3.1
