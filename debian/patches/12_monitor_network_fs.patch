@@ -1,0 +1,42 @@
+Debian #563592
+GNOME #606421
+
+Index: gnome-settings-daemon-2.30.2/plugins/housekeeping/gsd-disk-space.c
+===================================================================
+--- gnome-settings-daemon-2.30.2.orig/plugins/housekeeping/gsd-disk-space.c	2010-06-22 10:47:55.000000000 +0200
++++ gnome-settings-daemon-2.30.2/plugins/housekeeping/gsd-disk-space.c	2010-07-23 00:46:59.913454945 +0200
+@@ -306,10 +306,13 @@
+          * expose this in a way that allows it to be used for this
+          * purpose
+          */
++
++        /* We also ignore network filesystems. */
+                  
+         const gchar *ignore_fs[] = {
+                 "auto",
+                 "autofs",
++                "autofs4",
+                 "devfs",
+                 "devpts",
+                 "ecryptfs",
+@@ -326,6 +329,20 @@
+                 "nfsd",
+                 "rpc_pipefs",
+                 "zfs",
++
++                "adfs",
++                "afs",
++                "cifs",
++                "cxfs",
++                "gfs",
++                "gfs2",
++                "lustre",
++                "lustre_lite",
++                "ncpfs",
++                "nfs",
++                "nfs4",
++                "ocfs2",
++                "smbfs",
+                 NULL
+         };
+         const gchar *ignore_devices[] = {
