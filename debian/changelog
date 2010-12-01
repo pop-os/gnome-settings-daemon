@@ -1,12 +1,13 @@
-gnome-settings-daemon (2.91.5.1-0ubuntu1~build1) UNRELEASED; urgency=low
+gnome-settings-daemon (2.91.5.1-0ubuntu1~build1) natty; urgency=low
 
+  [ Rodrigo Moya ]
   * New upstream release
   * debian/control:
     - Bump gsettings-desktop-schemas-dev build dependency
   * debian/patches/02_missing_libs.patch:
     - Rebased patch
 
- -- Rodrigo Moya <rodrigo.moya@canonical.com>  Tue, 30 Nov 2010 10:30:39 +0100
+ -- Sebastien Bacher <seb128@ubuntu.com>  Wed, 01 Dec 2010 17:03:15 +0100
 
 gnome-settings-daemon (2.91.4-0ubuntu1~build1) natty; urgency=low
 
