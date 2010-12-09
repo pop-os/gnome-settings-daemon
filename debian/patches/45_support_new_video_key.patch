@@ -1,0 +1,85 @@
+Index: gnome-settings-daemon-2.30.0/plugins/xrandr/gsd-xrandr-manager.c
+===================================================================
+--- gnome-settings-daemon-2.30.0.orig/plugins/xrandr/gsd-xrandr-manager.c	2010-04-06 12:28:29.464095892 -0200
++++ gnome-settings-daemon-2.30.0/plugins/xrandr/gsd-xrandr-manager.c	2010-04-06 12:42:57.732070788 -0200
+@@ -67,6 +67,8 @@
+ 
+ #define VIDEO_KEYSYM    "XF86Display"
+ #define ROTATE_KEYSYM   "XF86RotateWindows"
++#define NEW_VIDEO_KEYSYM    "p"
++#define NEW_VIDEO_MODSYM    Mod4Mask
+ 
+ /* Number of seconds that the confirmation dialog will last before it resets the
+  * RANDR configuration to its old state.
+@@ -91,6 +93,11 @@
+         /* Key code of the XF86Display key (Fn-F7 on Thinkpads, Fn-F4 on HP machines, etc.) */
+         guint switch_video_mode_keycode;
+ 
++        /* Key code of a new video mode key (F1 on Dell machines).
++           It looks like Mod4+P. */
++        guint new_switch_video_mode_keycode;
++        guint new_switch_video_mode_modifier;
++
+         /* Key code of the XF86RotateWindows key (present on some tablets) */
+         guint rotate_windows_keycode;
+ 
+@@ -1142,7 +1149,9 @@
+                 return GDK_FILTER_CONTINUE;
+ 
+         if (xev->xany.type == KeyPress) {
+-                if (xev->xkey.keycode == manager->priv->switch_video_mode_keycode)
++                if (xev->xkey.keycode == manager->priv->switch_video_mode_keycode ||
++                    (xev->xkey.keycode == manager->priv->new_switch_video_mode_keycode &&
++                     xev->xkey.state & manager->priv->new_switch_video_mode_modifier))
+                         handle_fn_f7 (manager, xev->xkey.time);
+                 else if (xev->xkey.keycode == manager->priv->rotate_windows_keycode)
+                         handle_rotate_windows (manager, xev->xkey.time);
+@@ -2131,6 +2140,20 @@
+                 gdk_error_trap_pop ();
+         }
+ 
++        if (manager->priv->new_switch_video_mode_keycode &&
++            manager->priv->new_switch_video_mode_modifier) {
++                gdk_error_trap_push ();
++
++                XGrabKey (gdk_x11_get_default_xdisplay(),
++                          manager->priv->new_switch_video_mode_keycode,
++                          manager->priv->new_switch_video_mode_modifier,
++                          gdk_x11_get_default_root_xwindow(),
++                          True, GrabModeAsync, GrabModeAsync);
++
++                gdk_flush ();
++                gdk_error_trap_pop ();
++        }
++
+         if (manager->priv->rotate_windows_keycode) {
+                 gdk_error_trap_push ();
+ 
+@@ -2174,6 +2197,18 @@
+                 gdk_error_trap_pop ();
+         }
+ 
++        if (manager->priv->new_switch_video_mode_keycode &&
++            manager->priv->new_switch_video_mode_modifier) {
++                gdk_error_trap_push ();
++
++                XUngrabKey (gdk_x11_get_default_xdisplay(),
++                            manager->priv->new_switch_video_mode_keycode,
++                            manager->priv->new_switch_video_mode_modifier,
++                            gdk_x11_get_default_root_xwindow());
++
++                gdk_error_trap_pop ();
++        }
++
+         if (manager->priv->rotate_windows_keycode) {
+                 gdk_error_trap_push ();
+ 
+@@ -2309,6 +2344,8 @@
+         manager->priv = GSD_XRANDR_MANAGER_GET_PRIVATE (manager);
+ 
+         manager->priv->switch_video_mode_keycode = get_keycode_for_keysym_name (VIDEO_KEYSYM);
++        manager->priv->new_switch_video_mode_keycode = get_keycode_for_keysym_name (NEW_VIDEO_KEYSYM);
++        manager->priv->new_switch_video_mode_modifier = NEW_VIDEO_MODSYM;
+         manager->priv->rotate_windows_keycode = get_keycode_for_keysym_name (ROTATE_KEYSYM);
+ 
+         manager->priv->current_fn_f7_config = -1;

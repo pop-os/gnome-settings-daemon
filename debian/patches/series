@@ -9,5 +9,6 @@
 16_use_synchronous_notifications.patch
 30_pkgconfig-path.patch
 40_xres_lcddefault.patch
+45_support_new_video_key.patch
 91_update_gvc_source.patch
 
