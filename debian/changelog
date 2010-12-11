@@ -23,8 +23,10 @@ gnome-settings-daemon (2.91.5-1) UNRELEASED; urgency=low
   * debian/gnome-settings-daemon.install
     - Updated
   * Switch to dh_autoreconf and trigger list-missing
+  * Make gnome-settings-daemon depends on gsettings-desktop-schemas and
+    nautilus-data to pull in the necessary schema files.
 
- -- Sjoerd Simons <sjoerd@debian.org>  Sat, 11 Dec 2010 15:29:15 +0000
+ -- Sjoerd Simons <sjoerd@debian.org>  Sat, 11 Dec 2010 15:46:58 +0000
 
 gnome-settings-daemon (2.30.2-2) unstable; urgency=low
 
