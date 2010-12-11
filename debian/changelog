@@ -1,3 +1,31 @@
+gnome-settings-daemon (2.91.5-1) UNRELEASED; urgency=low
+
+  * New upstream release
+  * debian/control.in: Update build-depends to gnome 3.0 versions
+  * debian/patches/01_xrdb.patch
+    - Removed. g-s-d no longer manages xrdb
+  * debian/patches/03_maintainer_mode.patch
+    - Removed. Fixed upstream
+  * debian/patches/10_clipboard_crash.patch
+    - Removed. Fixed upstream.
+  * debian/patches/12_monitor_network_fs.patch
+    - Removed. Fixed upstream
+  * debian/patches/13_monitor_kfreebsd.patch
+    - Updated
+  * debian/patches/20_gstreamer.patch
+    - Removed. Time to move to pulseaudio by default...
+  * debian/patches/30_pkgconfig-path.patch:
+    - Removed. Fixed upstream
+  * debian/patches/70_relibtoolize.patch
+    - Removed, moving to dh_autoreconf
+  * debian/patches/99_ltmain_as-needed.patch
+    - Removed, moving to dh_autoreconf
+  * debian/gnome-settings-daemon.install
+    - Updated
+  * Switch to dh_autoreconf and trigger list-missing
+
+ -- Sjoerd Simons <sjoerd@debian.org>  Sat, 11 Dec 2010 15:29:15 +0000
+
 gnome-settings-daemon (2.30.2-2) unstable; urgency=low
 
   * 13_monitor_kfreebsd.patch: new patch. Don’t monitor fdescfs.
