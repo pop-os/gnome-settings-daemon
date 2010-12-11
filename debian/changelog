@@ -1,4 +1,4 @@
-gnome-settings-daemon (2.91.5-1) UNRELEASED; urgency=low
+gnome-settings-daemon (2.91.5.1-1) UNRELEASED; urgency=low
 
   * New upstream release
   * debian/control.in: Update build-depends to gnome 3.0 versions
