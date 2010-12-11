@@ -5,7 +5,7 @@ Maintainer: Debian GNOME Maintainers <pkg-gnome-maintainers@lists.alioth.debian.
 Uploaders: @GNOME_TEAM@
 Build-Depends: cdbs,
                debhelper (>= 5),
-               dh_autoreconf,
+               dh-autoreconf,
                autotools-dev,
                intltool (>= 0.37.1),
                libdbus-glib-1-dev (>= 0.74),
@@ -21,12 +21,13 @@ Build-Depends: cdbs,
                libfontconfig1-dev,
                libxext-dev,
                libx11-dev,
-               libgnomekbd-dev (>= 2.29.5),
+               libgnomekbd-dev (>= 2.91.1),
                libxklavier-dev (>= 5.0),
                libgstreamer0.10-dev (>= 0.10.1.2),
                libgstreamer-plugins-base0.10-dev (>= 0.10.1.2),
                gnome-pkg-tools,
-               gsettings-desktop-schemas-dev
+               gsettings-desktop-schemas-dev,
+               libgnome-desktop-3-dev
 Standards-Version: 3.9.0
 Vcs-Browser: http://svn.debian.org/wsvn/pkg-gnome/desktop/unstable/gnome-settings-daemon/
 Vcs-Svn: svn://svn.debian.org/svn/pkg-gnome/desktop/unstable/gnome-settings-daemon/
