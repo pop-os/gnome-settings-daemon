@@ -1,4 +1,4 @@
-gnome-settings-daemon (2.91.5.1-1) UNRELEASED; urgency=low
+gnome-settings-daemon (2.91.5.1-1) experimental; urgency=low
 
   * New upstream release
   * debian/control.in: Update build-depends to gnome 3.0 versions
@@ -26,7 +26,7 @@ gnome-settings-daemon (2.91.5.1-1) UNRELEASED; urgency=low
   * Make gnome-settings-daemon depends on gsettings-desktop-schemas and
     nautilus-data to pull in the necessary schema files.
 
- -- Sjoerd Simons <sjoerd@debian.org>  Sat, 11 Dec 2010 15:46:58 +0000
+ -- Sjoerd Simons <sjoerd@debian.org>  Sat, 11 Dec 2010 16:20:56 +0000
 
 gnome-settings-daemon (2.30.2-2) unstable; urgency=low
 
