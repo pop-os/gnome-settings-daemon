@@ -10,6 +10,7 @@ Maintainer: Debian GNOME Maintainers <pkg-gnome-maintainers@lists.alioth.debian.
 Uploaders: Emilio Pozuelo Monfort <pochu@debian.org>, Josselin Mouette <joss@debian.org>, Michael Biebl <biebl@debian.org>, Sjoerd Simons <sjoerd@debian.org>
 Build-Depends: cdbs,
                debhelper (>= 5),
+               dh_autoreconf,
                autotools-dev,
                intltool (>= 0.37.1),
                libdbus-glib-1-dev (>= 0.74),
@@ -39,7 +40,9 @@ Package: gnome-settings-daemon
 Architecture: any
 Depends: ${shlibs:Depends},
          ${misc:Depends},
-         libgnome2-common
+         libgnome2-common,
+         gsettings-desktop-schemas,
+         nautilus-data
 Replaces: capplets-data (<< 1:2.21.5),
           gnome-control-center (<< 1:2.21.5)
 Breaks: rhythmbox (<< 0.11.5),
