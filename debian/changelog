@@ -1,8 +1,8 @@
-gnome-settings-daemon (2.91.5.1-2) UNRELEASED; urgency=low
+gnome-settings-daemon (2.91.5.1-2) experimental; urgency=low
 
   * Make the nautilus-data depend versioned
 
- -- Sjoerd Simons <sjoerd@debian.org>  Sun, 12 Dec 2010 14:30:38 +0000
+ -- Sjoerd Simons <sjoerd@debian.org>  Sun, 12 Dec 2010 14:32:07 +0000
 
 gnome-settings-daemon (2.91.5.1-1) experimental; urgency=low
 
