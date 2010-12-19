@@ -27,7 +27,9 @@ Build-Depends: cdbs,
                libgstreamer-plugins-base0.10-dev (>= 0.10.1.2),
                gnome-pkg-tools,
                gsettings-desktop-schemas-dev,
-               libgnome-desktop-3-dev
+               libgnome-desktop-3-dev,
+               libpulse-dev (>= 0.9.16),
+               libcanberra-gtk3-dev
 Standards-Version: 3.9.0
 Vcs-Browser: http://svn.debian.org/wsvn/pkg-gnome/desktop/unstable/gnome-settings-daemon/
 Vcs-Svn: svn://svn.debian.org/svn/pkg-gnome/desktop/unstable/gnome-settings-daemon/
