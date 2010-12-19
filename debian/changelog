@@ -1,8 +1,9 @@
 gnome-settings-daemon (2.91.5.1-3) UNRELEASED; urgency=low
 
   * Enable pulseaudio support
+  * Enable the settings d-conf <-> gconf bridge
 
- -- Sjoerd Simons <sjoerd@debian.org>  Sun, 19 Dec 2010 13:15:18 +0000
+ -- Sjoerd Simons <sjoerd@debian.org>  Sun, 19 Dec 2010 13:33:53 +0000
 
 gnome-settings-daemon (2.91.5.1-2) experimental; urgency=low
 
