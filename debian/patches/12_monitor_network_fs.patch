@@ -1,11 +1,11 @@
 Debian #563592
 GNOME #606421
 
-Index: gnome-settings-daemon-2.31.91/plugins/housekeeping/gsd-disk-space.c
+Index: gnome-settings-daemon-2.32.1/plugins/housekeeping/gsd-disk-space.c
 ===================================================================
---- gnome-settings-daemon-2.31.91.orig/plugins/housekeeping/gsd-disk-space.c	2010-06-22 18:47:55.000000000 +1000
-+++ gnome-settings-daemon-2.31.91/plugins/housekeeping/gsd-disk-space.c	2010-09-01 19:01:09.452617000 +1000
-@@ -306,10 +306,13 @@
+--- gnome-settings-daemon-2.32.1.orig/plugins/housekeeping/gsd-disk-space.c	2010-11-16 00:10:51.000000000 +1100
++++ gnome-settings-daemon-2.32.1/plugins/housekeeping/gsd-disk-space.c	2010-12-21 10:23:28.372750001 +1100
+@@ -308,10 +308,13 @@
           * expose this in a way that allows it to be used for this
           * purpose
           */
@@ -19,7 +19,7 @@ Index: gnome-settings-daemon-2.31.91/plugins/housekeeping/gsd-disk-space.c
                  "devfs",
                  "devpts",
                  "ecryptfs",
-@@ -326,6 +329,20 @@
+@@ -328,6 +331,20 @@
                  "nfsd",
                  "rpc_pipefs",
                  "zfs",

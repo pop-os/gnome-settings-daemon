@@ -1,8 +1,8 @@
-Index: gnome-settings-daemon-2.30.0/plugins/xrandr/gsd-xrandr-manager.c
+Index: gnome-settings-daemon-2.32.1/plugins/xrandr/gsd-xrandr-manager.c
 ===================================================================
---- gnome-settings-daemon-2.30.0.orig/plugins/xrandr/gsd-xrandr-manager.c	2010-04-06 12:28:29.464095892 -0200
-+++ gnome-settings-daemon-2.30.0/plugins/xrandr/gsd-xrandr-manager.c	2010-04-06 12:42:57.732070788 -0200
-@@ -67,6 +67,8 @@
+--- gnome-settings-daemon-2.32.1.orig/plugins/xrandr/gsd-xrandr-manager.c	2010-12-21 10:23:25.802750001 +1100
++++ gnome-settings-daemon-2.32.1/plugins/xrandr/gsd-xrandr-manager.c	2010-12-21 10:23:32.502750001 +1100
+@@ -72,6 +72,8 @@
  
  #define VIDEO_KEYSYM    "XF86Display"
  #define ROTATE_KEYSYM   "XF86RotateWindows"
@@ -11,7 +11,7 @@ Index: gnome-settings-daemon-2.30.0/plugins/xrandr/gsd-xrandr-manager.c
  
  /* Number of seconds that the confirmation dialog will last before it resets the
   * RANDR configuration to its old state.
-@@ -91,6 +93,11 @@
+@@ -96,6 +98,11 @@
          /* Key code of the XF86Display key (Fn-F7 on Thinkpads, Fn-F4 on HP machines, etc.) */
          guint switch_video_mode_keycode;
  
@@ -23,7 +23,7 @@ Index: gnome-settings-daemon-2.30.0/plugins/xrandr/gsd-xrandr-manager.c
          /* Key code of the XF86RotateWindows key (present on some tablets) */
          guint rotate_windows_keycode;
  
-@@ -1142,7 +1149,9 @@
+@@ -1351,7 +1358,9 @@
                  return GDK_FILTER_CONTINUE;
  
          if (xev->xany.type == KeyPress) {
@@ -34,7 +34,7 @@ Index: gnome-settings-daemon-2.30.0/plugins/xrandr/gsd-xrandr-manager.c
                          handle_fn_f7 (manager, xev->xkey.time);
                  else if (xev->xkey.keycode == manager->priv->rotate_windows_keycode)
                          handle_rotate_windows (manager, xev->xkey.time);
-@@ -2131,6 +2140,20 @@
+@@ -2396,6 +2405,20 @@
                  gdk_error_trap_pop ();
          }
  
@@ -55,7 +55,7 @@ Index: gnome-settings-daemon-2.30.0/plugins/xrandr/gsd-xrandr-manager.c
          if (manager->priv->rotate_windows_keycode) {
                  gdk_error_trap_push ();
  
-@@ -2174,6 +2197,18 @@
+@@ -2447,6 +2470,18 @@
                  gdk_error_trap_pop ();
          }
  
@@ -74,7 +74,7 @@ Index: gnome-settings-daemon-2.30.0/plugins/xrandr/gsd-xrandr-manager.c
          if (manager->priv->rotate_windows_keycode) {
                  gdk_error_trap_push ();
  
-@@ -2309,6 +2344,8 @@
+@@ -2586,6 +2621,8 @@
          manager->priv = GSD_XRANDR_MANAGER_GET_PRIVATE (manager);
  
          manager->priv->switch_video_mode_keycode = get_keycode_for_keysym_name (VIDEO_KEYSYM);
