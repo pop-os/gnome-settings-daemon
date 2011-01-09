@@ -1,4 +1,4 @@
-gnome-settings-daemon (2.32.1-0ubuntu3) UNRELEASED; urgency=low
+gnome-settings-daemon (2.32.1-0ubuntu3) natty; urgency=low
 
   [ Sebastien Bacher ]
   * debian/rules: list the objects to build before the libraries to fix the 
@@ -11,7 +11,7 @@ gnome-settings-daemon (2.32.1-0ubuntu3) UNRELEASED; urgency=low
     literal Super+P scan codes instead of a proper KEY_VIDEOMODE scan
     code.  Patch by Mike Terry, thanks! (LP: #539477)
 
- -- Sebastien Bacher <seb128@ubuntu.com>  Wed, 17 Nov 2010 17:26:17 +0100
+ -- Martin Pitt <martin.pitt@ubuntu.com>  Sun, 09 Jan 2011 07:13:47 -0600
 
 gnome-settings-daemon (2.32.1-0ubuntu2) natty; urgency=low
 
