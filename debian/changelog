@@ -1,8 +1,8 @@
-gnome-settings-daemon (2.32.1-0ubuntu4) UNRELEASED; urgency=low
+gnome-settings-daemon (2.32.1-0ubuntu4) natty; urgency=low
 
   * debian/control.in: build-depends on libpolkit-gobject-1-dev
 
- -- Sebastien Bacher <seb128@ubuntu.com>  Mon, 10 Jan 2011 15:21:46 -0600
+ -- Sebastien Bacher <seb128@ubuntu.com>  Mon, 10 Jan 2011 15:27:52 -0600
 
 gnome-settings-daemon (2.32.1-0ubuntu3) natty; urgency=low
 
