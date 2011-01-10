@@ -35,7 +35,8 @@ Build-Depends: cdbs,
                gnome-pkg-tools,
                libpulse-dev (>= 0.9.15),
                libcanberra-gtk-dev,
-               libappindicator-dev (>= 0.2.4) 
+               libappindicator-dev (>= 0.2.4),
+               libpolkit-gobject-1-dev
 Standards-Version: 3.9.1
 Vcs-Bzr: https://code.launchpad.net/~ubuntu-desktop/gnome-settings-daemon/ubuntu
 
