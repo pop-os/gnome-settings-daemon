@@ -1,4 +1,4 @@
-gnome-settings-daemon (2.91.6.2-1) UNRELEASED; urgency=low
+gnome-settings-daemon (2.91.7-1) UNRELEASED; urgency=low
 
   [ Sjoerd Simons ]
   * Enable pulseaudio support
@@ -15,6 +15,9 @@ gnome-settings-daemon (2.91.6.2-1) UNRELEASED; urgency=low
     - Remove duplicated list-missing target and utils.mk include.
     - Include autoreconf.mk before debhelper.mk to not leave cruft when
       running clean.
+  * debian/control.in:
+    - Standards-Version is 3.9.1, no changes needed.
+    - Drop old Replaces.
 
  -- Sjoerd Simons <sjoerd@debian.org>  Sun, 19 Dec 2010 13:49:05 +0000
 
