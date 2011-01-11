@@ -29,7 +29,7 @@ Build-Depends: cdbs,
                libgnome-desktop-3-dev,
                libpulse-dev (>= 0.9.16),
                libcanberra-gtk3-dev
-Standards-Version: 3.9.0
+Standards-Version: 3.9.1
 Vcs-Browser: http://svn.debian.org/wsvn/pkg-gnome/desktop/unstable/gnome-settings-daemon/
 Vcs-Svn: svn://svn.debian.org/svn/pkg-gnome/desktop/unstable/gnome-settings-daemon/
 
@@ -40,8 +40,6 @@ Depends: ${shlibs:Depends},
          libgnome2-common,
          gsettings-desktop-schemas,
          nautilus-data (>= 2.91.3-1)
-Replaces: capplets-data (<< 1:2.21.5),
-          gnome-control-center (<< 1:2.21.5)
 Breaks: rhythmbox (<< 0.11.5),
         banshee (<< 0.13.2+dfsg-7),
         totem (<< 2.22.0),
