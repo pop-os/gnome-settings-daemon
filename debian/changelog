@@ -1,4 +1,4 @@
-gnome-settings-daemon (2.91.8-1) UNRELEASED; urgency=low
+gnome-settings-daemon (2.91.8-1) experimental; urgency=low
 
   [ Sjoerd Simons ]
   * Enable pulseaudio support
@@ -19,7 +19,7 @@ gnome-settings-daemon (2.91.8-1) UNRELEASED; urgency=low
     - Standards-Version is 3.9.1, no changes needed.
     - Drop old Replaces.
 
- -- Sjoerd Simons <sjoerd@debian.org>  Sun, 19 Dec 2010 13:49:05 +0000
+ -- Emilio Pozuelo Monfort <pochu@debian.org>  Wed, 12 Jan 2011 22:48:04 +0000
 
 gnome-settings-daemon (2.91.5.1-2) experimental; urgency=low
 
