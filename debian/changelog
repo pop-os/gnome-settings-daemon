@@ -1,3 +1,14 @@
+gnome-settings-daemon (2.91.8-2) UNRELEASED; urgency=low
+
+  * debian/patches/02_missing_libs.patch:
+    + Removed. This was fixed upstream in a different way a long time
+      ago. The patch was also disabled on 2.91.5.1-1 without any bad
+      consequences.
+  * debian/patches/13_monitor_kfreebsd.patch:
+    + Forwarded upstream, added headers.
+
+ -- Emilio Pozuelo Monfort <pochu@debian.org>  Sun, 16 Jan 2011 00:23:53 +0000
+
 gnome-settings-daemon (2.91.8-1) experimental; urgency=low
 
   [ Sjoerd Simons ]
