@@ -1,3 +1,10 @@
+gnome-settings-daemon (2.32.1-0ubuntu5) UNRELEASED; urgency=low
+
+  * debian/patches/06_use_application_indicator.patch:
+    - Initialize variable to avoid crashes on free (LP: #685785) 
+
+ -- Rodrigo Moya <rodrigo.moya@canonical.com>  Tue, 18 Jan 2011 16:23:55 +0100
+
 gnome-settings-daemon (2.32.1-0ubuntu4) natty; urgency=low
 
   * debian/control.in: build-depends on libpolkit-gobject-1-dev
