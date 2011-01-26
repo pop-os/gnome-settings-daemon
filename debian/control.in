@@ -5,33 +5,31 @@ Maintainer: Ubuntu Desktop Team <ubuntu-desktop@lists.ubuntu.com>
 XSBC-Original-Maintainer: Debian GNOME Maintainers <pkg-gnome-maintainers@lists.alioth.debian.org>
 Uploaders: @GNOME_TEAM@
 Build-Depends: cdbs,
-               quilt,
-               dh-autoreconf,
                debhelper (>= 5),
-               dpkg-dev (>= 1.13.19),
-               gnome-common,
+               dh-autoreconf,
                autotools-dev,
                intltool (>= 0.37.1),
                libdbus-glib-1-dev (>= 0.74),
-               libglib2.0-dev (>= 2.17.3),
-               libgtk3.0-dev (>= 2.91.0),
+               libglib2.0-dev (>= 2.26.0),
+               libgtk3.0-dev (>= 2.99.1),
                libgconf2-dev (>= 2.6.1),
-               libgnome-desktop-3-dev (>= 2.91.5),
-               libnotify4-dev (>= 0.7),
+               libnotify-dev (>= 0.7.0) | libnotify4-dev,
                libxt-dev,
                libxi-dev,
                libfontconfig1-dev,
                libxext-dev,
                libx11-dev,
-               libgnomekbd-dev (>= 2.91.2),
+               libgnomekbd-dev (>= 2.91.1),
                libxklavier-dev (>= 5.0),
                libgstreamer0.10-dev (>= 0.10.1.2),
                libgstreamer-plugins-base0.10-dev (>= 0.10.1.2),
                gnome-pkg-tools,
-               libpulse-dev (>= 0.9.15),
-               libcanberra-gtk-dev,
-               libappindicator-dev (>= 0.2.4),
-               gsettings-desktop-schemas-dev (>= 0.1.4)
+               gsettings-desktop-schemas-dev,
+               libgnome-desktop-3-dev (>= 2.91.5),
+               libpulse-dev (>= 0.9.16),
+               libcanberra-gtk3-dev,
+               libpolkit-gobject-1-dev,
+#               libappindicator-dev (>= 0.2.4)
 Standards-Version: 3.9.1
 Vcs-Bzr: https://code.launchpad.net/~gnome3-team/gnome-settings-daemon/ubuntu
 
@@ -39,15 +37,15 @@ Package: gnome-settings-daemon
 Architecture: any
 Depends: ${shlibs:Depends},
          ${misc:Depends},
-         libgnome2-common
-Recommends: pulseaudio         
-Replaces: capplets-data (<< 1:2.21.5),
-          gnome-control-center (<< 1:2.21.5)
-Conflicts: rhythmbox (<< 0.11.5),
-           banshee (<< 0.13.2+dfsg-7),
-           totem (<< 2.22.0),
-           gnome-control-center (<< 1:2.21.5)
-Breaks: gnome-session (<< 2.24),
+         libgnome2-common,
+         gsettings-desktop-schemas,
+         nautilus-data (>= 2.91.3-1)
+Recommends: pulseaudio
+Breaks: rhythmbox (<< 0.11.5),
+        banshee (<< 0.13.2+dfsg-7),
+        totem (<< 2.22.0),
+        gnome-control-center (<< 1:2.21.5),
+        gnome-session (<< 2.24),
         gnome-screensaver (<< 2.28.0)
 Suggests: x11-xserver-utils,
           gnome-screensaver,
@@ -73,8 +71,7 @@ Architecture: any
 Depends: ${shlibs:Depends},
          ${misc:Depends},
          libdbus-glib-1-dev (>= 0.74),
-         libglib2.0-dev (>= 2.17.3)
-Replaces: libgnome-settings-daemon-dev
+         libglib2.0-dev (>= 2.26.0)
 Description: Headers for building applications communicating with gnome-settings-daemon
  This package contains header files required to build applications that
  communicate with the GNOME settings daemon over D-Bus.

@@ -782,7 +782,7 @@
 +                gchar * guide = "XXX";
 +	        gchar ** shortnames;
 +	        gchar ** longnames;
-+	        gchar * layout_name;
++	        gchar * layout_name = NULL;
 +	        gchar * lname = NULL;
 +	        GHashTable *ln2cnt_map = g_hash_table_new_full (g_str_hash, g_str_equal, (GDestroyNotify) g_free, NULL);
 +

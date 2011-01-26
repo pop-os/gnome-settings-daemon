@@ -1,11 +1,11 @@
 debian/tmp/etc
 debian/tmp/usr/lib/gnome-settings-daemon*
-debian/tmp/usr/share/glib-2.0/schemas
 debian/tmp/usr/share/icons
 debian/tmp/usr/share/locale
-debian/tmp/usr/share/gnome-settings-daemon/icons
-debian/tmp/usr/share/gnome-settings-daemon/*.ui
+debian/tmp/usr/share/gnome-settings-daemon
 debian/tmp/usr/share/gnome-control-center
 debian/tmp/usr/share/dbus-1
+debian/tmp/usr/share/GConf
+debian/tmp/usr/share/glib-2.0
 debian/tmp/usr/share/polkit-1
 

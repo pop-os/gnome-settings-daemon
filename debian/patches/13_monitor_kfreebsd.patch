@@ -1,0 +1,12 @@
+diff --git a/plugins/housekeeping/gsd-disk-space.c b/plugins/housekeeping/gsd-disk-space.c
+index 392dcbd..5e815f1 100644
+--- a/plugins/housekeeping/gsd-disk-space.c
++++ b/plugins/housekeeping/gsd-disk-space.c
+@@ -457,6 +457,7 @@ ldsm_mount_should_ignore (GUnixMountEntry *mount)
+                 "devfs",
+                 "devpts",
+                 "ecryptfs",
++                "fdescfs",
+                 "gfs",
+                 "gfs2",
+                 "kernfs",
