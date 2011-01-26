@@ -1,4 +1,4 @@
-gnome-settings-daemon (2.91.8-1ubuntu1) UNRELEASED; urgency=low
+gnome-settings-daemon (2.91.8-1ubuntu1) natty; urgency=low
 
   * Resynchronize on Debian, remaining Ubuntu changes:
   * debian/control.in:
@@ -28,7 +28,7 @@ gnome-settings-daemon (2.91.8-1ubuntu1) UNRELEASED; urgency=low
   * debian/rules:
     - build gnome-update-wallpaper-cache
 
- -- Sebastien Bacher <seb128@ubuntu.com>  Wed, 26 Jan 2011 16:46:00 +0100
+ -- Sebastien Bacher <seb128@ubuntu.com>  Wed, 26 Jan 2011 17:24:05 +0100
 
 gnome-settings-daemon (2.91.8-1) experimental; urgency=low
 
