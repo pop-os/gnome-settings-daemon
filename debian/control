@@ -18,7 +18,7 @@ Build-Depends: cdbs,
                libglib2.0-dev (>= 2.26.0),
                libgtk3.0-dev (>= 2.99.1),
                libgconf2-dev (>= 2.6.1),
-               libnotify-dev (>= 0.7.0) | libnotify4-dev,
+               libnotify4-dev,
                libxt-dev,
                libxi-dev,
                libfontconfig1-dev,
@@ -32,7 +32,8 @@ Build-Depends: cdbs,
                gsettings-desktop-schemas-dev,
                libgnome-desktop-3-dev (>= 2.91.5),
                libpulse-dev (>= 0.9.16),
-               libcanberra-gtk3-dev
+               libcanberra-gtk3-dev,
+               libpolkit-gobject-1-dev,
 #               libappindicator-dev (>= 0.2.4)
 Standards-Version: 3.9.1
 Vcs-Bzr: https://code.launchpad.net/~gnome3-team/gnome-settings-daemon/ubuntu
