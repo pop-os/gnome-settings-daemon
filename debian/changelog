@@ -1,4 +1,4 @@
-gnome-settings-daemon (2.91.8-2) UNRELEASED; urgency=low
+gnome-settings-daemon (2.91.9-1) UNRELEASED; urgency=low
 
   [ Sebastien Bacher ]
   * debian/gnome-settings-daemon.install:
@@ -10,12 +10,17 @@ gnome-settings-daemon (2.91.8-2) UNRELEASED; urgency=low
     - recommends pulseaudio since it's used for the multimedia keys
     (Close: #611198)
 
+  [ Emilio Pozuelo Monfort ]
   * debian/patches/02_missing_libs.patch:
     + Removed. This was fixed upstream in a different way a long time
       ago. The patch was also disabled on 2.91.5.1-1 without any bad
       consequences.
-  * debian/patches/13_monitor_kfreebsd.patch:
-    + Forwarded upstream, added headers.
+  * New upstream release.
+    + d/patches/0001-Ensure-the-volume-doesn-t-underflow-and-wrap-around.patch,
+      d/patches/13_monitor_kfreebsd.patch:
+      - Removed, fixed upstream.
+    + debian/control.in:
+      - Updated build dependencies.
 
  -- Emilio Pozuelo Monfort <pochu@debian.org>  Sun, 16 Jan 2011 00:23:53 +0000
 
