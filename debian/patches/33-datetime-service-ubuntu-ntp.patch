@@ -1,0 +1,50 @@
+Description: Make the backported GNOME 3.0 ntp-control code work for Ubuntu
+Author: Michael Terry <michael.terry@canonical.com>
+
+Index: gnome-settings-daemon-2.32.1/plugins/datetime/gsd-datetime-mechanism.c
+===================================================================
+--- gnome-settings-daemon-2.32.1.orig/plugins/datetime/gsd-datetime-mechanism.c	2011-02-18 08:58:42.127976239 -0500
++++ gnome-settings-daemon-2.32.1/plugins/datetime/gsd-datetime-mechanism.c	2011-02-18 09:06:29.842752696 -0500
+@@ -588,14 +588,14 @@
+         gboolean can_use_ntp;
+         gboolean is_using_ntp;
+ 
+-        if (g_file_test ("/etc/ntp.conf", G_FILE_TEST_EXISTS)) {
++        if (g_file_test ("/usr/sbin/ntpd", G_FILE_TEST_EXISTS)) {
+                 can_use_ntp = TRUE;
+-                if (!g_spawn_command_line_sync ("/sbin/service ntpd status",
++                if (!g_spawn_command_line_sync ("/usr/sbin/service ntp status",
+                                                 NULL, NULL, &exit_status, &error)) {
+                         GError *error2;
+                         error2 = g_error_new (GSD_DATETIME_MECHANISM_ERROR,
+                                               GSD_DATETIME_MECHANISM_ERROR_GENERAL,
+-                                              "Error spawning /sbin/service: %s", error->message);
++                                              "Error spawning /usr/sbin/service: %s", error->message);
+                         g_error_free (error);
+                         dbus_g_method_return_error (context, error2);
+                         g_error_free (error2);
+@@ -629,7 +629,7 @@
+         if (!_check_polkit_for_action (mechanism, context, "org.gnome.clockapplet.mechanism.configurentp"))
+                 return FALSE;
+ 
+-        cmd = g_strconcat ("/sbin/chkconfig --level 2345 ntpd ", using_ntp ? "on" : "off", NULL);
++        cmd = g_strconcat ("/usr/sbin/update-rc.d ntp ", using_ntp ? "enable" : "disable", NULL);
+         if (!g_spawn_command_line_sync (cmd,
+                                         NULL, NULL, &exit_status, &error)) {
+                 GError *error2;
+@@ -645,13 +645,13 @@
+ 
+         g_free (cmd);
+ 
+-        cmd = g_strconcat ("/sbin/service ntpd ", using_ntp ? "restart" : "stop", NULL);
++        cmd = g_strconcat ("/usr/sbin/service ntp ", using_ntp ? "restart" : "stop", NULL);
+         if (!g_spawn_command_line_sync (cmd,
+                                         NULL, NULL, &exit_status, &error)) {
+                 GError *error2;
+                 error2 = g_error_new (GSD_DATETIME_MECHANISM_ERROR,
+                                       GSD_DATETIME_MECHANISM_ERROR_GENERAL,
+-                                      "Error spawning /sbin/service: %s", error->message);
++                                      "Error spawning /usr/sbin/service: %s", error->message);
+                 g_error_free (error);
+                 dbus_g_method_return_error (context, error2);
+                 g_error_free (error2);

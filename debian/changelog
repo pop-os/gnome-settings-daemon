@@ -1,3 +1,15 @@
+gnome-settings-daemon (2.32.1-0ubuntu6) natty; urgency=low
+
+  * debian/patches/32-datetime-service-add-ntp-support.patch:
+    - Backport ntp service control support from GNOME 3.0
+  * debian/patches/33-datetime-service-ubuntu-ntp.patch:
+    - Make previous patch work with Ubuntu's ntp and init system
+  * debian/patches/34-datetime-one-policykit-action.patch:
+    - Backport GNOME 3.0's merging of the policykit actions for configuring
+      date and time settings
+
+ -- Michael Terry <mterry@ubuntu.com>  Fri, 18 Feb 2011 09:32:39 -0500
+
 gnome-settings-daemon (2.32.1-0ubuntu5) natty; urgency=low
 
   * debian/patches/06_use_application_indicator.patch:

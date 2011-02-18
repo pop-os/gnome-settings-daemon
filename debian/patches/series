@@ -8,6 +8,9 @@
 12_monitor_network_fs.patch
 16_use_synchronous_notifications.patch
 30_pkgconfig-path.patch
+32-datetime-service-add-ntp-support.patch
+33-datetime-service-ubuntu-ntp.patch
+34-datetime-one-policykit-action.patch
 40_xres_lcddefault.patch
 45_support_new_video_key.patch
 91_update_gvc_source.patch
