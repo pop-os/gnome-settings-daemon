@@ -1,4 +1,4 @@
-gnome-settings-daemon (2.91.9-1) UNRELEASED; urgency=low
+gnome-settings-daemon (2.91.9-1) experimental; urgency=low
 
   [ Sebastien Bacher ]
   * debian/gnome-settings-daemon.install:
@@ -21,8 +21,9 @@ gnome-settings-daemon (2.91.9-1) UNRELEASED; urgency=low
       - Removed, fixed upstream.
     + debian/control.in:
       - Updated build dependencies.
+      - Update the gtk+ 3 build dependency for the new package name.
 
- -- Emilio Pozuelo Monfort <pochu@debian.org>  Sun, 16 Jan 2011 00:23:53 +0000
+ -- Emilio Pozuelo Monfort <pochu@debian.org>  Sat, 19 Feb 2011 14:28:40 +0000
 
 gnome-settings-daemon (2.91.8-1) experimental; urgency=low
 
