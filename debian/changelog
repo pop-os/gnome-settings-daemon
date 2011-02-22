@@ -1,3 +1,10 @@
+gnome-settings-daemon (2.91.90-0ubuntu1~build3) natty; urgency=low
+
+  * debian/control:
+    - Really fix the GTK3 renaming now
+
+ -- Rodrigo Moya <rodrigo.moya@canonical.com>  Tue, 22 Feb 2011 16:55:21 +0100
+
 gnome-settings-daemon (2.91.90-0ubuntu1~build2) natty; urgency=low
 
   * debian/control:
