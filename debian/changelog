@@ -1,3 +1,10 @@
+gnome-settings-daemon (2.91.90-0ubuntu1~build2) natty; urgency=low
+
+  * debian/control:
+    - Update for new GTK3 package names
+
+ -- Rodrigo Moya <rodrigo.moya@canonical.com>  Tue, 22 Feb 2011 16:42:05 +0100
+
 gnome-settings-daemon (2.91.90-0ubuntu1~build1) natty; urgency=low
 
   * New upstream release
