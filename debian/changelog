@@ -1,3 +1,11 @@
+gnome-settings-daemon (2.91.90-1) experimental; urgency=low
+
+  * New upstream release.
+    - gnome-settings-daemon.install: keybindings for accessibility tools
+      have been moved to the gnome-control-center module.
+
+ -- Frederic Peters <fpeters@debian.org>  Tue, 22 Feb 2011 22:49:26 +0100
+
 gnome-settings-daemon (2.91.9-1) experimental; urgency=low
 
   [ Sebastien Bacher ]
