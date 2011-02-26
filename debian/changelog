@@ -1,11 +1,11 @@
-gnome-settings-daemon (2.91.90-2) UNRELEASED; urgency=low
+gnome-settings-daemon (2.91.90-2) experimental; urgency=low
 
   * debian/control.in:
     * Add build-dep on recent libgnomekbd-dev
     * Remove direct build-depend on libxklavier-dev, libgnomekbd-dev will pull
       in the right version
 
- -- Sjoerd Simons <sjoerd@debian.org>  Sat, 26 Feb 2011 21:24:01 +0000
+ -- Sjoerd Simons <sjoerd@debian.org>  Sat, 26 Feb 2011 21:26:07 +0000
 
 gnome-settings-daemon (2.91.90-1) experimental; urgency=low
 
