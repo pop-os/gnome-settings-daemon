@@ -7,7 +7,7 @@ Source: gnome-settings-daemon
 Section: gnome
 Priority: optional
 Maintainer: Debian GNOME Maintainers <pkg-gnome-maintainers@lists.alioth.debian.org>
-Uploaders: Emilio Pozuelo Monfort <pochu@debian.org>, Frederic Peters <fpeters@debian.org>, Josselin Mouette <joss@debian.org>, Michael Biebl <biebl@debian.org>, Sjoerd Simons <sjoerd@debian.org>
+Uploaders: Emilio Pozuelo Monfort <pochu@debian.org>, Josselin Mouette <joss@debian.org>, Michael Biebl <biebl@debian.org>, Sjoerd Simons <sjoerd@debian.org>
 Build-Depends: cdbs,
                debhelper (>= 5),
                gnome-pkg-tools,
@@ -24,8 +24,7 @@ Build-Depends: cdbs,
                libfontconfig1-dev,
                libxext-dev,
                libx11-dev,
-               libgnomekbd-dev (>= 2.91.1),
-               libxklavier-dev (>= 5.0),
+               libgnomekbd-dev (>= 2.91.90),
                libgstreamer0.10-dev (>= 0.10.1.2),
                libgstreamer-plugins-base0.10-dev (>= 0.10.1.2),
                gsettings-desktop-schemas-dev,
