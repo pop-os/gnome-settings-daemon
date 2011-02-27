@@ -1,3 +1,11 @@
+gnome-settings-daemon (2.91.90-3) UNRELEASED; urgency=low
+
+  * debian/control.in:
+    + Re-add build dependency on libxklavier-dev, since configure.ac
+      actually requires it.
+
+ -- Emilio Pozuelo Monfort <pochu@debian.org>  Sun, 27 Feb 2011 11:10:43 +0000
+
 gnome-settings-daemon (2.91.90-2) experimental; urgency=low
 
   * debian/control.in:
