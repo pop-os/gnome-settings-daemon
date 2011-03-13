@@ -1,10 +1,14 @@
-gnome-settings-daemon (2.91.90-3) UNRELEASED; urgency=low
+gnome-settings-daemon (2.91.91-1) experimental; urgency=low
 
+  [Frederic Peters]
+  * New upstream release.
+
+  [Emilio Pozuelo Monfort]
   * debian/control.in:
     + Re-add build dependency on libxklavier-dev, since configure.ac
       actually requires it.
 
- -- Emilio Pozuelo Monfort <pochu@debian.org>  Sun, 27 Feb 2011 11:10:43 +0000
+ -- Frederic Peters <fpeters@debian.org>  Tue, 08 Mar 2011 19:17:09 +0100
 
 gnome-settings-daemon (2.91.90-2) experimental; urgency=low
 
