@@ -1,3 +1,10 @@
+gnome-settings-daemon (2.32.1-0ubuntu9) natty; urgency=low
+
+  * debian/patches/33-datetime-service-ubuntu-ntp.patch:
+    - Update to disable/enable ntpdate as well as ntpd.  LP: #734894
+
+ -- Michael Terry <mterry@ubuntu.com>  Mon, 14 Mar 2011 15:38:04 -0400
+
 gnome-settings-daemon (2.32.1-0ubuntu8) natty; urgency=low
 
   * debian/patches/06_use_application_indicator.patch:
