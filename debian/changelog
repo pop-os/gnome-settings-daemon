@@ -1,3 +1,11 @@
+gnome-settings-daemon (2.32.1-0ubuntu10) natty; urgency=low
+
+  * debian/patches/33-datetime-service-ubuntu-ntp.patch:
+    - Fix a crash with ntp error handling due to an uninitialized pointer.
+      LP: #735635
+
+ -- Michael Terry <mterry@ubuntu.com>  Fri, 18 Mar 2011 13:40:07 -0400
+
 gnome-settings-daemon (2.32.1-0ubuntu9) natty; urgency=low
 
   * debian/patches/33-datetime-service-ubuntu-ntp.patch:

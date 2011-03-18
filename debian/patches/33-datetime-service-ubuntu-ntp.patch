@@ -3,8 +3,8 @@ Author: Michael Terry <michael.terry@canonical.com>
 
 Index: gnome-settings-daemon-2.32.1/plugins/datetime/gsd-datetime-mechanism.c
 ===================================================================
---- gnome-settings-daemon-2.32.1.orig/plugins/datetime/gsd-datetime-mechanism.c	2011-03-14 14:58:53.368023371 -0400
-+++ gnome-settings-daemon-2.32.1/plugins/datetime/gsd-datetime-mechanism.c	2011-03-14 15:04:56.499780995 -0400
+--- gnome-settings-daemon-2.32.1.orig/plugins/datetime/gsd-datetime-mechanism.c	2011-03-18 13:37:53.924887143 -0400
++++ gnome-settings-daemon-2.32.1/plugins/datetime/gsd-datetime-mechanism.c	2011-03-18 13:39:33.447758505 -0400
 @@ -585,17 +585,20 @@
  {
          int exit_status;
@@ -50,7 +50,7 @@ Index: gnome-settings-daemon-2.32.1/plugins/datetime/gsd-datetime-mechanism.c
          }
  
          dbus_g_method_return (context, can_use_ntp, is_using_ntp);
-@@ -621,6 +625,7 @@
+@@ -621,48 +625,81 @@
                                         DBusGMethodInvocation   *context)
  {
          GError *error;
@@ -58,7 +58,9 @@ Index: gnome-settings-daemon-2.32.1/plugins/datetime/gsd-datetime-mechanism.c
          int exit_status;
          char *cmd;
  
-@@ -629,40 +634,71 @@
+         error = NULL;
++        error2 = NULL;
+ 
          if (!_check_polkit_for_action (mechanism, context, "org.gnome.clockapplet.mechanism.configurentp"))
                  return FALSE;
  
@@ -112,22 +114,22 @@ Index: gnome-settings-daemon-2.32.1/plugins/datetime/gsd-datetime-mechanism.c
 +        if (cmd != NULL) {
 +                if (!g_spawn_command_line_sync (cmd,
 +                                                NULL, NULL, &exit_status, &error)) {
-+                        if (error2 != NULL) {
++                        if (error2 == NULL) {
 +                                error2 = g_error_new (GSD_DATETIME_MECHANISM_ERROR,
 +                                                      GSD_DATETIME_MECHANISM_ERROR_GENERAL,
 +                                                      "Error spawning /bin/mv: %s", error->message);
-+                                g_error_free (error);
 +                        }
++                        g_error_free (error);
 +                }
 +                else if (using_ntp) {
 +                        if (!g_spawn_command_line_sync ("/etc/network/if-up.d/ntpdate",
 +                                                        NULL, NULL, &exit_status, &error)) {
-+                                if (error2 != NULL) {
++                                if (error2 == NULL) {
 +                                        error2 = g_error_new (GSD_DATETIME_MECHANISM_ERROR,
 +                                                              GSD_DATETIME_MECHANISM_ERROR_GENERAL,
 +                                                              "Error spawning /etc/network/if-up.d/ntpdate: %s", error->message);
-+                                        g_error_free (error);
 +                                }
++                                g_error_free (error);
 +                        }
 +                }
 +        }
