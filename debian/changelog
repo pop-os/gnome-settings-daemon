@@ -1,3 +1,11 @@
+gnome-settings-daemon (2.91.92-0ubuntu1~build1) natty; urgency=low
+
+  * New upstream release
+  * debian/patches/05_disable_corner_tapping.patch:
+    - Rebased patch
+
+ -- Rodrigo Moya <rodrigo.moya@canonical.com>  Tue, 22 Mar 2011 16:37:20 +0100
+
 gnome-settings-daemon (2.91.90-0ubuntu1~build3) natty; urgency=low
 
   * debian/control:
