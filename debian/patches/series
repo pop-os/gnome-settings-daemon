@@ -14,4 +14,5 @@
 40_xres_lcddefault.patch
 45_support_new_video_key.patch
 91_update_gvc_source.patch
+92_datetime_fixups.patch
 

@@ -1,3 +1,12 @@
+gnome-settings-daemon (2.32.1-0ubuntu11) natty; urgency=low
+
+  * debian/patches/92_datetime_fixups.patch:
+    - use the correct polkit methods names to determine if the users has the 
+      right to change the time settings, fixes the gnome clock applet button
+      not bein active (lp: #734425)
+
+ -- Sebastien Bacher <seb128@ubuntu.com>  Wed, 23 Mar 2011 18:42:48 +0100
+
 gnome-settings-daemon (2.32.1-0ubuntu10) natty; urgency=low
 
   * debian/patches/33-datetime-service-ubuntu-ntp.patch:
