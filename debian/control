@@ -35,6 +35,7 @@ Build-Depends: cdbs,
                libcanberra-gtk3-dev,
                libpolkit-gobject-1-dev,
 #               libappindicator-dev (>= 0.2.4)
+               libcups2-dev
 Standards-Version: 3.9.1
 Vcs-Bzr: https://code.launchpad.net/~gnome3-team/gnome-settings-daemon/ubuntu
 
