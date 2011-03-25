@@ -1,3 +1,9 @@
+gnome-settings-daemon (2.91.93-0ubuntu1~build1) natty; urgency=low
+
+  * New upstream release
+
+ -- Rico Tzschichholz <ricotz@ubuntu.com>  Fri, 25 Mar 2011 19:51:41 +0100
+
 gnome-settings-daemon (2.91.92-0ubuntu1~build2) natty; urgency=low
 
   * debian/control:
