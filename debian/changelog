@@ -1,3 +1,9 @@
+gnome-settings-daemon (2.91.93-1) experimental; urgency=low
+
+  * New upstream release.
+
+ -- Frederic Peters <fpeters@debian.org>  Sun, 27 Mar 2011 19:15:59 +0530
+
 gnome-settings-daemon (2.91.92-1) experimental; urgency=low
 
   * New upstream release.
