@@ -15,4 +15,4 @@
 45_support_new_video_key.patch
 91_update_gvc_source.patch
 92_datetime_fixups.patch
-
+93_wait_for_xsettings.patch
