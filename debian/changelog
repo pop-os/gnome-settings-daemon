@@ -1,3 +1,11 @@
+gnome-settings-daemon (2.32.1-0ubuntu12) natty; urgency=low
+
+  * debian/patches/93_wait_for_xsettings.patch:
+    - Add patch to avoid race condition between gdm's gnome-settings-daemon
+      and user's (LP: #649809)
+
+ -- Rodrigo Moya <rodrigo.moya@canonical.com>  Tue, 29 Mar 2011 10:26:47 +0200
+
 gnome-settings-daemon (2.32.1-0ubuntu11) natty; urgency=low
 
   * debian/patches/92_datetime_fixups.patch:
