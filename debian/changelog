@@ -1,3 +1,9 @@
+gnome-settings-daemon (3.0.0-0ubuntu1~build1) natty; urgency=low
+
+  * New upstream release
+
+ -- Rodrigo Moya <rodrigo.moya@canonical.com>  Tue, 05 Apr 2011 09:45:16 +0200
+
 gnome-settings-daemon (2.91.93-0ubuntu1~build1) natty; urgency=low
 
   * New upstream release
