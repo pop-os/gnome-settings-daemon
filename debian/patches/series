@@ -3,6 +3,7 @@
 02_missing_libs.patch
 03_maintainer_mode.patch
 05_disable_corner_tapping.patch
+05_use_xrecord.patch
 06_use_application_indicator.patch
 07_dont_display_autostart.patch
 12_monitor_network_fs.patch
