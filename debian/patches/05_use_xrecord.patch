@@ -1,6 +1,6 @@
 Description: Tell syndaemon to use the XRecord extension
-Bug-Ubuntu: https://bugs.launchpad.net/ubuntu/+source/gnome-settings-daemon/+bug/633125
-Author: Sergey Nizovtsev
+Bug-Ubuntu: https://launchpad.net/bugs/633125
+Author: Sergey Nizovtsev <snizovtsev@gmail.com>
 
 --- gnome-settings-daemon-2.32.1.orig/plugins/mouse/gsd-mouse-manager..c.old	2011-04-06 21:03:28.344661413 +0400
 +++ gnome-settings-daemon-2.32.1/plugins/mouse/gsd-mouse-manager.c	2011-04-06 21:03:54.184699318 +0400
