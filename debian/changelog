@@ -1,3 +1,11 @@
+gnome-settings-daemon (2.30.2-3) unstable; urgency=low
+
+  * 11_retry-startup.patch: when starting the Xsettings manager, try 
+    again several times because there is a race condition on the X side.
+    Closes: #614682.
+
+ -- Josselin Mouette <joss@debian.org>  Sat, 09 Apr 2011 12:29:30 +0200
+
 gnome-settings-daemon (2.30.2-2) unstable; urgency=low
 
   * 13_monitor_kfreebsd.patch: new patch. Don’t monitor fdescfs.

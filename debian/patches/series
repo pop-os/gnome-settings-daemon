@@ -2,6 +2,7 @@
 02_missing_libs.patch
 03_maintainer_mode.patch
 10_clipboard_crash.patch
+11_retry-startup.patch
 12_monitor_network_fs.patch
 13_monitor_kfreebsd.patch
 20_gstreamer.patch
