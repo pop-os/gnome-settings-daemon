@@ -1,3 +1,9 @@
+gnome-settings-daemon (3.0.0.1-2) UNRELEASED; urgency=low
+
+  * Bump build-dependency on libgnome-desktop-3-dev (Closes: #622689)
+
+ -- Guido Günther <agx@sigxcpu.org>  Thu, 14 Apr 2011 22:20:52 +0200
+
 gnome-settings-daemon (3.0.0.1-1) experimental; urgency=low
 
   * New upstream release.
