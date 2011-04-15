@@ -8,6 +8,7 @@
 07_dont_display_autostart.patch
 12_monitor_network_fs.patch
 16_use_synchronous_notifications.patch
+17_react_when_streams_removed.patch
 30_pkgconfig-path.patch
 32-datetime-service-add-ntp-support.patch
 33-datetime-service-ubuntu-ntp.patch

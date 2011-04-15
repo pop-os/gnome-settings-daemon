@@ -1,0 +1,33 @@
+diff --git a/plugins/media-keys/gsd-media-keys-manager.c b/plugins/media-keys/gsd-media-keys-manager.c
+index b563f73..08d7255 100644
+--- a/plugins/media-keys/gsd-media-keys-manager.c
++++ b/plugins/media-keys/gsd-media-keys-manager.c
+@@ -794,6 +794,17 @@ on_control_default_sink_changed (GvcMixerControl     *control,
+         update_default_sink (manager);
+ }
+ 
++static void
++on_control_stream_removed (GvcMixerControl     *control,
++                           guint                id,
++                           GsdMediaKeysManager *manager)
++{
++        if (manager->priv->stream != NULL) {
++                g_object_unref (manager->priv->stream);
++                manager->priv->stream = NULL;
++        }
++}
++
+ #endif /* HAVE_PULSE */
+ 
+ static gint
+@@ -1118,6 +1129,10 @@ gsd_media_keys_manager_start (GsdMediaKeysManager *manager,
+                           "default-sink-changed",
+                           G_CALLBACK (on_control_default_sink_changed),
+                           manager);
++        g_signal_connect (manager->priv->volume,
++                          "stream-removed",
++                          G_CALLBACK (on_control_stream_removed),
++                          manager);
+ 
+         gvc_mixer_control_open (manager->priv->volume);
+ 
