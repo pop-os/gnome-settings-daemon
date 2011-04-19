@@ -1,3 +1,12 @@
+From c9a6a27aa766b31d9f32d182b1de5886793e906b Mon Sep 17 00:00:00 2001
+From: Rodrigo Moya <rodrigo@gnome-db.org>
+Date: Tue, 19 Apr 2011 15:59:35 +0200
+Subject: [PATCH] media-keys: React to stream-removed signal from GvcMixerControl
+
+---
+ plugins/media-keys/gsd-media-keys-manager.c |   17 +++++++++++++++++
+ 1 files changed, 17 insertions(+), 0 deletions(-)
+
 diff --git a/plugins/media-keys/gsd-media-keys-manager.c b/plugins/media-keys/gsd-media-keys-manager.c
 index b563f73..1f18074 100644
 --- a/plugins/media-keys/gsd-media-keys-manager.c
@@ -33,3 +42,6 @@ index b563f73..1f18074 100644
  
          gvc_mixer_control_open (manager->priv->volume);
  
+-- 
+1.7.2.3
+
