@@ -21,9 +21,8 @@
 
 #include <glib.h>
 #include <gdk/gdk.h>
-#include <gconf/gconf-client.h>
 #define GNOME_DESKTOP_USE_UNSTABLE_API
-#include <libgnomeui/gnome-bg.h>
+#include <libgnome-desktop/gnome-bg.h>
 
 static GOptionEntry entries[] =
 {
@@ -38,7 +37,7 @@ main (int argc, char *argv[])
     GdkScreen *screen;
     GdkRectangle rect;
     GnomeBG *bg;
-    GConfClient *client;
+    GSettings *settings;
     GdkPixbuf *pixbuf;
 
     gdk_init (&argc, &argv);
@@ -59,11 +58,13 @@ main (int argc, char *argv[])
     gdk_screen_get_monitor_geometry (screen, 0, &rect);
 
     bg = gnome_bg_new ();
-    client = gconf_client_get_default ();
-    gnome_bg_load_from_preferences (bg, client);
+    settings = g_settings_new ("org.gnome.desktop.background");
+    gnome_bg_load_from_preferences (bg, settings);
 
     pixbuf = gdk_pixbuf_new (GDK_COLORSPACE_RGB, FALSE, 8, rect.width, rect.height);
     gnome_bg_draw (bg, pixbuf, screen, FALSE);
+
+    g_object_unref (settings);
 
     return (0);
 }
