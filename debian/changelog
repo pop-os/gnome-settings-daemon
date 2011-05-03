@@ -1,3 +1,34 @@
+gnome-settings-daemon (3.0.1-0ubuntu1) UNRELEASED; urgency=low
+
+  * New upstream release
+  * debian/control:
+    - Update build dependencies to GNOME/GTK3
+  * debian/patches/01_xrdb.patch:
+  * debian/patches/02_fix_randr.patch:
+  * debian/patches/03_maintainer_mode.patch:
+  * debian/patches/05_use_xrecord.patch:
+  * debian/patches/07_dont_display_autostart.patch:
+  * debian/patches/12_monitor_network_fs.patch:
+  * debian/patches/17_react_when_streams_removed.patch:
+  * debian/patches/30_pkgconfig-path.patch:
+  * debian/patches/32-datetime-service-add-ntp-support.patch:
+  * debian/patches/33-datetime-service-ubuntu-ntp.patch:
+  * debian/patches/34-datetime-one-policykit-action.patch:
+  * debian/patches/45_support_new_video_key.patch:
+  * debian/patches/91_update_gvc_source.patch:
+  * debian/patches/92_datetime_fixups.patch:
+  * debian/patches/93_wait_for_xsettings.patch:
+    - Remove obsolete and upstreamed patches
+  * debian/patches/05_disable_corner_tapping.patch:
+  * debian/patches/06_use_application_indicator.patch:
+  * debian/patches/16_use_synchronous_notifications.patch:
+  * debian/patches/40_xres_lcddefault.patch:
+    - Rebased patches
+  * debian/gnome-settings-daemon.install:
+    - Remove g-c-c-related files that were moved to g-c-c itself
+
+ -- Rodrigo Moya <rodrigo.moya@canonical.com>  Mon, 02 May 2011 10:51:50 +0200
+
 gnome-settings-daemon (2.32.1-0ubuntu13.1) natty; urgency=low
 
   * debian/patches/17_react_when_streams_removed.patch:
@@ -23,7 +54,7 @@ gnome-settings-daemon (2.32.1-0ubuntu12) natty; urgency=low
 gnome-settings-daemon (2.32.1-0ubuntu11) natty; urgency=low
 
   * debian/patches/92_datetime_fixups.patch:
-    - use the correct polkit methods names to determine if the users has the 
+    - use the correct polkit methods names to determine if the users has the
       right to change the time settings, fixes the gnome clock applet button
       not bein active (lp: #734425)
 
@@ -213,6 +244,32 @@ gnome-settings-daemon (2.31.91-0ubuntu1) maverick; urgency=low
     - Applied upstream
 
  -- Robert Ancell <robert.ancell@canonical.com>  Wed, 01 Sep 2010 18:52:24 +1000
+
+gnome-settings-daemon (2.30.2-2) unstable; urgency=low
+
+  * 13_monitor_kfreebsd.patch: new patch. Don’t monitor fdescfs.
+    Closes: #594891.
+  * 10_clipboard_crash.patch: stolen from upstream git. Fixes a crash in 
+    the clipboard manager. Closes: #588308.
+
+ -- Josselin Mouette <joss@debian.org>  Wed, 20 Oct 2010 01:29:10 +0200
+
+gnome-settings-daemon (2.30.2-1) unstable; urgency=low
+
+  * New upstream stable release.
+  * Switch to source format 3.0 (quilt).
+    - Add debian/source/format.
+    - Drop Build-Depends on quilt.
+    - Remove /usr/share/cdbs/1/rules/patchsys-quilt.mk from debian/rules.
+  * Refresh patches for new upstream release.
+  * debian/control.in
+    - Drop Build-Depends on dpkg-dev (>= 1.13.19) as even oldstable has a more
+      recent version.
+    - Add Vcs-Browser and Vcs-Svn fields.
+    - Bump Standards-Version to 3.9.0.
+    - Use Breaks as recommended by the new policy.
+
+ -- Michael Biebl <biebl@debian.org>  Fri, 23 Jul 2010 01:34:51 +0200
 
 gnome-settings-daemon (2.30.2-0ubuntu5) maverick; urgency=low
 
