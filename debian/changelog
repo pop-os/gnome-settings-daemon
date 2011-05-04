@@ -1,249 +1,162 @@
-gnome-settings-daemon (3.0.1-0ubuntu1) UNRELEASED; urgency=low
+gnome-settings-daemon (3.0.0.1-2ubuntu1) UNRELEASED; urgency=low
 
-  * New upstream release
+  [ Guido Günther ]
+  * Bump build-dependency on libgnome-desktop-3-dev (Closes: #622689)
+
+  [ Rodrigo Moya ]
+  * Rebase from Debian, remaining Ubuntu changes:
   * debian/control:
-    - Update build dependencies to GNOME/GTK3
-  * debian/patches/01_xrdb.patch:
-  * debian/patches/02_fix_randr.patch:
-  * debian/patches/03_maintainer_mode.patch:
-  * debian/patches/05_use_xrecord.patch:
-  * debian/patches/07_dont_display_autostart.patch:
-  * debian/patches/12_monitor_network_fs.patch:
-  * debian/patches/17_react_when_streams_removed.patch:
-  * debian/patches/30_pkgconfig-path.patch:
-  * debian/patches/32-datetime-service-add-ntp-support.patch:
-  * debian/patches/33-datetime-service-ubuntu-ntp.patch:
-  * debian/patches/34-datetime-one-policykit-action.patch:
-  * debian/patches/45_support_new_video_key.patch:
-  * debian/patches/91_update_gvc_source.patch:
-  * debian/patches/92_datetime_fixups.patch:
-  * debian/patches/93_wait_for_xsettings.patch:
-    - Remove obsolete and upstreamed patches
+    - Build-depend on libnotify4-dev, not libnotify-dev
+    - Add Buil-depend on libappindicator3-dev
+    - Add Vcs-Bzr URL
+  * debian/gnome-settings-daemon.install:
+  * debian/gnome-settings-daemon.postinst:
+    - Keep autostart files in standard directories
+  * debian/gnome-update-wallpaper-cache.c:
+  * debian/rules:
+    - Add wallpaper cache updater program
+  * debian/patches/02_missing_libs.patch:
   * debian/patches/05_disable_corner_tapping.patch:
+  * debian/patches/17_react_when_streams_removed.patch:
+  * debian/patches/40_xres_lcddefault.patch:
   * debian/patches/06_use_application_indicator.patch:
   * debian/patches/16_use_synchronous_notifications.patch:
-  * debian/patches/40_xres_lcddefault.patch:
-    - Rebased patches
-  * debian/gnome-settings-daemon.install:
-    - Remove g-c-c-related files that were moved to g-c-c itself
+    - Add Ubuntu-specific patches
 
- -- Rodrigo Moya <rodrigo.moya@canonical.com>  Mon, 02 May 2011 10:51:50 +0200
+ -- Rodrigo Moya <rodrigo.moya@canonical.com>  Wed, 04 May 2011 13:07:16 +0200
 
-gnome-settings-daemon (2.32.1-0ubuntu13.1) natty; urgency=low
-
-  * debian/patches/17_react_when_streams_removed.patch:
-    - Add patch to react when mixer streams are removed (LP: #750334)
-
- -- Rodrigo Moya <rodrigo.moya@canonical.com>  Fri, 15 Apr 2011 12:48:20 +0200
-
-gnome-settings-daemon (2.32.1-0ubuntu13) natty; urgency=low
-
-  * debian/patches/05_use_xrecord.patch:
-    - Add patch to tell syndaemon to use the XRecord extension (LP: #633125)
-
- -- Rodrigo Moya <rodrigo.moya@canonical.com>  Thu, 07 Apr 2011 12:24:07 +0200
-
-gnome-settings-daemon (2.32.1-0ubuntu12) natty; urgency=low
-
-  * debian/patches/93_wait_for_xsettings.patch:
-    - Add patch to avoid race condition between gdm's gnome-settings-daemon
-      and user's (LP: #649809)
-
- -- Rodrigo Moya <rodrigo.moya@canonical.com>  Thu, 31 Mar 2011 18:03:24 +0200
-
-gnome-settings-daemon (2.32.1-0ubuntu11) natty; urgency=low
-
-  * debian/patches/92_datetime_fixups.patch:
-    - use the correct polkit methods names to determine if the users has the
-      right to change the time settings, fixes the gnome clock applet button
-      not bein active (lp: #734425)
-
- -- Sebastien Bacher <seb128@ubuntu.com>  Wed, 23 Mar 2011 18:42:48 +0100
-
-gnome-settings-daemon (2.32.1-0ubuntu10) natty; urgency=low
-
-  * debian/patches/33-datetime-service-ubuntu-ntp.patch:
-    - Fix a crash with ntp error handling due to an uninitialized pointer.
-      LP: #735635
-
- -- Michael Terry <mterry@ubuntu.com>  Fri, 18 Mar 2011 13:40:07 -0400
-
-gnome-settings-daemon (2.32.1-0ubuntu9) natty; urgency=low
-
-  * debian/patches/33-datetime-service-ubuntu-ntp.patch:
-    - Update to disable/enable ntpdate as well as ntpd.  LP: #734894
-
- -- Michael Terry <mterry@ubuntu.com>  Mon, 14 Mar 2011 15:38:04 -0400
-
-gnome-settings-daemon (2.32.1-0ubuntu8) natty; urgency=low
-
-  * debian/patches/06_use_application_indicator.patch:
-    - Save state and update popup menu when layout is changed via
-      keyboard (LP: #682075)
-
- -- Michael Terry <mterry@ubuntu.com>  Thu, 03 Mar 2011 14:30:11 -0500
-
-gnome-settings-daemon (2.32.1-0ubuntu7) natty; urgency=low
-
-  [ Maciej Katafiasz ]
-  * debian/patches/06_use_application_indicator.patch:
-    - Fix building without appindicators (LP: #666806)
-
- -- Rodrigo Moya <rodrigo.moya@canonical.com>  Fri, 25 Feb 2011 11:01:25 +0100
-
-gnome-settings-daemon (2.32.1-0ubuntu6) natty; urgency=low
-
-  * debian/patches/32-datetime-service-add-ntp-support.patch:
-    - Backport ntp service control support from GNOME 3.0
-  * debian/patches/33-datetime-service-ubuntu-ntp.patch:
-    - Make previous patch work with Ubuntu's ntp and init system
-  * debian/patches/34-datetime-one-policykit-action.patch:
-    - Backport GNOME 3.0's merging of the policykit actions for configuring
-      date and time settings
-
- -- Michael Terry <mterry@ubuntu.com>  Fri, 18 Feb 2011 09:32:39 -0500
-
-gnome-settings-daemon (2.32.1-0ubuntu5) natty; urgency=low
-
-  * debian/patches/06_use_application_indicator.patch:
-    - Initialize variable to avoid crashes on free (LP: #685785) 
-
- -- Rodrigo Moya <rodrigo.moya@canonical.com>  Tue, 18 Jan 2011 16:23:55 +0100
-
-gnome-settings-daemon (2.32.1-0ubuntu4) natty; urgency=low
-
-  * debian/control.in: build-depends on libpolkit-gobject-1-dev
-
- -- Sebastien Bacher <seb128@ubuntu.com>  Mon, 10 Jan 2011 15:27:52 -0600
-
-gnome-settings-daemon (2.32.1-0ubuntu3) natty; urgency=low
-
-  [ Sebastien Bacher ]
-  * debian/rules: list the objects to build before the libraries to fix the 
-    build issues which was workarounded in the previous upload (lp: #676519)
-
-  [ Martin Pitt ]
-  * Add 45_support_new_video_key.patch: Have "Super+P" trigger a video mode
-    switch. Newer Dell and HP systems have a rather broken BIOS (due to a
-    misunderstanding of the spec) which causes FN+F8 to send the
-    literal Super+P scan codes instead of a proper KEY_VIDEOMODE scan
-    code.  Patch by Mike Terry, thanks! (LP: #539477)
-
- -- Martin Pitt <martin.pitt@ubuntu.com>  Sun, 09 Jan 2011 07:13:47 -0600
-
-gnome-settings-daemon (2.32.1-0ubuntu2) natty; urgency=low
-
-  * debian/rules:
-    - use gcc-4.4 to build the wallpaper cache app. doko investigates to get it
-      fixed with 4.5.
-
- -- Didier Roche <didrocks@ubuntu.com>  Tue, 16 Nov 2010 16:46:08 +0100
-
-gnome-settings-daemon (2.32.1-0ubuntu1) natty; urgency=low
-
-  * New upstream version:
-    - Revert calling g-c-c 3.0's display configuration tool
-    - Use the fallback configurations if the stored 
-      configuration fails at startup
-    - Don't access free'd memory if a volume is unmounted whilst the dialog is
-      displayed
-    - Add gconf key for disabling boot time configuration
-    - Use Xorg monitor settings by default
-  * debian/patches/08_xrandr_command.patch:
-    - dropped, the fix is in the new version
-  * debian/patches/09_gconfify_default_xrandr.patch:
-    - dropped, the fix is in the new version
-  * debian/patches/71_fix_ldsm_notification_crash.patch
-    - dropped, the fix is in the new version
-  * debian/gnome-settings-daemon.gconf-defaults:
-    - don't set xrandr keys since upstream default to using the xorg config
-
- -- Sebastien Bacher <seb128@ubuntu.com>  Mon, 15 Nov 2010 18:08:08 +0100
-
-gnome-settings-daemon (2.32.0-0ubuntu4) natty; urgency=low
-
-  * debian/gnome-settings-daemon.install:
-    - install the icons and polkit files which were not in the binaries
-  * debian/patches/70_migrate_touchpad_config.patch:
-    - dropped, it was just required for migration until lucid
-  * debian/patches/99_ltmain_as-needed.patch:
-    - dropped, it's not required with as-needed being default in natty
-  
- -- Sebastien Bacher <seb128@ubuntu.com>  Fri, 05 Nov 2010 10:25:40 +0100
-
-gnome-settings-daemon (2.32.0-0ubuntu3) maverick-proposed; urgency=low
-
-  * Fix LP: #625793 - Multiple Keyboard Layouts unusable: continuously 
-    changes layout + 100% CPU usage. Don't call xkl_engine_lock_group in 
-    response to XKB events, as XkbLockGroup generates another event
-    - update debian/patches/06_use_application_indicator.patch 
-  * Fix LP: #658777 - In popup_menu_set_group() - after adding new entries to 
-    the hash table, don't free the keys else we end up with a hash table full 
-    of keys pointing to invalid memory. Instead, create the hash table with 
-    g_hash_table_new_full, and have the keys freed when the hash table is 
-    destroyed
-    - update debian/patches/06_use_application_indicator.patch 
-
- -- Chris Coulson <chris.coulson@canonical.com>  Tue, 12 Oct 2010 11:03:40 +0100
-
-gnome-settings-daemon (2.32.0-0ubuntu2) maverick; urgency=low
-
-  * Add 09_gconfify_default_xrandr.patch: In a lot of situations it is
-    undesirable to have g-s-d change the XRandR settings, because it overrides
-    X.org customizations, leads to unnecessary mode switches, or increases
-    boot time. Add a gconf key "use_xorg_monitor_settings" to disable
-    apply_default_boot_configuration(), in which case the XRandR configuration
-    will not be touched unless there is a global or per-user configuration
-    file.
-  * debian/gnome-settings-daemon.gconf-defaults: Set use_xorg_monitor_settings
-    to true. This disables g-s-d's rather new default XRandR configuration and
-    reverts back to what we had up to Maverick beta. This avoids a lot of
-    monitor misconfigurations. (LP: #640807)
-
- -- Martin Pitt <martin.pitt@ubuntu.com>  Tue, 05 Oct 2010 12:02:35 +0200
-
-gnome-settings-daemon (2.32.0-0ubuntu1) maverick; urgency=low
+gnome-settings-daemon (3.0.0.1-1) experimental; urgency=low
 
   * New upstream release.
 
- -- Michael Terry <mike@mterry.name>  Mon, 27 Sep 2010 10:15:53 -0400
+ -- Frederic Peters <fpeters@debian.org>  Mon, 28 Mar 2011 11:37:24 +0530
 
-gnome-settings-daemon (2.31.92-0ubuntu1) maverick; urgency=low
+gnome-settings-daemon (2.91.93-1) experimental; urgency=low
 
-  * New upstream release:
-    - Don't use the Stored/custom configuration type in the XF86Display cycle
-      (Federico Mena Quintero)
-    - Basic infrastructure for RANDR logging (Federico Mena Quintero)
-    - Log when handling RANDR events (Gabriel Burt)
-    - Updated translations
+  * New upstream release.
 
- -- Didier Roche <didrocks@ubuntu.com>  Tue, 14 Sep 2010 13:01:50 +0200
+ -- Frederic Peters <fpeters@debian.org>  Sun, 27 Mar 2011 19:15:59 +0530
 
-gnome-settings-daemon (2.31.91-0ubuntu3) maverick; urgency=low
+gnome-settings-daemon (2.91.92-1) experimental; urgency=low
 
-  * debian/gnome-settings-daemon.gconf-defaults:
-    - turn on external screens by default
+  * New upstream release.
 
- -- Sebastien Bacher <seb128@ubuntu.com>  Fri, 10 Sep 2010 22:24:49 +0200
+ -- Frederic Peters <fpeters@debian.org>  Wed, 23 Mar 2011 19:24:48 +0100
 
-gnome-settings-daemon (2.31.91-0ubuntu2) maverick; urgency=low
+gnome-settings-daemon (2.91.91-1) experimental; urgency=low
 
-  * debian/patches/08_xrandr_command.patch:
-    - still call gnome-display-properties to configure the display, the
-      control center changes didn't land this cycle (lp: #631761)
-  * 06_use_application_indicator.patch: updated version by Karl Lattimer
-    - don't start using cpu when switching layout (lp: #624477)
-    - respect the option to display flag icons (lp: #623435)
+  [Frederic Peters]
+  * New upstream release.
 
- -- Sebastien Bacher <seb128@ubuntu.com>  Mon, 06 Sep 2010 19:38:10 +0200
+  [Emilio Pozuelo Monfort]
+  * debian/control.in:
+    + Re-add build dependency on libxklavier-dev, since configure.ac
+      actually requires it.
 
-gnome-settings-daemon (2.31.91-0ubuntu1) maverick; urgency=low
+ -- Frederic Peters <fpeters@debian.org>  Tue, 08 Mar 2011 19:17:09 +0100
+
+gnome-settings-daemon (2.91.90-2) experimental; urgency=low
+
+  * debian/control.in:
+    * Add build-dep on recent libgnomekbd-dev
+    * Remove direct build-depend on libxklavier-dev, libgnomekbd-dev will pull
+      in the right version
+
+ -- Sjoerd Simons <sjoerd@debian.org>  Sat, 26 Feb 2011 21:26:07 +0000
+
+gnome-settings-daemon (2.91.90-1) experimental; urgency=low
+
+  * New upstream release.
+    - gnome-settings-daemon.install: keybindings for accessibility tools
+      have been moved to the gnome-control-center module.
+
+ -- Frederic Peters <fpeters@debian.org>  Tue, 22 Feb 2011 22:49:26 +0100
+
+gnome-settings-daemon (2.91.9-1) experimental; urgency=low
+
+  [ Sebastien Bacher ]
+  * debian/gnome-settings-daemon.install:
+    - install the polkit files there
+  * debian/control.in:
+    - build-depends on libpolkit-gobject-1-dev
+    - drop the build-depends on libxrandr-dev and libxrender-dev, the 
+      configure doesn't use those in the new version
+    - recommends pulseaudio since it's used for the multimedia keys
+    (Close: #611198)
+
+  [ Emilio Pozuelo Monfort ]
+  * debian/patches/02_missing_libs.patch:
+    + Removed. This was fixed upstream in a different way a long time
+      ago. The patch was also disabled on 2.91.5.1-1 without any bad
+      consequences.
+  * New upstream release.
+    + d/patches/0001-Ensure-the-volume-doesn-t-underflow-and-wrap-around.patch,
+      d/patches/13_monitor_kfreebsd.patch:
+      - Removed, fixed upstream.
+    + debian/control.in:
+      - Updated build dependencies.
+      - Update the gtk+ 3 build dependency for the new package name.
+
+ -- Emilio Pozuelo Monfort <pochu@debian.org>  Sat, 19 Feb 2011 14:28:40 +0000
+
+gnome-settings-daemon (2.91.8-1) experimental; urgency=low
+
+  [ Sjoerd Simons ]
+  * Enable pulseaudio support
+  * Enable the settings d-conf <-> gconf bridge
+  * d/p/0001-Ensure-the-volume-doesn-t-underflow-and-wrap-around.patch
+    + Added. Fix a bug where it was possible to lower the volume below zero,
+      causing it to wrap-around to MAXUINT.
+
+  [ Emilio Pozuelo Monfort ]
+  * New upstream release.
+    + debian/control.in:
+      - Update build dependencies.
+  * debian/rules:
+    - Remove duplicated list-missing target and utils.mk include.
+    - Include autoreconf.mk before debhelper.mk to not leave cruft when
+      running clean.
+  * debian/control.in:
+    - Standards-Version is 3.9.1, no changes needed.
+    - Drop old Replaces.
+
+ -- Emilio Pozuelo Monfort <pochu@debian.org>  Wed, 12 Jan 2011 22:48:04 +0000
+
+gnome-settings-daemon (2.91.5.1-2) experimental; urgency=low
+
+  * Make the nautilus-data depend versioned
+
+ -- Sjoerd Simons <sjoerd@debian.org>  Sun, 12 Dec 2010 14:32:07 +0000
+
+gnome-settings-daemon (2.91.5.1-1) experimental; urgency=low
 
   * New upstream release
-  * debian/patches/91_bugzilla_update_touchpad_icons.patch:
-    - Applied upstream
+  * debian/control.in: Update build-depends to gnome 3.0 versions
+  * debian/patches/01_xrdb.patch
+    - Removed. g-s-d no longer manages xrdb
+  * debian/patches/03_maintainer_mode.patch
+    - Removed. Fixed upstream
+  * debian/patches/10_clipboard_crash.patch
+    - Removed. Fixed upstream.
+  * debian/patches/12_monitor_network_fs.patch
+    - Removed. Fixed upstream
+  * debian/patches/13_monitor_kfreebsd.patch
+    - Updated
+  * debian/patches/20_gstreamer.patch
+    - Removed. Time to move to pulseaudio by default...
+  * debian/patches/30_pkgconfig-path.patch:
+    - Removed. Fixed upstream
+  * debian/patches/70_relibtoolize.patch
+    - Removed, moving to dh_autoreconf
+  * debian/patches/99_ltmain_as-needed.patch
+    - Removed, moving to dh_autoreconf
+  * debian/gnome-settings-daemon.install
+    - Updated
+  * Switch to dh_autoreconf and trigger list-missing
+  * Make gnome-settings-daemon depends on gsettings-desktop-schemas and
+    nautilus-data to pull in the necessary schema files.
 
- -- Robert Ancell <robert.ancell@canonical.com>  Wed, 01 Sep 2010 18:52:24 +1000
+ -- Sjoerd Simons <sjoerd@debian.org>  Sat, 11 Dec 2010 16:20:56 +0000
 
 gnome-settings-daemon (2.30.2-2) unstable; urgency=low
 
@@ -270,119 +183,6 @@ gnome-settings-daemon (2.30.2-1) unstable; urgency=low
     - Use Breaks as recommended by the new policy.
 
  -- Michael Biebl <biebl@debian.org>  Fri, 23 Jul 2010 01:34:51 +0200
-
-gnome-settings-daemon (2.30.2-0ubuntu5) maverick; urgency=low
-
-  * debian/patches/06_use_application_indicator.patch:
-    - updated version by Karl Lattimer to improve the space computing
-
- -- Sebastien Bacher <seb128@ubuntu.com>  Tue, 24 Aug 2010 21:51:21 +0200
-
-gnome-settings-daemon (2.30.2-0ubuntu4) maverick; urgency=low
-
-  * 06_use_application_indicator.patch: update by Karl Lattimer to fix those
-    - keyboard indicator does not react to layout changes (lp: #531290)
-    - indicator variants in a same layout displayed the same way (lp: #620334)
-    - move keyboard layouts out of the submenu (lp: #620571)
-
- -- Sebastien Bacher <seb128@ubuntu.com>  Fri, 20 Aug 2010 11:12:10 +0200
-
-gnome-settings-daemon (2.30.2-0ubuntu3) maverick; urgency=low
-
-  * debian/control.in:
-    - requires libindicator-application 0.2.4 for label support
-  * debian/patches/06_use_application_indicator.patch:
-    - updated version by Karl Lattimer porting the keyboard layout to indicators
-      now that indicator-application supports labels (lp: #599844)
-  * debian/control.in, debian/rules:
-    - use dh-autoreconf
-
- -- Sebastien Bacher <seb128@ubuntu.com>  Tue, 17 Aug 2010 19:21:57 +0200
-
-gnome-settings-daemon (2.30.2-0ubuntu2) maverick; urgency=low
-
-  * debian/patches/10_fn-F7.patch:
-    - dropped, the change is in the new version
-
- -- Sebastien Bacher <seb128@ubuntu.com>  Wed, 23 Jun 2010 23:06:13 +0200
-
-gnome-settings-daemon (2.30.2-0ubuntu1) maverick; urgency=low
-
-  * New upstream release
-  * debian/patches/30_pkgconfig-path.patch:
-    - Fixed for latest upstream
-
- -- Rodrigo Moya <rodrigo.moya@canonical.com>  Tue, 22 Jun 2010 12:08:23 +0200
-
-gnome-settings-daemon (2.30.1-1ubuntu2) maverick; urgency=low
-
-  * debian/control.in:
-    - Build-depend on gnome-common for autotools
-
- -- Robert Ancell <robert.ancell@canonical.com>  Thu, 10 Jun 2010 13:26:51 +1000
-
-gnome-settings-daemon (2.30.1-1ubuntu1) maverick; urgency=low
-
-  * Merge with Debian unstable, remaining Ubuntu changes:
-  * debian/control.in:
-    - Drop libxrandr-dev and libxrender-dev build-deps
-    - Build-depend on libpulse and libcanberra
-    - Build-depend on libappindicator-dev
-    - Add Vcs-Bzr link
-    - Recommend pulseaudio
-  * debian/rules:
-    - Run autotools on build
-    - Don't disable the pulseaudio use
-    - Build and install gnome-update-wallpaper-cache
-  * debian/gnome-settings-daemon.gconf-defaults:
-    - Enable tap_on_click and disable_while_typing on by default,
-      it's the less confusing behaviour for user and was the consensus
-      during the discussion on the lists
-    - Ensure that touchpad settings are migrated to the new
-      config where appropriate
-    - Use subpixel rendering and slight hinting as the default
-  * debian/gnome-settings-daemon.install:
-    - Don't move the autostart to a non standard directory as debian
-    - Install dbus service
-    debian/gnome-settings-daemon.postinst:
-    - Don't move the autostart to a non standard directory as debian
-  * debian/gnome-update-cache-wallpaper.c:
-    - enable creating a cached wallpaper even when g-s-d or nautilus isn't
-      running. Used in ubiquity in install mode
-  * debian/patches/02_fix_randr.patch:
-    - Correctly apply the xrandr settings.
-  * debian/patches/05_disable_corner_tapping.patch:
-    - Disable corner tapping when disabling tap to click
-  * debian/patches/06_use_application_indicator.patch:
-    - Use the new application indicator system
-  * debian/patches/07_dont_display_autostart.patch:
-    - Don't show the gnome-settings-daemon autostart in the session capplet,
-      the description is confusing and it's a required component
-  * debian/patches/10_fn-F7.patch:
-    - Fix handling of fn-F7 (xrandr) when xev timestamp is later than server
-      timestamp
-  * debian/patches/16_use_synchronous_notifications.patch:
-    - Use synchronous notifications when they are supported
-  * debian/patches/20_gstreamer.patch:
-    - Don't use this debian change but rather the upstream code version
-  * debian/patches/40_xres_lcddefault.patch: 
-    - OpenOffice.org subpixel font rendering broken with new cairo
-  * debian/patches/70_migrate_touchpad_config.patch:
-    - Ensure that touchpad settings are migrated to the new
-      config where appropriate
-  * debian/patches/70_relibtoolize.patch:
-    - Not required, now run autotools on build
-  * debian/patches/71_fix_ldsm_notification_crash.patch:
-    - Don't access free'd memory if a volume is unmounted whilst the
-      dialog is displayed
-  * debian/patches/91_bugzilla_update_touchpad_icons.patch:
-    - Use correct touchpad svg icons
-  * debian/patches/91_update_gvc_source.patch:
-    - Update gvc copy using the current gnome-media version to fix a leak issue
-  * debian/watch:
-    - Watch unstable series
-  
- -- Robert Ancell <robert.ancell@canonical.com>  Thu, 10 Jun 2010 12:49:47 +1000
 
 gnome-settings-daemon (2.30.1-1) unstable; urgency=low
 
