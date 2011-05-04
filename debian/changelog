@@ -1,4 +1,4 @@
-gnome-settings-daemon (3.0.0.1-2ubuntu1) UNRELEASED; urgency=low
+gnome-settings-daemon (3.0.0.1-1ubuntu1) oneiric; urgency=low
 
   [ Guido Günther ]
   * Bump build-dependency on libgnome-desktop-3-dev (Closes: #622689)
