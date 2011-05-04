@@ -11,6 +11,7 @@ XSBC-Original-Maintainer: Debian GNOME Maintainers <pkg-gnome-maintainers@lists.
 Uploaders: Debian GNOME Maintainers <pkg-gnome-maintainers@lists.alioth.debian.org>, Emilio Pozuelo Monfort <pochu@debian.org>
 Build-Depends: cdbs,
                debhelper (>= 5),
+               gnome-pkg-tools,
                dh-autoreconf,
                autotools-dev,
                intltool (>= 0.37.1),
@@ -28,16 +29,17 @@ Build-Depends: cdbs,
                libxklavier-dev (>= 5.0),
                libgstreamer0.10-dev (>= 0.10.1.2),
                libgstreamer-plugins-base0.10-dev (>= 0.10.1.2),
-               gnome-pkg-tools,
                gsettings-desktop-schemas-dev,
                libgnome-desktop-3-dev (>= 2.91.93),
                libpulse-dev (>= 0.9.16),
                libcanberra-gtk3-dev,
+               libcups2-dev,
                libpolkit-gobject-1-dev,
-               libappindicator3-dev (>= 0.3.0),
-               libcups2-dev
+               libappindicator3-dev (>= 0.3.0)
 Standards-Version: 3.9.1
-Vcs-Bzr: https://code.launchpad.net/~gnome3-team/gnome-settings-daemon/ubuntu
+Vcs-Bzr: https://code.launchpad.net/~ubuntu-desktop/gnome-settings-daemon/ubuntu
+Vcs-Browser: http://svn.debian.org/wsvn/pkg-gnome/desktop/unstable/gnome-settings-daemon/
+Vcs-Svn: svn://svn.debian.org/svn/pkg-gnome/desktop/unstable/gnome-settings-daemon/
 
 Package: gnome-settings-daemon
 Architecture: any
