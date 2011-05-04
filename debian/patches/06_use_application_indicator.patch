@@ -32,7 +32,7 @@ Index: gnome-settings-daemon-2.32.1/configure.ac
 +
 +if test x$enable_appindicator = xyes ; then
 +	PKG_CHECK_MODULES(APPINDICATOR,
-+		[appindicator-0.1 >= $APPINDICATOR_REQUIRED_VERSION],
++		[appindicator3-0.1 >= $APPINDICATOR_REQUIRED_VERSION],
 +		[AC_DEFINE(HAVE_APPINDICATOR, 1, [Have AppIndicator])])
 +fi
 +
