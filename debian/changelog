@@ -16,12 +16,19 @@ gnome-settings-daemon (3.0.0.1-2ubuntu1) UNRELEASED; urgency=low
   * debian/rules:
     - Add wallpaper cache updater program
   * debian/patches/02_missing_libs.patch:
+    - Add missing X11 libraries to build dependencies
   * debian/patches/05_disable_corner_tapping.patch:
-  * debian/patches/17_react_when_streams_removed.patch:
-  * debian/patches/40_xres_lcddefault.patch:
+    - Disable corner tapping when disabling tap to click
   * debian/patches/06_use_application_indicator.patch:
+    - Use application indicators
   * debian/patches/16_use_synchronous_notifications.patch:
-    - Add Ubuntu-specific patches
+    - Use synchronous notifications when they are supported
+  * debian/patches/17_react_when_streams_removed.patch:
+    - React to stream-removed signal from GvcMixerControl
+  * debian/patches/40_xres_lcddefault.patch:
+    - OpenOffice.org subpixel font rendering broken with new cairo
+  * debian/gnome-settings-daemon.gconf-defaults:
+    - Needs to be moved to GSettings
 
  -- Rodrigo Moya <rodrigo.moya@canonical.com>  Wed, 04 May 2011 13:07:16 +0200
 
