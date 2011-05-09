@@ -290,7 +290,7 @@ Index: gnome-settings-daemon-2.32.1/plugins/keyboard/gkbd-configuration.c
 +
 +	xkl_debug (100,
 +		   "General configuration changed in GSettings - reiniting...\n");
-+	gkbd_desktop_config_load_from (&priv->cfg);
++	gkbd_desktop_config_load (&priv->cfg);
 +	gkbd_desktop_config_activate (&priv->cfg);
 +
 +	g_signal_emit (configuration,

@@ -1,3 +1,10 @@
+gnome-settings-daemon (3.0.0.1-1ubuntu2) oneiric; urgency=low
+
+  * debian/patches/06_use_application_indicator.patch:
+    - Fix call to non existing API
+
+ -- Rodrigo Moya <rodrigo.moya@canonical.com>  Mon, 09 May 2011 11:24:49 +0200
+
 gnome-settings-daemon (3.0.0.1-1ubuntu1) oneiric; urgency=low
 
   [ Guido Günther ]
