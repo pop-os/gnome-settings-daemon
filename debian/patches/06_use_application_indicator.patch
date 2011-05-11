@@ -413,7 +413,7 @@ Index: gnome-settings-daemon-2.32.1/plugins/keyboard/gkbd-configuration.c
 +	priv = GKBD_CONFIGURATION_GET_PRIVATE (configuration);
 +	configuration->priv = priv;
 +
-+	priv->engine = xkl_engine_get_instance (gdk_display_get_default ());
++	priv->engine = xkl_engine_get_instance (GDK_DISPLAY_XDISPLAY (gdk_display_get_default ()));
 +	if (priv->engine == NULL) {
 +		xkl_debug (0, "Libxklavier initialization error");
 +		return;
