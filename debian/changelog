@@ -1,3 +1,9 @@
+gnome-settings-daemon (3.0.1-1ubuntu1) oneiric; urgency=low
+
+  * New upstream release
+
+ -- Rodrigo Moya <rodrigo.moya@canonical.com>  Tue, 17 May 2011 16:37:27 +0200
+
 gnome-settings-daemon (3.0.0.1-1ubuntu4) oneiric; urgency=low
 
   * debian/control:
