@@ -1,3 +1,10 @@
+gnome-settings-daemon (3.0.0.1-1ubuntu4) oneiric; urgency=low
+
+  * debian/control:
+    - Rename build dependency from libnotify4-dev to libnotify-dev
+
+ -- Rodrigo Moya <rodrigo.moya@canonical.com>  Tue, 17 May 2011 12:17:12 +0200
+
 gnome-settings-daemon (3.0.0.1-1ubuntu3) oneiric; urgency=low
 
   * debian/patches/06_use_application_indicator.patch:
