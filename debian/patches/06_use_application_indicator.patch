@@ -217,7 +217,7 @@ Index: gnome-settings-daemon-2.32.1/plugins/keyboard/gkbd-configuration.c
 ===================================================================
 --- /dev/null	1970-01-01 00:00:00.000000000 +0000
 +++ gnome-settings-daemon-2.32.1/plugins/keyboard/gkbd-configuration.c	2011-03-03 13:30:40.197375766 -0500
-@@ -0,0 +1,351 @@
+@@ -0,0 +1,350 @@
 +/*
 + * Copyright (C) 2010 Canonical Ltd.
 + * 
@@ -341,10 +341,9 @@ Index: gnome-settings-daemon-2.32.1/plugins/keyboard/gkbd-configuration.c
 +
 +		if (xkl_engine_get_features (priv->engine) &
 +		    XKLF_MULTIPLE_LAYOUTS_SUPPORTED) {
-+			GSList *lst = priv->kbd_cfg.layouts_variants;
-+			for (i = 0; lst; lst = lst->next, i++) {
++			for (i = 0; priv->kbd_cfg.layouts_variants[i]; i++) {
 +				priv->full_group_names[i] =
-+				    g_strdup ((char *) lst->data);
++				    g_strdup ((char *) priv->kbd_cfg.layouts_variants[i]);
 +			}
 +		} else {
 +			for (i = total_groups; --i >= 0;) {
@@ -788,7 +787,7 @@ Index: gnome-settings-daemon-2.32.1/plugins/keyboard/gsd-keyboard-xkb.c
 +		        if (g < g_strv_length (shortnames)) {
 +			        if (xkl_engine_get_features (engine) &
 +			            XKLF_MULTIPLE_LAYOUTS_SUPPORTED) {
-+				        gchar *longname = (gchar *) g_slist_nth_data (current_kbd_config.layouts_variants, g);
++				        gchar *longname = (gchar *) current_kbd_config.layouts_variants[g];
 +				        gchar *variant_name;
 +				        if (!gkbd_keyboard_config_split_items (longname, &lname, &variant_name))
 +					        /* just in case */
