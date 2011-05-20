@@ -1,3 +1,13 @@
+gnome-settings-daemon (3.0.1-1ubuntu3) UNRELEASED; urgency=low
+
+  * Don't try to convert show-keyboard-leds-indicator in
+    gnome-settings-daemon.convert. It has no schema, and makes
+    gsettings-data-convert crash
+    - add debian/patches/41_dont_convert_nonexistant_key.patch
+    - update debian/patches/series
+
+ -- Chris Coulson <chris.coulson@canonical.com>  Fri, 20 May 2011 11:21:50 +0100
+
 gnome-settings-daemon (3.0.1-1ubuntu2) oneiric; urgency=low
 
   * debian/patches/06_use_application_indicator.patch:
