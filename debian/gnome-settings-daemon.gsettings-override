@@ -1,0 +1,7 @@
+[org.gnome.settings-daemon.plugins.xsettings]
+antialiasing = 'rgba'
+hinting = 'slight'
+
+[org.gnome.settings-daemon.peripherals.touchpad]
+disable-while-typing = true
+tap-to-click = true

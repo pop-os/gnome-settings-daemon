@@ -1,3 +1,11 @@
+gnome-settings-daemon (3.0.1-1ubuntu4) oneiric; urgency=low
+
+  * debian/gnome-settings-daemon.gconf-defaults:
+  * debian/gnome-settings-daemon.gsettings-override:
+    - Move default GConf settings to GSettings
+
+ -- Rodrigo Moya <rodrigo.moya@canonical.com>  Mon, 23 May 2011 16:06:19 +0200
+
 gnome-settings-daemon (3.0.1-1ubuntu3) oneiric; urgency=low
 
   * Don't try to convert show-keyboard-leds-indicator in
