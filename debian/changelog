@@ -1,3 +1,13 @@
+gnome-settings-daemon (3.0.2-1ubuntu1) oneiric; urgency=low
+
+  * New upstream release
+  * debian/patches/16_use_synchronous_notifications.patch:
+    - Rebased
+  * debian/patches/41_dont_convert_nonexistant_key.patch:
+    - Removed upstreamed patch
+
+ -- Rodrigo Moya <rodrigo.moya@canonical.com>  Tue, 24 May 2011 11:27:08 +0200
+
 gnome-settings-daemon (3.0.1-1ubuntu4) oneiric; urgency=low
 
   * debian/gnome-settings-daemon.gconf-defaults:

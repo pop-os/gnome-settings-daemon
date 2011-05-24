@@ -422,13 +422,13 @@ Index: gnome-settings-daemon-2.30.0/plugins/media-keys/gsd-media-keys-manager.c
          /* Show the dialogue */
 -        dialog_init (manager);
 -        gsd_media_keys_window_set_action_custom (GSD_MEDIA_KEYS_WINDOW (manager->priv->dialog),
--                                                 "media-eject",
+-                                                 "media-eject-symbolic",
 -                                                 FALSE);
 -        dialog_show (manager);
 +        if (!gsd_osd_notification_show_icon_only ("notification-device-eject", "Eject")) {
 +                dialog_init (manager);
 +                gsd_media_keys_window_set_action_custom (GSD_MEDIA_KEYS_WINDOW (manager->priv->dialog),
-+                                                         "media-eject",
++                                                         "media-eject-symbolic",
 +                                                         FALSE);
 +                dialog_show (manager);
 +        }
