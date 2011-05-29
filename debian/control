@@ -7,7 +7,7 @@ Source: gnome-settings-daemon
 Section: gnome
 Priority: optional
 Maintainer: Debian GNOME Maintainers <pkg-gnome-maintainers@lists.alioth.debian.org>
-Uploaders: Emilio Pozuelo Monfort <pochu@debian.org>, Josselin Mouette <joss@debian.org>, Michael Biebl <biebl@debian.org>, Sjoerd Simons <sjoerd@debian.org>
+Uploaders: Emilio Pozuelo Monfort <pochu@debian.org>, Frederic Peters <fpeters@debian.org>, Sjoerd Simons <sjoerd@debian.org>
 Build-Depends: cdbs,
                debhelper (>= 5),
                gnome-pkg-tools,
@@ -51,7 +51,8 @@ Breaks: rhythmbox (<< 0.11.5),
         totem (<< 2.22.0),
         gnome-control-center (<< 1:2.21.5),
         gnome-session (<< 2.24),
-        gnome-screensaver (<< 2.28.0)
+        gnome-screensaver (<< 2.28.0),
+        gdm3 (<< 3.0)
 Suggests: x11-xserver-utils,
           gnome-screensaver,
           metacity | x-window-manager
