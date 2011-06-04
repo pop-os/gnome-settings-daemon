@@ -1,3 +1,5 @@
+Workaround until GNOME#631989 is fixed.
+
 Index: gnome-settings-daemon-3.0.2/data/org.gnome.settings-daemon.peripherals.gschema.xml.in.in
 ===================================================================
 --- gnome-settings-daemon-3.0.2.orig/data/org.gnome.settings-daemon.peripherals.gschema.xml.in.in	2011-06-04 17:41:23.778543311 +0200
