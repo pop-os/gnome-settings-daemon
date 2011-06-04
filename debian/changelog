@@ -1,4 +1,4 @@
-gnome-settings-daemon (3.0.2-1) UNRELEASED; urgency=low
+gnome-settings-daemon (3.0.2-1) experimental; urgency=low
 
   [ Guido Günther ]
   * Bump build-dependency on libgnome-desktop-3-dev (Closes: #622689)
@@ -11,7 +11,7 @@ gnome-settings-daemon (3.0.2-1) UNRELEASED; urgency=low
     can turn wrong in multi-host environments, but it’s better than 
     nothing in the general case.
 
- -- Josselin Mouette <joss@debian.org>  Sat, 04 Jun 2011 17:50:53 +0200
+ -- Josselin Mouette <joss@debian.org>  Sat, 04 Jun 2011 18:33:11 +0200
 
 gnome-settings-daemon (3.0.0.1-1) experimental; urgency=low
 
