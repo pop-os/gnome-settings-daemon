@@ -1,0 +1,33 @@
+Description: Convert old filenames to an URI, to have migration of GConf
+             background to GSettings work correctly. This needs a related
+             patch in gsettings-desktop-schemas. It can be removed for next
+             LTS, which is the upgrade we maintain.
+Author: Rodrigo Moya <rodrigo.moya@canonical.com>
+
+diff --git a/plugins/background/gsd-background-manager.c b/plugins/background/gsd-background-manager.c
+index 4705f9b..c02d151 100644
+--- a/plugins/background/gsd-background-manager.c
++++ b/plugins/background/gsd-background-manager.c
+@@ -278,8 +278,22 @@ on_bg_changed (GnomeBG              *bg,
+ static void
+ setup_bg (GsdBackgroundManager *manager)
+ {
++        gchar *bg_uri_orig, *bg_uri_new, *scheme;
++
+         g_return_if_fail (manager->priv->bg == NULL);
+ 
++        /* We first check that picture-uri is indeed a URI */
++        bg_uri_orig = g_settings_get_string (manager->priv->settings, "picture-uri");
++	 if (!(scheme = g_uri_parse_scheme (bg_uri_orig))) {
++                bg_uri_new = g_filename_to_uri (bg_uri_orig, NULL, NULL);
++                g_settings_set_string (manager->priv->settings, "picture-uri", bg_uri_new);
++                g_free (bg_uri_new);
++        }
++
++        g_free (bg_uri_orig);
++        g_free (scheme);
++
++        /* Now really setup the background */
+         manager->priv->bg = gnome_bg_new ();
+ 
+         g_signal_connect (manager->priv->bg,

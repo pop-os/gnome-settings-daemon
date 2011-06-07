@@ -1,3 +1,11 @@
+gnome-settings-daemon (3.0.2-1ubuntu2) oneiric; urgency=low
+
+  * debian/patches/20_migrate_background_uri.patch:
+    - Convert old filenames to an URI, to have migration of GConf background
+      to GSettings work correctly
+
+ -- Rodrigo Moya <rodrigo.moya@canonical.com>  Tue, 07 Jun 2011 16:33:00 +0200
+
 gnome-settings-daemon (3.0.2-1ubuntu1) oneiric; urgency=low
 
   * New upstream release
