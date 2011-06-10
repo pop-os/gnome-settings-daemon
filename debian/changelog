@@ -1,3 +1,11 @@
+gnome-settings-daemon (3.0.2-1ubuntu3) oneiric; urgency=low
+
+  * debian/patches/01git_add_missing_schema_for_gconf.patch:
+    - Add upstream patch to add missing GSettings schema for GConf conversion
+      plugin
+
+ -- Rodrigo Moya <rodrigo.moya@canonical.com>  Fri, 10 Jun 2011 16:29:26 +0200
+
 gnome-settings-daemon (3.0.2-1ubuntu2) oneiric; urgency=low
 
   * debian/patches/20_migrate_background_uri.patch:

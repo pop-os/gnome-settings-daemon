@@ -1,3 +1,4 @@
+01git_add_missing_schema_for_gconf.patch
 02_missing_libs.patch
 05_disable_corner_tapping.patch
 06_use_application_indicator.patch
