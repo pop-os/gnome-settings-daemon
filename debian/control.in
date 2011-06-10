@@ -40,7 +40,6 @@ Package: gnome-settings-daemon
 Architecture: any
 Depends: ${shlibs:Depends},
          ${misc:Depends},
-         libgnome2-common,
          gsettings-desktop-schemas,
          nautilus-data (>= 2.91.3-1)
 Recommends: pulseaudio

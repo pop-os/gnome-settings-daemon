@@ -1,3 +1,9 @@
+gnome-settings-daemon (3.0.2-1ubuntu4) oneiric; urgency=low
+
+  * debian/control.in: stop depending on libgnome2-common
+
+ -- Sebastien Bacher <seb128@ubuntu.com>  Fri, 10 Jun 2011 18:48:41 +0200
+
 gnome-settings-daemon (3.0.2-1ubuntu3) oneiric; urgency=low
 
   * debian/patches/01git_add_missing_schema_for_gconf.patch:
