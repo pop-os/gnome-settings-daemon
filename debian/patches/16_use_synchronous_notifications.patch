@@ -416,7 +416,7 @@ Index: gnome-settings-daemon-2.30.0/plugins/media-keys/gsd-media-keys-manager.c
  
  static void
  init_screens (GsdMediaKeysManager *manager)
-@@ -563,11 +572,13 @@
+@@ -549,11 +558,13 @@
          }
  
          /* Show the dialogue */
@@ -435,45 +435,31 @@ Index: gnome-settings-daemon-2.30.0/plugins/media-keys/gsd-media-keys-manager.c
  
          /* Clean up the drive selection and exit if no suitable
           * drives are found */
-@@ -603,16 +614,27 @@
-         settings = g_settings_new (SETTINGS_TOUCHPAD_DIR);
-         state = g_settings_get_boolean (settings, TOUCHPAD_ENABLED_KEY);
- 
+@@ -576,11 +587,13 @@
+ static void
+ do_touchpad_osd_action (GsdMediaKeysManager *manager, gboolean state)
+ {
 -        dialog_init (manager);
 -        gsd_media_keys_window_set_action_custom (GSD_MEDIA_KEYS_WINDOW (manager->priv->dialog),
--                                                 (!state) ? "touchpad-enabled" : "touchpad-disabled",
+-                                                 state ? "touchpad-enabled" : "touchpad-disabled",
 -                                                 FALSE);
 -        dialog_show (manager);
 +        if (!gsd_osd_notification_show_icon_only ((!state) ? "touchpad-enabled" : "touchpad-disabled", "Touchpad")) {
 +                dialog_init (manager);
 +                gsd_media_keys_window_set_action_custom (GSD_MEDIA_KEYS_WINDOW (manager->priv->dialog),
-+                                                        (!state) ? "touchpad-enabled" : "touchpad-disabled",
++                                                        state ? "touchpad-enabled" : "touchpad-disabled",
 +                                                        FALSE);
 +                dialog_show (manager);
 +        }
- 
-         g_settings_set_boolean (settings, TOUCHPAD_ENABLED_KEY, !state);
-         g_object_unref (settings);
  }
  
-+play_volume_event_sound (GtkWidget *widget)
-+{
-+        ca_gtk_play_for_widget (widget, 0,
-+                                CA_PROP_EVENT_ID, "audio-volume-change",
-+                                CA_PROP_EVENT_DESCRIPTION, "volume changed hrough key press",
-+                                CA_PROP_APPLICATION_ID, "org.gnome.VolumeControl",
-+                                NULL);
-+}
-+
  static void
- do_touchpad_osd_action (GsdMediaKeysManager *manager, gboolean state)
- {
-@@ -629,9 +651,19 @@
-                guint vol,
+@@ -610,9 +633,19 @@
                 guint max_vol,
                 gboolean muted,
--               gboolean sound_changed)
-+               gboolean sound_changed,
+                gboolean sound_changed,
+-               gboolean quiet)
++               gboolean quiet,
 +               GsdOsdNotifierOvershootType overshoot)
  {
 +        GtkWidget *window;
@@ -481,40 +467,15 @@ Index: gnome-settings-daemon-2.30.0/plugins/media-keys/gsd-media-keys-manager.c
          vol = (int) (100 * (double) vol / (double) max_vol);
 +        if (overshoot != GSD_OSD_NOTIFICATION_NO_OVERSHOOT) {
 +                if (gsd_osd_notification_show_overshoot (manager->priv->notifier, overshoot))
-+                        goto done;
++                        return;
 +        } else {
 +                if (gsd_osd_notification_show_value (manager->priv->notifier, vol, muted))
-+                        goto done;
++                        return;
 +        }
          vol = CLAMP (vol, 0, 100);
  
          dialog_init (manager);
-@@ -642,12 +675,18 @@
-                                           GSD_MEDIA_KEYS_WINDOW_ACTION_VOLUME);
-         dialog_show (manager);
- 
--        if (sound_changed != FALSE && muted == FALSE)
--                ca_gtk_play_for_widget (manager->priv->dialog, 0,
--                                        CA_PROP_EVENT_ID, "audio-volume-change",
--                                        CA_PROP_EVENT_DESCRIPTION, "volume changed through key press",
--                                        CA_PROP_APPLICATION_ID, "org.gnome.VolumeControl",
--                                        NULL);
-+done:
-+        if (sound_changed != FALSE && muted == FALSE) {
-+                if (manager->priv->dialog == NULL) {
-+                        window = gtk_window_new (GTK_WINDOW_TOPLEVEL);
-+                        gtk_window_set_screen (GTK_WINDOW (window), manager->priv->current_screen);
-+                        gtk_widget_realize (window);
-+                        play_volume_event_sound (window);
-+                        gtk_widget_destroy (window);        
-+                } else {
-+                        play_volume_event_sound (manager->priv->dialog);        
-+                }
-+        }
- }
- 
- static void
-@@ -657,6 +696,7 @@
+@@ -639,6 +680,7 @@
          gboolean old_muted, new_muted;
          guint old_vol, new_vol, max_vol, norm_vol_step;
          gboolean sound_changed;
@@ -522,7 +483,7 @@ Index: gnome-settings-daemon-2.30.0/plugins/media-keys/gsd-media-keys-manager.c
  
          if (manager->priv->stream == NULL)
                  return;
-@@ -680,12 +720,14 @@
+@@ -662,12 +702,14 @@
                  } else {
                          new_vol = old_vol - norm_vol_step;
                  }
@@ -537,16 +498,16 @@ Index: gnome-settings-daemon-2.30.0/plugins/media-keys/gsd-media-keys-manager.c
                  break;
          }
  
-@@ -701,7 +743,7 @@
+@@ -683,7 +735,7 @@
                  }
          }
  
--        update_dialog (manager, new_vol, max_vol, new_muted, sound_changed);
-+        update_dialog (manager, new_vol, max_vol, new_muted, sound_changed, overshoot);
+-        update_dialog (manager, new_vol, max_vol, new_muted, sound_changed, quiet);
++        update_dialog (manager, new_vol, max_vol, new_muted, sound_changed, quiet, overshoot);
  }
  
  static void
-@@ -977,8 +1019,11 @@
+@@ -959,8 +1001,11 @@
  
  static gboolean
  do_multimedia_player_action (GsdMediaKeysManager *manager,
@@ -558,7 +519,7 @@ Index: gnome-settings-daemon-2.30.0/plugins/media-keys/gsd-media-keys-manager.c
          return gsd_media_player_key_pressed (manager, key);
  }
  
-@@ -1242,23 +1287,23 @@
+@@ -1241,23 +1286,23 @@
                  execute (manager, "gcalctool", FALSE, FALSE);
                  break;
          case PLAY_KEY:
@@ -591,7 +552,7 @@ Index: gnome-settings-daemon-2.30.0/plugins/media-keys/gsd-media-keys-manager.c
          case VIDEO_OUT_KEY:
          case VIDEO_OUT2_KEY:
                  do_video_out_action (manager, timestamp);
-@@ -1458,6 +1503,8 @@
+@@ -1459,6 +1504,8 @@
  
          gvc_mixer_control_open (manager->priv->volume);
  
@@ -600,7 +561,7 @@ Index: gnome-settings-daemon-2.30.0/plugins/media-keys/gsd-media-keys-manager.c
          gnome_settings_profile_end ("gvc_mixer_control_new");
  #endif /* HAVE_PULSE */
          manager->priv->start_idle_id = g_idle_add ((GSourceFunc) start_media_keys_idle_cb, manager);
-@@ -1554,6 +1601,9 @@
+@@ -1557,6 +1604,9 @@
                  g_list_free (priv->media_players);
                  priv->media_players = NULL;
          }
@@ -614,12 +575,12 @@ Index: gnome-settings-daemon-2.30.0/plugins/common/Makefile.am
 ===================================================================
 --- gnome-settings-daemon-2.30.0.orig/plugins/common/Makefile.am	2010-03-10 11:59:38.000000000 +0000
 +++ gnome-settings-daemon-2.30.0/plugins/common/Makefile.am	2010-04-23 17:10:43.209632216 +0100
-@@ -10,23 +10,27 @@
+@@ -8,23 +8,27 @@
+ 	gsd-keygrab.c		\
+ 	gsd-keygrab.h		\
  	gsd-input-helper.c	\
- 	gsd-input-helper.h	\
- 	gsd-osd-window.c	\
--	gsd-osd-window.h
-+	gsd-osd-window.h	\
+-	gsd-input-helper.h
++	gsd-input-helper.h	\
 +	gsd-osd-notification.c	\
 +	gsd-osd-notification.h
  
@@ -642,5 +603,5 @@ Index: gnome-settings-daemon-2.30.0/plugins/common/Makefile.am
 +	$(XINPUT_LIBS) \
 +	$(LIBNOTIFY_LIBS)
  
- scriptsdir = $(datadir)/gnome-settings-daemon-@GSD_API_VERSION@
- scripts_DATA = input-device-example.sh
+ noinst_PROGRAMS = test-input-helper test-egg-key-parsing
+ 

@@ -4,8 +4,8 @@ Index: gnome-settings-daemon-2.32.1/configure.ac
 +++ gnome-settings-daemon-2.32.1/configure.ac	2011-03-03 13:30:40.187375466 -0500
 @@ -52,6 +52,7 @@
  GIO_REQUIRED_VERSION=2.26.0
- GNOME_DESKTOP_REQUIRED_VERSION=2.91.5
- LIBNOTIFY_REQUIRED_VERSION=0.6.1
+ GNOME_DESKTOP_REQUIRED_VERSION=3.1.2
+ LIBNOTIFY_REQUIRED_VERSION=0.7.3
 +APPINDICATOR_REQUIRED_VERSION=0.3.0
  
  EXTRA_COMPILE_WARNINGS(yes)
@@ -43,14 +43,14 @@ Index: gnome-settings-daemon-2.32.1/configure.ac
  dnl ---------------------------------------------------------------------------
  dnl - Check for D-Bus
  dnl ---------------------------------------------------------------------------
-@@ -481,6 +508,7 @@
-         PolicyKit support:        ${HAVE_POLKIT}
+@@ -630,6 +657,7 @@
+         LCMS DICT support:        ${have_new_lcms}
  
          Libnotify support:        ${have_libnotify}
 +	App indicator support:    ${enable_appindicator}
+         Libcanberra support:      ${have_libcanberra}
          PulseAudio support:       ${have_pulse}
          PackageKit support:       ${have_packagekit}
-         Smartcard support:        ${have_smartcard_support}
 Index: gnome-settings-daemon-2.32.1/plugins/a11y-keyboard/gsd-a11y-keyboard-manager.c
 ===================================================================
 --- gnome-settings-daemon-2.32.1.orig/plugins/a11y-keyboard/gsd-a11y-keyboard-manager.c	2011-03-03 13:30:34.437203266 -0500

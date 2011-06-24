@@ -1,0 +1,42 @@
+diff --git a/configure.ac b/configure.ac
+index b81c7e0..0021181 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -101,7 +101,11 @@ PKG_CHECK_MODULES(GNOME_DESKTOP, gnome-desktop-3.0 >= $GNOME_DESKTOP_REQUIRED_VE
+ dnl ---------------------------------------------------------------------------
+ dnl - Check for colord
+ dnl ---------------------------------------------------------------------------
+-PKG_CHECK_MODULES(COLORD, colord >= 0.1.9)
++PKG_CHECK_MODULES(COLORD, colord >= 0.1.9,
++                  [have_colord=true
++		  AC_DEFINE(HAVE_COLORD, 1, [Define if colord should be used])],
++		  [have_colord=false])
++AM_CONDITIONAL(HAVE_COLORD, test "x$have_colord" = "xtrue")
+ 
+ dnl ---------------------------------------------------------------------------
+ dnl - Check for libcanberra
+diff --git a/plugins/Makefile.am b/plugins/Makefile.am
+index 082f051..647faed 100644
+--- a/plugins/Makefile.am
++++ b/plugins/Makefile.am
+@@ -6,7 +6,6 @@ enabled_plugins =	\
+ 	automount	\
+ 	background	\
+ 	clipboard	\
+-	color		\
+ 	cursor		\
+ 	datetime	\
+ 	dummy		\
+@@ -23,6 +22,12 @@ enabled_plugins =	\
+ 
+ disabled_plugins = $(NULL)
+ 
++if HAVE_COLORD
++enabled_plugins += color
++else
++disabled_plugins += color
++endif
++
+ if BUILD_GCONF_BRIDGE
+ enabled_plugins += gconf
+ else

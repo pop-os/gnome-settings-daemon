@@ -1,3 +1,20 @@
+gnome-settings-daemon (3.1.2-0ubuntu1) UNRELEASED; urgency=low
+
+  * New upstream release
+  * debian/control:
+    - Bump dependency on libgnome-desktop-3-dev
+  * debian/watch:
+    - Watch .bz2 tarball and unstable series
+  * debian/patches/06_use_application_indicator.patch:
+  * debian/patches/16_use_synchronous_notifications.patch:
+    - Rebased
+  * debian/patches/03_disable_colord.patch:
+    - Disable color plugin if colord is not found
+  * debian/patches/01git_add_missing_schema_for_gconf.patch:
+    - Remove upstreamed patch
+
+ -- Rodrigo Moya <rodrigo.moya@canonical.com>  Fri, 24 Jun 2011 12:33:25 +0200
+
 gnome-settings-daemon (3.0.2-1ubuntu4) oneiric; urgency=low
 
   * debian/control.in: stop depending on libgnome2-common
