@@ -3,6 +3,7 @@ gnome-settings-daemon (3.1.2-0ubuntu1) UNRELEASED; urgency=low
   * New upstream release
   * debian/control:
     - Bump dependency on libgnome-desktop-3-dev
+    - Conflict with gnome-color-manager < 3.0
   * debian/watch:
     - Watch .bz2 tarball and unstable series
   * debian/patches/06_use_application_indicator.patch:
