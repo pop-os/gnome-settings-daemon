@@ -30,7 +30,8 @@ Build-Depends: cdbs,
                libcanberra-gtk3-dev,
                libcups2-dev,
                libpolkit-gobject-1-dev,
-               libappindicator3-dev (>= 0.3.0)
+               libappindicator3-dev (>= 0.3.0),
+               hwdata
 Standards-Version: 3.9.1
 Vcs-Bzr: https://code.launchpad.net/~gnome3-team/gnome-settings-daemon/ubuntu
 Vcs-Browser: http://svn.debian.org/wsvn/pkg-gnome/desktop/unstable/gnome-settings-daemon/

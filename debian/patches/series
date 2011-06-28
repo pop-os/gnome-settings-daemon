@@ -1,3 +1,4 @@
+01_git_check_touchpad.patch
 02_missing_libs.patch
 03_disable_colord.patch
 05_disable_corner_tapping.patch
