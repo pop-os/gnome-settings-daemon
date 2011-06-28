@@ -33,7 +33,7 @@ Build-Depends: cdbs,
                libappindicator3-dev (>= 0.3.0),
                hwdata
 Standards-Version: 3.9.1
-Vcs-Bzr: https://code.launchpad.net/~gnome3-team/gnome-settings-daemon/ubuntu
+Vcs-Bzr: https://code.launchpad.net/~ubuntu-desktop/gnome-settings-daemon/ubuntu
 Vcs-Browser: http://svn.debian.org/wsvn/pkg-gnome/desktop/unstable/gnome-settings-daemon/
 Vcs-Svn: svn://svn.debian.org/svn/pkg-gnome/desktop/unstable/gnome-settings-daemon/
 
