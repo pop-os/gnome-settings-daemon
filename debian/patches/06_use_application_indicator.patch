@@ -877,7 +877,7 @@ Index: gnome-settings-daemon-2.32.1/plugins/keyboard/gsd-keyboard-xkb.c
  	GtkWidget *item = gtk_menu_item_new_with_mnemonic (_("_Layouts"));
 @@ -257,8 +412,22 @@
  	gtk_widget_show (item);
- 	g_signal_connect (item, "activate", popup_menu_show_layout, NULL);
+ 	g_signal_connect (item, "activate", popup_menu_launch_capplet, NULL);
  	gtk_menu_shell_append (GTK_MENU_SHELL (popup_menu), item);
 +#endif
  

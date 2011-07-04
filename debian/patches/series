@@ -1,4 +1,3 @@
-01_git_check_touchpad.patch
 01_git_shorter_syndaemon_delay.patch
 02_missing_libs.patch
 03_disable_colord.patch
