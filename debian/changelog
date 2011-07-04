@@ -1,3 +1,10 @@
+gnome-settings-daemon (3.1.2-0ubuntu2) oneiric; urgency=low
+
+  * debian/patches/01_git_shorter_syndaemon_delay.patch:
+    - Make syndaemon delay shorter (LP: #801763)
+
+ -- Rodrigo Moya <rodrigo.moya@canonical.com>  Wed, 29 Jun 2011 11:31:41 +0200
+
 gnome-settings-daemon (3.1.2-0ubuntu1) oneiric; urgency=low
 
   * New upstream release
