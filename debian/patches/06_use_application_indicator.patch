@@ -947,7 +947,7 @@ Index: gnome-settings-daemon-2.32.1/plugins/keyboard/gsd-keyboard-xkb.c
 +		if (app_indicator == NULL) {
 +			GtkMenu *popup_menu = create_status_menu ();
 +
-+			app_indicator = app_indicator_new ("gst-keyboard-xkb",
++			app_indicator = app_indicator_new ("gsd-keyboard-xkb",
 +							   "keyboard",
 +							   APP_INDICATOR_CATEGORY_HARDWARE);
 +			XklEngine *engine = gkbd_configuration_get_xkl_engine (gkbd_configuration);
