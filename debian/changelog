@@ -1,3 +1,20 @@
+gnome-settings-daemon (3.1.3-0ubuntu4) UNRELEASED; urgency=low
+
+  [ Marco Trevisan (Treviño) <mail@3v1n0.net> ]
+  * debian/patches/06_use_application_indicator.patch
+    - Updated to support libappindicator scroll event to change
+      the keyboard layout via mouse-wheel
+
+  [ Chris Coulson <chris.coulson@canonical.com> ]
+  * Fix the volume OSD notifications to work properly again (when the
+    media keys work properly)
+    - update debian/patches/16_use_synchronous_notifications.patch
+  * Fix the logic in grab_key_unsafe to not reject keys which are useful
+    to grab without a modifier. Fixes the media-keys plugin
+    - add debian/patches/41_fix_key_grab.patch
+
+ -- Chris Coulson <chris.coulson@canonical.com>  Wed, 13 Jul 2011 00:11:26 +0100
+
 gnome-settings-daemon (3.1.3-0ubuntu3) oneiric; urgency=low
 
   * debian/gnome-settings-daemon.gsettings-override: Set default action for

@@ -1,10 +1,8 @@
 Description: Use synchronous notifications when they are supported
 Author: ?
 
-Index: gnome-settings-daemon-2.30.0/plugins/common/gsd-osd-notification.c
-===================================================================
---- /dev/null	1970-01-01 00:00:00.000000000 +0000
-+++ gnome-settings-daemon-2.30.0/plugins/common/gsd-osd-notification.c	2010-04-23 17:05:08.862133020 +0100
+--- /dev/null
++++ b/plugins/common/gsd-osd-notification.c
 @@ -0,0 +1,296 @@
 +/* -*- Mode: C; indent-tabs-mode: nil; c-basic-offset: 8; tab-width: 8 -*- */
 +/*
@@ -302,10 +300,8 @@ Index: gnome-settings-daemon-2.30.0/plugins/common/gsd-osd-notification.c
 +
 +        g_type_class_add_private (klass, sizeof (GsdOsdNotificationPrivate));
 +}
-Index: gnome-settings-daemon-2.30.0/plugins/common/gsd-osd-notification.h
-===================================================================
---- /dev/null	1970-01-01 00:00:00.000000000 +0000
-+++ gnome-settings-daemon-2.30.0/plugins/common/gsd-osd-notification.h	2010-04-23 17:05:08.862133020 +0100
+--- /dev/null
++++ b/plugins/common/gsd-osd-notification.h
 @@ -0,0 +1,75 @@
 +/* -*- Mode: C; indent-tabs-mode: nil; c-basic-offset: 8; tab-width: 8 -*- */
 +/*
@@ -382,10 +378,8 @@ Index: gnome-settings-daemon-2.30.0/plugins/common/gsd-osd-notification.h
 +G_END_DECLS
 +
 +#endif /* _GSD_OSD_NOTIFICATION_H_ */
-Index: gnome-settings-daemon-2.30.0/plugins/media-keys/gsd-media-keys-manager.c
-===================================================================
---- gnome-settings-daemon-2.30.0.orig/plugins/media-keys/gsd-media-keys-manager.c	2010-03-29 09:15:04.000000000 +0100
-+++ gnome-settings-daemon-2.30.0/plugins/media-keys/gsd-media-keys-manager.c	2010-04-23 17:05:08.862133020 +0100
+--- a/plugins/media-keys/gsd-media-keys-manager.c
++++ b/plugins/media-keys/gsd-media-keys-manager.c
 @@ -46,6 +46,7 @@
  #include "acme.h"
  #include "gsd-media-keys-window.h"
@@ -394,7 +388,7 @@ Index: gnome-settings-daemon-2.30.0/plugins/media-keys/gsd-media-keys-manager.c
  
  #ifdef HAVE_PULSE
  #include <canberra-gtk.h>
-@@ -103,6 +104,7 @@
+@@ -103,6 +104,7 @@ struct GsdMediaKeysManagerPrivate
  #endif /* HAVE_PULSE */
          GtkWidget       *dialog;
          GSettings       *settings;
@@ -402,7 +396,7 @@ Index: gnome-settings-daemon-2.30.0/plugins/media-keys/gsd-media-keys-manager.c
  
          /* HighContrast theme settings */
          GSettings       *interface_settings;
-@@ -131,6 +133,13 @@
+@@ -131,6 +133,13 @@ G_DEFINE_TYPE (GsdMediaKeysManager, gsd_
  
  static gpointer manager_object = NULL;
  
@@ -416,7 +410,7 @@ Index: gnome-settings-daemon-2.30.0/plugins/media-keys/gsd-media-keys-manager.c
  
  static void
  init_screens (GsdMediaKeysManager *manager)
-@@ -549,11 +558,13 @@
+@@ -549,11 +558,13 @@ do_eject_action (GsdMediaKeysManager *ma
          }
  
          /* Show the dialogue */
@@ -435,7 +429,7 @@ Index: gnome-settings-daemon-2.30.0/plugins/media-keys/gsd-media-keys-manager.c
  
          /* Clean up the drive selection and exit if no suitable
           * drives are found */
-@@ -576,11 +587,13 @@
+@@ -576,11 +587,13 @@ do_eject_action (GsdMediaKeysManager *ma
  static void
  do_touchpad_osd_action (GsdMediaKeysManager *manager, gboolean state)
  {
@@ -454,7 +448,7 @@ Index: gnome-settings-daemon-2.30.0/plugins/media-keys/gsd-media-keys-manager.c
  }
  
  static void
-@@ -610,9 +633,19 @@
+@@ -610,9 +623,19 @@ update_dialog (GsdMediaKeysManager *mana
                 guint max_vol,
                 gboolean muted,
                 gboolean sound_changed,
@@ -467,15 +461,44 @@ Index: gnome-settings-daemon-2.30.0/plugins/media-keys/gsd-media-keys-manager.c
          vol = (int) (100 * (double) vol / (double) max_vol);
 +        if (overshoot != GSD_OSD_NOTIFICATION_NO_OVERSHOOT) {
 +                if (gsd_osd_notification_show_overshoot (manager->priv->notifier, overshoot))
-+                        return;
++                        goto done;
 +        } else {
 +                if (gsd_osd_notification_show_value (manager->priv->notifier, vol, muted))
-+                        return;
++                        goto done;
 +        }
          vol = CLAMP (vol, 0, 100);
  
          dialog_init (manager);
-@@ -639,6 +680,7 @@
+@@ -623,12 +646,26 @@ update_dialog (GsdMediaKeysManager *mana
+                                           GSD_MEDIA_KEYS_WINDOW_ACTION_VOLUME);
+         dialog_show (manager);
+ 
+-        if (quiet == FALSE && sound_changed != FALSE && muted == FALSE)
+-                ca_gtk_play_for_widget (manager->priv->dialog, 0,
++done:
++        if (quiet == FALSE && sound_changed != FALSE && muted == FALSE) {
++                GtkWidget *window;
++                if (!manager->priv->dialog) {
++                        window = gtk_window_new (GTK_WINDOW_TOPLEVEL);
++                        gtk_window_set_screen (GTK_WINDOW (window), manager->priv->current_screen);
++                        gtk_widget_realize (window);
++
++                } else {
++                        window = manager->priv->dialog;
++                }
++                ca_gtk_play_for_widget (window, 0,
+                                         CA_PROP_EVENT_ID, "audio-volume-change",
+                                         CA_PROP_EVENT_DESCRIPTION, "volume changed through key press",
+                                         CA_PROP_APPLICATION_ID, "org.gnome.VolumeControl",
+                                         NULL);
++
++                if (!manager->priv->dialog)
++                        gtk_widget_destroy(window);
++        }
+ }
+ 
+ static void
+@@ -639,6 +676,7 @@ do_sound_action (GsdMediaKeysManager *ma
          gboolean old_muted, new_muted;
          guint old_vol, new_vol, max_vol, norm_vol_step;
          gboolean sound_changed;
@@ -483,22 +506,34 @@ Index: gnome-settings-daemon-2.30.0/plugins/media-keys/gsd-media-keys-manager.c
  
          if (manager->priv->stream == NULL)
                  return;
-@@ -662,12 +702,14 @@
-                 } else {
-                         new_vol = old_vol - norm_vol_step;
-                 }
-+                overshoot = GSD_OSD_NOTIFICATION_UNDERSHOOT;
+@@ -656,7 +694,9 @@ do_sound_action (GsdMediaKeysManager *ma
+                 new_muted = !old_muted;
                  break;
+         case VOLUME_DOWN_KEY:
+-                if (old_vol <= norm_vol_step) {
++                if (old_vol == 0 && old_muted) {
++                        overshoot =  GSD_OSD_NOTIFICATION_UNDERSHOOT;
++                } else if (old_vol <= norm_vol_step) {
+                         new_vol = 0;
+                         new_muted = TRUE;
+                 } else {
+@@ -666,8 +706,13 @@ do_sound_action (GsdMediaKeysManager *ma
          case VOLUME_UP_KEY:
                  new_muted = FALSE;
                  /* When coming out of mute only increase the volume if it was 0 */
-                 if (!old_muted || old_vol == 0)
-                         new_vol = MIN (old_vol + norm_vol_step, max_vol);
-+                overshoot = GSD_OSD_NOTIFICATION_OVERSHOOT;
+-                if (!old_muted || old_vol == 0)
+-                        new_vol = MIN (old_vol + norm_vol_step, max_vol);
++                if (!old_muted || old_vol == 0) {
++                        if (old_vol == max_vol) {
++                                overshoot = GSD_OSD_NOTIFICATION_OVERSHOOT;
++                        } else {
++                                new_vol = MIN (old_vol + norm_vol_step, max_vol);
++                        }
++                }
                  break;
          }
  
-@@ -683,7 +735,7 @@
+@@ -683,7 +728,7 @@ do_sound_action (GsdMediaKeysManager *ma
                  }
          }
  
@@ -507,7 +542,7 @@ Index: gnome-settings-daemon-2.30.0/plugins/media-keys/gsd-media-keys-manager.c
  }
  
  static void
-@@ -959,8 +1001,11 @@
+@@ -959,8 +1004,11 @@ static const GDBusInterfaceVTable interf
  
  static gboolean
  do_multimedia_player_action (GsdMediaKeysManager *manager,
@@ -519,7 +554,7 @@ Index: gnome-settings-daemon-2.30.0/plugins/media-keys/gsd-media-keys-manager.c
          return gsd_media_player_key_pressed (manager, key);
  }
  
-@@ -1241,23 +1286,23 @@
+@@ -1241,23 +1289,23 @@ do_action (GsdMediaKeysManager *manager,
                  execute (manager, "gcalctool", FALSE, FALSE);
                  break;
          case PLAY_KEY:
@@ -552,7 +587,7 @@ Index: gnome-settings-daemon-2.30.0/plugins/media-keys/gsd-media-keys-manager.c
          case VIDEO_OUT_KEY:
          case VIDEO_OUT2_KEY:
                  do_video_out_action (manager, timestamp);
-@@ -1459,6 +1504,8 @@
+@@ -1459,6 +1507,8 @@ gsd_media_keys_manager_start (GsdMediaKe
  
          gvc_mixer_control_open (manager->priv->volume);
  
@@ -561,7 +596,7 @@ Index: gnome-settings-daemon-2.30.0/plugins/media-keys/gsd-media-keys-manager.c
          gnome_settings_profile_end ("gvc_mixer_control_new");
  #endif /* HAVE_PULSE */
          manager->priv->start_idle_id = g_idle_add ((GSourceFunc) start_media_keys_idle_cb, manager);
-@@ -1557,6 +1604,9 @@
+@@ -1557,6 +1607,9 @@ gsd_media_keys_manager_stop (GsdMediaKey
                  g_list_free (priv->media_players);
                  priv->media_players = NULL;
          }
@@ -571,11 +606,9 @@ Index: gnome-settings-daemon-2.30.0/plugins/media-keys/gsd-media-keys-manager.c
  }
  
  static void
-Index: gnome-settings-daemon-2.30.0/plugins/common/Makefile.am
-===================================================================
---- gnome-settings-daemon-2.30.0.orig/plugins/common/Makefile.am	2010-03-10 11:59:38.000000000 +0000
-+++ gnome-settings-daemon-2.30.0/plugins/common/Makefile.am	2010-04-23 17:10:43.209632216 +0100
-@@ -8,23 +8,27 @@
+--- a/plugins/common/Makefile.am
++++ b/plugins/common/Makefile.am
+@@ -8,7 +8,9 @@ libcommon_la_SOURCES = \
  	gsd-keygrab.c		\
  	gsd-keygrab.h		\
  	gsd-input-helper.c	\
@@ -586,7 +619,7 @@ Index: gnome-settings-daemon-2.30.0/plugins/common/Makefile.am
  
  libcommon_la_CPPFLAGS = \
  	$(AM_CPPFLAGS)
- 
+@@ -16,6 +18,7 @@ libcommon_la_CPPFLAGS = \
  libcommon_la_CFLAGS = \
  	$(PLUGIN_CFLAGS)		\
  	$(SETTINGS_PLUGIN_CFLAGS)	\
@@ -594,8 +627,7 @@ Index: gnome-settings-daemon-2.30.0/plugins/common/Makefile.am
  	$(XINPUT_CFLAGS)		\
  	$(AM_CFLAGS)
  
- libcommon_la_LDFLAGS = \
- 	$(GSD_PLUGIN_LDFLAGS) $(XINPUT_LIBS) $(X11_LIBS)
+@@ -24,7 +27,8 @@ libcommon_la_LDFLAGS = \
  
  libcommon_la_LIBADD  = \
  	$(SETTINGS_PLUGIN_LIBS)		\

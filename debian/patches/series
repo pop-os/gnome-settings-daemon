@@ -6,3 +6,4 @@
 16_use_synchronous_notifications.patch
 20_migrate_background_uri.patch
 40_xres_lcddefault.patch
+41_fix_key_grab.patch
