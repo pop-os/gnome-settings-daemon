@@ -139,7 +139,7 @@
 +#endif
  
          if (p->settings != NULL) {
-                 g_object_unref (p->settings);
+                 g_signal_handlers_disconnect_by_func (p->settings, keyboard_callback, manager);
 @@ -1134,8 +1165,13 @@ on_preferences_dialog_response (GtkDialo
  }
  

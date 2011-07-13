@@ -1,3 +1,17 @@
+gnome-settings-daemon (3.1.3-0ubuntu5) oneiric; urgency=low
+
+  * debian/patches/01_git_shorter_syndaemon_delay.patch:
+    - Remove this patch, it fixes the annoyance for some users and breaks it
+      for others
+  * debian/patches/17_react_when_streams_removed.patch:
+    - Remove patch not being applied and already upstream
+  * debian/patches/01_git_a11y_keyboard_cleanup.patch:
+    - Do proper cleanup when the plugin is stopped (LP: #804946)
+  * debian/patches/06_use_application_indicator.patch:
+    - Rebased
+
+ -- Rodrigo Moya <rodrigo.moya@canonical.com>  Tue, 12 Jul 2011 13:04:51 +0200
+
 gnome-settings-daemon (3.1.3-0ubuntu4) oneiric; urgency=low
 
   [ Marco Trevisan (Treviño) <mail@3v1n0.net> ]
