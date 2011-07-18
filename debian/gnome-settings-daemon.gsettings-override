@@ -8,3 +8,6 @@ tap-to-click = true
 
 [org.gnome.settings-daemon.plugins.power]
 button-power = 'interactive'
+button-sleep = 'suspend'
+critical-battery-action = 'suspend'
+sleep-inactive-battery = true
