@@ -380,10 +380,10 @@ Author: ?
 +#endif /* _GSD_OSD_NOTIFICATION_H_ */
 --- a/plugins/media-keys/gsd-media-keys-manager.c
 +++ b/plugins/media-keys/gsd-media-keys-manager.c
-@@ -46,6 +46,7 @@
- #include "acme.h"
+@@ -47,6 +47,7 @@
  #include "gsd-media-keys-window.h"
  #include "gsd-input-helper.h"
+ #include "gsd-enums.h"
 +#include "gsd-osd-notification.h"
  
  #ifdef HAVE_PULSE

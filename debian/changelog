@@ -1,3 +1,17 @@
+gnome-settings-daemon (3.1.4-0ubuntu1) oneiric; urgency=low
+
+  * New upstream release
+  * debian/control:
+    - bumo libgnome-desktop dependency
+  * debian/patches/01_git_a11y_keyboard_cleanup.patch:
+  * debian/patches/41_fix_key_grab.patch:
+    - Remove upstreamed patches
+  * debian/patches/06_use_application_indicator.patch:
+  * debian/patches/16_use_synchronous_notifications.patch:
+    - Rebased
+
+ -- Rodrigo Moya <rodrigo.moya@canonical.com>  Mon, 25 Jul 2011 12:00:12 +0200
+
 gnome-settings-daemon (3.1.3-0ubuntu7) oneiric; urgency=low
 
   * debian/patches/42_onlyshowin_unity.patch:
