@@ -31,7 +31,8 @@ Build-Depends: cdbs,
                libcups2-dev,
                libpolkit-gobject-1-dev,
                libappindicator3-dev (>= 0.3.0),
-               hwdata
+               hwdata,
+               libupower-glib-dev
 Standards-Version: 3.9.1
 Vcs-Bzr: https://code.launchpad.net/~ubuntu-desktop/gnome-settings-daemon/ubuntu
 

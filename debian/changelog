@@ -1,3 +1,10 @@
+gnome-settings-daemon (3.1.4-0ubuntu2) oneiric; urgency=low
+
+  * debian/control:
+    - Add missing build dependency on libupower-glib-dev
+
+ -- Rodrigo Moya <rodrigo.moya@canonical.com>  Tue, 26 Jul 2011 15:34:10 +0200
+
 gnome-settings-daemon (3.1.4-0ubuntu1) oneiric; urgency=low
 
   * New upstream release
