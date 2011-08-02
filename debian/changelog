@@ -1,3 +1,10 @@
+gnome-settings-daemon (3.1.4-0ubuntu3) oneiric; urgency=low
+
+  * debian/patches/42_onlyshowin_unity.patch:
+    - tweak the new automount .desktop as well to run under unity (lp: #816774)
+
+ -- Sebastien Bacher <seb128@ubuntu.com>  Mon, 01 Aug 2011 18:09:29 +0200
+
 gnome-settings-daemon (3.1.4-0ubuntu2) oneiric; urgency=low
 
   * debian/control:
