@@ -5,6 +5,7 @@
 11_retry-startup.patch
 12_monitor_network_fs.patch
 13_monitor_kfreebsd.patch
+14_libnotify_0.7.patch
 20_gstreamer.patch
 30_pkgconfig-path.patch
 70_relibtoolize.patch

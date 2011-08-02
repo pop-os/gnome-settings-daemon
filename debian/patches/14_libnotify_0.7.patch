@@ -1,0 +1,50 @@
+Index: gnome-settings-daemon-2.30.2/plugins/a11y-keyboard/gsd-a11y-keyboard-manager.c
+===================================================================
+--- gnome-settings-daemon-2.30.2.orig/plugins/a11y-keyboard/gsd-a11y-keyboard-manager.c	2011-08-02 05:07:53.074089035 +0200
++++ gnome-settings-daemon-2.30.2/plugins/a11y-keyboard/gsd-a11y-keyboard-manager.c	2011-08-02 05:08:48.041398002 +0200
+@@ -536,9 +536,7 @@
+         gsd_a11y_keyboard_manager_ensure_status_icon (manager);
+         manager->priv->notification = notify_notification_new (title,
+                                                                message,
+-                                                               "preferences-desktop-accessibility",
+-                                                               NULL);
+-        notify_notification_attach_to_status_icon (manager->priv->notification, manager->priv->status_icon);
++                                                               "preferences-desktop-accessibility");
+         notify_notification_set_timeout (manager->priv->notification, NOTIFICATION_TIMEOUT * 1000);
+ 
+         notify_notification_add_action (manager->priv->notification,
+@@ -675,9 +673,7 @@
+         gsd_a11y_keyboard_manager_ensure_status_icon (manager);
+         manager->priv->notification = notify_notification_new (title,
+                                                                message,
+-                                                               "preferences-desktop-accessibility",
+-                                                               NULL);
+-        notify_notification_attach_to_status_icon (manager->priv->notification, manager->priv->status_icon);
++                                                               "preferences-desktop-accessibility");
+         notify_notification_set_timeout (manager->priv->notification, NOTIFICATION_TIMEOUT * 1000);
+ 
+         notify_notification_add_action (manager->priv->notification,
+Index: gnome-settings-daemon-2.30.2/plugins/xrandr/gsd-xrandr-manager.c
+===================================================================
+--- gnome-settings-daemon-2.30.2.orig/plugins/xrandr/gsd-xrandr-manager.c	2011-08-02 05:09:03.025209630 +0200
++++ gnome-settings-daemon-2.30.2/plugins/xrandr/gsd-xrandr-manager.c	2011-08-02 05:09:36.464789237 +0200
+@@ -913,16 +913,9 @@
+ 
+         g_assert (error_to_display == NULL || secondary_text == NULL);
+ 
+-        if (priv->status_icon)
+-                notification = notify_notification_new_with_status_icon (primary_text,
+-                                                                         error_to_display ? error_to_display->message : secondary_text,
+-                                                                         GSD_XRANDR_ICON_NAME,
+-                                                                         priv->status_icon);
+-        else
+-                notification = notify_notification_new (primary_text,
+-                                                        error_to_display ? error_to_display->message : secondary_text,
+-                                                        GSD_XRANDR_ICON_NAME,
+-                                                        NULL);
++        notification = notify_notification_new (primary_text,
++                                                error_to_display ? error_to_display->message : secondary_text,
++                                                GSD_XRANDR_ICON_NAME);
+ 
+         notify_notification_show (notification, NULL); /* NULL-GError */
+ #else
