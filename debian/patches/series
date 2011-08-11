@@ -1,5 +1,4 @@
 02_missing_libs.patch
-03_disable_colord.patch
 05_disable_corner_tapping.patch
 06_use_application_indicator.patch
 16_use_synchronous_notifications.patch

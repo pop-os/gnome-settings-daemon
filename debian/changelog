@@ -1,3 +1,12 @@
+gnome-settings-daemon (3.1.4-0ubuntu4) oneiric; urgency=low
+
+  * debian/control:
+  * debian/patches/series:
+  * debian/patches/03_disable_colord.patch:
+    - Enable building with colord (LP: #788108)
+
+ -- Rodrigo Moya <rodrigo.moya@canonical.com>  Thu, 11 Aug 2011 13:57:00 +0200
+
 gnome-settings-daemon (3.1.4-0ubuntu3) oneiric; urgency=low
 
   * debian/patches/42_onlyshowin_unity.patch:
