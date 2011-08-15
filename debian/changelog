@@ -1,10 +1,10 @@
-gnome-settings-daemon (3.1.4-0ubuntu5) UNRELEASED; urgency=low
+gnome-settings-daemon (3.1.4-0ubuntu5) oneiric; urgency=low
 
   * debian/patches/43_disable_locale_settings.patch:
     - Don't set locales since they are set in Oneiric by sourcing
       ~/.profile.
 
- -- Gunnar Hjalmarsson <ubuntu@gunnar.cc>  Tue, 09 Aug 2011 19:42:00 +0200
+ -- Gunnar Hjalmarsson <ubuntu@gunnar.cc>  Mon, 15 Aug 2011 10:14:05 +0200
 
 gnome-settings-daemon (3.1.4-0ubuntu4) oneiric; urgency=low
 
