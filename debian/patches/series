@@ -5,3 +5,4 @@
 20_migrate_background_uri.patch
 40_xres_lcddefault.patch
 42_onlyshowin_unity.patch
+43_disable_locale_settings.patch
