@@ -1,3 +1,10 @@
+gnome-settings-daemon (3.1.5-0ubuntu4) UNRELEASED; urgency=low
+
+  * Make the brightness osd use synchronous notify-osd notifications
+    - update debian/patches/16_use_synchronous_notifications.patch
+
+ -- Chris Coulson <chris.coulson@canonical.com>  Mon, 22 Aug 2011 21:52:39 +0100
+
 gnome-settings-daemon (3.1.5-0ubuntu3) oneiric; urgency=low
 
   * debian/gnome-settings-daemon.gsettings-override:
