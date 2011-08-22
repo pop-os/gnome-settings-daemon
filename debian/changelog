@@ -1,9 +1,11 @@
-gnome-settings-daemon (3.1.5-0ubuntu2) UNRELEASED; urgency=low
+gnome-settings-daemon (3.1.5-0ubuntu3) oneiric; urgency=low
 
   * debian/gnome-settings-daemon.gsettings-override:
     - Enable GConf bridge plugin by default 
+  * debian/patches/10_smaller_syndaemon_timeout.patch:
+    - Use a smaller timeout for syndaemon (LP: #801763)
 
- -- Rodrigo Moya <rodrigo.moya@canonical.com>  Tue, 16 Aug 2011 12:18:58 +0200
+ -- Rodrigo Moya <rodrigo.moya@canonical.com>  Mon, 22 Aug 2011 10:46:19 +0200
 
 gnome-settings-daemon (3.1.5-0ubuntu1) oneiric; urgency=low
 
