@@ -33,7 +33,8 @@ Build-Depends: cdbs,
                libappindicator3-dev (>= 0.3.0),
                hwdata,
                libupower-glib-dev,
-               libcolord-dev
+               libcolord-dev,
+               liblcms2-dev
 Standards-Version: 3.9.1
 Vcs-Bzr: https://code.launchpad.net/~ubuntu-desktop/gnome-settings-daemon/ubuntu
 

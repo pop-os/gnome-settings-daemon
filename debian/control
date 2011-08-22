@@ -8,7 +8,7 @@ Section: gnome
 Priority: optional
 Maintainer: Ubuntu Desktop Team <ubuntu-desktop@lists.ubuntu.com>
 XSBC-Original-Maintainer: Debian GNOME Maintainers <pkg-gnome-maintainers@lists.alioth.debian.org>
-Uploaders: Debian GNOME Maintainers <pkg-gnome-maintainers@lists.alioth.debian.org>, Emilio Pozuelo Monfort <pochu@debian.org>
+Uploaders: Debian GNOME Maintainers <pkg-gnome-maintainers@lists.alioth.debian.org>
 Build-Depends: cdbs,
                debhelper (>= 5),
                gnome-pkg-tools,
@@ -38,17 +38,15 @@ Build-Depends: cdbs,
                libappindicator3-dev (>= 0.3.0),
                hwdata,
                libupower-glib-dev,
-               libcolord-dev
+               libcolord-dev,
+               liblcms2-dev
 Standards-Version: 3.9.1
 Vcs-Bzr: https://code.launchpad.net/~ubuntu-desktop/gnome-settings-daemon/ubuntu
-Vcs-Browser: http://svn.debian.org/wsvn/pkg-gnome/desktop/unstable/gnome-settings-daemon/
-Vcs-Svn: svn://svn.debian.org/svn/pkg-gnome/desktop/unstable/gnome-settings-daemon/
 
 Package: gnome-settings-daemon
 Architecture: any
 Depends: ${shlibs:Depends},
          ${misc:Depends},
-         libgnome2-common,
          gsettings-desktop-schemas,
          nautilus-data (>= 2.91.3-1)
 Recommends: pulseaudio
