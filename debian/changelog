@@ -1,3 +1,14 @@
+gnome-settings-daemon (3.1.90-0ubuntu1) oneiric; urgency=low
+
+  * New upstream release
+  * debian/patches/16_use_synchronous_notifications.patch:
+  * debian/patches/42_onlyshowin_unity.patch:
+    - Rebased patches
+  * debian/patches/44_lock_before_suspend.patch:
+    - Remove upstream patch
+
+ -- Rodrigo Moya <rodrigo.moya@canonical.com>  Mon, 29 Aug 2011 16:04:57 +0200
+
 gnome-settings-daemon (3.1.5-0ubuntu6) oneiric; urgency=low
 
   * debian/patches/44_lock_before_suspend.patch: ensure the screen is

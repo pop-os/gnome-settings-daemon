@@ -7,4 +7,3 @@
 40_xres_lcddefault.patch
 42_onlyshowin_unity.patch
 43_disable_locale_settings.patch
-44_lock_before_suspend.patch

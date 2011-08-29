@@ -195,16 +195,11 @@ Author: ?
  }
  
  static void
-@@ -621,12 +758,13 @@ do_touchpad_action (GsdMediaKeysManager
- static void
- update_dialog (GsdMediaKeysManager *manager,
-                guint vol,
--               guint max_vol,
-                gboolean muted,
+@@ -622,7 +759,9 @@ do_touchpad_action (GsdMediaKeysManager
                 gboolean sound_changed,
                 gboolean quiet)
  {
--        vol = (int) (100 * (double) vol / (double) max_vol);
+-        vol = (int) (100 * (double) vol / PA_VOLUME_NORM);
 +        if (ubuntu_osd_notification_show_volume (manager, vol, muted))
 +                goto done;
 +
@@ -244,27 +239,11 @@ Author: ?
                   gboolean             quiet)
  {
          gboolean old_muted, new_muted;
--        guint old_vol, new_vol, max_vol, norm_vol_step;
-+        guint old_vol, new_vol, max_vol, norm_vol_step, osd_vol;
+-        guint old_vol, new_vol, norm_vol_step;
++        guint old_vol, new_vol, norm_vol_step, osd_vol;
          gboolean sound_changed;
  
          if (manager->priv->stream == NULL)
-@@ -697,7 +849,14 @@ do_sound_action (GsdMediaKeysManager *ma
-                 }
-         }
- 
--        update_dialog (manager, new_vol, max_vol, new_muted, sound_changed, quiet);
-+        if (type == VOLUME_DOWN_KEY && old_vol == 0 && old_muted)
-+                osd_vol = -1;
-+        else if (type == VOLUME_UP_KEY && old_vol == max_vol && !old_muted)
-+                osd_vol = 101;
-+        else
-+                osd_vol = (int) (100 * (double) new_vol / (double) max_vol);    
-+
-+        update_dialog (manager, osd_vol, new_muted, sound_changed, quiet);
- }
- 
- static void
 @@ -973,8 +1132,11 @@ static const GDBusInterfaceVTable interf
  
  static gboolean
