@@ -68,6 +68,7 @@ Description: daemon handling the GNOME session settings
  freedesktop.org XSETTINGS.
 
 Package: gnome-settings-daemon-dev
+Section: libdevel
 Architecture: any
 Depends: ${shlibs:Depends},
          ${misc:Depends},

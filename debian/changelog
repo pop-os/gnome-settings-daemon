@@ -1,3 +1,9 @@
+gnome-settings-daemon (3.0.2-2) UNRELEASED; urgency=low
+
+  * Move g-s-d-dev to libdevel. Closes: #640125.
+
+ -- Josselin Mouette <joss@debian.org>  Fri, 02 Sep 2011 23:54:20 +0200
+
 gnome-settings-daemon (3.0.2-1) experimental; urgency=low
 
   [ Guido Günther ]
