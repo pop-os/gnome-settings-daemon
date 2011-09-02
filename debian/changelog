@@ -1,7 +1,10 @@
-gnome-settings-daemon (3.1.90-0ubuntu2) UNRELEASED; urgency=low
+gnome-settings-daemon (3.1.90-0ubuntu2) oneiric; urgency=low
 
   * debian/patches/01_git_fix_brightness_step_amount.patch:
     - Fix BRIGHTESS_STEP_AMOUNT calculation macro (LP: #827517)
+  * debian/patches/01_git_do_power_init_in_start.patch:
+    - Do power plugin initialization in _start, not _init, to avoid multiple
+      crashes (LP: #836014)
 
  -- Rodrigo Moya <rodrigo.moya@canonical.com>  Thu, 01 Sep 2011 10:33:58 +0200
 

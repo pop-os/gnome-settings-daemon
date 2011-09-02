@@ -1,4 +1,5 @@
 01_git_fix_brightness_step_amount.patch
+01_git_do_power_init_in_start.patch
 02_missing_libs.patch
 05_disable_corner_tapping.patch
 06_use_application_indicator.patch
