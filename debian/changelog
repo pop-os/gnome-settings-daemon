@@ -1,3 +1,11 @@
+gnome-settings-daemon (3.1.90-0ubuntu3) oneiric; urgency=low
+
+  * debian/patches/01_git_double_check_hash_table.patch:
+    - Double check stuff we add to the hash table to avoid crashes when cleaning up
+      (LP: #839322)
+
+ -- Rodrigo Moya <rodrigo.moya@canonical.com>  Fri, 02 Sep 2011 16:17:24 +0200
+
 gnome-settings-daemon (3.1.90-0ubuntu2) oneiric; urgency=low
 
   * debian/patches/01_git_fix_brightness_step_amount.patch:
