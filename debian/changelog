@@ -1,3 +1,13 @@
+gnome-settings-daemon (3.1.91-0ubuntu1) oneiric; urgency=low
+
+  * New upstream release
+  * debian/patches/01_git_do_power_init_in_start.patch:
+  * debian/patches/01_git_double_check_hash_table.patch:
+  * debian/patches/01_git_fix_brightness_step_amount.patch:
+    - Remove upstreamed patches
+
+ -- Rodrigo Moya <rodrigo.moya@canonical.com>  Mon, 05 Sep 2011 16:48:28 +0200
+
 gnome-settings-daemon (3.1.90-0ubuntu3) oneiric; urgency=low
 
   * debian/patches/01_git_double_check_hash_table.patch:
