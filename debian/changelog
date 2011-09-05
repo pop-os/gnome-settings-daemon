@@ -1,10 +1,10 @@
-gnome-settings-daemon (3.1.91-0ubuntu2) UNRELEASED; urgency=low
+gnome-settings-daemon (3.1.91-0ubuntu2) oneiric; urgency=low
 
   * Fix the volume OSD patch so that the volume level is displayed correctly
     again
     - update debian/patches/16_use_synchronous_notifications.patch
 
- -- Chris Coulson <chris.coulson@canonical.com>  Mon, 05 Sep 2011 17:14:17 +0100
+ -- Chris Coulson <chris.coulson@canonical.com>  Mon, 05 Sep 2011 17:40:06 +0100
 
 gnome-settings-daemon (3.1.91-0ubuntu1) oneiric; urgency=low
 
