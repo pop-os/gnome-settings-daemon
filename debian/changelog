@@ -1,3 +1,11 @@
+gnome-settings-daemon (3.1.91-0ubuntu3) UNRELEASED; urgency=low
+
+  * debian/control:
+    - Build depend on libgnome-desktop3-dev >= 3.1.5, which is what upstream
+      asks for
+
+ -- Rodrigo Moya <rodrigo.moya@canonical.com>  Wed, 07 Sep 2011 12:07:45 +0200
+
 gnome-settings-daemon (3.1.91-0ubuntu2) oneiric; urgency=low
 
   * Fix the volume OSD patch so that the volume level is displayed correctly
