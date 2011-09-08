@@ -1,10 +1,13 @@
-gnome-settings-daemon (3.1.91-0ubuntu3) UNRELEASED; urgency=low
+gnome-settings-daemon (3.1.91-0ubuntu3) oneiric; urgency=low
 
   * debian/control:
     - Build depend on libgnome-desktop3-dev >= 3.1.5, which is what upstream
       asks for
   * debian/patches/00git_guard_against_division_by_0.patch:
     - Guard against dividing by 0 in ABS_TO_PERCENTAGE macro (LP: #833595)
+  * debian/patches/00git_dont_crash_if_session_not_ready.patch:
+    - Don't crash if we try to calculate the idle state before connected to
+      the session (LP: #836014)
 
  -- Rodrigo Moya <rodrigo.moya@canonical.com>  Wed, 07 Sep 2011 12:07:45 +0200
 

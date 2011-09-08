@@ -1,0 +1,38 @@
+commit a0c62ab873bff5339e0f239550e24bd5161eb981
+Author: Richard Hughes <richard@hughsie.com>
+Date:   Thu Sep 8 11:44:22 2011 +0100
+
+    power: Don't crash if we try to calculate the idle state before connected to gnome-session
+    
+    Resolves https://bugzilla.gnome.org/show_bug.cgi?id=657917
+
+diff --git a/plugins/power/gsd-power-manager.c b/plugins/power/gsd-power-manager.c
+index 6c0174a..9706356 100644
+--- a/plugins/power/gsd-power-manager.c
++++ b/plugins/power/gsd-power-manager.c
+@@ -2730,6 +2730,12 @@ idle_is_session_idle (GsdPowerManager *manager)
+         GVariant *result;
+         guint status;
+ 
++        /* not yet connected to gnome-session */
++        if (manager->priv->session_presence_proxy == NULL) {
++                g_warning ("gnome-session is not available");
++                return FALSE;
++        }
++
+         /* get the session status */
+         result = g_dbus_proxy_get_cached_property (manager->priv->session_presence_proxy,
+                                                    "status");
+@@ -2750,6 +2756,12 @@ idle_is_session_inhibited (GsdPowerManager *manager, guint mask)
+         GVariant *retval = NULL;
+         GError *error = NULL;
+ 
++        /* not yet connected to gnome-session */
++        if (manager->priv->session_proxy == NULL) {
++                g_warning ("gnome-session is not available");
++                return FALSE;
++        }
++
+         retval = g_dbus_proxy_call_sync (manager->priv->session_proxy,
+                                          "IsInhibited",
+                                          g_variant_new ("(u)",
