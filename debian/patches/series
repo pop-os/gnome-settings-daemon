@@ -1,5 +1,6 @@
 00git_guard_against_division_by_0.patch
 00git_dont_crash_if_session_not_ready.patch
+00git_numlock_status.patch
 02_missing_libs.patch
 05_disable_corner_tapping.patch
 06_use_application_indicator.patch

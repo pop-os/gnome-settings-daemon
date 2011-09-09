@@ -1,0 +1,167 @@
+From 808640667656668693cedd685f6a830bddc0117d Mon Sep 17 00:00:00 2001
+From: Bastien Nocera <hadess@hadess.net>
+Date: Thu, 08 Sep 2011 23:59:01 +0000
+Subject: keyboard: Remember and apply NumLock status
+
+By default, without a care in the world for hostnames.
+
+https://bugzilla.gnome.org/show_bug.cgi?id=631989
+---
+Index: gnome-settings-daemon-3.1.91/data/gsd-enums.h
+===================================================================
+--- gnome-settings-daemon-3.1.91.orig/data/gsd-enums.h	2011-09-09 15:01:06.702871735 +0200
++++ gnome-settings-daemon-3.1.91/data/gsd-enums.h	2011-09-09 15:01:26.294872684 +0200
+@@ -107,4 +107,11 @@
+   GSD_UPDATE_TYPE_NONE
+ } GsdUpdateType;
+ 
++typedef enum
++{
++  GSD_NUM_LOCK_STATE_UNKNOWN,
++  GSD_NUM_LOCK_STATE_ON,
++  GSD_NUM_LOCK_STATE_OFF
++} GsdNumLockState;
++
+ #endif /* __gsd_enums_h__ */
+Index: gnome-settings-daemon-3.1.91/data/org.gnome.settings-daemon.peripherals.gschema.xml.in.in
+===================================================================
+--- gnome-settings-daemon-3.1.91.orig/data/org.gnome.settings-daemon.peripherals.gschema.xml.in.in	2011-09-09 15:01:06.718871736 +0200
++++ gnome-settings-daemon-3.1.91/data/org.gnome.settings-daemon.peripherals.gschema.xml.in.in	2011-09-09 15:01:26.294872684 +0200
+@@ -96,6 +96,11 @@
+       <summary>Remember NumLock state</summary>
+       <description>When set to true, GNOME will remember the state of the NumLock LED between sessions.</description>
+     </key>
++    <key name="numlock-state" enum="org.gnome.settings-daemon.GsdNumLockState">
++      <default>'unknown'</default>
++      <summary>NumLock state</summary>
++      <description>The remembered state of the NumLock LED.</description>
++    </key>
+   </schema>
+   <schema gettext-domain="@GETTEXT_PACKAGE@" id="org.gnome.settings-daemon.peripherals.mouse" path="/org/gnome/settings-daemon/peripherals/mouse/">
+     <key name="locate-pointer" type="b">
+Index: gnome-settings-daemon-3.1.91/plugins/keyboard/gsd-keyboard-manager.c
+===================================================================
+--- gnome-settings-daemon-3.1.91.orig/plugins/keyboard/gsd-keyboard-manager.c	2011-09-09 15:01:06.690871736 +0200
++++ gnome-settings-daemon-3.1.91/plugins/keyboard/gsd-keyboard-manager.c	2011-09-09 15:01:42.298873458 +0200
+@@ -61,6 +61,7 @@
+ #define KEY_INTERVAL       "repeat-interval"
+ #define KEY_DELAY          "delay"
+ #define KEY_CLICK_VOLUME   "click-volume"
++#define KEY_NUMLOCK_STATE  "numlock-state"
+ 
+ #define KEY_BELL_VOLUME    "bell-volume"
+ #define KEY_BELL_PITCH     "bell-pitch"
+@@ -94,42 +95,8 @@
+ }
+ #endif
+ 
+-static char *
+-gsd_keyboard_get_hostname_key (void)
+-{
+-        /* FIXME disabled for now, as we need GSettingsList support:
+-         * https://bugzilla.gnome.org/show_bug.cgi?id=622126 */
+-#if 0
+-        const char *hostname;
+-
+-        hostname = g_get_host_name ();
+-
+-        if (g_str_equal (hostname, "localhost") == FALSE &&
+-            g_str_equal (hostname, "localhost.localdomain") == FALSE) {
+-                char *escaped;
+-                char *key;
+-
+-                /* FIXME, really escape? */
+-                escaped = g_strdup (hostname);
+-                key = g_strdup_printf ("host-%s-0-numlock-on", escaped);
+-                g_free (escaped);
+-                return key;
+-        } else {
+-                g_message ("NumLock remembering disabled because hostname is set to \"localhost\"");
+-                return NULL;
+-        }
+-#endif
+-        return NULL;
+-}
+-
+ #ifdef HAVE_X11_EXTENSIONS_XKB_H
+ 
+-typedef enum {
+-        NUMLOCK_STATE_OFF = 0,
+-        NUMLOCK_STATE_ON = 1,
+-        NUMLOCK_STATE_UNKNOWN = 2
+-} NumLockState;
+-
+ static void
+ numlock_xkb_init (GsdKeyboardManager *manager)
+ {
+@@ -166,50 +133,16 @@
+ }
+ 
+ static void
+-numlock_set_xkb_state (NumLockState new_state)
++numlock_set_xkb_state (GsdNumLockState new_state)
+ {
+         unsigned int num_mask;
+         Display *dpy = GDK_DISPLAY_XDISPLAY (gdk_display_get_default ());
+-        if (new_state != NUMLOCK_STATE_ON && new_state != NUMLOCK_STATE_OFF)
++        if (new_state != GSD_NUM_LOCK_STATE_ON && new_state != GSD_NUM_LOCK_STATE_OFF)
+                 return;
+         num_mask = numlock_NumLock_modifier_mask ();
+         XkbLockModifiers (dpy, XkbUseCoreKbd, num_mask, new_state ? num_mask : 0);
+ }
+ 
+-static NumLockState
+-numlock_get_gsettings_state (GSettings *settings)
+-{
+-        int   curr_state;
+-        char *key;
+-
+-        key = gsd_keyboard_get_hostname_key ();
+-        if (!key)
+-                return NUMLOCK_STATE_UNKNOWN;
+-
+-        curr_state = g_settings_get_boolean (settings, key);
+-
+-        g_free (key);
+-
+-        return curr_state;
+-}
+-
+-static void
+-numlock_set_gsettings_state (GSettings   *settings,
+-                             NumLockState new_state)
+-{
+-        char *key;
+-
+-        if (new_state != NUMLOCK_STATE_ON && new_state != NUMLOCK_STATE_OFF) {
+-                return;
+-        }
+-
+-        key = gsd_keyboard_get_hostname_key ();
+-        if (key) {
+-                g_settings_set_boolean (settings, key, new_state);
+-                g_free (key);
+-        }
+-}
+-
+ static GdkFilterReturn
+ numlock_xkb_callback (GdkXEvent *xev_,
+                       GdkEvent  *gdkev_,
+@@ -225,7 +158,7 @@
+                         unsigned num_mask = numlock_NumLock_modifier_mask ();
+                         unsigned locked_mods = xkbev->state.locked_mods;
+                         int numlock_state = !! (num_mask & locked_mods);
+-                        numlock_set_gsettings_state (manager->priv->settings, numlock_state);
++                        g_settings_set_enum (manager->priv->settings, KEY_NUMLOCK_STATE, numlock_state);
+                 }
+         }
+         return GDK_FILTER_CONTINUE;
+@@ -320,7 +253,7 @@
+ 
+ #ifdef HAVE_X11_EXTENSIONS_XKB_H
+         if (manager->priv->have_xkb && rnumlock) {
+-                numlock_set_xkb_state (numlock_get_gsettings_state (manager->priv->settings));
++                numlock_set_xkb_state (g_settings_get_enum (manager->priv->settings, KEY_NUMLOCK_STATE));
+         }
+ #endif /* HAVE_X11_EXTENSIONS_XKB_H */
+ 
