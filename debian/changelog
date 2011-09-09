@@ -1,9 +1,9 @@
-gnome-settings-daemon (3.1.91-0ubuntu4) UNRELEASED; urgency=low
+gnome-settings-daemon (3.1.91-0ubuntu4) oneiric; urgency=low
 
   * debian/patches/00git_numlock_status.patch:
     - git backport, store the numlock status and apply it (lp: #841748)
 
- -- Sebastien Bacher <seb128@ubuntu.com>  Fri, 09 Sep 2011 13:05:02 +0200
+ -- Sebastien Bacher <seb128@ubuntu.com>  Fri, 09 Sep 2011 15:16:09 +0200
 
 gnome-settings-daemon (3.1.91-0ubuntu3) oneiric; urgency=low
 
