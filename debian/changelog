@@ -3,9 +3,11 @@ gnome-settings-daemon (3.0.3-1) UNRELEASED; urgency=low
   [ Jean Schurger ]
   * New upstream release.
   * Removed 01_numlock.patch (b-g-o #631989 is fixed)
+  * Added 01_medias_keys_dont_go_up_to_11.patch
   * debian/control.in
     - Standards-Version is 3.9.2, no changes needed.
     - Added dependencied to enable the update plugin (packagekit)
+    - Bumped pulseaudio dependency according to the volume patch
 
   [ Josselin Mouette ]
   * Move g-s-d-dev to libdevel. Closes: #640125.
