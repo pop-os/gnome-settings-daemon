@@ -1,3 +1,10 @@
+gnome-settings-daemon (3.1.91-0ubuntu5) oneiric; urgency=low
+
+  * debian/patches/00git_disconnect_callbacks.patch:
+    - Disconnect callbacks when cleaning up (LP: #837373)
+
+ -- Rodrigo Moya <rodrigo.moya@canonical.com>  Tue, 13 Sep 2011 11:00:41 +0200
+
 gnome-settings-daemon (3.1.91-0ubuntu4) oneiric; urgency=low
 
   * debian/patches/00git_numlock_status.patch:
