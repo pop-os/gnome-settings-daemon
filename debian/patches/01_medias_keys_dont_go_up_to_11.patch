@@ -1,0 +1,67 @@
+From: http://git.gnome.org/browse/gnome-settings-daemon/commit/plugins/media-keys/gsd-media-keys-manager.c?id=2d436da432d1dfb00eb98ed075ded8b4a4574af2
+Revert patch from bug https://bugzilla.gnome.org/show_bug.cgi?id=631030
+We don't actually want to go to 11 and allow users
+to blindly get into software amplification territory.
+diff -uNr gnome-settings-daemon-3.0.3.orig/plugins/media-keys/gsd-media-keys-manager.c gnome-settings-daemon-3.0.3/plugins/media-keys/gsd-media-keys-manager.c
+--- gnome-settings-daemon-3.0.3.orig/plugins/media-keys/gsd-media-keys-manager.c	2011-08-25 05:46:50.000000000 -0400
++++ gnome-settings-daemon-3.0.3/plugins/media-keys/gsd-media-keys-manager.c	2011-09-13 16:01:48.260981453 -0400
+@@ -80,10 +80,7 @@
+ #define HIGH_CONTRAST "HighContrast"
+ 
+ #define VOLUME_STEP 6           /* percents for one volume button press */
+-/* FIXME: Remove when PA 0.9.23 is used */
+-#ifndef PA_VOLUME_UI_MAX
+-#define PA_VOLUME_UI_MAX pa_sw_volume_from_dB(+11.0)
+-#endif
++#define MAX_VOLUME 65536.0
+ 
+ #define GSD_MEDIA_KEYS_MANAGER_GET_PRIVATE(o) (G_TYPE_INSTANCE_GET_PRIVATE ((o), GSD_TYPE_MEDIA_KEYS_MANAGER, GsdMediaKeysManagerPrivate))
+ 
+@@ -627,11 +624,10 @@
+ static void
+ update_dialog (GsdMediaKeysManager *manager,
+                guint vol,
+-               guint max_vol,
+                gboolean muted,
+                gboolean sound_changed)
+ {
+-        vol = (int) (100 * (double) vol / (double) max_vol);
++        vol = (int) (100 * (double) vol / PA_VOLUME_NORM);
+         vol = CLAMP (vol, 0, 100);
+ 
+         dialog_init (manager);
+@@ -655,14 +651,13 @@
+                  int                  type)
+ {
+         gboolean old_muted, new_muted;
+-        guint old_vol, new_vol, max_vol, norm_vol_step;
++        guint old_vol, new_vol, norm_vol_step;
+         gboolean sound_changed;
+ 
+         if (manager->priv->stream == NULL)
+                 return;
+ 
+-        max_vol = gvc_mixer_stream_get_can_decibel (manager->priv->stream) ? PA_VOLUME_UI_MAX : PA_VOLUME_NORM;
+-        norm_vol_step = max_vol * VOLUME_STEP / 100;
++        norm_vol_step = PA_VOLUME_NORM * VOLUME_STEP / 100;
+ 
+         /* FIXME: this is racy */
+         new_vol = old_vol = gvc_mixer_stream_get_volume (manager->priv->stream);
+@@ -685,7 +680,7 @@
+                 new_muted = FALSE;
+                 /* When coming out of mute only increase the volume if it was 0 */
+                 if (!old_muted || old_vol == 0)
+-                        new_vol = MIN (old_vol + norm_vol_step, max_vol);
++                        new_vol = MIN (old_vol + norm_vol_step, MAX_VOLUME);
+                 break;
+         }
+ 
+@@ -701,7 +696,7 @@
+                 }
+         }
+ 
+-        update_dialog (manager, new_vol, max_vol, new_muted, sound_changed);
++        update_dialog (manager, new_vol, new_muted, sound_changed);
+ }
+ 
+ static void
