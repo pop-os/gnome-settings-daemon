@@ -1,8 +1,16 @@
-gnome-settings-daemon (3.0.2-2) UNRELEASED; urgency=low
+gnome-settings-daemon (3.0.3-1) UNRELEASED; urgency=low
 
+  [ Jean Schurger ]
+  * New upstream release.
+  * Removed 01_numlock.patch (b-g-o #631989 is fixed)
+  * debian/control.in
+    - Standards-Version is 3.9.2, no changes needed.
+    - Added dependencied to enable the update plugin (packagekit)
+
+  [ Josselin Mouette ]
   * Move g-s-d-dev to libdevel. Closes: #640125.
 
- -- Josselin Mouette <joss@debian.org>  Fri, 02 Sep 2011 23:54:20 +0200
+ -- Jean Schurger <jean@schurger.org>  Tue, 13 Sep 2011 11:08:37 -0400
 
 gnome-settings-daemon (3.0.2-1) experimental; urgency=low
 

@@ -7,7 +7,7 @@ Source: gnome-settings-daemon
 Section: gnome
 Priority: optional
 Maintainer: Debian GNOME Maintainers <pkg-gnome-maintainers@lists.alioth.debian.org>
-Uploaders: Emilio Pozuelo Monfort <pochu@debian.org>, Frederic Peters <fpeters@debian.org>, Sjoerd Simons <sjoerd@debian.org>
+Uploaders: Emilio Pozuelo Monfort <pochu@debian.org>, Frederic Peters <fpeters@debian.org>, Josselin Mouette <joss@debian.org>, Sjoerd Simons <sjoerd@debian.org>
 Build-Depends: cdbs,
                debhelper (>= 5),
                gnome-pkg-tools,
@@ -33,8 +33,11 @@ Build-Depends: cdbs,
                libpulse-dev (>= 0.9.16),
                libcanberra-gtk3-dev,
                libcups2-dev,
-               libpolkit-gobject-1-dev
-Standards-Version: 3.9.1
+               libpolkit-gobject-1-dev,
+               libpackagekit-glib2-14 (>= 0.6.4),
+               libupower-glib-dev (>= 0.9.1),
+               libgudev-1.0-dev
+Standards-Version: 3.9.2
 Vcs-Browser: http://svn.debian.org/wsvn/pkg-gnome/desktop/unstable/gnome-settings-daemon/
 Vcs-Svn: svn://svn.debian.org/svn/pkg-gnome/desktop/unstable/gnome-settings-daemon/
 
