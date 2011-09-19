@@ -1,3 +1,19 @@
+gnome-settings-daemon (3.1.92-0ubuntu1) oneiric; urgency=low
+
+  * New upstream release
+  * debian/control:
+    - Bump libcolord-dev build dependency
+  * debian/patches/00git_guard_against_division_by_0.patch:
+  * debian/patches/00git_dont_crash_if_session_not_ready.patch:
+  * debian/patches/00git_numlock_status.patch:
+  * debian/patches/00git_disconnect_callbacks.patch:
+    - Remove upstream patches
+  * debian/patches/06_use_application_indicator.patch:
+  * debian/patches/16_use_synchronous_notifications.patch:
+    - Rebased
+
+ -- Rodrigo Moya <rodrigo.moya@canonical.com>  Mon, 19 Sep 2011 17:05:48 +0200
+
 gnome-settings-daemon (3.1.91-0ubuntu5) oneiric; urgency=low
 
   * debian/patches/00git_disconnect_callbacks.patch:

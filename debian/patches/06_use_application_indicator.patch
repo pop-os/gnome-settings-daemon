@@ -1,9 +1,9 @@
 --- a/configure.ac
 +++ b/configure.ac
-@@ -53,6 +53,7 @@ GCONF_REQUIRED_VERSION=2.6.1
- GIO_REQUIRED_VERSION=2.26.0
+@@ -54,6 +54,7 @@ GCONF_REQUIRED_VERSION=2.6.1
  GNOME_DESKTOP_REQUIRED_VERSION=3.1.5
  LIBNOTIFY_REQUIRED_VERSION=0.7.3
+ UPOWER_GLIB_REQUIRED_VERSION=0.9.1
 +APPINDICATOR_REQUIRED_VERSION=0.3.0
  
  EXTRA_COMPILE_WARNINGS(yes)
@@ -182,7 +182,7 @@
  
                  manager->priv->status_icon = gtk_status_icon_new_from_icon_name ("preferences-desktop-accessibility");
 @@ -1168,6 +1224,7 @@ gsd_a11y_keyboard_manager_ensure_status_
-                                   G_CALLBACK (on_status_icon_activate),
+                                   G_CALLBACK (on_status_icon_popup_menu),
                                    manager);
          }
 +#endif
@@ -1110,13 +1110,13 @@
  	$(PLUGIN_CFLAGS)		\
  	$(SETTINGS_PLUGIN_CFLAGS)	\
 +	$(APPINDICATOR_CFLAGS)		\
- 	$(LIBGNOMEKBDUI_CFLAGS)		\
+ 	$(KEYBOARD_CFLAGS)		\
  	$(AM_CFLAGS)
  
 @@ -47,6 +50,7 @@ libkeyboard_la_LIBADD  = 	\
  	$(SETTINGS_PLUGIN_LIBS)	\
  	$(XF86MISC_LIBS)	\
- 	$(LIBGNOMEKBDUI_LIBS)	\
+ 	$(KEYBOARD_LIBS)	\
 +	$(APPINDICATOR_LIBS)	\
  	$(NULL)
  
