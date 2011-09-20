@@ -1,3 +1,16 @@
+gnome-settings-daemon (3.1.92-0ubuntu2) oneiric; urgency=low
+
+  * debian/patches/45_suppress-printer-may-not-be-connected-notification.patch:
+    Do not show notifications if the printer state reason "connecting-to-device"
+    is reported by CUPS. The text of this state reason notificatioon is the
+    misleading "Printer XXX may not be connected" and the reason is set in
+    every print job (usually only for a short time but enough to trigger the
+    notifier). As we are after UI freeze we simply suppress this notification
+    with this patch (do not forward upstream). The real fix would be improving
+    the text, like really saying "Connecting to printer XXX ..." (LP: #842768).
+
+ -- Till Kamppeter <till.kamppeter@gmail.com>  Thu, 15 Sep 2011 18:34:24 +0200
+
 gnome-settings-daemon (3.1.92-0ubuntu1) oneiric; urgency=low
 
   * New upstream release
