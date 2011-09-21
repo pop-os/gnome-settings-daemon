@@ -8,3 +8,6 @@
 42_onlyshowin_unity.patch
 43_disable_locale_settings.patch
 45_suppress-printer-may-not-be-connected-notification.patch
+46_share_rr_screen.patch
+47_delay_pa_connect_to_idle.patch
+48_register_client_before_idle_callbacks.patch

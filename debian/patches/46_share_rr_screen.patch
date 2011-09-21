@@ -1,0 +1,60 @@
+Index: gnome-settings-daemon-3.1.92/plugins/color/gsd-color-manager.c
+===================================================================
+--- gnome-settings-daemon-3.1.92.orig/plugins/color/gsd-color-manager.c	2011-09-20 00:48:53.025729237 +0100
++++ gnome-settings-daemon-3.1.92/plugins/color/gsd-color-manager.c	2011-09-20 00:49:28.455728607 +0100
+@@ -1436,7 +1436,14 @@
+         gnome_settings_profile_start (NULL);
+ 
+         /* coldplug the list of screens */
+-        priv->x11_screen = gnome_rr_screen_new (gdk_screen_get_default (), error);
++        manager->priv->x11_screen = g_object_get_data (gdk_screen_get_default (), "gnome-rr-screen");
++        if (manager->priv->x11_screen) {
++                g_object_ref (manager->priv->x11_screen);
++        } else {
++                manager->priv->x11_screen = gnome_rr_screen_new (gdk_screen_get_default (), error);
++                g_object_set_data_full (gdk_screen_get_default (), "gnome-rr-screen",
++                                        g_object_ref (manager->priv->x11_screen), (GDestroyNotify) g_object_unref);
++        }
+         if (priv->x11_screen == NULL)
+                 goto out;
+ 
+Index: gnome-settings-daemon-3.1.92/plugins/power/gsd-power-manager.c
+===================================================================
+--- gnome-settings-daemon-3.1.92.orig/plugins/power/gsd-power-manager.c	2011-09-20 00:47:15.115730977 +0100
++++ gnome-settings-daemon-3.1.92/plugins/power/gsd-power-manager.c	2011-09-20 00:48:42.525729425 +0100
+@@ -3422,7 +3422,14 @@
+                           G_CALLBACK (idle_idletime_alarm_expired_cb), manager);
+ 
+         /* coldplug the list of screens */
+-        manager->priv->x11_screen = gnome_rr_screen_new (gdk_screen_get_default (), error);
++        manager->priv->x11_screen = g_object_get_data (gdk_screen_get_default (), "gnome-rr-screen");
++        if (manager->priv->x11_screen) {
++                g_object_ref (manager->priv->x11_screen);
++        } else {
++                manager->priv->x11_screen = gnome_rr_screen_new (gdk_screen_get_default (), error);
++                g_object_set_data_full (gdk_screen_get_default (), "gnome-rr-screen",
++                                        g_object_ref (manager->priv->x11_screen), (GDestroyNotify) g_object_unref);
++        }
+         if (manager->priv->x11_screen == NULL)
+                 return FALSE;
+ 
+Index: gnome-settings-daemon-3.1.92/plugins/xrandr/gsd-xrandr-manager.c
+===================================================================
+--- gnome-settings-daemon-3.1.92.orig/plugins/xrandr/gsd-xrandr-manager.c	2011-09-20 00:37:59.305740853 +0100
++++ gnome-settings-daemon-3.1.92/plugins/xrandr/gsd-xrandr-manager.c	2011-09-20 00:46:13.015732080 +0100
+@@ -1860,7 +1860,14 @@
+         log_open ();
+         log_msg ("------------------------------------------------------------\nSTARTING XRANDR PLUGIN\n");
+ 
+-        manager->priv->rw_screen = gnome_rr_screen_new (gdk_screen_get_default (), error);
++        manager->priv->rw_screen = g_object_get_data (gdk_screen_get_default (), "gnome-rr-screen");
++        if (manager->priv->rw_screen) {
++                g_object_ref (manager->priv->rw_screen);
++        } else {
++                manager->priv->rw_screen = gnome_rr_screen_new (gdk_screen_get_default (), error);
++                g_object_set_data_full (gdk_screen_get_default (), "gnome-rr-screen",
++                                        g_object_ref (manager->priv->rw_screen), (GDestroyNotify) g_object_unref);
++        }
+         g_signal_connect (manager->priv->rw_screen, "changed", G_CALLBACK (on_randr_event), manager);
+ 
+         if (manager->priv->rw_screen == NULL) {

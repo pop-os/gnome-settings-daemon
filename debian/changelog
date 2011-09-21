@@ -1,3 +1,22 @@
+gnome-settings-daemon (3.1.92-0ubuntu3) UNRELEASED; urgency=low
+
+  * Fix LP: #854101 - various startup time improvements
+  * debian/patches/46_share_rr_screen.patch:
+    - Share a single GnomeRRScreen across plugins by attaching it to the
+      default GdkScreen, rather than having the xrandr, color and power plugins
+      create their own, which results in 3 reprobes before running the
+      main loop
+  * debian/patches/47_delay_pa_connect_to_idle.patch:
+    - Don't connect to pulseaudio until we are running the main loop. Starting
+      pulseaudio seems to block for around a second here on my machine
+  * debian/patches/48_register_client_before_idle_callbacks.patch:
+    - Create the GDBusProxy for gnome-session synchronously, and then schedule
+      the RegisterClient call with a higher priority. This ensures that we
+      register with the session manager as soon as we start the main loop, and
+      before running any other idle callbacks
+
+ -- Chris Coulson <chris.coulson@canonical.com>  Wed, 21 Sep 2011 11:23:56 +0100
+
 gnome-settings-daemon (3.1.92-0ubuntu2) oneiric; urgency=low
 
   * debian/patches/45_suppress-printer-may-not-be-connected-notification.patch:
