@@ -1,60 +1,114 @@
+Index: gnome-settings-daemon-3.1.92/gnome-settings-daemon/Makefile.am
+===================================================================
+--- gnome-settings-daemon-3.1.92.orig/gnome-settings-daemon/Makefile.am	2011-09-19 15:20:28.000000000 +0100
++++ gnome-settings-daemon-3.1.92/gnome-settings-daemon/Makefile.am	2011-09-22 15:36:21.296894769 +0100
+@@ -8,7 +8,8 @@
+ 	$(WARN_CFLAGS)						\
+ 	$(DISABLE_DEPRECATED_CFLAGS)				\
+ 	$(SETTINGS_DAEMON_CFLAGS)				\
+-	$(LIBNOTIFY_CFLAGS)		\
++	$(LIBNOTIFY_CFLAGS)					\
++	$(GNOME_DESKTOP_CFLAGS)					\
+ 	$(NULL)
+ 
+ noinst_LTLIBRARIES = 			\
+@@ -74,6 +75,7 @@
+ 	libgsd-profile.la		\
+ 	$(SETTINGS_DAEMON_LIBS)		\
+ 	$(LIBNOTIFY_LIBS)		\
++	$(GNOME_DESKTOP_LIBS)		\
+ 	$(NULL)
+ 
+ 
+Index: gnome-settings-daemon-3.1.92/gnome-settings-daemon/gnome-settings-session.c
+===================================================================
+--- gnome-settings-daemon-3.1.92.orig/gnome-settings-daemon/gnome-settings-session.c	2011-09-19 15:20:28.000000000 +0100
++++ gnome-settings-daemon-3.1.92/gnome-settings-daemon/gnome-settings-session.c	2011-09-22 15:36:21.296894769 +0100
+@@ -308,3 +308,17 @@
+ 	return GNOME_SETTINGS_SESSION (session);
+ }
+ 
++GnomeRRScreen *
++gnome_settings_session_get_screen (GError **error)
++{
++	static GnomeRRScreen *screen = NULL;
++
++	if (screen != NULL)
++		return g_object_ref (screen);
++
++	screen = gnome_rr_screen_new (gdk_screen_get_default (), error);
++	if (screen != NULL)
++		g_object_add_weak_pointer (G_OBJECT (screen), (gpointer *) &screen);
++
++	return screen;
++}
+Index: gnome-settings-daemon-3.1.92/gnome-settings-daemon/gnome-settings-session.h
+===================================================================
+--- gnome-settings-daemon-3.1.92.orig/gnome-settings-daemon/gnome-settings-session.h	2011-09-19 15:20:28.000000000 +0100
++++ gnome-settings-daemon-3.1.92/gnome-settings-daemon/gnome-settings-session.h	2011-09-22 15:36:21.296894769 +0100
+@@ -24,6 +24,9 @@
+ 
+ #include <glib-object.h>
+ 
++#define GNOME_DESKTOP_USE_UNSTABLE_API
++#include <libgnome-desktop/gnome-rr.h>
++
+ G_BEGIN_DECLS
+ 
+ #define GNOME_TYPE_SETTINGS_SESSION		(gnome_settings_session_get_type ())
+@@ -58,6 +61,8 @@
+ GnomeSettingsSession	*gnome_settings_session_new		(void);
+ GnomeSettingsSessionState gnome_settings_session_get_state	(GnomeSettingsSession	*session);
+ 
++GnomeRRScreen           *gnome_settings_session_get_screen      (GError **error);
++
+ G_END_DECLS
+ 
+ #endif /* __GNOME_SETTINGS_SESSION_H */
 Index: gnome-settings-daemon-3.1.92/plugins/color/gsd-color-manager.c
 ===================================================================
---- gnome-settings-daemon-3.1.92.orig/plugins/color/gsd-color-manager.c	2011-09-20 00:48:53.025729237 +0100
-+++ gnome-settings-daemon-3.1.92/plugins/color/gsd-color-manager.c	2011-09-20 00:49:28.455728607 +0100
-@@ -1436,7 +1436,14 @@
+--- gnome-settings-daemon-3.1.92.orig/plugins/color/gsd-color-manager.c	2011-09-19 15:20:28.000000000 +0100
++++ gnome-settings-daemon-3.1.92/plugins/color/gsd-color-manager.c	2011-09-22 15:36:21.296894769 +0100
+@@ -1436,7 +1436,7 @@
          gnome_settings_profile_start (NULL);
  
          /* coldplug the list of screens */
 -        priv->x11_screen = gnome_rr_screen_new (gdk_screen_get_default (), error);
-+        manager->priv->x11_screen = g_object_get_data (gdk_screen_get_default (), "gnome-rr-screen");
-+        if (manager->priv->x11_screen) {
-+                g_object_ref (manager->priv->x11_screen);
-+        } else {
-+                manager->priv->x11_screen = gnome_rr_screen_new (gdk_screen_get_default (), error);
-+                g_object_set_data_full (gdk_screen_get_default (), "gnome-rr-screen",
-+                                        g_object_ref (manager->priv->x11_screen), (GDestroyNotify) g_object_unref);
-+        }
++        priv->x11_screen = gnome_settings_session_get_screen (error);
          if (priv->x11_screen == NULL)
                  goto out;
  
 Index: gnome-settings-daemon-3.1.92/plugins/power/gsd-power-manager.c
 ===================================================================
---- gnome-settings-daemon-3.1.92.orig/plugins/power/gsd-power-manager.c	2011-09-20 00:47:15.115730977 +0100
-+++ gnome-settings-daemon-3.1.92/plugins/power/gsd-power-manager.c	2011-09-20 00:48:42.525729425 +0100
-@@ -3422,7 +3422,14 @@
+--- gnome-settings-daemon-3.1.92.orig/plugins/power/gsd-power-manager.c	2011-09-19 15:20:28.000000000 +0100
++++ gnome-settings-daemon-3.1.92/plugins/power/gsd-power-manager.c	2011-09-22 15:36:21.296894769 +0100
+@@ -3422,7 +3422,7 @@
                            G_CALLBACK (idle_idletime_alarm_expired_cb), manager);
  
          /* coldplug the list of screens */
 -        manager->priv->x11_screen = gnome_rr_screen_new (gdk_screen_get_default (), error);
-+        manager->priv->x11_screen = g_object_get_data (gdk_screen_get_default (), "gnome-rr-screen");
-+        if (manager->priv->x11_screen) {
-+                g_object_ref (manager->priv->x11_screen);
-+        } else {
-+                manager->priv->x11_screen = gnome_rr_screen_new (gdk_screen_get_default (), error);
-+                g_object_set_data_full (gdk_screen_get_default (), "gnome-rr-screen",
-+                                        g_object_ref (manager->priv->x11_screen), (GDestroyNotify) g_object_unref);
-+        }
++        manager->priv->x11_screen = gnome_settings_session_get_screen (error);
          if (manager->priv->x11_screen == NULL)
                  return FALSE;
  
 Index: gnome-settings-daemon-3.1.92/plugins/xrandr/gsd-xrandr-manager.c
 ===================================================================
---- gnome-settings-daemon-3.1.92.orig/plugins/xrandr/gsd-xrandr-manager.c	2011-09-20 00:37:59.305740853 +0100
-+++ gnome-settings-daemon-3.1.92/plugins/xrandr/gsd-xrandr-manager.c	2011-09-20 00:46:13.015732080 +0100
-@@ -1860,7 +1860,14 @@
+--- gnome-settings-daemon-3.1.92.orig/plugins/xrandr/gsd-xrandr-manager.c	2011-09-07 11:29:58.000000000 +0100
++++ gnome-settings-daemon-3.1.92/plugins/xrandr/gsd-xrandr-manager.c	2011-09-22 15:37:44.526893290 +0100
+@@ -48,6 +48,7 @@
+ #include "gsd-enums.h"
+ #include "gsd-input-helper.h"
+ #include "gnome-settings-profile.h"
++#include "gnome-settings-session.h"
+ #include "gsd-xrandr-manager.h"
+ 
+ #define GSD_XRANDR_MANAGER_GET_PRIVATE(o) (G_TYPE_INSTANCE_GET_PRIVATE ((o), GSD_TYPE_XRANDR_MANAGER, GsdXrandrManagerPrivate))
+@@ -1860,7 +1861,7 @@
          log_open ();
          log_msg ("------------------------------------------------------------\nSTARTING XRANDR PLUGIN\n");
  
 -        manager->priv->rw_screen = gnome_rr_screen_new (gdk_screen_get_default (), error);
-+        manager->priv->rw_screen = g_object_get_data (gdk_screen_get_default (), "gnome-rr-screen");
-+        if (manager->priv->rw_screen) {
-+                g_object_ref (manager->priv->rw_screen);
-+        } else {
-+                manager->priv->rw_screen = gnome_rr_screen_new (gdk_screen_get_default (), error);
-+                g_object_set_data_full (gdk_screen_get_default (), "gnome-rr-screen",
-+                                        g_object_ref (manager->priv->rw_screen), (GDestroyNotify) g_object_unref);
-+        }
++        manager->priv->rw_screen = gnome_settings_session_get_screen (error);
          g_signal_connect (manager->priv->rw_screen, "changed", G_CALLBACK (on_randr_event), manager);
  
          if (manager->priv->rw_screen == NULL) {
