@@ -1,4 +1,4 @@
-gnome-settings-daemon (3.1.92-0ubuntu3) UNRELEASED; urgency=low
+gnome-settings-daemon (3.1.92-0ubuntu3) oneiric; urgency=low
 
   * Fix LP: #854101 - various startup time improvements:
   * debian/patches/46_share_rr_screen.patch:
@@ -18,7 +18,7 @@ gnome-settings-daemon (3.1.92-0ubuntu3) UNRELEASED; urgency=low
   * debian/patches/16_use_synchronous_notifications.patch:
     - Make the volume notifications work correctly again
 
- -- Chris Coulson <chris.coulson@canonical.com>  Thu, 22 Sep 2011 15:41:46 +0100
+ -- Chris Coulson <chris.coulson@canonical.com>  Thu, 22 Sep 2011 15:44:40 +0100
 
 gnome-settings-daemon (3.1.92-0ubuntu2) oneiric; urgency=low
 
