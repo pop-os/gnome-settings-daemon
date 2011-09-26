@@ -1,3 +1,13 @@
+gnome-settings-daemon (3.2.0-0ubuntu1) oneiric; urgency=low
+
+  * New upstream release
+  * debian/patches/00git_dont_restore_brightness.patch:
+    - Don't restore brightness if it's never been set
+  * debian/patches/00git_fix_reference_leaks.patch:
+    - Fix 2 small reference leaks
+
+ -- Rodrigo Moya <rodrigo.moya@canonical.com>  Mon, 26 Sep 2011 17:57:20 +0200
+
 gnome-settings-daemon (3.1.92-0ubuntu3) oneiric; urgency=low
 
   * Fix LP: #854101 - various startup time improvements:
