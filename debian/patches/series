@@ -13,3 +13,4 @@
 46_share_rr_screen.patch
 47_delay_pa_connect_to_idle.patch
 48_register_client_before_idle_callbacks.patch
+49_fix_suspend_media_key.patch

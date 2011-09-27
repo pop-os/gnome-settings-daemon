@@ -1,3 +1,10 @@
+gnome-settings-daemon (3.2.0-0ubuntu2) oneiric; urgency=low
+
+  * debian/patches/49_fix_suspend_media_key.patch: Fix screen locking when
+    suspending via a media key. (LP: #859498)
+
+ -- Marc Deslauriers <marc.deslauriers@ubuntu.com>  Tue, 27 Sep 2011 11:34:03 -0400
+
 gnome-settings-daemon (3.2.0-0ubuntu1) oneiric; urgency=low
 
   * New upstream release
