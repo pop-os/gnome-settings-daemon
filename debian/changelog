@@ -1,3 +1,12 @@
+gnome-settings-daemon (3.2.0-0ubuntu3) UNRELEASED; urgency=low
+
+  * debian/patches/00git_fix_async_dbus_crash.patch:
+    - Fix async DBus calls crashes (LP: #832603)
+  * debian/patches/49_fix_suspend_media_key.patch:
+    - Rebased
+
+ -- Rodrigo Moya <rodrigo.moya@canonical.com>  Wed, 28 Sep 2011 17:14:53 +0200
+
 gnome-settings-daemon (3.2.0-0ubuntu2) oneiric; urgency=low
 
   * debian/patches/49_fix_suspend_media_key.patch: Fix screen locking when

@@ -17,9 +17,9 @@ Index: gnome-settings-daemon-3.2.0/plugins/media-keys/gsd-media-keys-manager.c
  static const gchar introspection_xml[] =
  "<node>"
  "  <interface name='org.gnome.SettingsDaemon.MediaKeys'>"
-@@ -133,6 +137,7 @@
-         GDBusNodeInfo   *introspection_data;
+@@ -132,6 +136,7 @@
          GDBusConnection *connection;
+         GCancellable    *bus_cancellable;
          GDBusProxy      *xrandr_proxy;
 +        GDBusProxy      *upower_proxy;
          GCancellable    *cancellable;
