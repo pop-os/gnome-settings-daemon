@@ -1,0 +1,136 @@
+Description: Fix screen locking when suspending via a media key
+Author: Marc Deslauriers <marc.deslauriers@canonical.com>
+Bug-Ubuntu: https://bugs.launchpad.net/ubuntu/+source/gnome-settings-daemon/+bug/859498
+
+Index: gnome-settings-daemon-3.2.0/plugins/media-keys/gsd-media-keys-manager.c
+===================================================================
+--- gnome-settings-daemon-3.2.0.orig/plugins/media-keys/gsd-media-keys-manager.c	2011-09-27 11:36:12.619180915 -0400
++++ gnome-settings-daemon-3.2.0/plugins/media-keys/gsd-media-keys-manager.c	2011-09-27 11:49:08.563200783 -0400
+@@ -69,6 +69,10 @@
+ #define GNOME_SESSION_DBUS_PATH "/org/gnome/SessionManager"
+ #define GNOME_SESSION_DBUS_INTERFACE "org.gnome.SessionManager"
+ 
++#define UPOWER_DBUS_NAME "org.freedesktop.UPower"
++#define UPOWER_DBUS_PATH "/org/freedesktop/UPower"
++#define UPOWER_DBUS_INTERFACE "org.freedesktop.UPower"
++
+ static const gchar introspection_xml[] =
+ "<node>"
+ "  <interface name='org.gnome.SettingsDaemon.MediaKeys'>"
+@@ -133,6 +137,7 @@
+         GDBusNodeInfo   *introspection_data;
+         GDBusConnection *connection;
+         GDBusProxy      *xrandr_proxy;
++        GDBusProxy      *upower_proxy;
+         GCancellable    *cancellable;
+ 
+         guint            start_idle_id;
+@@ -1423,6 +1428,42 @@
+ }
+ 
+ static void
++upower_sleep_cb (GObject *source_object,
++                 GAsyncResult *res,
++                 gpointer user_data)
++{
++        GVariant *result;
++        GError *error = NULL;
++
++        result = g_dbus_proxy_call_finish (G_DBUS_PROXY (source_object),
++                                           res,
++                                           &error);
++        if (result == NULL) {
++                g_warning ("couldn't sleep using UPower: %s",
++                           error->message);
++                g_error_free (error);
++        } else {
++                g_variant_unref (result);
++        }
++}
++
++static void
++power_proxy_ready_cb (GObject             *source_object,
++                      GAsyncResult        *res,
++                      gpointer             user_data)
++{
++        GError *error = NULL;
++        GsdMediaKeysManager *manager = GSD_MEDIA_KEYS_MANAGER (user_data);
++
++        manager->priv->upower_proxy = g_dbus_proxy_new_for_bus_finish (res, &error);
++        if (manager->priv->upower_proxy == NULL) {
++                g_warning ("Could not connect to UPower: %s",
++                           error->message);
++                g_error_free (error);
++        }
++}
++
++static void
+ do_config_power_action (GsdMediaKeysManager *manager,
+                         const gchar *config_key)
+ {
+@@ -1434,25 +1475,23 @@
+                                            config_key);
+         switch (action_type) {
+         case GSD_POWER_ACTION_SUSPEND:
+-                ret = up_client_suspend_sync (manager->priv->up_client,
+-                                              NULL, &error);
+-                if (!ret) {
+-                        g_warning ("failed to suspend: %s",
+-                                   error->message);
+-                        g_error_free (error);
+-                }
++                g_dbus_proxy_call (manager->priv->upower_proxy,
++                        "Suspend",
++                        NULL,
++                        G_DBUS_CALL_FLAGS_NONE,
++                        -1, NULL,
++                        upower_sleep_cb, NULL);
+                 break;
+         case GSD_POWER_ACTION_INTERACTIVE:
+                 gnome_session_shutdown ();
+                 break;
+         case GSD_POWER_ACTION_HIBERNATE:
+-                ret = up_client_hibernate_sync (manager->priv->up_client,
+-                                                NULL, &error);
+-                if (!ret) {
+-                        g_warning ("failed to suspend: %s",
+-                                   error->message);
+-                        g_error_free (error);
+-                }
++                g_dbus_proxy_call (manager->priv->upower_proxy,
++                        "Suspend",
++                        NULL,
++                        G_DBUS_CALL_FLAGS_NONE,
++                        -1, NULL,
++                        upower_sleep_cb, NULL);
+                 break;
+         case GSD_POWER_ACTION_SHUTDOWN:
+         case GSD_POWER_ACTION_BLANK:
+@@ -2143,6 +2182,17 @@
+ gsd_media_keys_manager_init (GsdMediaKeysManager *manager)
+ {
+         manager->priv = GSD_MEDIA_KEYS_MANAGER_GET_PRIVATE (manager);
++
++        /* connect to UPower for async power operations */
++        g_dbus_proxy_new_for_bus (G_BUS_TYPE_SYSTEM,
++                                  G_DBUS_PROXY_FLAGS_DO_NOT_LOAD_PROPERTIES,
++                                  NULL,
++                                  UPOWER_DBUS_NAME,
++                                  UPOWER_DBUS_PATH,
++                                  UPOWER_DBUS_INTERFACE,
++                                  NULL,
++                                  power_proxy_ready_cb,
++                                  manager);
+ }
+ 
+ static void
+@@ -2160,6 +2210,9 @@
+         if (media_keys_manager->priv->start_idle_id != 0)
+                 g_source_remove (media_keys_manager->priv->start_idle_id);
+ 
++        if (media_keys_manager->priv->upower_proxy != NULL)
++                g_object_unref (media_keys_manager->priv->upower_proxy);
++
+         G_OBJECT_CLASS (gsd_media_keys_manager_parent_class)->finalize (object);
+ }
+ 
