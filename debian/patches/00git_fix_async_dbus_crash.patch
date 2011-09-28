@@ -1,5 +1,5 @@
 diff --git a/plugins/media-keys/gsd-media-keys-manager.c b/plugins/media-keys/gsd-media-keys-manager.c
-index c2ddf96..4991e8b 100644
+index c2ddf96..522bf1e 100644
 --- a/plugins/media-keys/gsd-media-keys-manager.c
 +++ b/plugins/media-keys/gsd-media-keys-manager.c
 @@ -130,6 +130,7 @@ struct GsdMediaKeysManagerPrivate
@@ -27,7 +27,7 @@ index c2ddf96..4991e8b 100644
          GDBusConnection *connection;
          GError *error = NULL;
  
-+        if (manager->priv->bus_cancellable != NULL &&
++        if (manager->priv->bus_cancellable == NULL ||
 +            g_cancellable_is_cancelled (manager->priv->bus_cancellable)) {
 +                g_warning ("Operation has been cancelled, so not retrieving session bus");
 +                return;
@@ -50,7 +50,7 @@ index c2ddf96..4991e8b 100644
                     manager);
  }
 diff --git a/plugins/power/gsd-power-manager.c b/plugins/power/gsd-power-manager.c
-index d786977..e316f8f 100644
+index d786977..370d90d 100644
 --- a/plugins/power/gsd-power-manager.c
 +++ b/plugins/power/gsd-power-manager.c
 @@ -157,6 +157,7 @@ struct GsdPowerManagerPrivate
@@ -78,7 +78,7 @@ index d786977..e316f8f 100644
          GError *error = NULL;
          guint i;
  
-+        if (manager->priv->bus_cancellable != NULL &&
++        if (manager->priv->bus_cancellable == NULL ||
 +            g_cancellable_is_cancelled (manager->priv->bus_cancellable)) {
 +                g_warning ("Operation has been cancelled, so not retrieving session bus");
 +                return;
@@ -101,7 +101,7 @@ index d786977..e316f8f 100644
                     manager);
  }
 diff --git a/plugins/xrandr/gsd-xrandr-manager.c b/plugins/xrandr/gsd-xrandr-manager.c
-index 4ccf5d1..d7bb709 100644
+index 4ccf5d1..8b12ddd 100644
 --- a/plugins/xrandr/gsd-xrandr-manager.c
 +++ b/plugins/xrandr/gsd-xrandr-manager.c
 @@ -104,6 +104,7 @@ struct GsdXrandrManagerPrivate
@@ -129,7 +129,7 @@ index 4ccf5d1..d7bb709 100644
          GDBusConnection *connection;
          GError *error = NULL;
  
-+        if (manager->priv->bus_cancellable != NULL &&
++        if (manager->priv->bus_cancellable == NULL ||
 +            g_cancellable_is_cancelled (manager->priv->bus_cancellable)) {
 +                g_warning ("Operation has been cancelled, so not retrieving session bus");
 +                return;
