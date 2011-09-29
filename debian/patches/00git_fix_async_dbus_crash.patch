@@ -1,3 +1,15 @@
+From 573889e0be2f39f894dfaebedf72b6ae4b626554 Mon Sep 17 00:00:00 2001
+From: Rodrigo Moya <rodrigo@gnome-db.org>
+Date: Thu, 29 Sep 2011 11:57:12 +0200
+Subject: [PATCH] power, media-keys, xrandr: Use a GCancellable for g_bus_get
+ calls so that they can be cancelled
+
+---
+ plugins/media-keys/gsd-media-keys-manager.c |   16 +++++++++++++++-
+ plugins/power/gsd-power-manager.c           |   16 +++++++++++++++-
+ plugins/xrandr/gsd-xrandr-manager.c         |   16 +++++++++++++++-
+ 3 files changed, 45 insertions(+), 3 deletions(-)
+
 diff --git a/plugins/media-keys/gsd-media-keys-manager.c b/plugins/media-keys/gsd-media-keys-manager.c
 index c2ddf96..522bf1e 100644
 --- a/plugins/media-keys/gsd-media-keys-manager.c
@@ -151,3 +163,6 @@ index 4ccf5d1..8b12ddd 100644
                     (GAsyncReadyCallback) on_bus_gotten,
                     manager);
  }
+-- 
+1.7.5.4
+

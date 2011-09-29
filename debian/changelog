@@ -1,4 +1,4 @@
-gnome-settings-daemon (3.2.0-0ubuntu3) UNRELEASED; urgency=low
+gnome-settings-daemon (3.2.0-0ubuntu3) oneiric; urgency=low
 
   * debian/patches/00git_fix_async_dbus_crash.patch:
     - Fix async DBus calls crashes (LP: #832603)
