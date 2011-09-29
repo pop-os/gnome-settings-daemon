@@ -1,3 +1,12 @@
+gnome-settings-daemon (3.2.0-0ubuntu4) UNRELEASED; urgency=low
+
+  * debian/patches/00git_dont_sleep_on_idle_by_default.patch:
+    - Don't sleep on idle by default (LP: #860485)
+  * debian/patches/00git_dont_revert_pre_idle_brigthness.patch:
+    - Do not revert to the pre-idle brightness if idle dimming is disabled
+
+ -- Rodrigo Moya <rodrigo.moya@canonical.com>  Thu, 29 Sep 2011 16:47:57 +0200
+
 gnome-settings-daemon (3.2.0-0ubuntu3) oneiric; urgency=low
 
   * debian/patches/00git_fix_async_dbus_crash.patch:
