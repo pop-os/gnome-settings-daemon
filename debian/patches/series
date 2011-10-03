@@ -19,3 +19,4 @@
 48_register_client_before_idle_callbacks.patch
 49_fix_suspend_media_key.patch
 50_add_dell_backlight.patch
+51_always_lock_screen_on_suspend.patch

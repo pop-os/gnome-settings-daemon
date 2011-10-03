@@ -1,0 +1,24 @@
+Description: always lock the screen when suspending or hibernating, even if
+ automatic screen lock is disabled.
+Author: Marc Deslauriers <marc.deslauriers@canonical.com>
+Forwarded: no, likely a Ubuntu-specific preference
+Bug-Ubuntu: https://bugs.launchpad.net/ubuntu/+source/gnome-session/+bug/847814
+
+Index: gnome-settings-daemon-3.2.0/plugins/power/gsd-power-manager.c
+===================================================================
+--- gnome-settings-daemon-3.2.0.orig/plugins/power/gsd-power-manager.c	2011-10-03 17:05:09.336601122 -0400
++++ gnome-settings-daemon-3.2.0/plugins/power/gsd-power-manager.c	2011-10-03 17:05:30.964601678 -0400
+@@ -3190,13 +3190,6 @@
+                         UpSleepKind sleep_kind,
+                         GsdPowerManager *manager)
+ {
+-        gboolean do_lock;
+-
+-        do_lock = g_settings_get_boolean (manager->priv->settings_screensaver,
+-                                          "lock-enabled");
+-        if (!do_lock)
+-                return;
+-
+         if (manager->priv->screensaver_proxy != NULL) {
+                 g_debug ("doing gnome-screensaver lock");
+                 g_dbus_proxy_call (manager->priv->screensaver_proxy,
