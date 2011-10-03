@@ -1,5 +1,5 @@
---- gsd-backlight-helper.c	2011-09-29 17:01:47.124496714 +0200
-+++ gsd-backlight-helper.c.new	2011-09-29 17:01:41.656469599 +0200
+--- gnome-settings-daemon-3.2.0/plugins/power/gsd-backlight-helper.c	2011-09-29 17:01:47.124496714 +0200
++++ gnome-settings-daemon-3.2.0/plugins/power/gsd-backlight-helper.c.new	2011-09-29 17:01:41.656469599 +0200
 @@ -53,6 +53,7 @@ gsd_backlight_helper_get_best_backlight
  		"toshiba",
  		"eeepc",

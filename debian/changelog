@@ -1,4 +1,4 @@
-gnome-settings-daemon (3.2.0-0ubuntu4) UNRELEASED; urgency=low
+gnome-settings-daemon (3.2.0-0ubuntu4) oneiric; urgency=low
 
   * debian/patches/00git_dont_sleep_on_idle_by_default.patch:
     - Don't sleep on idle by default (LP: #860485)
