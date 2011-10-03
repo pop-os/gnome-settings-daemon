@@ -1,0 +1,22 @@
+diff --git a/plugins/power/gsd-power-manager.c b/plugins/power/gsd-power-manager.c
+index 370d90d..7c03752 100644
+--- a/plugins/power/gsd-power-manager.c
++++ b/plugins/power/gsd-power-manager.c
+@@ -2936,11 +2936,13 @@ idle_evaluate (GsdPowerManager *manager)
+         /* only do the sleep timeout when the session is idle
+          * and we aren't inhibited from sleeping */
+         if (on_battery) {
+-                timeout_sleep = g_settings_get_int (manager->priv->settings,
+-                                                    "sleep-inactive-battery-timeout");
++                timeout_sleep = g_settings_get_boolean (manager->priv->settings, "sleep-inactive-battery") ?
++                        g_settings_get_int (manager->priv->settings, "sleep-inactive-battery-timeout") :
++                        0;
+         } else {
+-                timeout_sleep = g_settings_get_int (manager->priv->settings,
+-                                                    "sleep-inactive-ac-timeout");
++                timeout_sleep = g_settings_get_boolean (manager->priv->settings, "sleep-inactive-ac") ?
++                        g_settings_get_int (manager->priv->settings, "sleep-inactive-ac-timeout") :
++                        0;
+         }
+         if (manager->priv->timeout_sleep_id == 0 &&
+             timeout_sleep != 0) {

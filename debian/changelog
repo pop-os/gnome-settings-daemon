@@ -1,3 +1,11 @@
+gnome-settings-daemon (3.2.0-0ubuntu5) UNRELEASED; urgency=low
+
+  * debian/patches/11_avoid_undesired_sleeps.patch:
+    - Avoid sleeping the computer when disabled (LP: #864479) and ditto for
+      the display (LP: #863038)
+
+ -- Rodrigo Moya <rodrigo.moya@canonical.com>  Mon, 03 Oct 2011 16:43:40 +0200
+
 gnome-settings-daemon (3.2.0-0ubuntu4) oneiric; urgency=low
 
   * debian/patches/00git_dont_sleep_on_idle_by_default.patch:

@@ -7,6 +7,7 @@
 05_disable_corner_tapping.patch
 06_use_application_indicator.patch
 10_smaller_syndaemon_timeout.patch
+11_avoid_undesired_sleeps.patch
 16_use_synchronous_notifications.patch
 20_migrate_background_uri.patch
 40_xres_lcddefault.patch
