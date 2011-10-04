@@ -3,11 +3,11 @@
 00git_fix_async_dbus_crash.patch
 00git_dont_sleep_on_idle_by_default.patch
 00git_dont_revert_pre_idle_brigthness.patch
+00git_avoid_undesired_sleeps.patch
 02_missing_libs.patch
 05_disable_corner_tapping.patch
 06_use_application_indicator.patch
 10_smaller_syndaemon_timeout.patch
-11_avoid_undesired_sleeps.patch
 16_use_synchronous_notifications.patch
 20_migrate_background_uri.patch
 40_xres_lcddefault.patch
