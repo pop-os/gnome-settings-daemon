@@ -1,4 +1,4 @@
-gnome-settings-daemon (3.0.3-1) UNRELEASED; urgency=low
+gnome-settings-daemon (3.0.3-1) experimental; urgency=low
 
   [ Jean Schurger ]
   * New upstream release.
@@ -12,7 +12,10 @@ gnome-settings-daemon (3.0.3-1) UNRELEASED; urgency=low
   [ Josselin Mouette ]
   * Move g-s-d-dev to libdevel. Closes: #640125.
 
- -- Jean Schurger <jean@schurger.org>  Tue, 13 Sep 2011 11:08:37 -0400
+  [ Jordi Mallach ]
+  * Update Vcs-* fields to new URLs.
+
+ -- Jordi Mallach <jordi@debian.org>  Wed, 05 Oct 2011 19:26:19 +0200
 
 gnome-settings-daemon (3.0.2-1) experimental; urgency=low
 
