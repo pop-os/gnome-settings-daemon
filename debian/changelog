@@ -4,6 +4,7 @@ gnome-settings-daemon (3.0.3-1) experimental; urgency=low
   * New upstream release.
   * Removed 01_numlock.patch (b-g-o #631989 is fixed)
   * Added 01_medias_keys_dont_go_up_to_11.patch
+  * Added 02_missing_format.patch
   * debian/control.in
     - Standards-Version is 3.9.2, no changes needed.
     - Added dependencied to enable the update plugin (packagekit)

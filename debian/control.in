@@ -29,7 +29,7 @@ Build-Depends: cdbs,
                libcanberra-gtk3-dev,
                libcups2-dev,
                libpolkit-gobject-1-dev,
-               libpackagekit-glib2-14 (>= 0.6.4),
+               libpackagekit-glib2-dev (>= 0.6.4),
                libupower-glib-dev (>= 0.9.1),
                libgudev-1.0-dev
 Standards-Version: 3.9.2
