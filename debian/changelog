@@ -1,4 +1,4 @@
-gnome-settings-daemon (3.0.3-1) experimental; urgency=low
+gnome-settings-daemon (3.0.3-1) UNRELEASED; urgency=low
 
   [ Jean Schurger ]
   * New upstream release.
@@ -16,7 +16,10 @@ gnome-settings-daemon (3.0.3-1) experimental; urgency=low
   [ Jordi Mallach ]
   * Update Vcs-* fields to new URLs.
 
- -- Jordi Mallach <jordi@debian.org>  Wed, 05 Oct 2011 19:26:19 +0200
+  [ Michael Biebl ]
+  * Upload to unstable.
+
+ -- Michael Biebl <biebl@debian.org>  Fri, 14 Oct 2011 13:11:50 +0200
 
 gnome-settings-daemon (3.0.2-1) experimental; urgency=low
 
