@@ -1,4 +1,4 @@
-gnome-settings-daemon (3.0.3-1) UNRELEASED; urgency=low
+gnome-settings-daemon (3.0.3-1) unstable; urgency=low
 
   [ Jean Schurger ]
   * New upstream release.
@@ -25,7 +25,7 @@ gnome-settings-daemon (3.0.3-1) UNRELEASED; urgency=low
     - Update Build-Depends on debhelper.
     - Strip debian/tmp/ from .install files.
 
- -- Michael Biebl <biebl@debian.org>  Fri, 14 Oct 2011 13:11:50 +0200
+ -- Michael Biebl <biebl@debian.org>  Fri, 14 Oct 2011 13:17:13 +0200
 
 gnome-settings-daemon (3.0.2-1) experimental; urgency=low
 
