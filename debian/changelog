@@ -166,6 +166,22 @@ gnome-settings-daemon (2.91.5.1-1) experimental; urgency=low
 
  -- Sjoerd Simons <sjoerd@debian.org>  Sat, 11 Dec 2010 16:20:56 +0000
 
+gnome-settings-daemon (2.30.2-4) unstable; urgency=low
+
+  * Update for libnotify 0.7. Closes: #630277
+    - Bump Build-Depends on libnotify-dev to (>= 0.7.0).
+    - Add debian/patches/14_libnotify_0.7.patch.
+
+ -- Michael Biebl <biebl@debian.org>  Tue, 02 Aug 2011 05:14:40 +0200
+
+gnome-settings-daemon (2.30.2-3) unstable; urgency=low
+
+  * 11_retry-startup.patch: when starting the Xsettings manager, try 
+    again several times because there is a race condition on the X side.
+    Closes: #614682.
+
+ -- Josselin Mouette <joss@debian.org>  Sat, 09 Apr 2011 12:29:30 +0200
+
 gnome-settings-daemon (2.30.2-2) unstable; urgency=low
 
   * 13_monitor_kfreebsd.patch: new patch. Don’t monitor fdescfs.
