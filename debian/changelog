@@ -1,3 +1,171 @@
+gnome-settings-daemon (3.0.3-1) experimental; urgency=low
+
+  [ Jean Schurger ]
+  * New upstream release.
+  * Removed 01_numlock.patch (b-g-o #631989 is fixed)
+  * Added 01_medias_keys_dont_go_up_to_11.patch
+  * Added 02_missing_format.patch
+  * debian/control.in
+    - Standards-Version is 3.9.2, no changes needed.
+    - Added dependencied to enable the update plugin (packagekit)
+    - Bumped pulseaudio dependency according to the volume patch
+
+  [ Josselin Mouette ]
+  * Move g-s-d-dev to libdevel. Closes: #640125.
+
+  [ Jordi Mallach ]
+  * Update Vcs-* fields to new URLs.
+
+ -- Jordi Mallach <jordi@debian.org>  Wed, 05 Oct 2011 19:26:19 +0200
+
+gnome-settings-daemon (3.0.2-1) experimental; urgency=low
+
+  [ Guido Günther ]
+  * Bump build-dependency on libgnome-desktop-3-dev (Closes: #622689)
+
+  [ Josselin Mouette ]
+  * Break gdm3 < version with GSettings support.
+  * New upstream release.
+  * 01_numlock.patch: new patch. Work around the lack of support for 
+    per-host NumLock status by providing at least a global setting. It 
+    can turn wrong in multi-host environments, but it’s better than 
+    nothing in the general case.
+
+ -- Josselin Mouette <joss@debian.org>  Sat, 04 Jun 2011 18:33:11 +0200
+
+gnome-settings-daemon (3.0.0.1-1) experimental; urgency=low
+
+  * New upstream release.
+
+ -- Frederic Peters <fpeters@debian.org>  Mon, 28 Mar 2011 11:37:24 +0530
+
+gnome-settings-daemon (2.91.93-1) experimental; urgency=low
+
+  * New upstream release.
+
+ -- Frederic Peters <fpeters@debian.org>  Sun, 27 Mar 2011 19:15:59 +0530
+
+gnome-settings-daemon (2.91.92-1) experimental; urgency=low
+
+  * New upstream release.
+
+ -- Frederic Peters <fpeters@debian.org>  Wed, 23 Mar 2011 19:24:48 +0100
+
+gnome-settings-daemon (2.91.91-1) experimental; urgency=low
+
+  [Frederic Peters]
+  * New upstream release.
+
+  [Emilio Pozuelo Monfort]
+  * debian/control.in:
+    + Re-add build dependency on libxklavier-dev, since configure.ac
+      actually requires it.
+
+ -- Frederic Peters <fpeters@debian.org>  Tue, 08 Mar 2011 19:17:09 +0100
+
+gnome-settings-daemon (2.91.90-2) experimental; urgency=low
+
+  * debian/control.in:
+    * Add build-dep on recent libgnomekbd-dev
+    * Remove direct build-depend on libxklavier-dev, libgnomekbd-dev will pull
+      in the right version
+
+ -- Sjoerd Simons <sjoerd@debian.org>  Sat, 26 Feb 2011 21:26:07 +0000
+
+gnome-settings-daemon (2.91.90-1) experimental; urgency=low
+
+  * New upstream release.
+    - gnome-settings-daemon.install: keybindings for accessibility tools
+      have been moved to the gnome-control-center module.
+
+ -- Frederic Peters <fpeters@debian.org>  Tue, 22 Feb 2011 22:49:26 +0100
+
+gnome-settings-daemon (2.91.9-1) experimental; urgency=low
+
+  [ Sebastien Bacher ]
+  * debian/gnome-settings-daemon.install:
+    - install the polkit files there
+  * debian/control.in:
+    - build-depends on libpolkit-gobject-1-dev
+    - drop the build-depends on libxrandr-dev and libxrender-dev, the 
+      configure doesn't use those in the new version
+    - recommends pulseaudio since it's used for the multimedia keys
+    (Close: #611198)
+
+  [ Emilio Pozuelo Monfort ]
+  * debian/patches/02_missing_libs.patch:
+    + Removed. This was fixed upstream in a different way a long time
+      ago. The patch was also disabled on 2.91.5.1-1 without any bad
+      consequences.
+  * New upstream release.
+    + d/patches/0001-Ensure-the-volume-doesn-t-underflow-and-wrap-around.patch,
+      d/patches/13_monitor_kfreebsd.patch:
+      - Removed, fixed upstream.
+    + debian/control.in:
+      - Updated build dependencies.
+      - Update the gtk+ 3 build dependency for the new package name.
+
+ -- Emilio Pozuelo Monfort <pochu@debian.org>  Sat, 19 Feb 2011 14:28:40 +0000
+
+gnome-settings-daemon (2.91.8-1) experimental; urgency=low
+
+  [ Sjoerd Simons ]
+  * Enable pulseaudio support
+  * Enable the settings d-conf <-> gconf bridge
+  * d/p/0001-Ensure-the-volume-doesn-t-underflow-and-wrap-around.patch
+    + Added. Fix a bug where it was possible to lower the volume below zero,
+      causing it to wrap-around to MAXUINT.
+
+  [ Emilio Pozuelo Monfort ]
+  * New upstream release.
+    + debian/control.in:
+      - Update build dependencies.
+  * debian/rules:
+    - Remove duplicated list-missing target and utils.mk include.
+    - Include autoreconf.mk before debhelper.mk to not leave cruft when
+      running clean.
+  * debian/control.in:
+    - Standards-Version is 3.9.1, no changes needed.
+    - Drop old Replaces.
+
+ -- Emilio Pozuelo Monfort <pochu@debian.org>  Wed, 12 Jan 2011 22:48:04 +0000
+
+gnome-settings-daemon (2.91.5.1-2) experimental; urgency=low
+
+  * Make the nautilus-data depend versioned
+
+ -- Sjoerd Simons <sjoerd@debian.org>  Sun, 12 Dec 2010 14:32:07 +0000
+
+gnome-settings-daemon (2.91.5.1-1) experimental; urgency=low
+
+  * New upstream release
+  * debian/control.in: Update build-depends to gnome 3.0 versions
+  * debian/patches/01_xrdb.patch
+    - Removed. g-s-d no longer manages xrdb
+  * debian/patches/03_maintainer_mode.patch
+    - Removed. Fixed upstream
+  * debian/patches/10_clipboard_crash.patch
+    - Removed. Fixed upstream.
+  * debian/patches/12_monitor_network_fs.patch
+    - Removed. Fixed upstream
+  * debian/patches/13_monitor_kfreebsd.patch
+    - Updated
+  * debian/patches/20_gstreamer.patch
+    - Removed. Time to move to pulseaudio by default...
+  * debian/patches/30_pkgconfig-path.patch:
+    - Removed. Fixed upstream
+  * debian/patches/70_relibtoolize.patch
+    - Removed, moving to dh_autoreconf
+  * debian/patches/99_ltmain_as-needed.patch
+    - Removed, moving to dh_autoreconf
+  * debian/gnome-settings-daemon.install
+    - Updated
+  * Switch to dh_autoreconf and trigger list-missing
+  * Make gnome-settings-daemon depends on gsettings-desktop-schemas and
+    nautilus-data to pull in the necessary schema files.
+
+ -- Sjoerd Simons <sjoerd@debian.org>  Sat, 11 Dec 2010 16:20:56 +0000
+
 gnome-settings-daemon (2.30.2-4) unstable; urgency=low
 
   * Update for libnotify 0.7. Closes: #630277

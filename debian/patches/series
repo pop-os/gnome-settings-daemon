@@ -1,12 +1,2 @@
-01_xrdb.patch
-02_missing_libs.patch
-03_maintainer_mode.patch
-10_clipboard_crash.patch
-11_retry-startup.patch
-12_monitor_network_fs.patch
-13_monitor_kfreebsd.patch
-14_libnotify_0.7.patch
-20_gstreamer.patch
-30_pkgconfig-path.patch
-70_relibtoolize.patch
-99_ltmain_as-needed.patch
+01_medias_keys_dont_go_up_to_11.patch
+02_missing_format.patch
