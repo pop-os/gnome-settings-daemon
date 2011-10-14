@@ -21,6 +21,9 @@ gnome-settings-daemon (3.0.3-1) UNRELEASED; urgency=low
   * debian/watch:
     - Switch to version 3.
     - Track .xz tarballs.
+  * Bump debhelper compatibility level to 8.
+    - Update Build-Depends on debhelper.
+    - Strip debian/tmp/ from .install files.
 
  -- Michael Biebl <biebl@debian.org>  Fri, 14 Oct 2011 13:11:50 +0200
 

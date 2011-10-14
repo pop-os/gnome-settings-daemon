@@ -1,10 +1,10 @@
-debian/tmp/etc/xdg/autostart /usr/share/gnome
-debian/tmp/etc/dbus-1
-debian/tmp/usr/lib/gnome-settings-daemon*
-debian/tmp/usr/share/icons
-debian/tmp/usr/share/locale
-debian/tmp/usr/share/gnome-settings-daemon
-debian/tmp/usr/share/dbus-1
-debian/tmp/usr/share/GConf
-debian/tmp/usr/share/glib-2.0
-debian/tmp/usr/share/polkit-1
+etc/xdg/autostart /usr/share/gnome
+etc/dbus-1
+usr/lib/gnome-settings-daemon*
+usr/share/icons
+usr/share/locale
+usr/share/gnome-settings-daemon
+usr/share/dbus-1
+usr/share/GConf
+usr/share/glib-2.0
+usr/share/polkit-1
