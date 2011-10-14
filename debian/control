@@ -36,7 +36,7 @@ Build-Depends: cdbs,
                libpolkit-gobject-1-dev,
                libpackagekit-glib2-dev (>= 0.6.4),
                libupower-glib-dev (>= 0.9.1),
-               libgudev-1.0-dev
+               libgudev-1.0-dev [linux-any]
 Standards-Version: 3.9.2
 Vcs-Browser: http://anonscm.debian.org/viewvc/pkg-gnome/desktop/unstable/gnome-settings-daemon/
 Vcs-Svn: svn://anonscm.debian.org/svn/pkg-gnome/desktop/unstable/gnome-settings-daemon/
