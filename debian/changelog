@@ -1,3 +1,12 @@
+gnome-settings-daemon (3.0.3-3) UNRELEASED; urgency=low
+
+  * debian/patches/03_deal_with_absence_of_gnome-session.patch:
+    - Deal with absence of gnome-session gracefully and don't crash if
+      gnome-session is not running. Patch cherry-picked from upstream Git.
+      Closes: #645429
+
+ -- Michael Biebl <biebl@debian.org>  Mon, 17 Oct 2011 17:35:22 +0200
+
 gnome-settings-daemon (3.0.3-2) unstable; urgency=low
 
   * debian/control.in:
