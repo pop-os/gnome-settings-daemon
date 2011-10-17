@@ -10,3 +10,5 @@ dpkg-maintscript-helper rm_conffile /etc/gnome/config/Emacs.ad 3.0.3-2 gnome-set
 dpkg-maintscript-helper rm_conffile /etc/gnome/config/Motif.ad 3.0.3-2 gnome-settings-daemon -- "$@"
 dpkg-maintscript-helper rm_conffile /etc/gnome/config/General.ad 3.0.3-2 gnome-settings-daemon -- "$@"
 dpkg-maintscript-helper rm_conffile /etc/gnome/config/Xaw.ad 3.0.3-2 gnome-settings-daemon -- "$@"
+
+#DEBHELPER#

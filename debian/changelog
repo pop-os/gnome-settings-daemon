@@ -4,7 +4,8 @@ gnome-settings-daemon (3.0.3-3) UNRELEASED; urgency=low
     - Deal with absence of gnome-session gracefully and don't crash if
       gnome-session is not running. Patch cherry-picked from upstream Git.
       Closes: #645429
-  * Remove obsolete conffiles in /etc/gnome/config on upgrades. Closes: 645443
+  * Remove obsolete conffiles in /etc/gnome/config on upgrades.
+    Closes: #645443
 
  -- Michael Biebl <biebl@debian.org>  Mon, 17 Oct 2011 17:35:22 +0200
 

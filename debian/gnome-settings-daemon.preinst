@@ -12,3 +12,5 @@ if dpkg-maintscript-helper supports rm_conffile; then
   dpkg-maintscript-helper rm_conffile /etc/gnome/config/General.ad 3.0.3-2 gnome-settings-daemon -- "$@"
   dpkg-maintscript-helper rm_conffile /etc/gnome/config/Xaw.ad 3.0.3-2 gnome-settings-daemon -- "$@"
 fi
+
+#DEBHELPER#
