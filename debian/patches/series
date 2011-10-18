@@ -1,9 +1,3 @@
-00git_dont_restore_brightness.patch
-00git_fix_reference_leaks.patch
-00git_fix_async_dbus_crash.patch
-00git_dont_sleep_on_idle_by_default.patch
-00git_dont_revert_pre_idle_brigthness.patch
-00git_avoid_undesired_sleeps.patch
 02_missing_libs.patch
 05_disable_corner_tapping.patch
 06_use_application_indicator.patch
@@ -17,6 +11,5 @@
 46_share_rr_screen.patch
 47_delay_pa_connect_to_idle.patch
 48_register_client_before_idle_callbacks.patch
-49_fix_suspend_media_key.patch
 50_add_dell_backlight.patch
 51_always_lock_screen_on_suspend.patch

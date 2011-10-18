@@ -6,8 +6,8 @@ Index: gnome-settings-daemon-3.1.92/plugins/media-keys/gsd-media-keys-manager.c
 --- gnome-settings-daemon-3.1.92.orig/plugins/media-keys/gsd-media-keys-manager.c	2011-09-21 13:00:51.629796557 +0100
 +++ gnome-settings-daemon-3.1.92/plugins/media-keys/gsd-media-keys-manager.c	2011-09-21 13:08:23.793788522 +0100
 @@ -58,6 +58,8 @@
- 
- #include <libupower-glib/upower.h>
+ #include "gvc-mixer-control.h"
+ #endif /* HAVE_PULSE */
  
 +#include <libnotify/notify.h>
 +
@@ -184,13 +184,13 @@ Index: gnome-settings-daemon-3.1.92/plugins/media-keys/gsd-media-keys-manager.c
  {
 -        dialog_init (manager);
 -        gsd_media_keys_window_set_action_custom (GSD_MEDIA_KEYS_WINDOW (manager->priv->dialog),
--                                                 state ? "touchpad-enabled" : "touchpad-disabled",
+-                                                 state ? "input-touchpad-symbolic" : "touchpad-disabled-symbolic",
 -                                                 FALSE);
 -        dialog_show (manager);
 +        if (!ubuntu_osd_notification_show_icon ((!state) ? "touchpad-enabled" : "touchpad-disabled", "Touchpad")) {
 +                dialog_init (manager);
 +                gsd_media_keys_window_set_action_custom (GSD_MEDIA_KEYS_WINDOW (manager->priv->dialog),
-+                                                        state ? "touchpad-enabled" : "touchpad-disabled",
++                                                        state ? "input-touchpad-symbolic" : "touchpad-disabled-symbolic",
 +                                                        FALSE);
 +                dialog_show (manager);
 +        }

@@ -1,3 +1,19 @@
+gnome-settings-daemon (3.2.1-0ubuntu1) oneiric-proposed; urgency=low
+
+  * New upstream release (LP: #877326)
+  * debian/patches/00git_dont_restore_brightness.patch:
+  * debian/patches/00git_fix_reference_leaks.patch:
+  * debian/patches/00git_fix_async_dbus_crash.patch:
+  * debian/patches/00git_dont_sleep_on_idle_by_default.patch:
+  * debian/patches/00git_dont_revert_pre_idle_brigthness.patch:
+  * debian/patches/00git_avoid_undesired_sleeps.patch:
+  * debian/patches/49_fix_suspend_media_key.patch:
+    - Remove upstreamed patches
+  * debian/patches/16_use_synchronous_notifications.patch:
+    - Rebased
+
+ -- Rodrigo Moya <rodrigo.moya@canonical.com>  Tue, 18 Oct 2011 11:29:23 +0200
+
 gnome-settings-daemon (3.2.0-0ubuntu5) oneiric; urgency=low
 
   [ Rodrigo Moya ]
