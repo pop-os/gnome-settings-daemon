@@ -1,11 +1,16 @@
 gnome-settings-daemon (3.0.3-4) UNRELEASED; urgency=low
 
+  [ Michael Biebl ]
   * Use the new maintscript facility in dh_installdeb to remove the obsolete
     conffiles:
     - Bump Build-Depends on debhelper to (>= 8.1.0~).
     - Add Pre-Depends: ${misc:Pre-Depends}.
     - Replace preinst/postinst/postrm scripts with a
       gnome-settings-daemon.maintscript file.
+
+  [ Josselin Mouette ]
+  * 04_superP.patch: new patch. Allow to reconfigure the Super-P 
+    shortcut which is otherwise hardcoded to VIDEO_OUT.
 
  -- Michael Biebl <biebl@debian.org>  Wed, 19 Oct 2011 09:45:33 +0200
 
