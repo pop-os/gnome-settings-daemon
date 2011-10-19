@@ -1,3 +1,10 @@
+gnome-settings-daemon (3.2.1-0ubuntu2) UNRELEASED; urgency=low
+
+  * debian/patches/16_use_synchronous_notifications.patch:
+    - make our patch using the new icon name (LP: #877058)
+
+ -- Didier Roche <didrocks@ubuntu.com>  Wed, 19 Oct 2011 14:32:59 +0200
+
 gnome-settings-daemon (3.2.1-0ubuntu1) oneiric-proposed; urgency=low
 
   * New upstream release (LP: #877326)
