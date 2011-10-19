@@ -1,3 +1,4 @@
+git_correct_suspend_bus.patch
 02_missing_libs.patch
 05_disable_corner_tapping.patch
 06_use_application_indicator.patch

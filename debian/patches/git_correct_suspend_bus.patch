@@ -1,0 +1,52 @@
+From 16cb82282f74bca403e1d752997ed6614ff2e2b4 Mon Sep 17 00:00:00 2001
+From: Bastien Nocera <hadess@hadess.net>
+Date: Wed, 19 Oct 2011 12:46:18 +0000
+Subject: media-keys: Fix the suspend key not working
+
+We were trying to find UPower on the session bus instead of the
+system bus.
+
+Spotted by Sebastien Bacher <seb128@ubuntu.com>
+
+https://bugzilla.gnome.org/show_bug.cgi?id=660267#c3
+---
+diff --git a/plugins/media-keys/gsd-media-keys-manager.c b/plugins/media-keys/gsd-media-keys-manager.c
+index fbf0479..ffd8a76 100644
+--- a/plugins/media-keys/gsd-media-keys-manager.c
++++ b/plugins/media-keys/gsd-media-keys-manager.c
+@@ -2065,16 +2065,6 @@ on_bus_gotten (GObject             *source_object,
+                           NULL,
+                           (GAsyncReadyCallback) power_keyboard_ready_cb,
+                           manager);
+-
+-        g_dbus_proxy_new (manager->priv->connection,
+-                          G_DBUS_PROXY_FLAGS_NONE,
+-                          NULL,
+-                          "org.freedesktop.UPower",
+-                          "/org/freedesktop/UPower",
+-                          "org.freedesktop.UPower",
+-                          NULL,
+-                          (GAsyncReadyCallback) upower_ready_cb,
+-                          manager);
+ }
+ 
+ static void
+@@ -2088,6 +2078,16 @@ register_manager (GsdMediaKeysManager *manager)
+                    manager->priv->bus_cancellable,
+                    (GAsyncReadyCallback) on_bus_gotten,
+                    manager);
++
++        g_dbus_proxy_new_for_bus (G_BUS_TYPE_SYSTEM,
++                                  G_DBUS_PROXY_FLAGS_NONE,
++                                  NULL,
++                                  "org.freedesktop.UPower",
++                                  "/org/freedesktop/UPower",
++                                  "org.freedesktop.UPower",
++                                  NULL,
++                                  (GAsyncReadyCallback) upower_ready_cb,
++                                  manager);
+ }
+ 
+ GsdMediaKeysManager *
+--
+cgit v0.9.0.2
