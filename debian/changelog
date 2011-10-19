@@ -1,3 +1,14 @@
+gnome-settings-daemon (3.0.3-4) UNRELEASED; urgency=low
+
+  * Use the new maintscript facility in dh_installdeb to remove the obsolete
+    conffiles:
+    - Bump Build-Depends on debhelper to (>= 8.1.0~).
+    - Add Pre-Depends: ${misc:Pre-Depends}.
+    - Replace preinst/postinst/postrm scripts with a
+      gnome-bluetooth.maintscript file.
+
+ -- Michael Biebl <biebl@debian.org>  Wed, 19 Oct 2011 09:45:33 +0200
+
 gnome-settings-daemon (3.0.3-3) unstable; urgency=low
 
   * debian/patches/03_deal_with_absence_of_gnome-session.patch:

@@ -9,7 +9,7 @@ Priority: optional
 Maintainer: Debian GNOME Maintainers <pkg-gnome-maintainers@lists.alioth.debian.org>
 Uploaders: Frederic Peters <fpeters@debian.org>, Josselin Mouette <joss@debian.org>, Michael Biebl <biebl@debian.org>, Sjoerd Simons <sjoerd@debian.org>
 Build-Depends: cdbs,
-               debhelper (>= 8),
+               debhelper (>= 8.1.0~),
                gnome-pkg-tools,
                dh-autoreconf,
                autotools-dev,
@@ -43,6 +43,7 @@ Vcs-Svn: svn://anonscm.debian.org/svn/pkg-gnome/desktop/unstable/gnome-settings-
 
 Package: gnome-settings-daemon
 Architecture: any
+Pre-Depends: ${misc:Pre-Depends}
 Depends: ${shlibs:Depends},
          ${misc:Depends},
          libgnome2-common,
