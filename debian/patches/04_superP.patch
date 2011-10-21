@@ -1,6 +1,24 @@
---- gnome-settings-daemon-2.91.93/plugins/media-keys/acme.h.orig	2011-03-31 14:27:13.298838842 +0700
-+++ gnome-settings-daemon-2.91.93/plugins/media-keys/acme.h	2011-03-31 14:35:00.669362095 +0700
-@@ -47,11 +47,11 @@
+diff --git a/data/org.gnome.settings-daemon.plugins.media-keys.gschema.xml.in.in b/data/org.gnome.settings-daemon.plugins.media-keys.gschema.xml.in.in
+index 85438c5..c3ad6c0 100644
+--- a/data/org.gnome.settings-daemon.plugins.media-keys.gschema.xml.in.in
++++ b/data/org.gnome.settings-daemon.plugins.media-keys.gschema.xml.in.in
+@@ -80,6 +80,11 @@
+       <_summary>Stop playback</_summary>
+       <_description>Binding to stop playback.</_description>
+     </key>
++    <key name="video-out" type="s">
++      <default>'&lt;Super&gt;p'</default>
++      <_summary>Video output</_summary>
++      <_description>Binding to switch the video output device.</_description>
++    </key>
+     <key name="volume-down" type="s">
+       <default>'XF86AudioLowerVolume'</default>
+       <_summary>Volume down</_summary>
+diff --git a/plugins/media-keys/acme.h b/plugins/media-keys/acme.h
+index 54ec19b..028609a 100644
+--- a/plugins/media-keys/acme.h
++++ b/plugins/media-keys/acme.h
+@@ -51,11 +51,11 @@ typedef enum {
          STOP_KEY,
          PREVIOUS_KEY,
          NEXT_KEY,
@@ -13,7 +31,7 @@
          VIDEO_OUT2_KEY,
          ROTATE_VIDEO_KEY,
          MAGNIFIER_KEY,
-@@ -92,12 +92,12 @@
+@@ -110,12 +110,12 @@ static struct {
          { STOP_KEY, "stop", NULL, NULL },
          { PREVIOUS_KEY, "previous", NULL, NULL },
          { NEXT_KEY, "next", NULL, NULL },
@@ -27,17 +45,3 @@
          /* Key code of the XF86Display key (Fn-F7 on Thinkpads, Fn-F4 on HP machines, etc.) */
          { VIDEO_OUT2_KEY, NULL, "XF86Display", NULL },
          /* Key code of the XF86RotateWindows key (present on some tablets) */
---- gnome-settings-daemon-2.91.93/data/org.gnome.settings-daemon.plugins.media-keys.gschema.xml.in.in.orig	2011-03-31 14:44:11.845107222 +0700
-+++ gnome-settings-daemon-2.91.93/data/org.gnome.settings-daemon.plugins.media-keys.gschema.xml.in.in	2011-03-31 14:43:25.644063308 +0700
-@@ -90,6 +90,11 @@
-       <_summary>Toggle touchpad</_summary>
-       <_description>Binding to enable or disable the touchpad.</_description>
-     </key>
-+    <key name="video-out" type="s">
-+      <default>'&lt;Super&gt;p'</default>
-+      <_summary>Video output</_summary>
-+      <_description>Binding to switch the video output device.</_description>
-+    </key>
-     <key name="volume-down" type="s">
-       <default>'XF86AudioLowerVolume'</default>
-       <_summary>Volume down</_summary>

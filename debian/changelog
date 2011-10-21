@@ -1,4 +1,4 @@
-gnome-settings-daemon (3.0.3-4) UNRELEASED; urgency=low
+gnome-settings-daemon (3.2.1-1) UNRELEASED; urgency=low
 
   [ Michael Biebl ]
   * Use the new maintscript facility in dh_installdeb to remove the obsolete
@@ -12,7 +12,18 @@ gnome-settings-daemon (3.0.3-4) UNRELEASED; urgency=low
   * 04_superP.patch: new patch. Allow to reconfigure the Super-P 
     shortcut which is otherwise hardcoded to VIDEO_OUT.
 
- -- Michael Biebl <biebl@debian.org>  Wed, 19 Oct 2011 09:45:33 +0200
+  [ Sjoerd Simons ]
+  * New upstream release (3.2.1)
+  * debian/patches/01_medias_keys_dont_go_up_to_11.patch:
+    + Removed, merged upsteram
+  * debian/patches/02_missing_format.patch:
+    + Removed, fixed upstream
+  * debian/patches/03_deal_with_absence_of_gnome-session.patch:
+    + Removed, merged upstream
+  * debian/patches/04_superP.patch: Refreshed
+  * debian/control.in: Update build-depends
+
+ -- Sjoerd Simons <sjoerd@debian.org>  Fri, 21 Oct 2011 23:09:29 +0200
 
 gnome-settings-daemon (3.0.3-3) unstable; urgency=low
 
