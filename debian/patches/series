@@ -1,2 +1,4 @@
 01_medias_keys_dont_go_up_to_11.patch
 02_missing_format.patch
+03_deal_with_absence_of_gnome-session.patch
+04_superP.patch
