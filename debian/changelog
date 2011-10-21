@@ -1,4 +1,38 @@
-gnome-settings-daemon (3.0.3-1) experimental; urgency=low
+gnome-settings-daemon (3.0.3-4) UNRELEASED; urgency=low
+
+  [ Michael Biebl ]
+  * Use the new maintscript facility in dh_installdeb to remove the obsolete
+    conffiles:
+    - Bump Build-Depends on debhelper to (>= 8.1.0~).
+    - Add Pre-Depends: ${misc:Pre-Depends}.
+    - Replace preinst/postinst/postrm scripts with a
+      gnome-settings-daemon.maintscript file.
+
+  [ Josselin Mouette ]
+  * 04_superP.patch: new patch. Allow to reconfigure the Super-P 
+    shortcut which is otherwise hardcoded to VIDEO_OUT.
+
+ -- Michael Biebl <biebl@debian.org>  Wed, 19 Oct 2011 09:45:33 +0200
+
+gnome-settings-daemon (3.0.3-3) unstable; urgency=low
+
+  * debian/patches/03_deal_with_absence_of_gnome-session.patch:
+    - Deal with absence of gnome-session gracefully and don't crash if
+      gnome-session is not running. Patch cherry-picked from upstream Git.
+      Closes: #645429
+  * Remove obsolete conffiles in /etc/gnome/config on upgrades.
+    Closes: #645443
+
+ -- Michael Biebl <biebl@debian.org>  Mon, 17 Oct 2011 18:07:27 +0200
+
+gnome-settings-daemon (3.0.3-2) unstable; urgency=low
+
+  * debian/control.in:
+    - Make libgudev-1.0-dev linux-any.
+
+ -- Michael Biebl <biebl@debian.org>  Fri, 14 Oct 2011 16:14:37 +0200
+
+gnome-settings-daemon (3.0.3-1) unstable; urgency=low
 
   [ Jean Schurger ]
   * New upstream release.
@@ -16,7 +50,16 @@ gnome-settings-daemon (3.0.3-1) experimental; urgency=low
   [ Jordi Mallach ]
   * Update Vcs-* fields to new URLs.
 
- -- Jordi Mallach <jordi@debian.org>  Wed, 05 Oct 2011 19:26:19 +0200
+  [ Michael Biebl ]
+  * Upload to unstable.
+  * debian/watch:
+    - Switch to version 3.
+    - Track .xz tarballs.
+  * Bump debhelper compatibility level to 8.
+    - Update Build-Depends on debhelper.
+    - Strip debian/tmp/ from .install files.
+
+ -- Michael Biebl <biebl@debian.org>  Fri, 14 Oct 2011 13:17:13 +0200
 
 gnome-settings-daemon (3.0.2-1) experimental; urgency=low
 

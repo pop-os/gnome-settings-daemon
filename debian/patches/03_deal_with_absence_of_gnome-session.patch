@@ -1,0 +1,41 @@
+commit 5c931cd037cdcc9b5dbb48371b8edc993a8872c0
+Author: Matthias Clasen <mclasen@redhat.com>
+Date:   Mon May 2 14:23:53 2011 -0400
+
+    updates: deal with absence of gnome-session gracefully
+    
+    This was leading to crashes when g-s-d got started under xfce.
+    Reported and tested in
+    http://bugzilla.redhat.com/show_bug.cgi?id=698533
+
+diff --git a/plugins/updates/gsd-updates-refresh.c b/plugins/updates/gsd-updates-refresh.c
+index 15e6917..60d5f80 100644
+--- a/plugins/updates/gsd-updates-refresh.c
++++ b/plugins/updates/gsd-updates-refresh.c
+@@ -560,7 +560,7 @@ gsd_updates_refresh_init (GsdUpdatesRefresh *refresh)
+         /* use gnome-session for the idle detection */
+         refresh->priv->proxy_session =
+                 g_dbus_proxy_new_for_bus_sync (G_BUS_TYPE_SESSION,
+-                                               G_DBUS_PROXY_FLAGS_NONE,
++                                               G_DBUS_PROXY_FLAGS_DO_NOT_AUTO_START,
+                                                NULL, /* GDBusInterfaceInfo */
+                                                "org.gnome.SessionManager",
+                                                "/org/gnome/SessionManager/Presence",
+@@ -578,9 +578,14 @@ gsd_updates_refresh_init (GsdUpdatesRefresh *refresh)
+                                   refresh);
+                 status = g_dbus_proxy_get_cached_property (refresh->priv->proxy_session,
+                                                            "status");
+-                g_variant_get (status, "u", &status_code);
+-                refresh->priv->session_idle = (status_code == PRESENCE_STATUS_IDLE);
+-                g_variant_unref (status);
++                if (status) {
++                        g_variant_get (status, "u", &status_code);
++                        refresh->priv->session_idle = (status_code == PRESENCE_STATUS_IDLE);
++                        g_variant_unref (status);
++                }
++                else {
++                        refresh->priv->session_idle = FALSE;
++                }
+         }
+ 
+         /* we check this in case we miss one of the async signals */
