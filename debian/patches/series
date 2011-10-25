@@ -1,3 +1,4 @@
+00git_remove_assertions.patch
 git_correct_suspend_bus.patch
 02_missing_libs.patch
 05_disable_corner_tapping.patch
