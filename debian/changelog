@@ -22,8 +22,9 @@ gnome-settings-daemon (3.2.1-1) UNRELEASED; urgency=low
     + Removed, merged upstream
   * debian/patches/04_superP.patch: Refreshed
   * debian/control.in: Update build-depends
+  * debian/control.in: Add hwdata and libcolord-dev build-depends
 
- -- Sjoerd Simons <sjoerd@debian.org>  Fri, 21 Oct 2011 23:09:29 +0200
+ -- Sjoerd Simons <sjoerd@debian.org>  Tue, 25 Oct 2011 16:31:49 +0200
 
 gnome-settings-daemon (3.0.3-3) unstable; urgency=low
 
