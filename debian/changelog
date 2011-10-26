@@ -1,4 +1,4 @@
-gnome-settings-daemon (3.2.1-1) UNRELEASED; urgency=low
+gnome-settings-daemon (3.2.1-1) experimental; urgency=low
 
   [ Michael Biebl ]
   * Use the new maintscript facility in dh_installdeb to remove the obsolete
@@ -26,7 +26,7 @@ gnome-settings-daemon (3.2.1-1) UNRELEASED; urgency=low
   * debian/control.in: make gnome-settings-daemon recommend hwdata
   * debian/control.in: Make the gsettings-desktop-schemas depend more precise
 
- -- Sjoerd Simons <sjoerd@debian.org>  Wed, 26 Oct 2011 13:57:18 +0200
+ -- Sjoerd Simons <sjoerd@debian.org>  Wed, 26 Oct 2011 14:01:21 +0200
 
 gnome-settings-daemon (3.0.3-3) unstable; urgency=low
 
