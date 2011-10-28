@@ -1,4 +1,4 @@
-gnome-settings-daemon (3.2.1-0ubuntu3) UNRELEASED; urgency=low
+gnome-settings-daemon (3.2.1-0ubuntu3) oneiric-proposed; urgency=low
 
   * debian/patches/00git_remove_assertions.patch:
     - git patch to remove assertions that shouldn't be there (LP: #878486)
