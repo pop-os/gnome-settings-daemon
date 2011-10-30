@@ -33,7 +33,8 @@ Build-Depends: cdbs,
                libupower-glib-dev (>= 0.9.1),
                libgudev-1.0-dev [linux-any],
                libcolord-dev (>= 0.1.12),
-               hwdata (>= 0.227-1)
+               hwdata (>= 0.227-1),
+               liblcms2-dev
 Standards-Version: 3.9.2
 Vcs-Browser: http://anonscm.debian.org/viewvc/pkg-gnome/desktop/unstable/gnome-settings-daemon/
 Vcs-Svn: svn://anonscm.debian.org/svn/pkg-gnome/desktop/unstable/gnome-settings-daemon/
