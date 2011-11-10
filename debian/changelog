@@ -2,8 +2,9 @@ gnome-settings-daemon (3.2.1-2) UNRELEASED; urgency=low
 
   * debian/control.in: Add liblcms2-dev to the build-depends for display color
     management
+  * debian/gnome-settings-daemon.install: Also install the helper service files
 
- -- Sjoerd Simons <sjoerd@debian.org>  Sun, 30 Oct 2011 12:34:04 +0100
+ -- Sjoerd Simons <sjoerd@debian.org>  Thu, 10 Nov 2011 15:03:07 +0100
 
 gnome-settings-daemon (3.2.1-1) experimental; urgency=low
 
