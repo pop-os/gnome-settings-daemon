@@ -1,6 +1,6 @@
 --- a/plugins/print-notifications/gsd-print-notifications-manager.c
 +++ b/plugins/print-notifications/gsd-print-notifications-manager.c
-@@ -162,7 +162,7 @@
+@@ -279,7 +279,7 @@
          static const char * const reasons[] = {
                  "toner-low",
                  "toner-empty",
@@ -9,7 +9,7 @@
                  "cover-open",
                  "cups-missing-filter",
                  "door-open",
-@@ -179,7 +179,7 @@
+@@ -296,7 +296,7 @@
                  /* Translators: The printer has no toner left (same as in system-config-printer) */
                  N_("Toner empty"),
                  /* Translators: The printer is in the process of connecting to a shared network output device (same as in system-config-printer) */
@@ -17,8 +17,8 @@
 +                /*N_("Not connected?"),*/
                  /* Translators: One or more covers on the printer are open (same as in system-config-printer) */
                  N_("Cover open"),
-                 /* Trnaslators: A filter or backend is not installed (same as in system-config-printer) */
-@@ -205,7 +205,7 @@
+                 /* Translators: A filter or backend is not installed (same as in system-config-printer) */
+@@ -322,7 +322,7 @@
                  /* Translators: The printer has no toner left (same as in system-config-printer) */
                  N_("Printer '%s' has no toner left."),
                  /* Translators: The printer is in the process of connecting to a shared network output device (same as in system-config-printer) */
@@ -26,4 +26,4 @@
 +                /*N_("Printer '%s' may not be connected."),*/
                  /* Translators: One or more covers on the printer are open (same as in system-config-printer) */
                  N_("The cover is open on printer '%s'."),
-                 /* Trnaslators: A filter or backend is not installed (same as in system-config-printer) */
+                 /* Translators: A filter or backend is not installed (same as in system-config-printer) */

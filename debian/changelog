@@ -1,3 +1,15 @@
+gnome-settings-daemon (3.2.2-0ubuntu1) oneiric-proposed; urgency=low
+
+  * New upstream release (LP: #888526)
+  * debian/patches/00git_remove_assertions.patch:
+  * debian/patches/git_correct_suspend_bus.patch:
+    - Remove upstreamed patches
+  * debian/patches/16_use_synchronous_notifications.patch:
+  * debian/patches/45_suppress-printer-may-not-be-connected-notification.patch:
+    - Rebased
+
+ -- Rodrigo Moya <rodrigo.moya@canonical.com>  Thu, 10 Nov 2011 12:15:05 +0100
+
 gnome-settings-daemon (3.2.1-0ubuntu3) oneiric-proposed; urgency=low
 
   * debian/patches/00git_remove_assertions.patch:

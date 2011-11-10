@@ -214,7 +214,7 @@ Index: gnome-settings-daemon-3.1.92/plugins/media-keys/gsd-media-keys-manager.c
  
          dialog_init (manager);
          gsd_media_keys_window_set_volume_muted (GSD_MEDIA_KEYS_WINDOW (manager->priv->dialog),
-@@ -686,12 +821,26 @@
+@@ -686,13 +821,27 @@
                                            GSD_MEDIA_KEYS_WINDOW_ACTION_VOLUME);
          dialog_show (manager);
  
@@ -231,10 +231,11 @@ Index: gnome-settings-daemon-3.1.92/plugins/media-keys/gsd-media-keys-manager.c
 +                } else {
 +                        window = manager->priv->dialog;
 +                }
-+                ca_gtk_play_for_widget (window, 0,
++                ca_gtk_play_for_widget (manager->priv->dialog, 0,
                                          CA_PROP_EVENT_ID, "audio-volume-change",
                                          CA_PROP_EVENT_DESCRIPTION, "volume changed through key press",
                                          CA_PROP_APPLICATION_ID, "org.gnome.VolumeControl",
+                                         CA_PROP_CANBERRA_CACHE_CONTROL, "permanent",
                                          NULL);
 +
 +                if (!manager->priv->dialog)
