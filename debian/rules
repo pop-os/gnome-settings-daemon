@@ -7,7 +7,10 @@ include /usr/share/cdbs/1/class/gnome.mk
 include /usr/share/gnome-pkg-tools/1/rules/uploaders.mk
 include /usr/share/gnome-pkg-tools/1/rules/gnome-get-source.mk
 
-LDFLAGS += -Wl,-O1 -Wl,-z,defs -Wl,--warn-unresolved-symbols -Wl,--as-needed
+LDFLAGS += -Wl,-O1 -Wl,--warn-unresolved-symbols -Wl,--as-needed
+ifneq ($(DEB_HOST_ARCH_CPU),ia64)
+  LDFLAGS += -Wl,-z,defs
+endif
 
 DEB_DH_MAKESHLIBS_ARGS_ALL += --no-act
 DEB_CONFIGURE_EXTRA_FLAGS = --enable-pulse --enable-gconf-bridge

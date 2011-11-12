@@ -1,8 +1,14 @@
 gnome-settings-daemon (3.2.1-2) UNRELEASED; urgency=low
 
+  [ Sjoerd Simons ]
   * debian/control.in: Add liblcms2-dev to the build-depends for display color
     management
   * debian/gnome-settings-daemon.install: Also install the helper service files
+
+  [ Josselin Mouette ]
+  * Disable -z defs on ia64. This should really be avoided because it 
+    can cause runtime errors, but since binutils won’t be fixed it 
+    causes runtime errors anyway. Closes: #537572.
 
  -- Sjoerd Simons <sjoerd@debian.org>  Thu, 10 Nov 2011 15:03:07 +0100
 
