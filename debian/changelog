@@ -1,4 +1,4 @@
-gnome-settings-daemon (3.2.2-1) UNRELEASED; urgency=low
+gnome-settings-daemon (3.2.2-1) experimental; urgency=low
 
   [ Sjoerd Simons ]
   * New upstream release (3.2.2-1)
@@ -15,7 +15,7 @@ gnome-settings-daemon (3.2.2-1) UNRELEASED; urgency=low
   * Set -z,defs *before* setting --warn-unresolved-symbols in the linker flags
     otherwise the build will fail with unresolved symbol *errors*
 
- -- Sjoerd Simons <sjoerd@debian.org>  Sun, 13 Nov 2011 16:19:27 +0100
+ -- Sjoerd Simons <sjoerd@debian.org>  Sun, 13 Nov 2011 16:25:33 +0100
 
 gnome-settings-daemon (3.2.1-1) experimental; urgency=low
 
