@@ -1,6 +1,7 @@
-gnome-settings-daemon (3.2.1-2) UNRELEASED; urgency=low
+gnome-settings-daemon (3.2.2-1) UNRELEASED; urgency=low
 
   [ Sjoerd Simons ]
+  * New upstream release (3.2.2-1)
   * debian/control.in: Add liblcms2-dev to the build-depends for display color
     management
   * debian/gnome-settings-daemon.install: Also install the helper service files
