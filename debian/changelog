@@ -1,4 +1,4 @@
-gnome-settings-daemon (3.2.2-0ubuntu2) UNRELEASED; urgency=low
+gnome-settings-daemon (3.2.2-0ubuntu2) oneiric-proposed; urgency=low
 
   * debian/patches/07_hide_status_icon_on_unity.patch:
     - Never show the power status icon when running Unity (LP: #833397)
