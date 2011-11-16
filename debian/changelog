@@ -1,3 +1,9 @@
+gnome-settings-daemon (3.2.2-0ubuntu3) precise; urgency=low
+
+  * Upload for Precise
+
+ -- Rodrigo Moya <rodrigo.moya@canonical.com>  Wed, 16 Nov 2011 12:59:33 +0100
+
 gnome-settings-daemon (3.2.2-0ubuntu2) oneiric-proposed; urgency=low
 
   * debian/patches/07_hide_status_icon_on_unity.patch:
