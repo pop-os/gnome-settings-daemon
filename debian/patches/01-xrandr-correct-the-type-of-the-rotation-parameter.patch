@@ -1,0 +1,38 @@
+From 09d7867ba29221ae687371daf7da330c55ff9712 Mon Sep 17 00:00:00 2001
+From: Sjoerd Simons <sjoerd@luon.net>
+Date: Fri, 18 Nov 2011 23:55:08 +0000
+Subject: [PATCH] xrandr: correct the type of the rotation parameter
+
+GnomeRRRotation is an enum with only values >= 0, so it is likely to be
+made unsigned. As the rotation argument to handle_rotate_windows can be
+-1 to indicate ``next possible rotation'', rotation can't be a
+GnomeRRRotation as that won't be < 0...
+---
+ plugins/xrandr/gsd-xrandr-manager.c |    4 ++--
+ 1 files changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/plugins/xrandr/gsd-xrandr-manager.c b/plugins/xrandr/gsd-xrandr-manager.c
+index a989352..83913c6 100644
+--- a/plugins/xrandr/gsd-xrandr-manager.c
++++ b/plugins/xrandr/gsd-xrandr-manager.c
+@@ -135,7 +135,7 @@ static void get_allowed_rotations_for_output (GnomeRRConfig *config,
+                                               int *out_num_rotations,
+                                               GnomeRRRotation *out_rotations);
+ static void handle_fn_f7 (GsdXrandrManager *mgr, guint32 timestamp);
+-static void handle_rotate_windows (GsdXrandrManager *mgr, GnomeRRRotation rotation, guint32 timestamp);
++static void handle_rotate_windows (GsdXrandrManager *mgr, gint rotation, guint32 timestamp);
+ 
+ G_DEFINE_TYPE (GsdXrandrManager, gsd_xrandr_manager, G_TYPE_OBJECT)
+ 
+@@ -1414,7 +1414,7 @@ rotate_touchscreens (GsdXrandrManager *mgr,
+  */
+ static void
+ handle_rotate_windows (GsdXrandrManager *mgr,
+-                       GnomeRRRotation rotation,
++                       gint rotation,
+                        guint32 timestamp)
+ {
+         GsdXrandrManagerPrivate *priv = mgr->priv;
+-- 
+1.7.7.3
+

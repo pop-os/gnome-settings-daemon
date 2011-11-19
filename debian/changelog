@@ -1,3 +1,10 @@
+gnome-settings-daemon (3.2.2-2) UNRELEASED; urgency=low
+
+  * debian/patches/01-xrandr-correct-the-type-of-the-rotation-parameter.patch:
+    + Added, fix handling of XF86RotateWindows (bgo#664363)
+
+ -- Sjoerd Simons <sjoerd@debian.org>  Sat, 19 Nov 2011 00:07:53 +0000
+
 gnome-settings-daemon (3.2.2-1) experimental; urgency=low
 
   [ Sjoerd Simons ]
