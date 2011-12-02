@@ -1,9 +1,9 @@
-gnome-settings-daemon (3.2.2-0ubuntu4) UNRELEASED; urgency=low
+gnome-settings-daemon (3.2.2-0ubuntu4) precise; urgency=low
 
   * 42_onlyshowin_unity.patch: the gnome-shell session is called "gnome", use
     the correct name so nautilus doesn't open in shell sessions (lp: #892989)
 
- -- Sebastien Bacher <seb128@ubuntu.com>  Fri, 02 Dec 2011 12:11:01 +0100
+ -- Sebastien Bacher <seb128@ubuntu.com>  Fri, 02 Dec 2011 12:12:29 +0100
 
 gnome-settings-daemon (3.2.2-0ubuntu3) precise; urgency=low
 
