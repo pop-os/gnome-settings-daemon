@@ -14,4 +14,4 @@ diff -Nur gnome-settings-daemon-3.1.4.gnome/plugins/automount/gnome-fallback-mou
 +OnlyShowIn=GNOME;Unity;
  X-GNOME-Autostart-Notify=true
 -AutostartCondition=GNOME3 if-session gnome-fallback
-+AutostartCondition=GNOME3 unless-session gnome-shell
++AutostartCondition=GNOME3 unless-session gnome
