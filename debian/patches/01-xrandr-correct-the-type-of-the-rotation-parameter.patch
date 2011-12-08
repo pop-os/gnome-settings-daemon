@@ -11,11 +11,11 @@ GnomeRRRotation as that won't be < 0...
  plugins/xrandr/gsd-xrandr-manager.c |    4 ++--
  1 files changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/plugins/xrandr/gsd-xrandr-manager.c b/plugins/xrandr/gsd-xrandr-manager.c
-index a989352..83913c6 100644
---- a/plugins/xrandr/gsd-xrandr-manager.c
-+++ b/plugins/xrandr/gsd-xrandr-manager.c
-@@ -135,7 +135,7 @@ static void get_allowed_rotations_for_output (GnomeRRConfig *config,
+Index: gnome-settings-daemon-3.2.2/plugins/xrandr/gsd-xrandr-manager.c
+===================================================================
+--- gnome-settings-daemon-3.2.2.orig/plugins/xrandr/gsd-xrandr-manager.c	2011-11-08 14:48:52.000000000 +0100
++++ gnome-settings-daemon-3.2.2/plugins/xrandr/gsd-xrandr-manager.c	2011-12-08 22:51:46.606919662 +0100
+@@ -134,7 +134,7 @@
                                                int *out_num_rotations,
                                                GnomeRRRotation *out_rotations);
  static void handle_fn_f7 (GsdXrandrManager *mgr, guint32 timestamp);
@@ -24,7 +24,7 @@ index a989352..83913c6 100644
  
  G_DEFINE_TYPE (GsdXrandrManager, gsd_xrandr_manager, G_TYPE_OBJECT)
  
-@@ -1414,7 +1414,7 @@ rotate_touchscreens (GsdXrandrManager *mgr,
+@@ -1413,7 +1413,7 @@
   */
  static void
  handle_rotate_windows (GsdXrandrManager *mgr,
@@ -33,6 +33,3 @@ index a989352..83913c6 100644
                         guint32 timestamp)
  {
          GsdXrandrManagerPrivate *priv = mgr->priv;
--- 
-1.7.7.3
-

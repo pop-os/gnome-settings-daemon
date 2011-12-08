@@ -1,8 +1,8 @@
-diff --git a/data/org.gnome.settings-daemon.plugins.media-keys.gschema.xml.in.in b/data/org.gnome.settings-daemon.plugins.media-keys.gschema.xml.in.in
-index 85438c5..c3ad6c0 100644
---- a/data/org.gnome.settings-daemon.plugins.media-keys.gschema.xml.in.in
-+++ b/data/org.gnome.settings-daemon.plugins.media-keys.gschema.xml.in.in
-@@ -80,6 +80,11 @@
+Index: gnome-settings-daemon-3.2.2/data/org.gnome.settings-daemon.plugins.media-keys.gschema.xml.in.in
+===================================================================
+--- gnome-settings-daemon-3.2.2.orig/data/org.gnome.settings-daemon.plugins.media-keys.gschema.xml.in.in	2011-11-08 14:48:52.000000000 +0100
++++ gnome-settings-daemon-3.2.2/data/org.gnome.settings-daemon.plugins.media-keys.gschema.xml.in.in	2011-12-08 22:51:50.774919514 +0100
+@@ -85,6 +85,11 @@
        <_summary>Stop playback</_summary>
        <_description>Binding to stop playback.</_description>
      </key>
@@ -14,11 +14,11 @@ index 85438c5..c3ad6c0 100644
      <key name="volume-down" type="s">
        <default>'XF86AudioLowerVolume'</default>
        <_summary>Volume down</_summary>
-diff --git a/plugins/media-keys/acme.h b/plugins/media-keys/acme.h
-index 54ec19b..028609a 100644
---- a/plugins/media-keys/acme.h
-+++ b/plugins/media-keys/acme.h
-@@ -51,11 +51,11 @@ typedef enum {
+Index: gnome-settings-daemon-3.2.2/plugins/media-keys/acme.h
+===================================================================
+--- gnome-settings-daemon-3.2.2.orig/plugins/media-keys/acme.h	2011-11-08 14:49:07.000000000 +0100
++++ gnome-settings-daemon-3.2.2/plugins/media-keys/acme.h	2011-12-08 22:51:50.774919514 +0100
+@@ -51,11 +51,11 @@
          STOP_KEY,
          PREVIOUS_KEY,
          NEXT_KEY,
@@ -31,7 +31,7 @@ index 54ec19b..028609a 100644
          VIDEO_OUT2_KEY,
          ROTATE_VIDEO_KEY,
          MAGNIFIER_KEY,
-@@ -110,12 +110,12 @@ static struct {
+@@ -110,12 +110,12 @@
          { STOP_KEY, "stop", NULL, NULL },
          { PREVIOUS_KEY, "previous", NULL, NULL },
          { NEXT_KEY, "next", NULL, NULL },
