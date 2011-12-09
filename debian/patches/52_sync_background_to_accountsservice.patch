@@ -2,7 +2,7 @@ Index: gnome-settings-daemon-3.2.2/plugins/background/gsd-background-manager.c
 ===================================================================
 --- gnome-settings-daemon-3.2.2.orig/plugins/background/gsd-background-manager.c	2011-12-09 16:37:53.424046657 -0500
 +++ gnome-settings-daemon-3.2.2/plugins/background/gsd-background-manager.c	2011-12-09 16:38:24.996046991 -0500
-@@ -426,6 +426,99 @@
+@@ -426,6 +426,98 @@
                  setup_bg_and_draw_background (manager);
  }
  
