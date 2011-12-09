@@ -14,3 +14,4 @@
 48_register_client_before_idle_callbacks.patch
 50_add_dell_backlight.patch
 51_always_lock_screen_on_suspend.patch
+52_sync_background_to_accountsservice.patch

@@ -1,3 +1,11 @@
+gnome-settings-daemon (3.2.2-0ubuntu5) precise; urgency=low
+
+  * debian/patches/52_sync_background_to_accountsservice.patch:
+    - Watch background gsettings value and synchronize it to the
+      accountsservice daemon for the benefit of unity-greeter
+
+ -- Michael Terry <mterry@ubuntu.com>  Fri, 09 Dec 2011 15:35:40 -0500
+
 gnome-settings-daemon (3.2.2-0ubuntu4) precise; urgency=low
 
   * 42_onlyshowin_unity.patch: the gnome-shell session is called "gnome", use
