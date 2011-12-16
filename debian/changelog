@@ -1,4 +1,4 @@
-gnome-settings-daemon (3.2.2-2) UNRELEASED; urgency=low
+gnome-settings-daemon (3.2.2-2) unstable; urgency=low
 
   [ Sjoerd Simons ]
   * debian/patches/01-xrandr-correct-the-type-of-the-rotation-parameter.patch:
@@ -7,7 +7,7 @@ gnome-settings-daemon (3.2.2-2) UNRELEASED; urgency=low
   [ Michael Biebl ]
   * Upload to unstable.
 
- -- Michael Biebl <biebl@debian.org>  Thu, 08 Dec 2011 22:52:13 +0100
+ -- Michael Biebl <biebl@debian.org>  Sat, 17 Dec 2011 00:12:47 +0100
 
 gnome-settings-daemon (3.2.2-1) experimental; urgency=low
 
