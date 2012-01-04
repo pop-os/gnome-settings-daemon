@@ -1,10 +1,10 @@
-gnome-settings-daemon (3.2.2-0ubuntu6) UNRELEASED; urgency=low
+gnome-settings-daemon (3.2.2-0ubuntu6) precise; urgency=low
 
   * Add 53_disable_gsd_printer_on_unity.patch: Disable gsd-printer plugin
     under Unity. We are still using system-config-printer for this, so no need
     to start another service for this.
 
- -- Martin Pitt <martin.pitt@ubuntu.com>  Wed, 04 Jan 2012 16:15:24 +0100
+ -- Martin Pitt <martin.pitt@ubuntu.com>  Wed, 04 Jan 2012 16:15:47 +0100
 
 gnome-settings-daemon (3.2.2-0ubuntu5) precise; urgency=low
 
