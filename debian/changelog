@@ -1,3 +1,12 @@
+gnome-settings-daemon (3.2.2-0ubuntu7) UNRELEASED; urgency=low
+
+  * Add 54_lazily_connect_to_screensaver.patch: Do not D-BUS activate
+    gnome-screensaver right at startup, this unnecessarily slows down boot
+    speed. Instead, D-BUS activate it the first time we actually need it.
+    (LP: #912186)
+
+ -- Martin Pitt <martin.pitt@ubuntu.com>  Thu, 05 Jan 2012 12:17:43 +0100
+
 gnome-settings-daemon (3.2.2-0ubuntu6) precise; urgency=low
 
   * Add 53_disable_gsd_printer_on_unity.patch: Disable gsd-printer plugin

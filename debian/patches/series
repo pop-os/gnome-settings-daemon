@@ -16,3 +16,4 @@
 51_always_lock_screen_on_suspend.patch
 52_sync_background_to_accountsservice.patch
 53_disable_gsd_printer_on_unity.patch
+54_lazily_connect_to_screensaver.patch
