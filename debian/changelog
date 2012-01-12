@@ -1,3 +1,10 @@
+gnome-settings-daemon (3.2.2-0ubuntu8) UNRELEASED; urgency=low
+
+  * debian/patches/90_set_gmenus_xsettings.patch:
+    - set the ShellShowsMenubar and ShellShowsAppMenu xsettings under unity
+
+ -- Sebastien Bacher <seb128@ubuntu.com>  Thu, 12 Jan 2012 09:45:34 +0100
+
 gnome-settings-daemon (3.2.2-0ubuntu7) precise; urgency=low
 
   * Add 54_lazily_connect_to_screensaver.patch: Do not D-BUS activate
