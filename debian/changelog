@@ -1,3 +1,10 @@
+gnome-settings-daemon (3.2.2-0ubuntu9) UNRELEASED; urgency=low
+
+  * Rebuild with fixed pkgbinarymangler (lp: #913085), 
+    that should fix broke permissions errors (lp: #915600)
+
+ -- Sebastien Bacher <seb128@ubuntu.com>  Fri, 13 Jan 2012 11:41:32 +0100
+
 gnome-settings-daemon (3.2.2-0ubuntu8) precise; urgency=low
 
   * debian/patches/90_set_gmenus_xsettings.patch:
