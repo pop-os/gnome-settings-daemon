@@ -1,9 +1,9 @@
-gnome-settings-daemon (3.2.2-0ubuntu10) UNRELEASED; urgency=low
+gnome-settings-daemon (3.2.2-0ubuntu10) precise; urgency=low
 
   * Rebuild with the newest pkgbinarymangler (lp: #913085)
   * debian/control.in: build-depends on libnss3-dev for smartcard support
 
- -- Sebastien Bacher <seb128@ubuntu.com>  Fri, 13 Jan 2012 17:31:06 +0100
+ -- Sebastien Bacher <seb128@ubuntu.com>  Fri, 13 Jan 2012 17:32:40 +0100
 
 gnome-settings-daemon (3.2.2-0ubuntu9) precise; urgency=low
 
