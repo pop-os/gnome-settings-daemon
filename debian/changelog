@@ -1,3 +1,10 @@
+gnome-settings-daemon (3.2.2-0ubuntu11) UNRELEASED; urgency=low
+
+  * debian/patches/git_gsettings_write_only_when_required.patch:
+    - git patch, don't write to gsettings when not required (i.e on login)
+
+ -- Sebastien Bacher <seb128@ubuntu.com>  Thu, 19 Jan 2012 19:45:13 +0100
+
 gnome-settings-daemon (3.2.2-0ubuntu10) precise; urgency=low
 
   * Rebuild with the newest pkgbinarymangler (lp: #913085)

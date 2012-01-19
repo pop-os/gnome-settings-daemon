@@ -1,0 +1,43 @@
+From 78fd07dc004de4fdbee86a58942a1f40a83678f3 Mon Sep 17 00:00:00 2001
+From: Ryan Lortie <desrt@desrt.ca>
+Date: Wed, 18 Jan 2012 22:47:01 +0000
+Subject: a11y-keyboard: only update GSettings on user input
+
+X sends a message to us to tell us when the accessx settings are
+changed.  They can change for two reasons: because a client (like
+ourselves) has changed them or because the user did some keystroke (like
+pressing shift 5 times to enable stickykeys).
+
+We want to update GSettings in response to user requests, but prevent
+spurious updates caused by the X server notifying us of the updates that
+we just did for ourselves, so check that the update is actually caused
+by user input.
+
+https://bugzilla.gnome.org/show_bug.cgi?id=668213
+---
+diff --git a/plugins/a11y-keyboard/gsd-a11y-keyboard-manager.c b/plugins/a11y-keyboard/gsd-a11y-keyboard-manager.c
+index 3461793..7d48105 100644
+--- a/plugins/a11y-keyboard/gsd-a11y-keyboard-manager.c
++++ b/plugins/a11y-keyboard/gsd-a11y-keyboard-manager.c
+@@ -901,8 +901,17 @@ cb_xkb_event_filter (GdkXEvent              *xevent,
+         XEvent   *xev   = (XEvent *) xevent;
+         XkbEvent *xkbEv = (XkbEvent *) xevent;
+ 
++        /* 'event_type' is set to zero on notifying us of updates in
++         * response to client requests (including our own) and non-zero
++         * to notify us of key/mouse events causing changes (like
++         * pressing shift 5 times to enable sticky keys).
++         *
++         * We only want to update GSettings when it's in response to an
++         * explicit user input event, so require a non-zero event_type.
++         */
+         if (xev->xany.type == (manager->priv->xkbEventBase + XkbEventCode) &&
+-            xkbEv->any.xkb_type == XkbControlsNotify) {
++            xkbEv->any.xkb_type == XkbControlsNotify &&
++            xkbEv->ctrls.event_type != 0) {
+                 d ("XKB state changed");
+                 set_gsettings_from_server (manager);
+         } else if (xev->xany.type == (manager->priv->xkbEventBase + XkbEventCode) &&
+--
+cgit v0.9.0.2
+

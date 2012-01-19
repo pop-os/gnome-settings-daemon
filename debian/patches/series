@@ -18,4 +18,4 @@
 53_disable_gsd_printer_on_unity.patch
 54_lazily_connect_to_screensaver.patch
 90_set_gmenus_xsettings.patch
-
+git_gsettings_write_only_when_required.patch
