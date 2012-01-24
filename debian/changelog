@@ -1,3 +1,10 @@
+gnome-settings-daemon (3.2.2-0ubuntu12) UNRELEASED; urgency=low
+
+  * debian/patches/16_use_synchronous_notifications.patch:
+    - use the correct widget so the media key sounds work (lp: #909407)
+
+ -- Sebastien Bacher <seb128@ubuntu.com>  Tue, 24 Jan 2012 22:38:58 +0100
+
 gnome-settings-daemon (3.2.2-0ubuntu11) precise; urgency=low
 
   * debian/patches/git_gsettings_write_only_when_required.patch:
