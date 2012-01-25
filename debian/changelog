@@ -1,7 +1,13 @@
 gnome-settings-daemon (3.2.2-0ubuntu12) UNRELEASED; urgency=low
 
+  [ Sebastien Bacher ]
   * debian/patches/16_use_synchronous_notifications.patch:
     - use the correct widget so the media key sounds work (lp: #909407)
+
+  [ Martin Pitt ]
+  * debian/gnome-settings-daemon.gsettings-override: Set default idle dim time
+    to 30 seconds. 10 seconds is a bit unnerving when you want to read
+    something or show photos. (LP: #918928)
 
  -- Sebastien Bacher <seb128@ubuntu.com>  Tue, 24 Jan 2012 22:38:58 +0100
 
