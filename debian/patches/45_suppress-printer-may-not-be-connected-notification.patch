@@ -1,3 +1,4 @@
+# Ubuntu: https://launchpad.net/bugs/842768
 --- a/plugins/print-notifications/gsd-print-notifications-manager.c
 +++ b/plugins/print-notifications/gsd-print-notifications-manager.c
 @@ -279,7 +279,7 @@

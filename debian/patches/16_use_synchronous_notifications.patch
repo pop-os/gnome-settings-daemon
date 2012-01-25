@@ -1,6 +1,6 @@
 Description: Use synchronous notifications when they are supported
 Author: ?
-
+Upstream: that's Ubuntu specific (notify-osd)
 Index: gnome-settings-daemon-3.1.92/plugins/media-keys/gsd-media-keys-manager.c
 ===================================================================
 --- gnome-settings-daemon-3.1.92.orig/plugins/media-keys/gsd-media-keys-manager.c	2011-09-21 13:00:51.629796557 +0100

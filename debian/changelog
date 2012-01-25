@@ -1,6 +1,8 @@
 gnome-settings-daemon (3.2.2-0ubuntu12) UNRELEASED; urgency=low
 
-  [ Sebastien Bacher ]
+  * Updated some patches with bug references
+  * debian/patches/02_missing_libs.patch:
+    - dropped, that patch is a leftover and not required nowadays
   * debian/patches/16_use_synchronous_notifications.patch:
     - use the correct widget so the media key sounds work (lp: #909407)
 
@@ -9,7 +11,7 @@ gnome-settings-daemon (3.2.2-0ubuntu12) UNRELEASED; urgency=low
     to 30 seconds. 10 seconds is a bit unnerving when you want to read
     something or show photos. (LP: #918928)
 
- -- Sebastien Bacher <seb128@ubuntu.com>  Tue, 24 Jan 2012 22:38:58 +0100
+ -- Sebastien Bacher <seb128@ubuntu.com>  Wed, 25 Jan 2012 21:35:00 +0100
 
 gnome-settings-daemon (3.2.2-0ubuntu11) precise; urgency=low
 
