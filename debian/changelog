@@ -1,4 +1,4 @@
-gnome-settings-daemon (3.2.2-0ubuntu12) UNRELEASED; urgency=low
+gnome-settings-daemon (3.2.2-0ubuntu12) precise; urgency=low
 
   * Updated some patches with bug references
   * debian/patches/02_missing_libs.patch:
@@ -11,7 +11,7 @@ gnome-settings-daemon (3.2.2-0ubuntu12) UNRELEASED; urgency=low
     to 30 seconds. 10 seconds is a bit unnerving when you want to read
     something or show photos. (LP: #918928)
 
- -- Sebastien Bacher <seb128@ubuntu.com>  Wed, 25 Jan 2012 21:35:00 +0100
+ -- Sebastien Bacher <seb128@ubuntu.com>  Thu, 26 Jan 2012 22:36:41 +0100
 
 gnome-settings-daemon (3.2.2-0ubuntu11) precise; urgency=low
 
