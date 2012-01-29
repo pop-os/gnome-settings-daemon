@@ -1,24 +1,156 @@
-Description: always lock the screen when suspending or hibernating, even if
- automatic screen lock is disabled.
+Description: when suspending or hibernating, lock the screen if the account
+ isn't set to autologin, even if automatic screen lock is disabled.
 Author: Marc Deslauriers <marc.deslauriers@canonical.com>
 Forwarded: no, likely a Ubuntu-specific preference
 Bug-Ubuntu: https://bugs.launchpad.net/ubuntu/+source/gnome-session/+bug/847814
 
-Index: gnome-settings-daemon-3.2.0/plugins/power/gsd-power-manager.c
+Index: gnome-settings-daemon-3.2.2/plugins/power/gsd-power-manager.c
 ===================================================================
---- gnome-settings-daemon-3.2.0.orig/plugins/power/gsd-power-manager.c	2011-10-03 17:05:09.336601122 -0400
-+++ gnome-settings-daemon-3.2.0/plugins/power/gsd-power-manager.c	2011-10-03 17:05:30.964601678 -0400
-@@ -3190,13 +3190,6 @@
+--- gnome-settings-daemon-3.2.2.orig/plugins/power/gsd-power-manager.c	2012-01-28 16:03:07.834972724 -0500
++++ gnome-settings-daemon-3.2.2/plugins/power/gsd-power-manager.c	2012-01-28 16:13:49.526966605 -0500
+@@ -55,6 +55,10 @@
+ #define CONSOLEKIT_DBUS_PATH_MANAGER            "/org/freedesktop/ConsoleKit/Manager"
+ #define CONSOLEKIT_DBUS_INTERFACE_MANAGER       "org.freedesktop.ConsoleKit.Manager"
+ 
++#define ACCOUNTS_DBUS_NAME                      "org.freedesktop.Accounts"
++#define ACCOUNTS_DBUS_PATH                      "/org/freedesktop/Accounts/User"
++#define ACCOUNTS_DBUS_INTERFACE                 "org.freedesktop.Accounts.User"
++
+ #define UPOWER_DBUS_NAME                        "org.freedesktop.UPower"
+ #define UPOWER_DBUS_PATH                        "/org/freedesktop/UPower"
+ #define UPOWER_DBUS_PATH_KBDBACKLIGHT           "/org/freedesktop/UPower/KbdBacklight"
+@@ -161,6 +165,8 @@
+         GCancellable            *bus_cancellable;
+         GDBusProxy              *upower_proxy;
+         GDBusProxy              *upower_kdb_proxy;
++        GDBusProxy              *accounts_proxy;
++        gchar                   *accounts_object_path;
+         gint                     kbd_brightness_now;
+         gint                     kbd_brightness_max;
+         gint                     kbd_brightness_old;
+@@ -2840,6 +2846,57 @@
+ }
+ 
+ static gboolean
++account_is_autologin (GsdPowerManager *manager)
++{
++        gboolean ret = FALSE;
++        GVariant *retval = NULL;
++        GVariant *automatic_login = NULL;
++        GError *error = NULL;
++
++        /* not yet connected to accounts */
++        if (manager->priv->accounts_proxy == NULL) {
++                g_warning ("accounts is not available");
++                return FALSE;
++        }
++
++        retval = g_dbus_proxy_call_sync (manager->priv->accounts_proxy,
++                                         "Get",
++                                         g_variant_new ("(ss)",
++                                                        ACCOUNTS_DBUS_INTERFACE,
++                                                        "AutomaticLogin"),
++                                         G_DBUS_CALL_FLAGS_NONE,
++                                         -1, NULL,
++                                         &error);
++        if (retval == NULL) {
++                /* abort as the DBUS method failed */
++                g_warning ("Get AutomaticLogin failed: %s", error->message);
++                g_error_free (error);
++                return FALSE;
++        }
++
++        g_variant_get (retval, "(v)", &automatic_login);
++        g_variant_unref (retval);
++
++        if (automatic_login != NULL) {
++                g_variant_get (automatic_login, "b", &ret);
++                g_variant_unref (automatic_login);
++        }
++
++        return ret;
++}
++
++static gchar *
++accounts_object_path ()
++{
++        gchar *object_path;
++
++        object_path = g_strdup_printf ("/org/freedesktop/Accounts/User%d",
++                                       getuid ());
++
++        return object_path;
++}
++
++static gboolean
+ idle_sleep_cb (GsdPowerManager *manager)
+ {
+         gboolean is_idle;
+@@ -3135,6 +3192,22 @@
+ }
+ 
+ static void
++accounts_proxy_ready_cb (GObject             *source_object,
++                         GAsyncResult        *res,
++                         gpointer             user_data)
++{
++        GError *error = NULL;
++        GsdPowerManager *manager = GSD_POWER_MANAGER (user_data);
++
++        manager->priv->accounts_proxy = g_dbus_proxy_new_for_bus_finish (res, &error);
++        if (manager->priv->accounts_proxy == NULL) {
++                g_warning ("Could not connect to Accounts: %s",
++                           error->message);
++                g_error_free (error);
++        }
++}
++
++static void
+ power_keyboard_proxy_ready_cb (GObject             *source_object,
+                                GAsyncResult        *res,
+                                gpointer             user_data)
+@@ -3196,11 +3269,11 @@
                          UpSleepKind sleep_kind,
                          GsdPowerManager *manager)
  {
 -        gboolean do_lock;
--
++        gboolean is_autologin;
+ 
 -        do_lock = g_settings_get_boolean (manager->priv->settings_screensaver,
 -                                          "lock-enabled");
 -        if (!do_lock)
--                return;
--
++        is_autologin = account_is_autologin (manager);
++        if (is_autologin)
++                g_debug ("account has autologin enabled, skipping lock");
+                 return;
+ 
          if (manager->priv->screensaver_proxy != NULL) {
-                 g_debug ("doing gnome-screensaver lock");
-                 g_dbus_proxy_call (manager->priv->screensaver_proxy,
+@@ -3364,6 +3437,18 @@
+                                   power_keyboard_proxy_ready_cb,
+                                   manager);
+ 
++        /* connect to Accounts for autologin information */
++        manager->priv->accounts_object_path = accounts_object_path();
++        g_dbus_proxy_new_for_bus (G_BUS_TYPE_SYSTEM,
++                                  G_DBUS_PROXY_FLAGS_DO_NOT_LOAD_PROPERTIES,
++                                  NULL,
++                                  ACCOUNTS_DBUS_NAME,
++                                  manager->priv->accounts_object_path,
++                                  "org.freedesktop.DBus.Properties",
++                                  NULL,
++                                  accounts_proxy_ready_cb,
++                                  manager);
++
+         /* connect to the screensaver */
+         g_dbus_proxy_new_for_bus (G_BUS_TYPE_SESSION,
+                                   G_DBUS_PROXY_FLAGS_DO_NOT_LOAD_PROPERTIES,
+@@ -3511,6 +3596,9 @@
+ 
+         if (manager->priv->upower_proxy != NULL)
+                 g_object_unref (manager->priv->upower_proxy);
++        if (manager->priv->accounts_proxy != NULL)
++                g_object_unref (manager->priv->accounts_proxy);
++        g_free (manager->priv->accounts_object_path);
+         if (manager->priv->session_proxy != NULL)
+                 g_object_unref (manager->priv->session_proxy);
+         if (manager->priv->session_presence_proxy != NULL)
