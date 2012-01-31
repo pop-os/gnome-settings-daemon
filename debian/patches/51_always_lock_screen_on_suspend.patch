@@ -6,8 +6,8 @@ Bug-Ubuntu: https://bugs.launchpad.net/ubuntu/+source/gnome-session/+bug/847814
 
 Index: gnome-settings-daemon-3.2.2/plugins/power/gsd-power-manager.c
 ===================================================================
---- gnome-settings-daemon-3.2.2.orig/plugins/power/gsd-power-manager.c	2012-01-28 16:03:07.834972724 -0500
-+++ gnome-settings-daemon-3.2.2/plugins/power/gsd-power-manager.c	2012-01-28 16:13:49.526966605 -0500
+--- gnome-settings-daemon-3.2.2.orig/plugins/power/gsd-power-manager.c	2012-01-31 10:08:49.296675297 -0500
++++ gnome-settings-daemon-3.2.2/plugins/power/gsd-power-manager.c	2012-01-31 10:09:18.352676043 -0500
 @@ -55,6 +55,10 @@
  #define CONSOLEKIT_DBUS_PATH_MANAGER            "/org/freedesktop/ConsoleKit/Manager"
  #define CONSOLEKIT_DBUS_INTERFACE_MANAGER       "org.freedesktop.ConsoleKit.Manager"
@@ -109,7 +109,7 @@ Index: gnome-settings-daemon-3.2.2/plugins/power/gsd-power-manager.c
  power_keyboard_proxy_ready_cb (GObject             *source_object,
                                 GAsyncResult        *res,
                                 gpointer             user_data)
-@@ -3196,11 +3269,11 @@
+@@ -3196,12 +3269,13 @@
                          UpSleepKind sleep_kind,
                          GsdPowerManager *manager)
  {
@@ -120,12 +120,14 @@ Index: gnome-settings-daemon-3.2.2/plugins/power/gsd-power-manager.c
 -                                          "lock-enabled");
 -        if (!do_lock)
 +        is_autologin = account_is_autologin (manager);
-+        if (is_autologin)
++        if (is_autologin) {
 +                g_debug ("account has autologin enabled, skipping lock");
                  return;
++        }
  
          if (manager->priv->screensaver_proxy != NULL) {
-@@ -3364,6 +3437,18 @@
+                 g_debug ("doing gnome-screensaver lock");
+@@ -3364,6 +3438,18 @@
                                    power_keyboard_proxy_ready_cb,
                                    manager);
  
@@ -144,7 +146,7 @@ Index: gnome-settings-daemon-3.2.2/plugins/power/gsd-power-manager.c
          /* connect to the screensaver */
          g_dbus_proxy_new_for_bus (G_BUS_TYPE_SESSION,
                                    G_DBUS_PROXY_FLAGS_DO_NOT_LOAD_PROPERTIES,
-@@ -3511,6 +3596,9 @@
+@@ -3511,6 +3597,9 @@
  
          if (manager->priv->upower_proxy != NULL)
                  g_object_unref (manager->priv->upower_proxy);

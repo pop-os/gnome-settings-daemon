@@ -1,3 +1,11 @@
+gnome-settings-daemon (3.2.2-0ubuntu14) precise; urgency=low
+
+  * debian/patches/51_always_lock_screen_on_suspend.patch: added missing
+    brackets that was preventing screen locking from working at all.
+    (LP: #924336)
+
+ -- Marc Deslauriers <marc.deslauriers@ubuntu.com>  Tue, 31 Jan 2012 10:10:41 -0500
+
 gnome-settings-daemon (3.2.2-0ubuntu13) precise; urgency=low
 
   * debian/patches/51_always_lock_screen_on_suspend.patch: updated to
