@@ -1,9 +1,9 @@
-gnome-settings-daemon (3.2.2-0ubuntu15) UNRELEASED; urgency=low
+gnome-settings-daemon (3.2.2-0ubuntu15) precise; urgency=low
 
   * debian/patches/46_share_rr_screen.patch:
     - dropped that optimization, upstream fixed it in gnome-desktop instead
 
- -- Sebastien Bacher <seb128@ubuntu.com>  Mon, 06 Feb 2012 11:07:43 +0100
+ -- Sebastien Bacher <seb128@ubuntu.com>  Mon, 06 Feb 2012 11:09:47 +0100
 
 gnome-settings-daemon (3.2.2-0ubuntu14) precise; urgency=low
 
