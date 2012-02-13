@@ -1,3 +1,13 @@
+gnome-settings-daemon (3.2.2-0ubuntu16) precise; urgency=low
+
+  * debian/patches/06_use_application_indicator.patch:
+    - Check for gtk3 version of libappindicator, not gtk2
+  * debian/patches/sync_keyboard_layout_to_accountsservice.patch:
+    - Sync user's list of layouts to accountsservice so it can in turn
+      inform LightDM.  LP: #915468
+
+ -- Michael Terry <mterry@ubuntu.com>  Mon, 13 Feb 2012 10:40:21 -0500
+
 gnome-settings-daemon (3.2.2-0ubuntu15) precise; urgency=low
 
   * debian/patches/46_share_rr_screen.patch:

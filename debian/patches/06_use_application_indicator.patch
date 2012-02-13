@@ -1,6 +1,8 @@
---- a/configure.ac
-+++ b/configure.ac
-@@ -54,6 +54,7 @@ GCONF_REQUIRED_VERSION=2.6.1
+Index: gnome-settings-daemon-3.2.2/configure.ac
+===================================================================
+--- gnome-settings-daemon-3.2.2.orig/configure.ac	2011-11-08 15:04:04.000000000 -0500
++++ gnome-settings-daemon-3.2.2/configure.ac	2012-02-13 10:39:53.013944408 -0500
+@@ -54,6 +54,7 @@
  GNOME_DESKTOP_REQUIRED_VERSION=3.1.5
  LIBNOTIFY_REQUIRED_VERSION=0.7.3
  UPOWER_GLIB_REQUIRED_VERSION=0.9.1
@@ -8,7 +10,7 @@
  
  EXTRA_COMPILE_WARNINGS(yes)
  
-@@ -145,6 +146,32 @@ fi
+@@ -140,6 +141,32 @@
  AC_SUBST(LIBNOTIFY_CFLAGS)
  AC_SUBST(LIBNOTIFY_LIBS)
  
@@ -23,7 +25,7 @@
 +
 +
 +if test x$enable_appindicator = xauto ; then
-+	PKG_CHECK_EXISTS(appindicator-0.1 >= $APPINDICATOR_REQUIRED_VERSION,
++	PKG_CHECK_EXISTS(appindicator3-0.1 >= $APPINDICATOR_REQUIRED_VERSION,
 +		[enable_appindicator="yes"],
 +		[enable_appindicator="no"])
 +fi
@@ -41,7 +43,7 @@
  dnl ---------------------------------------------------------------------------
  dnl - Check for D-Bus
  dnl ---------------------------------------------------------------------------
-@@ -636,6 +663,7 @@ echo "
+@@ -603,6 +630,7 @@
          LCMS DICT support:        ${have_new_lcms}
  
          Libnotify support:        ${have_libnotify}
@@ -49,8 +51,10 @@
          Libcanberra support:      ${have_libcanberra}
          PulseAudio support:       ${have_pulse}
          PackageKit support:       ${have_packagekit}
---- a/plugins/a11y-keyboard/gsd-a11y-keyboard-manager.c
-+++ b/plugins/a11y-keyboard/gsd-a11y-keyboard-manager.c
+Index: gnome-settings-daemon-3.2.2/plugins/a11y-keyboard/gsd-a11y-keyboard-manager.c
+===================================================================
+--- gnome-settings-daemon-3.2.2.orig/plugins/a11y-keyboard/gsd-a11y-keyboard-manager.c	2011-11-08 08:48:52.000000000 -0500
++++ gnome-settings-daemon-3.2.2/plugins/a11y-keyboard/gsd-a11y-keyboard-manager.c	2012-02-13 10:39:33.213944199 -0500
 @@ -41,6 +41,10 @@
  #include <X11/XKBlib.h>
  #include <X11/extensions/XKBstr.h>
@@ -62,7 +66,7 @@
  #include "gnome-settings-profile.h"
  #include "gsd-a11y-keyboard-manager.h"
  #include "gsd-a11y-preferences-dialog.h"
-@@ -61,7 +65,11 @@ struct GsdA11yKeyboardManagerPrivate
+@@ -61,7 +65,11 @@
          GtkWidget        *stickykeys_alert;
          GtkWidget        *slowkeys_alert;
          GtkWidget        *preferences_dialog;
@@ -74,7 +78,7 @@
          XkbDescRec       *original_xkb_desc;
  
          GSettings        *settings;
-@@ -436,11 +444,24 @@ maybe_show_status_icon (GsdA11yKeyboardM
+@@ -436,11 +444,24 @@
          /* for now, show if accessx is enabled */
          show = g_settings_get_boolean (manager->priv->settings, "enable");
  
@@ -99,7 +103,7 @@
  }
  
  static void
-@@ -519,9 +540,11 @@ ax_slowkeys_warning_post_bubble (GsdA11y
+@@ -519,9 +540,11 @@
          message = _("You just held down the Shift key for 8 seconds.  This is the shortcut "
                      "for the Slow Keys feature, which affects the way your keyboard works.");
  
@@ -111,7 +115,7 @@
  
          if (manager->priv->slowkeys_alert != NULL) {
                  gtk_widget_destroy (manager->priv->slowkeys_alert);
-@@ -655,9 +678,11 @@ ax_stickykeys_warning_post_bubble (GsdA1
+@@ -655,9 +678,11 @@
                  _("You just pressed two keys at once, or pressed the Shift key 5 times in a row.  "
                    "This turns off the Sticky Keys feature, which affects the way your keyboard works.");
  
@@ -123,7 +127,7 @@
  
          if (manager->priv->slowkeys_alert != NULL) {
                  gtk_widget_destroy (manager->priv->slowkeys_alert);
-@@ -1028,10 +1053,16 @@ gsd_a11y_keyboard_manager_stop (GsdA11yK
+@@ -1033,10 +1058,16 @@
                  p->device_manager = NULL;
          }
  
@@ -140,7 +144,7 @@
  
          if (p->settings != NULL) {
                  g_signal_handlers_disconnect_by_func (p->settings, keyboard_callback, manager);
-@@ -1134,8 +1165,13 @@ on_preferences_dialog_response (GtkDialo
+@@ -1140,8 +1171,13 @@
  }
  
  static void
@@ -154,7 +158,7 @@
  {
          if (manager->priv->preferences_dialog == NULL) {
                  manager->priv->preferences_dialog = gsd_a11y_preferences_dialog_new ();
-@@ -1159,6 +1195,26 @@ gsd_a11y_keyboard_manager_ensure_status_
+@@ -1174,6 +1210,26 @@
  {
          gnome_settings_profile_start (NULL);
  
@@ -181,7 +185,7 @@
          if (!manager->priv->status_icon) {
  
                  manager->priv->status_icon = gtk_status_icon_new_from_icon_name ("preferences-desktop-accessibility");
-@@ -1168,6 +1224,7 @@ gsd_a11y_keyboard_manager_ensure_status_
+@@ -1187,6 +1243,7 @@
                                    G_CALLBACK (on_status_icon_popup_menu),
                                    manager);
          }
@@ -189,9 +193,11 @@
  
          gnome_settings_profile_end (NULL);
  }
---- a/plugins/a11y-keyboard/Makefile.am
-+++ b/plugins/a11y-keyboard/Makefile.am
-@@ -56,6 +56,7 @@ liba11y_keyboard_la_CPPFLAGS = \
+Index: gnome-settings-daemon-3.2.2/plugins/a11y-keyboard/Makefile.am
+===================================================================
+--- gnome-settings-daemon-3.2.2.orig/plugins/a11y-keyboard/Makefile.am	2011-09-07 10:40:46.000000000 -0400
++++ gnome-settings-daemon-3.2.2/plugins/a11y-keyboard/Makefile.am	2012-02-13 10:37:13.385942719 -0500
+@@ -56,6 +56,7 @@
  liba11y_keyboard_la_CFLAGS = \
  	$(SETTINGS_PLUGIN_CFLAGS)	\
  	$(LIBNOTIFY_CFLAGS)		\
@@ -199,7 +205,7 @@
  	$(AM_CFLAGS)
  
  liba11y_keyboard_la_LDFLAGS = 		\
-@@ -66,6 +67,7 @@ liba11y_keyboard_la_LIBADD  = 		\
+@@ -66,6 +67,7 @@
  	$(SETTINGS_PLUGIN_LIBS)		\
  	$(XF86MISC_LIBS)		\
  	$(LIBNOTIFY_LIBS)		\
@@ -207,8 +213,10 @@
  	$(NULL)
  
  plugin_in_files = 		\
---- /dev/null
-+++ b/plugins/keyboard/gkbd-configuration.c
+Index: gnome-settings-daemon-3.2.2/plugins/keyboard/gkbd-configuration.c
+===================================================================
+--- /dev/null	1970-01-01 00:00:00.000000000 +0000
++++ gnome-settings-daemon-3.2.2/plugins/keyboard/gkbd-configuration.c	2012-02-13 10:37:13.389942719 -0500
 @@ -0,0 +1,350 @@
 +/*
 + * Copyright (C) 2010 Canonical Ltd.
@@ -560,8 +568,10 @@
 +{
 +	return configuration->priv->short_group_names;
 +}
---- /dev/null
-+++ b/plugins/keyboard/gkbd-configuration.h
+Index: gnome-settings-daemon-3.2.2/plugins/keyboard/gkbd-configuration.h
+===================================================================
+--- /dev/null	1970-01-01 00:00:00.000000000 +0000
++++ gnome-settings-daemon-3.2.2/plugins/keyboard/gkbd-configuration.h	2012-02-13 10:37:13.389942719 -0500
 @@ -0,0 +1,65 @@
 +/*
 + * Copyright (C) 2010 Canonical Ltd.
@@ -628,8 +638,10 @@
 +G_END_DECLS
 +
 +#endif
---- a/plugins/keyboard/gsd-keyboard-xkb.c
-+++ b/plugins/keyboard/gsd-keyboard-xkb.c
+Index: gnome-settings-daemon-3.2.2/plugins/keyboard/gsd-keyboard-xkb.c
+===================================================================
+--- gnome-settings-daemon-3.2.2.orig/plugins/keyboard/gsd-keyboard-xkb.c	2011-11-08 08:48:52.000000000 -0500
++++ gnome-settings-daemon-3.2.2/plugins/keyboard/gsd-keyboard-xkb.c	2012-02-13 10:37:13.393942719 -0500
 @@ -30,12 +30,20 @@
  #include <gdk/gdkx.h>
  #include <gtk/gtk.h>
@@ -651,7 +663,7 @@
  #include "gsd-keyboard-xkb.h"
  #include "delayed-dialog.h"
  #include "gnome-settings-profile.h"
-@@ -61,7 +69,21 @@ static GSettings *settings_keyboard = NU
+@@ -61,7 +69,21 @@
  static PostActivationCallback pa_callback = NULL;
  static void *pa_callback_user_data = NULL;
  
@@ -673,7 +685,7 @@
  
  static GHashTable *preview_dialogs = NULL;
  
-@@ -175,10 +197,14 @@ popup_menu_show_layout ()
+@@ -174,10 +196,14 @@
  	    xkl_engine_get_instance (GDK_DISPLAY_XDISPLAY
  				     (gdk_display_get_default ()));
  	XklState *xkl_state = xkl_engine_get_current_state (engine);
@@ -689,7 +701,7 @@
  
  	if (xkl_state->group < 0
  	    || xkl_state->group >= g_strv_length (group_names)) {
-@@ -206,38 +232,185 @@ popup_menu_show_layout ()
+@@ -205,38 +231,185 @@
  }
  
  static void
@@ -886,7 +898,7 @@
  	gchar **current_name = gkbd_status_get_group_names ();
  
  	GtkWidget *item = gtk_menu_item_new_with_mnemonic (_("_Layouts"));
-@@ -257,8 +430,23 @@ status_icon_popup_menu_cb (GtkStatusIcon
+@@ -256,8 +429,23 @@
  	gtk_widget_show (item);
  	g_signal_connect (item, "activate", popup_menu_launch_capplet, NULL);
  	gtk_menu_shell_append (GTK_MENU_SHELL (popup_menu), item);
@@ -911,7 +923,7 @@
  		gchar *image_file = gkbd_status_get_image_filename (i);
  
  		if (image_file == NULL) {
-@@ -284,19 +472,83 @@ status_icon_popup_menu_cb (GtkStatusIcon
+@@ -283,19 +471,83 @@
  		gtk_widget_show (item);
  		gtk_menu_shell_append (GTK_MENU_SHELL (groups_menu), item);
  		g_signal_connect (item, "activate",
@@ -996,7 +1008,7 @@
  		if (icon == NULL) {
  			xkl_debug (150, "Creating keyboard status icon\n");
  			icon = gkbd_status_new ();
-@@ -306,12 +558,20 @@ show_hide_icon ()
+@@ -305,12 +557,20 @@
  					  NULL);
  
  		}
@@ -1017,7 +1029,7 @@
  	}
  }
  
-@@ -401,6 +661,15 @@ apply_xkb_settings (void)
+@@ -400,6 +660,15 @@
  	gkbd_keyboard_config_load_from_x_current (&current_sys_kbd_config,
  						  NULL);
  
@@ -1033,7 +1045,7 @@
  	if (!try_activating_xkb_config_if_new (&current_sys_kbd_config)) {
  		if (filter_xkb_config ()) {
  			if (!try_activating_xkb_config_if_new
-@@ -436,6 +705,22 @@ gsd_keyboard_xkb_analyze_sysconfig (void
+@@ -435,6 +704,22 @@
  						  NULL);
  }
  
@@ -1056,7 +1068,7 @@
  void
  gsd_keyboard_xkb_set_post_activation_callback (PostActivationCallback fun,
  					       void *user_data)
-@@ -471,6 +756,13 @@ gsd_keyboard_xkb_init (GsdKeyboardManage
+@@ -470,6 +755,13 @@
  					   DATADIR G_DIR_SEPARATOR_S
  					   "icons");
  
@@ -1070,7 +1082,7 @@
  	manager = kbd_manager;
  	gnome_settings_profile_start ("xkl_engine_get_instance");
  	xkl_engine = xkl_engine_get_instance (display);
-@@ -492,6 +784,9 @@ gsd_keyboard_xkb_init (GsdKeyboardManage
+@@ -491,6 +783,9 @@
  		g_signal_connect (settings_keyboard, "changed",
  				  (GCallback) apply_xkb_settings, NULL);
  
@@ -1080,7 +1092,7 @@
  		gdk_window_add_filter (NULL, (GdkFilterFunc)
  				       gsd_keyboard_xkb_evt_filter, NULL);
  
-@@ -554,5 +849,13 @@ gsd_keyboard_xkb_shutdown (void)
+@@ -553,5 +848,13 @@
  	g_object_unref (xkl_engine);
  
  	xkl_engine = NULL;
@@ -1094,9 +1106,11 @@
 +
  	inited_ok = FALSE;
  }
---- a/plugins/keyboard/Makefile.am
-+++ b/plugins/keyboard/Makefile.am
-@@ -24,6 +24,8 @@ libkeyboard_la_SOURCES = 	\
+Index: gnome-settings-daemon-3.2.2/plugins/keyboard/Makefile.am
+===================================================================
+--- gnome-settings-daemon-3.2.2.orig/plugins/keyboard/Makefile.am	2011-10-17 13:36:56.000000000 -0400
++++ gnome-settings-daemon-3.2.2/plugins/keyboard/Makefile.am	2012-02-13 10:37:13.397942719 -0500
+@@ -24,6 +24,8 @@
  	gsd-keyboard-xkb.c	\
  	delayed-dialog.h	\
  	delayed-dialog.c	\
@@ -1105,7 +1119,7 @@
  	$(NULL)
  
  libkeyboard_la_CPPFLAGS = \
-@@ -36,6 +38,7 @@ libkeyboard_la_CPPFLAGS = \
+@@ -36,6 +38,7 @@
  libkeyboard_la_CFLAGS = \
  	$(PLUGIN_CFLAGS)		\
  	$(SETTINGS_PLUGIN_CFLAGS)	\
@@ -1113,7 +1127,7 @@
  	$(KEYBOARD_CFLAGS)		\
  	$(AM_CFLAGS)
  
-@@ -47,6 +50,7 @@ libkeyboard_la_LIBADD  = 	\
+@@ -47,6 +50,7 @@
  	$(SETTINGS_PLUGIN_LIBS)	\
  	$(XF86MISC_LIBS)	\
  	$(KEYBOARD_LIBS)	\
