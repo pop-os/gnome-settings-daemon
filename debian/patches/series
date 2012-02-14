@@ -18,3 +18,4 @@
 90_set_gmenus_xsettings.patch
 git_gsettings_write_only_when_required.patch
 sync_keyboard_layout_to_accountsservice.patch
+disable_three_touch_tap.patch

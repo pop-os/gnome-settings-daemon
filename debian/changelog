@@ -1,3 +1,10 @@
+gnome-settings-daemon (3.2.2-0ubuntu17) UNRELEASED; urgency=low
+
+  * debian/patches/disable_three_touch_tap.patch
+    - Disable three-touch tap so three-touch gestures work
+
+ -- Chase Douglas <chase.douglas@ubuntu.com>  Mon, 13 Feb 2012 20:38:46 -0800
+
 gnome-settings-daemon (3.2.2-0ubuntu16) precise; urgency=low
 
   * debian/patches/06_use_application_indicator.patch:
