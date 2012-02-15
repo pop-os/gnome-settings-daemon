@@ -2,11 +2,11 @@ Description: Disable gsd-printer plugin under Unity. We are still using system-c
 Author: Martin Pitt <martin.pitt@ubuntu.com>
 Forwarded: No, Ubuntu specific
 
-diff --git a/plugins/print-notifications/gsd-print-notifications-plugin.c b/plugins/print-notifications/gsd-print-notifications-plugin.c
-index 2b9055b..5eef613 100644
---- a/plugins/print-notifications/gsd-print-notifications-plugin.c
-+++ b/plugins/print-notifications/gsd-print-notifications-plugin.c
-@@ -38,6 +38,12 @@ GNOME_SETTINGS_PLUGIN_REGISTER (GsdPrintNotificationsPlugin, gsd_print_notificat
+Index: gnome-settings-daemon-3.3.5/plugins/print-notifications/gsd-print-notifications-plugin.c
+===================================================================
+--- gnome-settings-daemon-3.3.5.orig/plugins/print-notifications/gsd-print-notifications-plugin.c	2011-09-07 16:40:46.000000000 +0200
++++ gnome-settings-daemon-3.3.5/plugins/print-notifications/gsd-print-notifications-plugin.c	2012-02-13 17:31:02.752427557 +0100
+@@ -38,6 +38,12 @@
  static void
  gsd_print_notifications_plugin_init (GsdPrintNotificationsPlugin *plugin)
  {
@@ -19,7 +19,7 @@ index 2b9055b..5eef613 100644
          plugin->priv = GSD_PRINT_NOTIFICATIONS_PLUGIN_GET_PRIVATE (plugin);
  
          plugin->priv->manager = gsd_print_notifications_manager_new ();
-@@ -70,6 +76,11 @@ impl_activate (GnomeSettingsPlugin *plugin)
+@@ -70,6 +76,11 @@
          gboolean res;
          GError  *error;
  
@@ -31,7 +31,7 @@ index 2b9055b..5eef613 100644
          g_debug ("Activating print-notifications plugin");
  
          error = NULL;
-@@ -83,6 +94,11 @@ impl_activate (GnomeSettingsPlugin *plugin)
+@@ -83,6 +94,11 @@
  static void
  impl_deactivate (GnomeSettingsPlugin *plugin)
  {

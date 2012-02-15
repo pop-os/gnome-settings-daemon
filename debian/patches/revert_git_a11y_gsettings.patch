@@ -1,0 +1,51 @@
+Index: gnome-settings-daemon-3.3.5/plugins/a11y-keyboard/gsd-a11y-preferences-dialog.c
+===================================================================
+--- gnome-settings-daemon-3.3.5.orig/plugins/a11y-keyboard/gsd-a11y-preferences-dialog.c	2012-02-01 20:33:14.000000000 +0100
++++ gnome-settings-daemon-3.3.5/plugins/a11y-keyboard/gsd-a11y-preferences-dialog.c	2012-02-13 17:53:53.312437038 +0100
+@@ -31,6 +31,8 @@
+ #include <gio/gio.h>
+ #include <gtk/gtk.h>
+ 
++#include <gconf/gconf-client.h>
++
+ #include "gsd-a11y-preferences-dialog.h"
+ 
+ #define SM_DBUS_NAME      "org.gnome.SessionManager"
+@@ -60,8 +62,8 @@
+ #define DPI_FACTOR_LARGEST 2.0
+ 
+ #define KEY_GTK_THEME          "gtk-theme"
++#define KEY_METACITY_THEME     "/apps/metacity/general/theme"
+ #define KEY_ICON_THEME         "icon-theme"
+-#define KEY_METACITY_THEME     "theme"
+ 
+ #define HIGH_CONTRAST_THEME    "HighContrast"
+ 
+@@ -167,11 +169,11 @@
+ static void
+ config_set_high_contrast (gboolean enabled)
+ {
++        GConfClient *client;
+         GSettings *settings;
+-        GSettings *wm_settings;
+ 
++        client = gconf_client_get_default ();
+         settings = g_settings_new ("org.gnome.desktop.interface");
+-        wm_settings = g_settings_new ("org.gnome.desktop.wm.preferences");
+ 
+         if (enabled) {
+                 g_settings_set_string (settings, KEY_GTK_THEME, HIGH_CONTRAST_THEME);
+@@ -180,11 +182,11 @@
+         } else {
+                 g_settings_reset (settings, KEY_GTK_THEME);
+                 g_settings_reset (settings, KEY_ICON_THEME);
+-                g_settings_reset (wm_settings, KEY_METACITY_THEME);
++                gconf_client_unset (client, KEY_METACITY_THEME, NULL);
+         }
+ 
++        g_object_unref (client);
+         g_object_unref (settings);
+-        g_object_unref (wm_settings);
+ }
+ 
+ static gboolean

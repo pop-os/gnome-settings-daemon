@@ -13,11 +13,11 @@ Bug-Ubuntu: https://launchpad.net/bugs/912186
  plugins/power/gsd-power-manager.c |   32 ++++++++++++++++++++------------
  1 files changed, 20 insertions(+), 12 deletions(-)
 
-Index: gnome-settings-daemon-3.2.2/plugins/power/gsd-power-manager.c
+Index: gnome-settings-daemon-3.3.5/plugins/power/gsd-power-manager.c
 ===================================================================
---- gnome-settings-daemon-3.2.2.orig/plugins/power/gsd-power-manager.c	2012-01-27 22:33:08.739573531 -0500
-+++ gnome-settings-daemon-3.2.2/plugins/power/gsd-power-manager.c	2012-01-27 22:33:08.795573530 -0500
-@@ -3091,7 +3091,7 @@
+--- gnome-settings-daemon-3.3.5.orig/plugins/power/gsd-power-manager.c	2012-02-13 17:31:02.716427557 +0100
++++ gnome-settings-daemon-3.3.5/plugins/power/gsd-power-manager.c	2012-02-13 17:31:02.776427558 +0100
+@@ -3358,7 +3358,7 @@
  }
  
  static void
@@ -26,7 +26,7 @@ Index: gnome-settings-daemon-3.2.2/plugins/power/gsd-power-manager.c
                              GAsyncResult *res,
                              gpointer user_data)
  {
-@@ -3103,7 +3103,15 @@
+@@ -3370,7 +3370,15 @@
                  g_warning ("Could not connect to gnome-screensaver: %s",
                             error->message);
                  g_error_free (error);
@@ -42,7 +42,7 @@ Index: gnome-settings-daemon-3.2.2/plugins/power/gsd-power-manager.c
  }
  
  static void
-@@ -3275,6 +3283,17 @@
+@@ -3559,6 +3567,17 @@
                                     "Lock",
                                     NULL, G_DBUS_CALL_FLAGS_NONE, -1,
                                     NULL, NULL, NULL);
@@ -60,7 +60,7 @@ Index: gnome-settings-daemon-3.2.2/plugins/power/gsd-power-manager.c
          }
  }
  
-@@ -3442,17 +3461,6 @@
+@@ -3727,17 +3746,6 @@
                                    accounts_proxy_ready_cb,
                                    manager);
  

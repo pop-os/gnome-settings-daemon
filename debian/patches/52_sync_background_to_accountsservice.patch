@@ -1,7 +1,7 @@
-Index: gnome-settings-daemon-3.2.2/plugins/background/gsd-background-manager.c
+Index: gnome-settings-daemon-3.3.5/plugins/background/gsd-background-manager.c
 ===================================================================
---- gnome-settings-daemon-3.2.2.orig/plugins/background/gsd-background-manager.c	2011-12-09 16:37:53.424046657 -0500
-+++ gnome-settings-daemon-3.2.2/plugins/background/gsd-background-manager.c	2011-12-09 16:38:24.996046991 -0500
+--- gnome-settings-daemon-3.3.5.orig/plugins/background/gsd-background-manager.c	2012-02-13 17:31:02.596427557 +0100
++++ gnome-settings-daemon-3.3.5/plugins/background/gsd-background-manager.c	2012-02-13 17:31:02.732427557 +0100
 @@ -426,6 +426,98 @@
                  setup_bg_and_draw_background (manager);
  }
@@ -101,7 +101,7 @@ Index: gnome-settings-daemon-3.2.2/plugins/background/gsd-background-manager.c
  gboolean
  gsd_background_manager_start (GsdBackgroundManager *manager,
                                GError              **error)
-@@ -438,6 +531,8 @@
+@@ -438,6 +530,8 @@
          manager->priv->settings = g_settings_new ("org.gnome.desktop.background");
          g_signal_connect (manager->priv->settings, "changed::draw-background",
                            G_CALLBACK (draw_background_changed), manager);

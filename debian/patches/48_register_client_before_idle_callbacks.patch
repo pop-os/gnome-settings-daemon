@@ -1,8 +1,8 @@
-Index: gnome-settings-daemon-3.1.92/gnome-settings-daemon/main.c
+Index: gnome-settings-daemon-3.3.5/gnome-settings-daemon/main.c
 ===================================================================
---- gnome-settings-daemon-3.1.92.orig/gnome-settings-daemon/main.c	2011-09-20 15:50:32.550913141 +0100
-+++ gnome-settings-daemon-3.1.92/gnome-settings-daemon/main.c	2011-09-20 15:51:29.350912129 +0100
-@@ -218,36 +218,6 @@
+--- gnome-settings-daemon-3.3.5.orig/gnome-settings-daemon/main.c	2012-02-13 17:31:02.652427556 +0100
++++ gnome-settings-daemon-3.3.5/gnome-settings-daemon/main.c	2012-02-13 17:31:02.688427557 +0100
+@@ -219,36 +219,6 @@
          g_object_unref (locale_settings);
  }
  
@@ -39,7 +39,7 @@ Index: gnome-settings-daemon-3.1.92/gnome-settings-daemon/main.c
  static gboolean
  on_term_signal_pipe_closed (GIOChannel *source,
                              GIOCondition condition,
-@@ -297,16 +267,6 @@
+@@ -298,16 +268,6 @@
  {
          g_assert (bus != NULL);
  
@@ -56,7 +56,7 @@ Index: gnome-settings-daemon-3.1.92/gnome-settings-daemon/main.c
          watch_for_term_signal (manager);
  }
  
-@@ -329,6 +289,56 @@
+@@ -330,6 +290,56 @@
          gtk_main_quit ();
  }
  
@@ -113,7 +113,7 @@ Index: gnome-settings-daemon-3.1.92/gnome-settings-daemon/main.c
  static void
  bus_register (void)
  {
-@@ -425,6 +435,8 @@
+@@ -429,6 +439,8 @@
  
          notify_init ("gnome-settings-daemon");
  

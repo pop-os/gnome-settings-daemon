@@ -1,18 +1,17 @@
-diff --git a/plugins/power/gsd-power-manager.c b/plugins/power/gsd-power-manager.c
-index 3f10c22..5265ce7 100644
---- a/plugins/power/gsd-power-manager.c
-+++ b/plugins/power/gsd-power-manager.c
-@@ -646,7 +646,8 @@ engine_recalculate_state_icon (GsdPowerManager *manager)
+Index: gnome-settings-daemon-3.3.5/plugins/power/gsd-power-manager.c
+===================================================================
+--- gnome-settings-daemon-3.3.5.orig/plugins/power/gsd-power-manager.c	2012-02-01 20:33:15.000000000 +0100
++++ gnome-settings-daemon-3.3.5/plugins/power/gsd-power-manager.c	2012-02-13 17:31:05.660427578 +0100
+@@ -698,6 +698,8 @@
          if (manager->priv->previous_icon == NULL) {
  
                  /* set fallback icon */
--                gtk_status_icon_set_visible (manager->priv->status_icon, TRUE);
-+                if (g_strcmp0 (g_getenv ("XDG_CURRENT_DESKTOP"), "Unity") != 0)
-+                        gtk_status_icon_set_visible (manager->priv->status_icon, TRUE);
++                if (g_strcmp0 (g_getenv ("XDG_CURRENT_DESKTOP"), "Unity") == 0)
++                        gtk_status_icon_set_visible (manager->priv->status_icon, FALSE);
                  gtk_status_icon_set_from_gicon (manager->priv->status_icon, icon);
                  manager->priv->previous_icon = icon;
                  return TRUE;
-@@ -3338,6 +3339,8 @@ gsd_power_manager_start (GsdPowerManager *manager,
+@@ -3614,6 +3616,8 @@
          /* TRANSLATORS: this is the title of the power manager status icon
           * that is only shown in fallback mode */
          gtk_status_icon_set_title (manager->priv->status_icon, _("Power Manager"));

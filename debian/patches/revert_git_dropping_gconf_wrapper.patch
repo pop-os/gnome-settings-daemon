@@ -1,0 +1,762 @@
+Index: gnome-settings-daemon-3.3.5/configure.ac
+===================================================================
+--- gnome-settings-daemon-3.3.5.orig/configure.ac	2012-02-13 17:53:40.964436953 +0100
++++ gnome-settings-daemon-3.3.5/configure.ac	2012-02-13 17:53:45.708436986 +0100
+@@ -247,6 +247,32 @@
+ 
+ PKG_CHECK_MODULES(WACOM, [libwacom >= $LIBWACOM_REQUIRED_VERSION x11 xi gnome-desktop-3.0 >= $GNOME_DESKTOP_REQUIRED_VERSION])
+ 
++dnl ---------------------------------------------------------------------------
++dnl - GConf<->GSettings bridge
++dnl ---------------------------------------------------------------------------
++
++build_gconf_bridge=false
++AC_ARG_ENABLE(gconf-bridge,
++  AC_HELP_STRING([--disable-gconf-bridge],
++                 [turn off GConf bridge plugin]),
++      [case "${enableval}" in
++              yes) WANT_GCONF_BRIDGE=yes ;;
++	      no) WANT_GCONF_BRIDGE=no ;;
++	      *) AC_MSG_ERROR(bad value ${enableval} for --disable-gconf-bridge) ;;
++      esac],
++      [WANT_GCONF_BRIDGE=no]) dnl Default value
++
++if test x$WANT_GCONF_BRIDGE = xyes; then
++      PKG_CHECK_MODULES(GCONF, gconf-2.0 >= 2.6.1,
++            [build_gconf_bridge=true
++             AC_DEFINE(BUILD_GCONF_BRIDGE, 1, [Define if GConf bridge should be built])],
++	    [build_gconf_bridge=false])
++fi
++AM_CONDITIONAL(BUILD_GCONF_BRIDGE, test "x$build_gconf_bridge" = "xtrue")
++
++AC_SUBST(GCONF_CFLAGS)
++AC_SUBST(GCONF_LIBS)
++
+ dnl ==============================================
+ dnl PackageKit section
+ dnl ==============================================
+@@ -528,6 +554,7 @@
+ plugins/datetime/Makefile
+ plugins/dummy/Makefile
+ plugins/power/Makefile
++plugins/gconf/Makefile
+ plugins/housekeeping/Makefile
+ plugins/keyboard/Makefile
+ plugins/media-keys/Makefile
+@@ -592,6 +619,7 @@
+ 	App indicator support:    ${enable_appindicator}
+         PackageKit support:       ${have_packagekit}
+         Smartcard support:        ${have_smartcard_support}
++        GConf bridge support:     ${build_gconf_bridge}
+         Cups support:             ${have_cups}
+ ${NSS_DATABASE:+\
+         System nssdb:             ${NSS_DATABASE}
+Index: gnome-settings-daemon-3.3.5/data/org.gnome.settings-daemon.plugins.gschema.xml.in.in
+===================================================================
+--- gnome-settings-daemon-3.3.5.orig/data/org.gnome.settings-daemon.plugins.gschema.xml.in.in	2012-02-01 20:33:14.000000000 +0100
++++ gnome-settings-daemon-3.3.5/data/org.gnome.settings-daemon.plugins.gschema.xml.in.in	2012-02-13 17:53:40.996436953 +0100
+@@ -84,6 +84,18 @@
+       <_description>Priority to use for this plugin in gnome-settings-daemon startup queue</_description>
+     </key>
+   </schema>
++  <schema gettext-domain="@GETTEXT_PACKAGE@" id="org.gnome.settings-daemon.plugins.gconf" path="/org/gnome/settings-daemon/plugins/gconf/">
++    <key name="active" type="b">
++      <default>false</default>
++      <_summary>Activation of this plugin</_summary>
++      <_description>Whether this plugin would be activated by gnome-settings-daemon or not</_description>
++    </key>
++    <key name="priority" type="i">
++      <default>100</default>
++      <_summary>Priority to use for this plugin</_summary>
++      <_description>Priority to use for this plugin in gnome-settings-daemon startup queue</_description>
++    </key>
++  </schema>
+   <schema gettext-domain="@GETTEXT_PACKAGE@" id="org.gnome.settings-daemon.plugins.keybindings" path="/org/gnome/settings-daemon/plugins/keybindings/">
+     <key name="active" type="b">
+       <default>true</default>
+Index: gnome-settings-daemon-3.3.5/plugins/gconf/conf-watcher.c
+===================================================================
+--- /dev/null	1970-01-01 00:00:00.000000000 +0000
++++ gnome-settings-daemon-3.3.5/plugins/gconf/conf-watcher.c	2012-02-13 17:53:40.996436953 +0100
+@@ -0,0 +1,150 @@
++/* -*- Mode: C; tab-width: 8; indent-tabs-mode: nil; c-basic-offset: 8 -*-
++ *
++ * Copyright (C) 2010 Rodrigo Moya <rodrigo@gnome.org>
++ *
++ * This program is free software; you can redistribute it and/or modify
++ * it under the terms of the GNU General Public License as published by
++ * the Free Software Foundation; either version 2 of the License, or
++ * (at your option) any later version.
++ *
++ * This program is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ * GNU General Public License for more details.
++ *
++ * You should have received a copy of the GNU General Public License
++ * along with this program; if not, write to the Free Software
++ * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
++ *
++ */
++
++#include "config.h"
++#include "conf-watcher.h"
++
++G_DEFINE_TYPE(ConfWatcher, conf_watcher, G_TYPE_OBJECT)
++
++static void settings_changed_cb (GSettings *settings,
++                                 const gchar *key,
++                                 ConfWatcher *watcher);
++
++static void
++conf_watcher_finalize (GObject *object)
++{
++	ConfWatcher *watcher = CONF_WATCHER (object);
++
++	if (watcher->settings != NULL) {
++                g_signal_handlers_disconnect_by_func (watcher->settings, settings_changed_cb, watcher);
++		g_object_unref (watcher->settings);
++        }
++
++	if (watcher->conf_client != NULL)
++		g_object_unref (watcher->conf_client);
++
++	if (watcher->settings_id != NULL)
++		g_free (watcher->settings_id);
++
++	if (watcher->keys_hash != NULL)
++		g_hash_table_destroy (watcher->keys_hash);
++
++	G_OBJECT_CLASS (conf_watcher_parent_class)->finalize (object);
++}
++
++static void
++conf_watcher_class_init (ConfWatcherClass *klass)
++{
++	GObjectClass *object_class = G_OBJECT_CLASS (klass);
++
++	object_class->finalize = conf_watcher_finalize;
++}
++
++static void
++conf_watcher_init (ConfWatcher *watcher)
++{
++}
++
++static void
++settings_changed_cb (GSettings *settings,
++		     const gchar *key,
++		     ConfWatcher *watcher)
++{
++	const gchar *gconf_key_name;
++
++	gconf_key_name = g_hash_table_lookup (watcher->keys_hash, key);
++	if (gconf_key_name != NULL) {
++		GVariant *value;
++
++		value = g_settings_get_value (settings, key);
++		if (g_variant_is_of_type (value, G_VARIANT_TYPE_BOOLEAN)) {
++			gconf_client_set_bool (watcher->conf_client,
++					       gconf_key_name,
++					       g_variant_get_boolean (value),
++					       NULL);
++		} else if (g_variant_is_of_type (value, G_VARIANT_TYPE_BYTE) ||
++			   g_variant_is_of_type (value, G_VARIANT_TYPE_INT16) ||
++			   g_variant_is_of_type (value, G_VARIANT_TYPE_UINT16) ||
++			   g_variant_is_of_type (value, G_VARIANT_TYPE_INT32) ||
++			   g_variant_is_of_type (value, G_VARIANT_TYPE_UINT32) ||
++			   g_variant_is_of_type (value, G_VARIANT_TYPE_INT64) ||
++			   g_variant_is_of_type (value, G_VARIANT_TYPE_UINT64)) {
++			gconf_client_set_int (watcher->conf_client,
++					      gconf_key_name,
++					      g_settings_get_int (settings, key),
++					      NULL);
++		} else if (g_variant_is_of_type (value, G_VARIANT_TYPE_STRING)) {
++			gconf_client_set_string (watcher->conf_client,
++						 gconf_key_name,
++						 g_variant_get_string (value, NULL),
++						 NULL);
++		} else if (g_variant_is_of_type (value, G_VARIANT_TYPE_DOUBLE)) {
++			gconf_client_set_float (watcher->conf_client,
++						gconf_key_name,
++						g_variant_get_double (value),
++						NULL);
++		} else if (g_variant_is_of_type (value, G_VARIANT_TYPE_STRING_ARRAY)) {
++			const gchar **items;
++			gsize len, i;
++			GSList *gconf_list = NULL;
++
++			items = g_variant_get_strv (value, &len);
++			for (i = 0; i < len; i++) {
++				gconf_list = g_slist_append (gconf_list, (gpointer) items[i]);
++			}
++
++			gconf_client_set_list (watcher->conf_client,
++					       gconf_key_name,
++					       GCONF_VALUE_STRING,
++					       gconf_list,
++					       NULL);
++
++			g_slist_free (gconf_list);
++			g_free (items);
++		}
++	}
++}
++
++static void
++setup_watcher (ConfWatcher *watcher)
++{
++	watcher->settings = g_settings_new (watcher->settings_id);
++	g_signal_connect (watcher->settings, "changed",
++			  G_CALLBACK (settings_changed_cb), watcher);
++
++	watcher->conf_client = gconf_client_get_default ();
++}
++
++ConfWatcher *
++conf_watcher_new (const gchar *settings_id, GHashTable *keys_hash)
++{
++	ConfWatcher *watcher;
++
++	g_return_val_if_fail (settings_id != NULL, NULL);
++	g_return_val_if_fail (keys_hash != NULL, NULL);
++
++	watcher = g_object_new (TYPE_CONF_WATCHER, NULL);
++
++	watcher->settings_id = g_strdup (settings_id);
++	watcher->keys_hash = keys_hash;
++	setup_watcher (watcher);
++
++	return watcher;
++}
+Index: gnome-settings-daemon-3.3.5/plugins/gconf/conf-watcher.h
+===================================================================
+--- /dev/null	1970-01-01 00:00:00.000000000 +0000
++++ gnome-settings-daemon-3.3.5/plugins/gconf/conf-watcher.h	2012-02-13 17:53:41.000436953 +0100
+@@ -0,0 +1,61 @@
++/* -*- Mode: C; tab-width: 8; indent-tabs-mode: nil; c-basic-offset: 8 -*-
++ *
++ * Copyright (C) 2010 Rodrigo Moya <rodrigo@gnome.org>
++ *
++ * This program is free software; you can redistribute it and/or modify
++ * it under the terms of the GNU General Public License as published by
++ * the Free Software Foundation; either version 2 of the License, or
++ * (at your option) any later version.
++ *
++ * This program is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ * GNU General Public License for more details.
++ *
++ * You should have received a copy of the GNU General Public License
++ * along with this program; if not, write to the Free Software
++ * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
++ *
++ */
++
++#ifndef __CONF_WATCHER_H
++#define __CONF_WATCHER_H
++
++#include <glib-object.h>
++#include <gio/gio.h>
++#include <gconf/gconf-client.h>
++
++G_BEGIN_DECLS
++
++#define TYPE_CONF_WATCHER         (conf_watcher_get_type ())
++#define CONF_WATCHER(o)           (G_TYPE_CHECK_INSTANCE_CAST ((o), TYPE_CONF_WATCHER, ConfWatcher))
++#define CONF_WATCHER_CLASS(k)     (G_TYPE_CHECK_CLASS_CAST((k), TYPE_CONF_WATCHER, ConfWatcherClass))
++#define IS_CONF_WATCHER(o)        (G_TYPE_CHECK_INSTANCE_TYPE ((o), TYPE_CONF_WATCHER))
++#define IS_CONF_WATCHER_CLASS(k)  (G_TYPE_CHECK_CLASS_TYPE ((k), TYPE_CONF_WATCHER))
++#define CONF_WATCHER_GET_CLASS(o) (G_TYPE_INSTANCE_GET_CLASS ((o), TYPE_CONF_WATCHER, ConfWatcherClass))
++
++typedef struct ConfWatcherPrivate ConfWatcherPrivate;
++
++typedef struct
++{
++        GObject parent;
++
++	/* Private data */
++	GSettings *settings;
++	GConfClient *conf_client;
++	gchar *settings_id;
++	GHashTable *keys_hash;
++} ConfWatcher;
++
++typedef struct
++{
++        GObjectClass   parent_class;
++} ConfWatcherClass;
++
++GType        conf_watcher_get_type (void);
++
++ConfWatcher *conf_watcher_new      (const gchar *settings_id, GHashTable *keys_hash);
++
++G_END_DECLS
++
++#endif /* __CONF_WATCHER_H */
+Index: gnome-settings-daemon-3.3.5/plugins/gconf/gconf.gnome-settings-plugin.in
+===================================================================
+--- /dev/null	1970-01-01 00:00:00.000000000 +0000
++++ gnome-settings-daemon-3.3.5/plugins/gconf/gconf.gnome-settings-plugin.in	2012-02-13 17:53:41.000436953 +0100
+@@ -0,0 +1,8 @@
++[GNOME Settings Plugin]
++Module=gconf
++IAge=0
++_Name=GConf
++_Description=GConf/GSettings bridge
++Authors=Rodrigo Moya <rodrigo@gnome.org>
++Copyright=Copyright © 2010 
++Website=
+Index: gnome-settings-daemon-3.3.5/plugins/gconf/gsd-gconf-manager.c
+===================================================================
+--- /dev/null	1970-01-01 00:00:00.000000000 +0000
++++ gnome-settings-daemon-3.3.5/plugins/gconf/gsd-gconf-manager.c	2012-02-13 17:53:41.000436953 +0100
+@@ -0,0 +1,159 @@
++/* -*- Mode: C; tab-width: 8; indent-tabs-mode: nil; c-basic-offset: 8 -*-
++ *
++ * Copyright (C) 2010 Rodrigo Moya <rodrigo@gnome.org>
++ *
++ * This program is free software; you can redistribute it and/or modify
++ * it under the terms of the GNU General Public License as published by
++ * the Free Software Foundation; either version 2, or (at your option)
++ * any later version.
++ *
++ * This program is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ * GNU General Public License for more details.
++ *
++ * You should have received a copy of the GNU General Public License
++ * along with this program; if not, write to the Free Software
++ * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
++ *
++ */
++
++#include "config.h"
++#include "conf-watcher.h"
++#include "gsd-gconf-manager.h"
++
++#define GSD_GCONF_MANAGER_GET_PRIVATE(o) (G_TYPE_INSTANCE_GET_PRIVATE ((o), GSD_TYPE_GCONF_MANAGER, GsdGconfManagerPrivate))
++
++struct GsdGconfManagerPrivate {
++        GHashTable *conf_watchers;
++};
++
++GsdGconfManager *manager_object = NULL;
++
++G_DEFINE_TYPE(GsdGconfManager, gsd_gconf_manager, G_TYPE_OBJECT)
++
++static void
++gsd_gconf_manager_finalize (GObject *object)
++{
++        GsdGconfManager *manager = GSD_GCONF_MANAGER (object);
++
++        g_return_if_fail (manager->priv != NULL);
++
++        if (manager->priv->conf_watchers != NULL)
++                g_hash_table_destroy (manager->priv->conf_watchers);
++
++        G_OBJECT_CLASS (gsd_gconf_manager_parent_class)->finalize (object);
++}
++
++static void
++gsd_gconf_manager_class_init (GsdGconfManagerClass *klass)
++{
++        GObjectClass *object_class = G_OBJECT_CLASS (klass);
++
++        object_class->finalize = gsd_gconf_manager_finalize;
++
++        g_type_class_add_private (klass, sizeof (GsdGconfManagerPrivate));
++}
++
++static void
++gsd_gconf_manager_init (GsdGconfManager *manager)
++{
++        manager->priv = GSD_GCONF_MANAGER_GET_PRIVATE (manager);
++}
++
++GsdGconfManager *
++gsd_gconf_manager_new (void)
++{
++        if (manager_object != NULL) {
++                g_object_ref (manager_object);
++        } else {
++                manager_object = g_object_new (GSD_TYPE_GCONF_MANAGER, NULL);
++                g_object_add_weak_pointer ((gpointer) manager_object,
++                                           (gpointer *) &manager_object);
++        }
++
++        return manager_object;
++}
++
++gboolean
++gsd_gconf_manager_start (GsdGconfManager *manager, GError **error)
++{
++        GDir *convertdir;
++        gboolean result = FALSE;
++
++        manager->priv->conf_watchers = g_hash_table_new_full (g_str_hash, g_str_equal, g_free, g_object_unref);
++
++        /* Read all conversion files from GCONF_SETTINGS_CONVERTDIR */
++        convertdir = g_dir_open (GCONF_SETTINGS_CONVERTDIR, 0, error);
++        if (convertdir) {
++                const gchar *filename;
++
++                while ((filename = g_dir_read_name (convertdir))) {
++                        gchar *path, **groups;
++                        gsize group_len, i;
++                        GKeyFile *key_file = g_key_file_new ();
++
++                        path = g_build_filename (GCONF_SETTINGS_CONVERTDIR, filename, NULL);
++                        if (!g_key_file_load_from_file (key_file, path, G_KEY_FILE_NONE, error)) {
++                                g_free (path);
++                                g_key_file_free (key_file);
++                                result = FALSE;
++                                break;
++                        }
++
++                        /* Load the groups in the file */
++                        groups = g_key_file_get_groups (key_file, &group_len);
++                        for (i = 0; i < group_len; i++) {
++                                gchar **keys;
++                                gsize key_len, j;
++                                GHashTable *keys_hash = NULL;
++
++                                if (!groups[i])
++                                        continue;
++
++                                keys = g_key_file_get_keys (key_file, groups[i], &key_len, error);
++                                for (j = 0; j < key_len; j++) {
++                                        if (keys_hash == NULL)
++                                                keys_hash = g_hash_table_new_full (g_str_hash, g_str_equal, g_free, g_free);
++
++                                        g_hash_table_insert (keys_hash, g_strdup (keys[j]),
++                                                             g_key_file_get_value (key_file, groups[i], keys[j], error));
++                                }
++
++                                g_strfreev (keys);
++
++                                if (keys_hash != NULL) {
++                                        ConfWatcher *watcher;
++
++                                        watcher = conf_watcher_new (groups[i], keys_hash);
++                                        if (watcher) {
++                                                g_hash_table_insert (manager->priv->conf_watchers,
++                                                                     g_strdup (groups[i]),
++                                                                     watcher);
++                                        } else
++                                                g_hash_table_destroy (keys_hash);
++                                }
++                        }
++
++                        /* Free all memory */
++                        g_free (path);
++                        g_strfreev (groups);
++                        g_key_file_free (key_file);
++
++                        result = TRUE;
++                }
++
++                g_dir_close (convertdir);
++        }
++
++        return result;
++}
++
++void
++gsd_gconf_manager_stop (GsdGconfManager *manager)
++{
++        if (manager->priv->conf_watchers != NULL) {
++                g_hash_table_destroy (manager->priv->conf_watchers);
++                manager->priv->conf_watchers = NULL;
++        }
++}
+Index: gnome-settings-daemon-3.3.5/plugins/gconf/gsd-gconf-manager.h
+===================================================================
+--- /dev/null	1970-01-01 00:00:00.000000000 +0000
++++ gnome-settings-daemon-3.3.5/plugins/gconf/gsd-gconf-manager.h	2012-02-13 17:53:41.000436953 +0100
+@@ -0,0 +1,57 @@
++/* -*- Mode: C; tab-width: 8; indent-tabs-mode: nil; c-basic-offset: 8 -*-
++ *
++ * Copyright (C) 2010 Rodrigo Moya <rodrigo@gnome.org>
++ *
++ * This program is free software; you can redistribute it and/or modify
++ * it under the terms of the GNU General Public License as published by
++ * the Free Software Foundation; either version 2 of the License, or
++ * (at your option) any later version.
++ *
++ * This program is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ * GNU General Public License for more details.
++ *
++ * You should have received a copy of the GNU General Public License
++ * along with this program; if not, write to the Free Software
++ * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
++ *
++ */
++
++#ifndef __GSD_GCONF_MANAGER_H
++#define __GSD_GCONF_MANAGER_H
++
++#include <glib-object.h>
++
++G_BEGIN_DECLS
++
++#define GSD_TYPE_GCONF_MANAGER         (gsd_gconf_manager_get_type ())
++#define GSD_GCONF_MANAGER(o)           (G_TYPE_CHECK_INSTANCE_CAST ((o), GSD_TYPE_GCONF_MANAGER, GsdGconfManager))
++#define GSD_GCONF_MANAGER_CLASS(k)     (G_TYPE_CHECK_CLASS_CAST((k), GSD_TYPE_GCONF_MANAGER, GsdGconfManagerClass))
++#define GSD_IS_GCONF_MANAGER(o)        (G_TYPE_CHECK_INSTANCE_TYPE ((o), GSD_TYPE_GCONF_MANAGER))
++#define GSD_IS_GCONF_MANAGER_CLASS(k)  (G_TYPE_CHECK_CLASS_TYPE ((k), GSD_TYPE_GCONF_MANAGER))
++#define GSD_GCONF_MANAGER_GET_CLASS(o) (G_TYPE_INSTANCE_GET_CLASS ((o), GSD_TYPE_GCONF_MANAGER, GsdGconfManagerClass))
++
++typedef struct GsdGconfManagerPrivate GsdGconfManagerPrivate;
++
++typedef struct
++{
++        GObject                 parent;
++        GsdGconfManagerPrivate *priv;
++} GsdGconfManager;
++
++typedef struct
++{
++        GObjectClass   parent_class;
++} GsdGconfManagerClass;
++
++GType                   gsd_gconf_manager_get_type            (void);
++
++GsdGconfManager *       gsd_gconf_manager_new                 (void);
++gboolean                gsd_gconf_manager_start               (GsdGconfManager *manager,
++                                                               GError         **error);
++void                    gsd_gconf_manager_stop                (GsdGconfManager *manager);
++
++G_END_DECLS
++
++#endif /* __GSD_GCONF_MANAGER_H */
+Index: gnome-settings-daemon-3.3.5/plugins/gconf/gsd-gconf-plugin.c
+===================================================================
+--- /dev/null	1970-01-01 00:00:00.000000000 +0000
++++ gnome-settings-daemon-3.3.5/plugins/gconf/gsd-gconf-plugin.c	2012-02-13 17:53:41.000436953 +0100
+@@ -0,0 +1,95 @@
++/* -*- Mode: C; tab-width: 8; indent-tabs-mode: nil; c-basic-offset: 8 -*-
++ *
++ * Copyright (C) 2010 Rodrigo Moya <rodrigo@gnome.org>
++ *
++ * This program is free software; you can redistribute it and/or modify
++ * it under the terms of the GNU General Public License as published by
++ * the Free Software Foundation; either version 2, or (at your option)
++ * any later version.
++ *
++ * This program is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ * GNU General Public License for more details.
++ *
++ * You should have received a copy of the GNU General Public License
++ * along with this program; if not, write to the Free Software
++ * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
++ *
++ */
++
++#include "config.h"
++#include <gmodule.h>
++#include "gnome-settings-plugin.h"
++#include "gsd-gconf-plugin.h"
++#include "gsd-gconf-manager.h"
++
++struct GsdGconfPluginPrivate {
++	GsdGconfManager *manager;
++};
++
++#define GSD_GCONF_PLUGIN_GET_PRIVATE(object) (G_TYPE_INSTANCE_GET_PRIVATE ((object), GSD_TYPE_GCONF_PLUGIN, GsdGconfPluginPrivate))
++
++GNOME_SETTINGS_PLUGIN_REGISTER(GsdGconfPlugin, gsd_gconf_plugin)
++
++static void
++gsd_gconf_plugin_init (GsdGconfPlugin *plugin)
++{
++	plugin->priv = GSD_GCONF_PLUGIN_GET_PRIVATE (plugin);
++	plugin->priv->manager = gsd_gconf_manager_new ();
++}
++
++static void
++gsd_gconf_plugin_finalize (GObject *object)
++{
++	GsdGconfPlugin *plugin;
++
++	plugin = GSD_GCONF_PLUGIN (object);
++
++	g_return_if_fail (plugin->priv != NULL);
++
++	if (plugin->priv->manager != NULL)
++		g_object_unref (plugin->priv->manager);
++
++	G_OBJECT_CLASS (gsd_gconf_plugin_parent_class)->finalize (object);
++}
++
++static void
++impl_activate (GnomeSettingsPlugin *plugin)
++{
++	gboolean res;
++	GError *error = NULL;
++
++	g_debug ("Starting GConf bridge plugin");
++	res = gsd_gconf_manager_start (GSD_GCONF_PLUGIN (plugin)->priv->manager, &error);
++	if (!res) {
++		g_warning ("Unable to start GConf manager: %s", error->message);
++		g_error_free (error);
++	}
++}
++
++static void
++impl_deactivate (GnomeSettingsPlugin *plugin)
++{
++	g_debug ("Stopping GConf bridge plugin");
++	gsd_gconf_manager_stop (GSD_GCONF_PLUGIN (plugin)->priv->manager);
++}
++
++static void
++gsd_gconf_plugin_class_init (GsdGconfPluginClass *klass)
++{
++	GObjectClass *object_class = G_OBJECT_CLASS (klass);
++	GnomeSettingsPluginClass *plugin_class = GNOME_SETTINGS_PLUGIN_CLASS (klass);
++
++	object_class->finalize = gsd_gconf_plugin_finalize;
++
++	plugin_class->activate = impl_activate;
++	plugin_class->deactivate = impl_deactivate;
++
++	g_type_class_add_private (klass, sizeof (GsdGconfPluginPrivate));
++}
++
++static void
++gsd_gconf_plugin_class_finalize (GsdGconfPluginClass *klass)
++{
++}
+Index: gnome-settings-daemon-3.3.5/plugins/gconf/gsd-gconf-plugin.h
+===================================================================
+--- /dev/null	1970-01-01 00:00:00.000000000 +0000
++++ gnome-settings-daemon-3.3.5/plugins/gconf/gsd-gconf-plugin.h	2012-02-13 17:53:41.004436953 +0100
+@@ -0,0 +1,59 @@
++/* -*- Mode: C; tab-width: 8; indent-tabs-mode: nil; c-basic-offset: 8 -*-
++ *
++ * Copyright (C) 2010 Rodrigo Moya <rodrigo@gnome-db.org>
++ *
++ * This program is free software; you can redistribute it and/or modify
++ * it under the terms of the GNU General Public License as published by
++ * the Free Software Foundation; either version 2, or (at your option)
++ * any later version.
++ *
++ * This program is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ * GNU General Public License for more details.
++ *
++ * You should have received a copy of the GNU General Public License
++ * along with this program; if not, write to the Free Software
++ * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
++ *
++ */
++
++#ifndef __GSD_GCONF_PLUGIN_H__
++#define __GSD_GCONF_PLUGIN_H__
++
++#include <glib.h>
++#include <glib-object.h>
++#include <gmodule.h>
++
++#include "gnome-settings-plugin.h"
++
++G_BEGIN_DECLS
++
++#define GSD_TYPE_GCONF_PLUGIN                (gsd_gconf_plugin_get_type ())
++#define GSD_GCONF_PLUGIN(o)                  (G_TYPE_CHECK_INSTANCE_CAST ((o), GSD_TYPE_GCONF_PLUGIN, GsdGconfPlugin))
++#define GSD_GCONF_PLUGIN_CLASS(k)            (G_TYPE_CHECK_CLASS_CAST((k), GSD_TYPE_GCONF_PLUGIN, GsdGconfPluginClass))
++#define GSD_IS_GCONF_PLUGIN(o)               (G_TYPE_CHECK_INSTANCE_TYPE ((o), GSD_TYPE_GCONF_PLUGIN))
++#define GSD_IS_GCONF_PLUGIN_CLASS(k)         (G_TYPE_CHECK_CLASS_TYPE ((k), GSD_TYPE_GCONF_PLUGIN))
++#define GSD_GCONF_PLUGIN_GET_CLASS(o)        (G_TYPE_INSTANCE_GET_CLASS ((o), GSD_TYPE_GCONF_PLUGIN, GsdGconfPluginClass))
++
++typedef struct GsdGconfPluginPrivate GsdGconfPluginPrivate;
++
++typedef struct
++{
++        GnomeSettingsPlugin    parent;
++        GsdGconfPluginPrivate *priv;
++} GsdGconfPlugin;
++
++typedef struct
++{
++        GnomeSettingsPluginClass parent_class;
++} GsdGconfPluginClass;
++
++GType   gsd_gconf_plugin_get_type            (void) G_GNUC_CONST;
++
++/* All the plugins must implement this function */
++G_MODULE_EXPORT GType register_gnome_settings_plugin (GTypeModule *module);
++
++G_END_DECLS
++
++#endif /* __GSD_GCONF_PLUGIN_H__ */
+Index: gnome-settings-daemon-3.3.5/plugins/gconf/Makefile.am
+===================================================================
+--- /dev/null	1970-01-01 00:00:00.000000000 +0000
++++ gnome-settings-daemon-3.3.5/plugins/gconf/Makefile.am	2012-02-13 17:53:41.004436953 +0100
+@@ -0,0 +1,40 @@
++plugin_name = gconf
++
++plugin_LTLIBRARIES = libgconf.la
++
++libgconf_la_SOURCES =		\
++	conf-watcher.c		\
++	conf-watcher.h		\
++	gsd-gconf-plugin.c	\
++	gsd-gconf-plugin.h	\
++	gsd-gconf-manager.c	\
++	gsd-gconf-manager.h
++
++libgconf_la_CPPFLAGS =							\
++	-I$(top_srcdir)/gnome-settings-daemon				\
++	-DGNOME_SETTINGS_LOCALEDIR=\""$(datadir)/locale"\"		\
++	-DGCONF_SETTINGS_CONVERTDIR=\""$(datadir)/GConf/gsettings"\"	\
++        -DLIBEXECDIR=\""$(libexecdir)"\"				\
++        $(AM_CPPFLAGS)
++
++libgconf_la_CFLAGS =			\
++	$(PLUGIN_CFLAGS)		\
++	$(GCONF_CFLAGS)			\
++	$(SETTINGS_PLUGIN_CFLAGS)	\
++	$(AM_CFLAGS)
++
++libgconf_la_LDFLAGS = $(GSD_PLUGIN_LDFLAGS)
++
++libgconf_la_LIBADD =		\
++	$(GCONF_LIBS)		\
++	$(SETTINGS_PLUGIN_LIBS)
++
++plugin_in_files = gconf.gnome-settings-plugin.in
++
++plugin_DATA = $(plugin_in_files:.gnome-settings-plugin.in=.gnome-settings-plugin)
++
++EXTRA_DIST = $(plugin_in_files)
++CLEANFILES = $(plugin_DATA)
++DISTCLEANFILES = $(plugin_DATA)
++
++@GSD_INTLTOOL_PLUGIN_RULE@
+Index: gnome-settings-daemon-3.3.5/plugins/Makefile.am
+===================================================================
+--- gnome-settings-daemon-3.3.5.orig/plugins/Makefile.am	2012-02-13 17:53:40.976436952 +0100
++++ gnome-settings-daemon-3.3.5/plugins/Makefile.am	2012-02-13 17:53:41.008436953 +0100
+@@ -23,6 +23,12 @@
+ 
+ disabled_plugins = $(NULL)
+ 
++if BUILD_GCONF_BRIDGE
++enabled_plugins += gconf
++else
++disabled_plugins += gconf
++endif
++
+ if HAVE_PACKAGEKIT
+ enabled_plugins += updates
+ else

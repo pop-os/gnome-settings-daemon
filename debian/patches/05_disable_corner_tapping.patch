@@ -2,13 +2,13 @@ Description: Disable corner tapping when disabling tap to click
 Bug: https://bugzilla.gnome.org/show_bug.cgi?id=607474
 Bug-Ubuntu: https://bugs.launchpad.net/bugs/509724
 
-diff --git a/plugins/mouse/gsd-mouse-manager.c b/plugins/mouse/gsd-mouse-manager.c
-index 685b703..f2fc316 100644
---- a/plugins/mouse/gsd-mouse-manager.c
-+++ b/plugins/mouse/gsd-mouse-manager.c
-@@ -588,6 +588,10 @@ set_tap_to_click (GdkDevice *device,
+Index: gnome-settings-daemon-3.3.5/plugins/mouse/gsd-mouse-manager.c
+===================================================================
+--- gnome-settings-daemon-3.3.5.orig/plugins/mouse/gsd-mouse-manager.c	2012-02-01 20:33:15.000000000 +0100
++++ gnome-settings-daemon-3.3.5/plugins/mouse/gsd-mouse-manager.c	2012-02-13 17:31:10.328427610 +0100
+@@ -569,6 +569,10 @@
                                   &bytes_after, &data);
-
+ 
          if (rc == Success && type == XA_INTEGER && format == 8 && nitems >= 7) {
 +               /* Set MR mapping for corner tapping on the right side*/
 +               data[0] = (state) ? 2 : 0;

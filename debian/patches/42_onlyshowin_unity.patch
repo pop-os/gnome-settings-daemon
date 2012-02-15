@@ -3,9 +3,10 @@ Author: Michael Terry <michael.terry@canonical.com>
 Bug: https://bugzilla.gnome.org/show_bug.cgi?id=654919
 Bug-Ubuntu: https://launchpad.net/bugs/803519
 
-diff -Nur gnome-settings-daemon-3.1.4.gnome/plugins/automount/gnome-fallback-mount-helper.desktop.in.in gnome-settings-daemon-3.1.4/plugins/automount/gnome-fallback-mount-helper.desktop.in.in
---- gnome-settings-daemon-3.1.4.gnome/plugins/automount/gnome-fallback-mount-helper.desktop.in.in	2011-08-02 12:39:54.032834906 +0200
-+++ gnome-settings-daemon-3.1.4/plugins/automount/gnome-fallback-mount-helper.desktop.in.in	2011-08-02 12:40:14.648834916 +0200
+Index: gnome-settings-daemon-3.3.5/plugins/automount/gnome-fallback-mount-helper.desktop.in.in
+===================================================================
+--- gnome-settings-daemon-3.3.5.orig/plugins/automount/gnome-fallback-mount-helper.desktop.in.in	2011-10-17 19:36:56.000000000 +0200
++++ gnome-settings-daemon-3.3.5/plugins/automount/gnome-fallback-mount-helper.desktop.in.in	2012-02-13 17:31:02.632427556 +0100
 @@ -7,6 +7,6 @@
  Type=Application
  Categories=

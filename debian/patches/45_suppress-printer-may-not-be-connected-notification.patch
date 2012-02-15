@@ -1,7 +1,9 @@
 # Ubuntu: https://launchpad.net/bugs/842768
---- a/plugins/print-notifications/gsd-print-notifications-manager.c
-+++ b/plugins/print-notifications/gsd-print-notifications-manager.c
-@@ -279,7 +279,7 @@
+Index: gnome-settings-daemon-3.3.5/plugins/print-notifications/gsd-print-notifications-manager.c
+===================================================================
+--- gnome-settings-daemon-3.3.5.orig/plugins/print-notifications/gsd-print-notifications-manager.c	2012-02-01 20:33:15.000000000 +0100
++++ gnome-settings-daemon-3.3.5/plugins/print-notifications/gsd-print-notifications-manager.c	2012-02-13 17:31:02.672427557 +0100
+@@ -281,7 +281,7 @@
          static const char * const reasons[] = {
                  "toner-low",
                  "toner-empty",
@@ -10,7 +12,7 @@
                  "cover-open",
                  "cups-missing-filter",
                  "door-open",
-@@ -296,7 +296,7 @@
+@@ -298,7 +298,7 @@
                  /* Translators: The printer has no toner left (same as in system-config-printer) */
                  N_("Toner empty"),
                  /* Translators: The printer is in the process of connecting to a shared network output device (same as in system-config-printer) */
@@ -19,7 +21,7 @@
                  /* Translators: One or more covers on the printer are open (same as in system-config-printer) */
                  N_("Cover open"),
                  /* Translators: A filter or backend is not installed (same as in system-config-printer) */
-@@ -322,7 +322,7 @@
+@@ -324,7 +324,7 @@
                  /* Translators: The printer has no toner left (same as in system-config-printer) */
                  N_("Printer '%s' has no toner left."),
                  /* Translators: The printer is in the process of connecting to a shared network output device (same as in system-config-printer) */

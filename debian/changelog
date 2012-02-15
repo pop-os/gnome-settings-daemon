@@ -1,3 +1,49 @@
+gnome-settings-daemon (3.3.5-0ubuntu1) UNRELEASED; urgency=low
+
+  * New upstream version (lp: #931656), refreshed patches, 
+    thanks Jeremy Bicha for starting the work on the new version:
+    - change the sound level by device (lp: #340720)
+    - correctly unassign keybindings (lp: #515670)
+    - define keybinding to take a screenshot of a selection (lp: #625518)
+    - resolve some segfaults (lp: #865286)
+  * debian/control.in:
+    - build-depends on libgudev-1.0-dev
+    - breaks unity-greeter (<< 0.2.1-0ubuntu1) due to the wacom schema rename
+    - build-depends on libwacom
+    - updated gtk, gnome-desktop3, g-d-s, upower requirements
+  * debian/gnome-settings-daemon.gsettings-override:
+    - don't set deprecated "sleep-inactive-battery" key
+  * debian/patches/90_set_gmenus_xsettings.patch:
+    - refreshed, we don't handle gnome-shell xsettings yet because we still
+      ship 3.2, that patch will need an update if we go for the new version
+  * debian/patches/git_gsettings_write_only_when_required.patch;
+    debian/patches/50_add_dell_backlight.patch:
+    - dropped the fix is in the new version
+  * debian/patches/47_delay_pa_connect_to_idle.patch:
+    - commented, will need to be updated if still needed
+  * debian/patches/revert_git_datetime_dropping.patch:
+    - revert the datetime service dropping, ubuntu-system-service doesn't
+      implement the timedated interfaces
+  * debian/patches/revert_git_dropping_gconf_wrapper.patch:
+    - revert the gconf code dropping, we might still need the settings
+      gateway for the lts (though it's a bit hackish)
+  * debian/patches/revert_git_use_gsetting_keybindings.patch:
+    - revert the keybindings switch to gsettings, compiz is not ready,
+      it's likely possible to update the patch to do either according to
+      the session in use at runtime if somebody wants to work on that
+  * debian/patches/revert_git_a11y_gsettings.patch:
+    - similar to the previous one
+  * debian/patches/revert_git_stop_using_gconf.patch:
+    - don't stop using gconf, the other patches listed before need it
+  * debian/rules:
+    - don't use -Bsymbolic-functions to workaround upstream issues
+    - drop deprecated --enable-pulse option
+    - use --disable-systemd
+  * debian/watch:
+    - watch for .xz
+
+ -- Sebastien Bacher <seb128@ubuntu.com>  Mon, 13 Feb 2012 22:19:50 +0100
+
 gnome-settings-daemon (3.2.2-0ubuntu17) precise; urgency=low
 
   * debian/patches/disable_three_touch_tap.patch

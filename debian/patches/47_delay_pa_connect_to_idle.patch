@@ -3,15 +3,15 @@ Index: gnome-settings-daemon-3.1.92/plugins/media-keys/gsd-media-keys-manager.c
 --- gnome-settings-daemon-3.1.92.orig/plugins/media-keys/gsd-media-keys-manager.c	2011-09-20 13:06:46.417743905 +0100
 +++ gnome-settings-daemon-3.1.92/plugins/media-keys/gsd-media-keys-manager.c	2011-09-20 13:11:44.497738608 +0100
 @@ -1873,6 +1873,9 @@
- 
          g_debug ("Starting media_keys manager");
          gnome_settings_profile_start (NULL);
+ 
 +
 +        gvc_mixer_control_open (manager->priv->volume);
 +
          manager->priv->settings = g_settings_new (SETTINGS_BINDING_DIR);
          g_signal_connect (G_OBJECT (manager->priv->settings), "changed",
-                           G_CALLBACK (update_kbd_cb), manager);
+                           G_CALLBACK (gsettings_changed_cb), manager);
 @@ -1947,8 +1950,6 @@
                            G_CALLBACK (on_control_stream_removed),
                            manager);
@@ -19,5 +19,5 @@ Index: gnome-settings-daemon-3.1.92/plugins/media-keys/gsd-media-keys-manager.c
 -        gvc_mixer_control_open (manager->priv->volume);
 -
          gnome_settings_profile_end ("gvc_mixer_control_new");
- #endif /* HAVE_PULSE */
+ 
          manager->priv->start_idle_id = g_idle_add ((GSourceFunc) start_media_keys_idle_cb, manager);

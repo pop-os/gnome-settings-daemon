@@ -4,11 +4,11 @@ Description: Convert old filenames to an URI, to have migration of GConf
              LTS, which is the upgrade we maintain.
 Author: Rodrigo Moya <rodrigo.moya@canonical.com>
 
-diff --git a/plugins/background/gsd-background-manager.c b/plugins/background/gsd-background-manager.c
-index 4705f9b..c02d151 100644
---- a/plugins/background/gsd-background-manager.c
-+++ b/plugins/background/gsd-background-manager.c
-@@ -278,8 +278,22 @@ on_bg_changed (GnomeBG              *bg,
+Index: gnome-settings-daemon-3.3.5/plugins/background/gsd-background-manager.c
+===================================================================
+--- gnome-settings-daemon-3.3.5.orig/plugins/background/gsd-background-manager.c	2012-02-01 20:33:14.000000000 +0100
++++ gnome-settings-daemon-3.3.5/plugins/background/gsd-background-manager.c	2012-02-13 17:31:05.096427573 +0100
+@@ -278,8 +278,22 @@
  static void
  setup_bg (GsdBackgroundManager *manager)
  {

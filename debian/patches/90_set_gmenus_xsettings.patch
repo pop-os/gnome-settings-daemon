@@ -1,85 +1,21 @@
-From 4c8902a8f10a78ad67b1443ef9039dda526238e8 Mon Sep 17 00:00:00 2001
-From: Colin Walters <walters@verbum.org>
-Date: Fri, 02 Dec 2011 00:55:21 +0000
-Subject: xsettings: Monitor for the shell, and update Gtk/ShellShowsAppMenu
-
----
-Index: gnome-settings-daemon-3.2.2/plugins/xsettings/gsd-xsettings-manager.c
+Index: gnome-settings-daemon-3.3.5/plugins/xsettings/gsd-xsettings-manager.c
 ===================================================================
---- gnome-settings-daemon-3.2.2.orig/plugins/xsettings/gsd-xsettings-manager.c	2012-01-12 10:50:50.113102907 +0100
-+++ gnome-settings-daemon-3.2.2/plugins/xsettings/gsd-xsettings-manager.c	2012-01-12 10:50:50.345102917 +0100
-@@ -95,6 +95,8 @@
-         fontconfig_monitor_handle_t *fontconfig_handle;
+--- gnome-settings-daemon-3.3.5.orig/plugins/xsettings/gsd-xsettings-manager.c	2012-02-13 17:53:40.772436952 +0100
++++ gnome-settings-daemon-3.3.5/plugins/xsettings/gsd-xsettings-manager.c	2012-02-13 17:53:40.948436953 +0100
+@@ -682,6 +682,7 @@
  
-         GsdXSettingsGtk   *gtk;
-+
-+        guint              shell_name_watch_id;
- };
- 
- #define GSD_XSETTINGS_ERROR gsd_xsettings_error_quark ()
-@@ -526,6 +528,40 @@
- }
- 
- static void
-+notify_have_shell (GnomeXSettingsManager   *manager,
-+                   gboolean                 have_shell)
-+{
-+        int i;
-+        int timestamp = time (NULL);
-+
-+        gnome_settings_profile_start (NULL);
-+
-+        for (i = 0; manager->priv->managers [i]; i++) {
-+                xsettings_manager_set_int (manager->priv->managers [i], "Gtk/ShellShowsAppMenu", have_shell);
+         for (i = 0; manager->priv->managers [i]; i++) {
+                 xsettings_manager_set_int (manager->priv->managers [i], "Gtk/ShellShowsAppMenu", have_shell);
 +                xsettings_manager_set_int (manager->priv->managers [i], "Gtk/ShellShowsMenubar", have_shell);
-+                xsettings_manager_notify (manager->priv->managers [i]);
-+        }
-+        gnome_settings_profile_end (NULL);
-+}
-+
-+static void
-+on_shell_appeared (GDBusConnection *connection,
-+                   const gchar     *name,
-+                   const gchar     *name_owner,
-+                   gpointer         user_data)
-+{
-+        notify_have_shell (user_data, TRUE);
-+}
-+
-+static void
-+on_shell_disappeared (GDBusConnection *connection,
-+                      const gchar     *name,
-+                      gpointer         user_data)
-+{
-+        notify_have_shell (user_data, FALSE);
-+}
-+
-+static void
- process_value (GnomeXSettingsManager *manager,
-                TranslationEntry      *trans,
-                GVariant              *value)
-@@ -720,6 +756,15 @@
+                 xsettings_manager_notify (manager->priv->managers [i]);
+         }
+         gnome_settings_profile_end (NULL);
+@@ -892,7 +893,7 @@
  
-         start_fontconfig_monitor (manager);
- 
-+        /* Shell flag */
-+        manager->priv->shell_name_watch_id = g_bus_watch_name (G_BUS_TYPE_SESSION,
+         /* Shell flag */
+         manager->priv->shell_name_watch_id = g_bus_watch_name (G_BUS_TYPE_SESSION,
+-                                                               "org.gnome.Shell",
 +                                                               "com.canonical.AppMenu.Registrar",
-+                                                               0,
-+                                                               on_shell_appeared,
-+                                                               on_shell_disappeared,
-+                                                               manager,
-+                                                               NULL);
-+
-         for (i = 0; manager->priv->managers [i]; i++)
-                 xsettings_manager_set_string (manager->priv->managers [i],
-                                               "Net/FallbackIconTheme",
-@@ -758,6 +803,8 @@
- 
-         stop_fontconfig_monitor (manager);
- 
-+        g_bus_unwatch_name (manager->priv->shell_name_watch_id);
-+
-         if (p->settings != NULL) {
-                 g_hash_table_destroy (p->settings);
-                 p->settings = NULL;
+                                                                0,
+                                                                on_shell_appeared,
+                                                                on_shell_disappeared,

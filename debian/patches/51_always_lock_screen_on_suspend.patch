@@ -4,13 +4,13 @@ Author: Marc Deslauriers <marc.deslauriers@canonical.com>
 Forwarded: no, likely a Ubuntu-specific preference
 Bug-Ubuntu: https://bugs.launchpad.net/ubuntu/+source/gnome-session/+bug/847814
 
-Index: gnome-settings-daemon-3.2.2/plugins/power/gsd-power-manager.c
+Index: gnome-settings-daemon-3.3.5/plugins/power/gsd-power-manager.c
 ===================================================================
---- gnome-settings-daemon-3.2.2.orig/plugins/power/gsd-power-manager.c	2012-01-31 10:08:49.296675297 -0500
-+++ gnome-settings-daemon-3.2.2/plugins/power/gsd-power-manager.c	2012-01-31 10:09:18.352676043 -0500
-@@ -55,6 +55,10 @@
- #define CONSOLEKIT_DBUS_PATH_MANAGER            "/org/freedesktop/ConsoleKit/Manager"
- #define CONSOLEKIT_DBUS_INTERFACE_MANAGER       "org.freedesktop.ConsoleKit.Manager"
+--- gnome-settings-daemon-3.3.5.orig/plugins/power/gsd-power-manager.c	2012-02-13 17:31:02.536427556 +0100
++++ gnome-settings-daemon-3.3.5/plugins/power/gsd-power-manager.c	2012-02-13 17:31:03.948427566 +0100
+@@ -56,6 +56,10 @@
+ #define SYSTEMD_DBUS_PATH                       "/org/freedesktop/login1"
+ #define SYSTEMD_DBUS_INTERFACE                  "org.freedesktop.login1.Manager"
  
 +#define ACCOUNTS_DBUS_NAME                      "org.freedesktop.Accounts"
 +#define ACCOUNTS_DBUS_PATH                      "/org/freedesktop/Accounts/User"
@@ -19,7 +19,7 @@ Index: gnome-settings-daemon-3.2.2/plugins/power/gsd-power-manager.c
  #define UPOWER_DBUS_NAME                        "org.freedesktop.UPower"
  #define UPOWER_DBUS_PATH                        "/org/freedesktop/UPower"
  #define UPOWER_DBUS_PATH_KBDBACKLIGHT           "/org/freedesktop/UPower/KbdBacklight"
-@@ -161,6 +165,8 @@
+@@ -160,6 +164,8 @@
          GCancellable            *bus_cancellable;
          GDBusProxy              *upower_proxy;
          GDBusProxy              *upower_kdb_proxy;
@@ -28,7 +28,7 @@ Index: gnome-settings-daemon-3.2.2/plugins/power/gsd-power-manager.c
          gint                     kbd_brightness_now;
          gint                     kbd_brightness_max;
          gint                     kbd_brightness_old;
-@@ -2840,6 +2846,57 @@
+@@ -3101,6 +3107,57 @@
  }
  
  static gboolean
@@ -86,7 +86,7 @@ Index: gnome-settings-daemon-3.2.2/plugins/power/gsd-power-manager.c
  idle_sleep_cb (GsdPowerManager *manager)
  {
          gboolean is_idle;
-@@ -3135,6 +3192,22 @@
+@@ -3396,6 +3453,22 @@
  }
  
  static void
@@ -109,7 +109,7 @@ Index: gnome-settings-daemon-3.2.2/plugins/power/gsd-power-manager.c
  power_keyboard_proxy_ready_cb (GObject             *source_object,
                                 GAsyncResult        *res,
                                 gpointer             user_data)
-@@ -3196,12 +3269,13 @@
+@@ -3472,12 +3545,13 @@
                          UpSleepKind sleep_kind,
                          GsdPowerManager *manager)
  {
@@ -127,7 +127,7 @@ Index: gnome-settings-daemon-3.2.2/plugins/power/gsd-power-manager.c
  
          if (manager->priv->screensaver_proxy != NULL) {
                  g_debug ("doing gnome-screensaver lock");
-@@ -3364,6 +3438,18 @@
+@@ -3641,6 +3715,18 @@
                                    power_keyboard_proxy_ready_cb,
                                    manager);
  
@@ -146,13 +146,14 @@ Index: gnome-settings-daemon-3.2.2/plugins/power/gsd-power-manager.c
          /* connect to the screensaver */
          g_dbus_proxy_new_for_bus (G_BUS_TYPE_SESSION,
                                    G_DBUS_PROXY_FLAGS_DO_NOT_LOAD_PROPERTIES,
-@@ -3511,6 +3597,9 @@
+@@ -3808,6 +3894,10 @@
+                 manager->priv->upower_proxy = NULL;
+         }
  
-         if (manager->priv->upower_proxy != NULL)
-                 g_object_unref (manager->priv->upower_proxy);
 +        if (manager->priv->accounts_proxy != NULL)
 +                g_object_unref (manager->priv->accounts_proxy);
 +        g_free (manager->priv->accounts_object_path);
-         if (manager->priv->session_proxy != NULL)
++
+         if (manager->priv->session_proxy != NULL) {
                  g_object_unref (manager->priv->session_proxy);
-         if (manager->priv->session_presence_proxy != NULL)
+                 manager->priv->session_proxy = NULL;

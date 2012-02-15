@@ -13,5 +13,4 @@ tap-to-click = true
 button-power = 'interactive'
 button-sleep = 'suspend'
 critical-battery-action = 'suspend'
-sleep-inactive-battery = true
 idle-dim-time = 30
