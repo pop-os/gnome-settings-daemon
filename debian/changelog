@@ -1,4 +1,4 @@
-gnome-settings-daemon (3.3.5-0ubuntu1) UNRELEASED; urgency=low
+gnome-settings-daemon (3.3.5-0ubuntu1) precise; urgency=low
 
   * New upstream version (lp: #931656), refreshed patches, 
     thanks Jeremy Bicha for starting the work on the new version:
@@ -42,7 +42,7 @@ gnome-settings-daemon (3.3.5-0ubuntu1) UNRELEASED; urgency=low
   * debian/watch:
     - watch for .xz
 
- -- Sebastien Bacher <seb128@ubuntu.com>  Mon, 13 Feb 2012 22:19:50 +0100
+ -- Sebastien Bacher <seb128@ubuntu.com>  Wed, 15 Feb 2012 11:41:52 +0100
 
 gnome-settings-daemon (3.2.2-0ubuntu17) precise; urgency=low
 
