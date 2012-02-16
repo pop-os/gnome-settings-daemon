@@ -1,3 +1,10 @@
+gnome-settings-daemon (3.3.5-0ubuntu3) UNRELEASED; urgency=low
+
+  * debian/patches/buggy_error_handling_segfault.patch:
+    - don't try to print an unset error variable (lp: #932953)
+
+ -- Sebastien Bacher <seb128@ubuntu.com>  Thu, 16 Feb 2012 17:02:36 +0100
+
 gnome-settings-daemon (3.3.5-0ubuntu2) precise; urgency=low
 
   * debian/patches/git_numlock_status.patch:

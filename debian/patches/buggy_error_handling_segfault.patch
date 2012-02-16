@@ -1,0 +1,33 @@
+From 96ae990ebc7d8fddd5ee6237739cdd8d69cd7a86 Mon Sep 17 00:00:00 2001
+From: Sebastien Bacher <seb128@ubuntu.com>
+Date: Thu, 16 Feb 2012 16:39:35 +0100
+Subject: [PATCH] Drop buggy error handling leading to a segfault
+
+---
+ plugins/power/gsd-backlight-helper.c |    4 +---
+ 1 files changed, 1 insertions(+), 3 deletions(-)
+
+diff --git a/plugins/power/gsd-backlight-helper.c b/plugins/power/gsd-backlight-helper.c
+index 6e59fcb..fd9325e 100644
+--- a/plugins/power/gsd-backlight-helper.c
++++ b/plugins/power/gsd-backlight-helper.c
+@@ -53,15 +53,13 @@ static gchar *
+ gsd_backlight_helper_get_best_backlight ()
+ {
+ 	gchar *path = NULL;
+-	GError *error = NULL;
+ 	GList *devices;
+ 	GUdevClient *client;
+ 
+ 	client = g_udev_client_new (NULL);
+ 	devices = g_udev_client_query_by_subsystem (client, "backlight");
+ 	if (devices == NULL) {
+-		g_warning ("failed to find any devices: %s", error->message);
+-		g_error_free (error);
++		g_warning ("failed to find any devices");
+ 		goto out;
+ 	}
+ 
+-- 
+1.7.9
+
