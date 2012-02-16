@@ -1,3 +1,10 @@
+gnome-settings-daemon (3.3.5-0ubuntu2) UNRELEASED; urgency=low
+
+  * debian/patches/git_numlock_status.patch:
+    - correctly update the numlock status (lp: #933405)
+
+ -- Sebastien Bacher <seb128@ubuntu.com>  Thu, 16 Feb 2012 15:41:03 +0100
+
 gnome-settings-daemon (3.3.5-0ubuntu1) precise; urgency=low
 
   * New upstream version (lp: #931656), refreshed patches, 

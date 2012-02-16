@@ -1,0 +1,26 @@
+Subject: keyboard: fix numlock_set_xkb_state
+
+num lock state is stored in an enumeration called
+GsdNumLockState.  Prior to commit
+89b476ec6196aaad5c65804c8ceade3a92d33e29, the old_state
+variable was being used as a boolean despite being
+an enumeration. That commit fixed most of the code
+to use the proper enumeration values instead of
+TRUE / FALSE.
+
+It missed numlock_set_xkb_state though.  This commit
+fixes that function, too.
+---
+diff --git a/plugins/keyboard/gsd-keyboard-manager.c b/plugins/keyboard/gsd-keyboard-manager.c
+index b9cc406..a33460c 100644
+--- a/plugins/keyboard/gsd-keyboard-manager.c
++++ b/plugins/keyboard/gsd-keyboard-manager.c
+@@ -135,7 +135,7 @@ numlock_set_xkb_state (GsdNumLockState new_state)
+         if (new_state != GSD_NUM_LOCK_STATE_ON && new_state != GSD_NUM_LOCK_STATE_OFF)
+                 return;
+         num_mask = numlock_NumLock_modifier_mask ();
+-        XkbLockModifiers (dpy, XkbUseCoreKbd, num_mask, new_state ? num_mask : 0);
++        XkbLockModifiers (dpy, XkbUseCoreKbd, num_mask, new_state == GSD_NUM_LOCK_STATE_ON ? num_mask : 0);
+ }
+ 
+ static GdkFilterReturn
