@@ -1,9 +1,19 @@
-gnome-settings-daemon (3.3.5-0ubuntu4) UNRELEASED; urgency=low
+gnome-settings-daemon (3.3.90-0ubuntu1) UNRELEASED; urgency=low
 
+  * New upstream version
+  * debian/control.in:
+    - build-depends on libxtst-dev and xserver-xorg-input-wacom
+    - updated glib requirement
+  * debian/patches/buggy_error_handling_segfault.patch:
+    - dropped, the patch is in the new version
+  * debian/patches/git_numlock_status.patch:
+    - dropped, the patch is in the new version
+  * debian/rules: 
+    - drop -Bsymbolic-functions workaround, upstream fixed the issue
   * debian/source_gnome-settings-daemon.py:
     - set title and tag with the component which had issues for segfaults
 
- -- Sebastien Bacher <seb128@ubuntu.com>  Tue, 21 Feb 2012 11:57:57 +0100
+ -- Sebastien Bacher <seb128@ubuntu.com>  Tue, 21 Feb 2012 12:00:03 +0100
 
 gnome-settings-daemon (3.3.5-0ubuntu3) precise; urgency=low
 

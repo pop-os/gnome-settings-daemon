@@ -8,8 +8,6 @@ include /usr/share/gnome-pkg-tools/1/rules/uploaders.mk
 include /usr/share/gnome-pkg-tools/1/rules/gnome-get-source.mk
 
 LDFLAGS += -Wl,-O1 -Wl,-z,defs -Wl,--warn-unresolved-symbols -Wl,--as-needed
-LDFLAGS=$(shell echo $$LDFLAGS | sed -e 's/-Wl,-Bsymbolic-functions//')
-export LDFLAGS
 
 DEB_DH_MAKESHLIBS_ARGS_ALL += --no-act
 DEB_CONFIGURE_EXTRA_FLAGS = --enable-gconf-bridge --disable-systemd

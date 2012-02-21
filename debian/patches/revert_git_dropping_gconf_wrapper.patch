@@ -4,7 +4,7 @@ Index: gnome-settings-daemon-3.3.5/configure.ac
 +++ gnome-settings-daemon-3.3.5/configure.ac	2012-02-13 17:53:45.708436986 +0100
 @@ -247,6 +247,32 @@
  
- PKG_CHECK_MODULES(WACOM, [libwacom >= $LIBWACOM_REQUIRED_VERSION x11 xi gnome-desktop-3.0 >= $GNOME_DESKTOP_REQUIRED_VERSION])
+ PKG_CHECK_MODULES(WACOM, [libwacom >= $LIBWACOM_REQUIRED_VERSION x11 xi xtst gnome-desktop-3.0 >= $GNOME_DESKTOP_REQUIRED_VERSION xorg-wacom])
  
 +dnl ---------------------------------------------------------------------------
 +dnl - GConf<->GSettings bridge
