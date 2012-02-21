@@ -1,3 +1,10 @@
+gnome-settings-daemon (3.3.5-0ubuntu4) UNRELEASED; urgency=low
+
+  * debian/source_gnome-settings-daemon.py:
+    - set title and tag with the component which had issues for segfaults
+
+ -- Sebastien Bacher <seb128@ubuntu.com>  Tue, 21 Feb 2012 11:57:57 +0100
+
 gnome-settings-daemon (3.3.5-0ubuntu3) precise; urgency=low
 
   * debian/patches/buggy_error_handling_segfault.patch:
