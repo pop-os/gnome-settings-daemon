@@ -1,3 +1,10 @@
+gnome-settings-daemon (3.3.90-0ubuntu2) UNRELEASED; urgency=low
+
+  * debian/gnome-settings-daemon.install:
+    - install the hook
+
+ -- Sebastien Bacher <seb128@ubuntu.com>  Tue, 21 Feb 2012 22:28:06 +0100
+
 gnome-settings-daemon (3.3.90-0ubuntu1) precise; urgency=low
 
   * New upstream version
