@@ -12,5 +12,5 @@ def add_info(report):
     		    # update the title to reflect the component and tab	
 			    component = re.compile("lib(\w*).so").search(words).groups(1)[0]
 			    report['Title'] = '[%s]: %s' % (component, report.get('Title', report.standard_title()))
-			    report['Tags'] += component
+			    report['Tags'] = '%s %s' % (report.get('Tags', ""), component)
 			    break # Stop on the first .so that's the interesting one
