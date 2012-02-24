@@ -1,11 +1,11 @@
-gnome-settings-daemon (3.3.90-0ubuntu3) UNRELEASED; urgency=low
+gnome-settings-daemon (3.3.90-0ubuntu3) precise; urgency=low
 
   * debian/patches/git_wacom_fix.patch:
     - deal better with some wacom devices to avoiding segfaults (lp: #934445)
   * debian/source_gnome-settings-daemon.py:
     - correctly separate tags with spaces so they don't get concatenated
 
- -- Sebastien Bacher <seb128@ubuntu.com>  Fri, 24 Feb 2012 11:58:23 +0100
+ -- Sebastien Bacher <seb128@ubuntu.com>  Fri, 24 Feb 2012 12:39:29 +0100
 
 gnome-settings-daemon (3.3.90-0ubuntu2) precise; urgency=low
 
