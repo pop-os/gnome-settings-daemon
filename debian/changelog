@@ -1,4 +1,4 @@
-gnome-settings-daemon (3.3.90-0ubuntu4) UNRELEASED; urgency=low
+gnome-settings-daemon (3.3.90-0ubuntu4) precise; urgency=low
 
   * Renamed unity patches to start with <num>_unity and be in the same range,
     it makes easier to see what patches we have
@@ -9,7 +9,7 @@ gnome-settings-daemon (3.3.90-0ubuntu4) UNRELEASED; urgency=low
   * debian/patches/61_unity_use_application_indicator.patch:
     - set an indicator title for the unity hud benefit (lp: #943319) 
 
- -- Sebastien Bacher <seb128@ubuntu.com>  Wed, 29 Feb 2012 16:06:19 +0100
+ -- Sebastien Bacher <seb128@ubuntu.com>  Wed, 29 Feb 2012 18:28:11 +0100
 
 gnome-settings-daemon (3.3.90-0ubuntu3) precise; urgency=low
 
