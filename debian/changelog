@@ -1,3 +1,12 @@
+gnome-settings-daemon (3.3.90-0ubuntu4) UNRELEASED; urgency=low
+
+  * Renamed unity patches to start with <num>_unity and be in the same range,
+    it makes easier to see what patches we have
+  * debian/patches/60_unity_hide_status_icon.patch:
+    - updated to fix a case not handled before (lp: #934582)
+
+ -- Sebastien Bacher <seb128@ubuntu.com>  Wed, 29 Feb 2012 16:06:19 +0100
+
 gnome-settings-daemon (3.3.90-0ubuntu3) precise; urgency=low
 
   * debian/patches/git_wacom_fix.patch:
