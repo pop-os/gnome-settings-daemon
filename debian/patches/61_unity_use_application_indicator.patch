@@ -1,8 +1,8 @@
-Index: gnome-settings-daemon-3.3.5/configure.ac
+Index: gnome-settings-daemon-3.3.90/configure.ac
 ===================================================================
---- gnome-settings-daemon-3.3.5.orig/configure.ac	2012-02-07 16:27:45.000000000 +0100
-+++ gnome-settings-daemon-3.3.5/configure.ac	2012-02-13 17:31:02.504427555 +0100
-@@ -54,6 +54,7 @@
+--- gnome-settings-daemon-3.3.90.orig/configure.ac	2012-02-29 16:10:19.102870154 +0100
++++ gnome-settings-daemon-3.3.90/configure.ac	2012-02-29 16:10:21.146870253 +0100
+@@ -53,6 +53,7 @@
  PA_REQUIRED_VERSION=0.9.16
  LIBWACOM_REQUIRED_VERSION=0.3
  UPOWER_REQUIRED_VERSION=0.9.11
@@ -10,7 +10,7 @@ Index: gnome-settings-daemon-3.3.5/configure.ac
  
  EXTRA_COMPILE_WARNINGS(yes)
  
-@@ -147,6 +148,32 @@
+@@ -146,6 +147,32 @@
  
  PKG_CHECK_MODULES(AUTOMOUNT, x11 kbproto)
  
@@ -43,7 +43,7 @@ Index: gnome-settings-daemon-3.3.5/configure.ac
  dnl ---------------------------------------------------------------------------
  dnl - background
  dnl ---------------------------------------------------------------------------
-@@ -505,6 +532,7 @@
+@@ -504,6 +531,7 @@
          LCMS DICT support:        ${have_new_lcms}
  
          Libnotify support:        ${have_libnotify}
@@ -51,10 +51,10 @@ Index: gnome-settings-daemon-3.3.5/configure.ac
          PackageKit support:       ${have_packagekit}
          Smartcard support:        ${have_smartcard_support}
          Cups support:             ${have_cups}
-Index: gnome-settings-daemon-3.3.5/plugins/a11y-keyboard/gsd-a11y-keyboard-manager.c
+Index: gnome-settings-daemon-3.3.90/plugins/a11y-keyboard/gsd-a11y-keyboard-manager.c
 ===================================================================
---- gnome-settings-daemon-3.3.5.orig/plugins/a11y-keyboard/gsd-a11y-keyboard-manager.c	2012-02-01 20:33:14.000000000 +0100
-+++ gnome-settings-daemon-3.3.5/plugins/a11y-keyboard/gsd-a11y-keyboard-manager.c	2012-02-13 17:31:02.508427555 +0100
+--- gnome-settings-daemon-3.3.90.orig/plugins/a11y-keyboard/gsd-a11y-keyboard-manager.c	2012-02-29 16:10:19.118870155 +0100
++++ gnome-settings-daemon-3.3.90/plugins/a11y-keyboard/gsd-a11y-keyboard-manager.c	2012-02-29 16:10:21.150870253 +0100
 @@ -41,6 +41,10 @@
  #include <X11/XKBlib.h>
  #include <X11/extensions/XKBstr.h>
@@ -193,10 +193,10 @@ Index: gnome-settings-daemon-3.3.5/plugins/a11y-keyboard/gsd-a11y-keyboard-manag
  
          gnome_settings_profile_end (NULL);
  }
-Index: gnome-settings-daemon-3.3.5/plugins/a11y-keyboard/Makefile.am
+Index: gnome-settings-daemon-3.3.90/plugins/a11y-keyboard/Makefile.am
 ===================================================================
---- gnome-settings-daemon-3.3.5.orig/plugins/a11y-keyboard/Makefile.am	2011-09-07 16:40:46.000000000 +0200
-+++ gnome-settings-daemon-3.3.5/plugins/a11y-keyboard/Makefile.am	2012-02-13 17:31:02.508427555 +0100
+--- gnome-settings-daemon-3.3.90.orig/plugins/a11y-keyboard/Makefile.am	2012-02-29 16:10:19.130870157 +0100
++++ gnome-settings-daemon-3.3.90/plugins/a11y-keyboard/Makefile.am	2012-02-29 16:10:21.150870253 +0100
 @@ -56,6 +56,7 @@
  liba11y_keyboard_la_CFLAGS = \
  	$(SETTINGS_PLUGIN_CFLAGS)	\
@@ -213,10 +213,10 @@ Index: gnome-settings-daemon-3.3.5/plugins/a11y-keyboard/Makefile.am
  	$(NULL)
  
  plugin_in_files = 		\
-Index: gnome-settings-daemon-3.3.5/plugins/keyboard/gkbd-configuration.c
+Index: gnome-settings-daemon-3.3.90/plugins/keyboard/gkbd-configuration.c
 ===================================================================
 --- /dev/null	1970-01-01 00:00:00.000000000 +0000
-+++ gnome-settings-daemon-3.3.5/plugins/keyboard/gkbd-configuration.c	2012-02-13 17:31:02.508427555 +0100
++++ gnome-settings-daemon-3.3.90/plugins/keyboard/gkbd-configuration.c	2012-02-29 16:10:21.150870253 +0100
 @@ -0,0 +1,350 @@
 +/*
 + * Copyright (C) 2010 Canonical Ltd.
@@ -568,10 +568,10 @@ Index: gnome-settings-daemon-3.3.5/plugins/keyboard/gkbd-configuration.c
 +{
 +	return configuration->priv->short_group_names;
 +}
-Index: gnome-settings-daemon-3.3.5/plugins/keyboard/gkbd-configuration.h
+Index: gnome-settings-daemon-3.3.90/plugins/keyboard/gkbd-configuration.h
 ===================================================================
 --- /dev/null	1970-01-01 00:00:00.000000000 +0000
-+++ gnome-settings-daemon-3.3.5/plugins/keyboard/gkbd-configuration.h	2012-02-13 17:31:02.508427555 +0100
++++ gnome-settings-daemon-3.3.90/plugins/keyboard/gkbd-configuration.h	2012-02-29 16:10:21.150870253 +0100
 @@ -0,0 +1,65 @@
 +/*
 + * Copyright (C) 2010 Canonical Ltd.
@@ -638,10 +638,10 @@ Index: gnome-settings-daemon-3.3.5/plugins/keyboard/gkbd-configuration.h
 +G_END_DECLS
 +
 +#endif
-Index: gnome-settings-daemon-3.3.5/plugins/keyboard/gsd-keyboard-xkb.c
+Index: gnome-settings-daemon-3.3.90/plugins/keyboard/gsd-keyboard-xkb.c
 ===================================================================
---- gnome-settings-daemon-3.3.5.orig/plugins/keyboard/gsd-keyboard-xkb.c	2012-02-01 20:33:15.000000000 +0100
-+++ gnome-settings-daemon-3.3.5/plugins/keyboard/gsd-keyboard-xkb.c	2012-02-13 17:31:02.512427556 +0100
+--- gnome-settings-daemon-3.3.90.orig/plugins/keyboard/gsd-keyboard-xkb.c	2012-02-29 16:10:19.154870157 +0100
++++ gnome-settings-daemon-3.3.90/plugins/keyboard/gsd-keyboard-xkb.c	2012-02-29 16:11:14.886872854 +0100
 @@ -30,12 +30,20 @@
  #include <gdk/gdkx.h>
  #include <gtk/gtk.h>
@@ -923,7 +923,7 @@ Index: gnome-settings-daemon-3.3.5/plugins/keyboard/gsd-keyboard-xkb.c
  		gchar *image_file = gkbd_status_get_image_filename (i);
  
  		if (image_file == NULL) {
-@@ -283,19 +471,83 @@
+@@ -283,19 +471,84 @@
  		gtk_widget_show (item);
  		gtk_menu_shell_append (GTK_MENU_SHELL (groups_menu), item);
  		g_signal_connect (item, "activate",
@@ -998,6 +998,7 @@ Index: gnome-settings-daemon-3.3.5/plugins/keyboard/gsd-keyboard-xkb.c
 +						  APP_INDICATOR_STATUS_ACTIVE);
 +			app_indicator_set_menu (app_indicator,
 +						popup_menu);
++			app_indicator_set_title (app_indicator, _("Keyboard"));
 +			g_signal_connect (app_indicator, "scroll-event", G_CALLBACK (scroll_event), NULL);
 +		} else {
 +                        XklEngine *engine = gkbd_configuration_get_xkl_engine (gkbd_configuration);
@@ -1008,7 +1009,7 @@ Index: gnome-settings-daemon-3.3.5/plugins/keyboard/gsd-keyboard-xkb.c
  		if (icon == NULL) {
  			xkl_debug (150, "Creating keyboard status icon\n");
  			icon = gkbd_status_new ();
-@@ -305,12 +557,20 @@
+@@ -305,12 +558,20 @@
  					  NULL);
  
  		}
@@ -1029,7 +1030,7 @@ Index: gnome-settings-daemon-3.3.5/plugins/keyboard/gsd-keyboard-xkb.c
  	}
  }
  
-@@ -399,6 +659,15 @@
+@@ -399,6 +660,15 @@
  	gkbd_keyboard_config_load_from_x_current (&current_sys_kbd_config,
  						  NULL);
  
@@ -1045,7 +1046,7 @@ Index: gnome-settings-daemon-3.3.5/plugins/keyboard/gsd-keyboard-xkb.c
  	if (!try_activating_xkb_config_if_new (&current_sys_kbd_config)) {
  		if (filter_xkb_config ()) {
  			if (!try_activating_xkb_config_if_new
-@@ -431,6 +700,22 @@
+@@ -431,6 +701,22 @@
  						  NULL);
  }
  
@@ -1068,7 +1069,7 @@ Index: gnome-settings-daemon-3.3.5/plugins/keyboard/gsd-keyboard-xkb.c
  void
  gsd_keyboard_xkb_set_post_activation_callback (PostActivationCallback fun,
  					       void *user_data)
-@@ -466,6 +751,13 @@
+@@ -466,6 +752,13 @@
  					   DATADIR G_DIR_SEPARATOR_S
  					   "icons");
  
@@ -1082,7 +1083,7 @@ Index: gnome-settings-daemon-3.3.5/plugins/keyboard/gsd-keyboard-xkb.c
  	manager = kbd_manager;
  	gnome_settings_profile_start ("xkl_engine_get_instance");
  	xkl_engine = xkl_engine_get_instance (display);
-@@ -487,6 +779,9 @@
+@@ -487,6 +780,9 @@
  		g_signal_connect (settings_keyboard, "changed",
  				  (GCallback) apply_xkb_settings, NULL);
  
@@ -1092,7 +1093,7 @@ Index: gnome-settings-daemon-3.3.5/plugins/keyboard/gsd-keyboard-xkb.c
  		gdk_window_add_filter (NULL, (GdkFilterFunc)
  				       gsd_keyboard_xkb_evt_filter, NULL);
  
-@@ -549,5 +844,13 @@
+@@ -549,5 +845,13 @@
  	g_object_unref (xkl_engine);
  
  	xkl_engine = NULL;
@@ -1106,10 +1107,10 @@ Index: gnome-settings-daemon-3.3.5/plugins/keyboard/gsd-keyboard-xkb.c
 +
  	inited_ok = FALSE;
  }
-Index: gnome-settings-daemon-3.3.5/plugins/keyboard/Makefile.am
+Index: gnome-settings-daemon-3.3.90/plugins/keyboard/Makefile.am
 ===================================================================
---- gnome-settings-daemon-3.3.5.orig/plugins/keyboard/Makefile.am	2011-10-17 19:36:56.000000000 +0200
-+++ gnome-settings-daemon-3.3.5/plugins/keyboard/Makefile.am	2012-02-13 17:31:02.512427556 +0100
+--- gnome-settings-daemon-3.3.90.orig/plugins/keyboard/Makefile.am	2012-02-29 16:10:19.166870157 +0100
++++ gnome-settings-daemon-3.3.90/plugins/keyboard/Makefile.am	2012-02-29 16:10:21.154870254 +0100
 @@ -24,6 +24,8 @@
  	gsd-keyboard-xkb.c	\
  	delayed-dialog.h	\

@@ -1,7 +1,7 @@
-Index: gnome-settings-daemon-3.3.5/plugins/power/gsd-power-manager.c
+Index: gnome-settings-daemon-3.3.90/plugins/power/gsd-power-manager.c
 ===================================================================
---- gnome-settings-daemon-3.3.5.orig/plugins/power/gsd-power-manager.c	2012-02-01 20:33:15.000000000 +0100
-+++ gnome-settings-daemon-3.3.5/plugins/power/gsd-power-manager.c	2012-02-13 17:31:05.660427578 +0100
+--- gnome-settings-daemon-3.3.90.orig/plugins/power/gsd-power-manager.c	2012-02-29 16:17:55.226892229 +0100
++++ gnome-settings-daemon-3.3.90/plugins/power/gsd-power-manager.c	2012-02-29 16:17:55.250892231 +0100
 @@ -688,7 +688,10 @@
  
          /* show a different icon if we are disconnected */
@@ -14,7 +14,7 @@ Index: gnome-settings-daemon-3.3.5/plugins/power/gsd-power-manager.c
  
          if (icon == NULL) {
                  /* none before, now none */
-@@ -698,6 +701,8 @@
+@@ -704,6 +707,8 @@
          if (manager->priv->previous_icon == NULL) {
  
                  /* set fallback icon */
@@ -22,8 +22,8 @@ Index: gnome-settings-daemon-3.3.5/plugins/power/gsd-power-manager.c
 +                        gtk_status_icon_set_visible (manager->priv->status_icon, FALSE);
                  gtk_status_icon_set_from_gicon (manager->priv->status_icon, icon);
                  manager->priv->previous_icon = icon;
-                 return TRUE;              
-@@ -3614,6 +3616,8 @@
+                 return TRUE;
+@@ -3707,6 +3712,8 @@
          /* TRANSLATORS: this is the title of the power manager status icon
           * that is only shown in fallback mode */
          gtk_status_icon_set_title (manager->priv->status_icon, _("Power Manager"));

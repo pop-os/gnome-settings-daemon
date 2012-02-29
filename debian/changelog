@@ -2,8 +2,12 @@ gnome-settings-daemon (3.3.90-0ubuntu4) UNRELEASED; urgency=low
 
   * Renamed unity patches to start with <num>_unity and be in the same range,
     it makes easier to see what patches we have
+  * debian/control.in:
+    - updated libappindicator version requirement for set_title()
   * debian/patches/60_unity_hide_status_icon.patch:
     - updated to fix a case not handled before (lp: #934582)
+  * debian/patches/61_unity_use_application_indicator.patch:
+    - set an indicator title for the unity hud benefit (lp: #943319) 
 
  -- Sebastien Bacher <seb128@ubuntu.com>  Wed, 29 Feb 2012 16:06:19 +0100
 
