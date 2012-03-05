@@ -1,4 +1,4 @@
-gnome-settings-daemon (3.3.91-0ubuntu1) UNRELEASED; urgency=low
+gnome-settings-daemon (3.3.91-0ubuntu1) precise; urgency=low
 
   * New upstream version:
     - fix segfault with some wacom devices (lp: #945477)
@@ -6,7 +6,7 @@ gnome-settings-daemon (3.3.91-0ubuntu1) UNRELEASED; urgency=low
     - dropped, the fix is in the new version
   * debian/rules: disable pkgkit support explicitly
 
- -- Sebastien Bacher <seb128@ubuntu.com>  Mon, 05 Mar 2012 20:53:09 +0100
+ -- Sebastien Bacher <seb128@ubuntu.com>  Mon, 05 Mar 2012 21:17:42 +0100
 
 gnome-settings-daemon (3.3.90-0ubuntu4) precise; urgency=low
 
