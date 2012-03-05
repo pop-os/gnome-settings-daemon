@@ -13,7 +13,7 @@
 60_unity_hide_status_icon.patch
 61_unity_use_application_indicator.patch
 62_unity_disable_gsd_printer.patch
-63_onlyshowin_unity.patch
+63_unity_start_mounter.patch
 90_set_gmenus_xsettings.patch
 sync_keyboard_layout_to_accountsservice.patch
 disable_three_touch_tap.patch
@@ -22,4 +22,4 @@ revert_git_dropping_gconf_wrapper.patch
 revert_git_stop_using_gconf.patch
 revert_git_use_gsetting_keybindings.patch
 revert_git_a11y_gsettings.patch
-git_wacom_fix.patch
+

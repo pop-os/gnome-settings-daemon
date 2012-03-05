@@ -1,0 +1,15 @@
+Description: Show in Unity too
+Author: Michael Terry <michael.terry@canonical.com>
+Bug: https://bugzilla.gnome.org/show_bug.cgi?id=654919
+Bug-Ubuntu: https://launchpad.net/bugs/803519
+
+Index: gnome-settings-daemon-3.3.91/plugins/automount/gnome-fallback-mount-helper.desktop.in.in
+===================================================================
+--- gnome-settings-daemon-3.3.91.orig/plugins/automount/gnome-fallback-mount-helper.desktop.in.in	2012-03-04 15:45:01.000000000 +0100
++++ gnome-settings-daemon-3.3.91/plugins/automount/gnome-fallback-mount-helper.desktop.in.in	2012-03-05 21:04:12.969981068 +0100
+@@ -9,4 +9,4 @@
+ NoDisplay=true
+ OnlyShowIn=GNOME;Unity;
+ X-GNOME-Autostart-Notify=true
+-AutostartCondition=GNOME3 if-session gnome-fallback
++AutostartCondition=GNOME3 unless-session gnome

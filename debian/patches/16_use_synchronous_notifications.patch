@@ -1,10 +1,10 @@
 Description: Use synchronous notifications when they are supported
 Author: ?
 Upstream: that's Ubuntu specific (notify-osd)
-Index: gnome-settings-daemon-3.3.5/plugins/media-keys/gsd-media-keys-manager.c
+Index: gnome-settings-daemon-3.3.91/plugins/media-keys/gsd-media-keys-manager.c
 ===================================================================
---- gnome-settings-daemon-3.3.5.orig/plugins/media-keys/gsd-media-keys-manager.c	2012-02-01 20:33:15.000000000 +0100
-+++ gnome-settings-daemon-3.3.5/plugins/media-keys/gsd-media-keys-manager.c	2012-02-13 21:34:51.372732896 +0100
+--- gnome-settings-daemon-3.3.91.orig/plugins/media-keys/gsd-media-keys-manager.c	2012-02-01 20:33:15.000000000 +0100
++++ gnome-settings-daemon-3.3.91/plugins/media-keys/gsd-media-keys-manager.c	2012-03-05 21:04:22.929981550 +0100
 @@ -57,6 +57,8 @@
  #include <pulse/pulseaudio.h>
  #include "gvc-mixer-control.h"
@@ -454,11 +454,11 @@ Index: gnome-settings-daemon-3.3.5/plugins/media-keys/gsd-media-keys-manager.c
          if (priv->keys != NULL) {
                  gdk_error_trap_push ();
                  for (i = 0; i < priv->keys->len; ++i) {
-Index: gnome-settings-daemon-3.3.5/configure.ac
+Index: gnome-settings-daemon-3.3.91/configure.ac
 ===================================================================
---- gnome-settings-daemon-3.3.5.orig/configure.ac	2012-02-13 21:34:51.940732923 +0100
-+++ gnome-settings-daemon-3.3.5/configure.ac	2012-02-13 21:35:13.344733959 +0100
-@@ -215,7 +215,7 @@
+--- gnome-settings-daemon-3.3.91.orig/configure.ac	2012-03-05 19:13:16.000000000 +0100
++++ gnome-settings-daemon-3.3.91/configure.ac	2012-03-05 21:04:20.001981408 +0100
+@@ -187,7 +187,7 @@
  dnl - media-keys plugin stuff
  dnl ---------------------------------------------------------------------------
  

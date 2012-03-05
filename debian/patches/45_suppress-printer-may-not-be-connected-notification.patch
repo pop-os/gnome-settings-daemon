@@ -1,8 +1,8 @@
 # Ubuntu: https://launchpad.net/bugs/842768
-Index: gnome-settings-daemon-3.3.5/plugins/print-notifications/gsd-print-notifications-manager.c
+Index: gnome-settings-daemon-3.3.91/plugins/print-notifications/gsd-print-notifications-manager.c
 ===================================================================
---- gnome-settings-daemon-3.3.5.orig/plugins/print-notifications/gsd-print-notifications-manager.c	2012-02-01 20:33:15.000000000 +0100
-+++ gnome-settings-daemon-3.3.5/plugins/print-notifications/gsd-print-notifications-manager.c	2012-02-13 17:31:02.672427557 +0100
+--- gnome-settings-daemon-3.3.91.orig/plugins/print-notifications/gsd-print-notifications-manager.c	2012-02-01 20:33:15.000000000 +0100
++++ gnome-settings-daemon-3.3.91/plugins/print-notifications/gsd-print-notifications-manager.c	2012-03-05 21:04:12.777981060 +0100
 @@ -281,7 +281,7 @@
          static const char * const reasons[] = {
                  "toner-low",

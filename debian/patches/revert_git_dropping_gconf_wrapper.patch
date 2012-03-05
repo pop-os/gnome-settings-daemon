@@ -1,10 +1,10 @@
-Index: gnome-settings-daemon-3.3.5/configure.ac
+Index: gnome-settings-daemon-3.3.91/configure.ac
 ===================================================================
---- gnome-settings-daemon-3.3.5.orig/configure.ac	2012-02-13 17:53:40.964436953 +0100
-+++ gnome-settings-daemon-3.3.5/configure.ac	2012-02-13 17:53:45.708436986 +0100
-@@ -247,6 +247,32 @@
+--- gnome-settings-daemon-3.3.91.orig/configure.ac	2012-03-05 21:04:13.045981072 +0100
++++ gnome-settings-daemon-3.3.91/configure.ac	2012-03-05 21:04:15.581981194 +0100
+@@ -246,6 +246,32 @@
  
- PKG_CHECK_MODULES(WACOM, [libwacom >= $LIBWACOM_REQUIRED_VERSION x11 xi xtst gnome-desktop-3.0 >= $GNOME_DESKTOP_REQUIRED_VERSION xorg-wacom])
+ PKG_CHECK_MODULES(WACOM, [libwacom >= $LIBWACOM_REQUIRED_VERSION x11 xi xtst $GUDEV_PKG gnome-desktop-3.0 >= $GNOME_DESKTOP_REQUIRED_VERSION xorg-wacom])
  
 +dnl ---------------------------------------------------------------------------
 +dnl - GConf<->GSettings bridge
@@ -35,7 +35,7 @@ Index: gnome-settings-daemon-3.3.5/configure.ac
  dnl ==============================================
  dnl PackageKit section
  dnl ==============================================
-@@ -528,6 +554,7 @@
+@@ -527,6 +553,7 @@
  plugins/datetime/Makefile
  plugins/dummy/Makefile
  plugins/power/Makefile
@@ -43,7 +43,7 @@ Index: gnome-settings-daemon-3.3.5/configure.ac
  plugins/housekeeping/Makefile
  plugins/keyboard/Makefile
  plugins/media-keys/Makefile
-@@ -592,6 +619,7 @@
+@@ -591,6 +618,7 @@
  	App indicator support:    ${enable_appindicator}
          PackageKit support:       ${have_packagekit}
          Smartcard support:        ${have_smartcard_support}
@@ -51,10 +51,10 @@ Index: gnome-settings-daemon-3.3.5/configure.ac
          Cups support:             ${have_cups}
  ${NSS_DATABASE:+\
          System nssdb:             ${NSS_DATABASE}
-Index: gnome-settings-daemon-3.3.5/data/org.gnome.settings-daemon.plugins.gschema.xml.in.in
+Index: gnome-settings-daemon-3.3.91/data/org.gnome.settings-daemon.plugins.gschema.xml.in.in
 ===================================================================
---- gnome-settings-daemon-3.3.5.orig/data/org.gnome.settings-daemon.plugins.gschema.xml.in.in	2012-02-01 20:33:14.000000000 +0100
-+++ gnome-settings-daemon-3.3.5/data/org.gnome.settings-daemon.plugins.gschema.xml.in.in	2012-02-13 17:53:40.996436953 +0100
+--- gnome-settings-daemon-3.3.91.orig/data/org.gnome.settings-daemon.plugins.gschema.xml.in.in	2012-02-01 20:33:14.000000000 +0100
++++ gnome-settings-daemon-3.3.91/data/org.gnome.settings-daemon.plugins.gschema.xml.in.in	2012-03-05 21:04:13.081981073 +0100
 @@ -84,6 +84,18 @@
        <_description>Priority to use for this plugin in gnome-settings-daemon startup queue</_description>
      </key>
@@ -74,10 +74,10 @@ Index: gnome-settings-daemon-3.3.5/data/org.gnome.settings-daemon.plugins.gschem
    <schema gettext-domain="@GETTEXT_PACKAGE@" id="org.gnome.settings-daemon.plugins.keybindings" path="/org/gnome/settings-daemon/plugins/keybindings/">
      <key name="active" type="b">
        <default>true</default>
-Index: gnome-settings-daemon-3.3.5/plugins/gconf/conf-watcher.c
+Index: gnome-settings-daemon-3.3.91/plugins/gconf/conf-watcher.c
 ===================================================================
 --- /dev/null	1970-01-01 00:00:00.000000000 +0000
-+++ gnome-settings-daemon-3.3.5/plugins/gconf/conf-watcher.c	2012-02-13 17:53:40.996436953 +0100
++++ gnome-settings-daemon-3.3.91/plugins/gconf/conf-watcher.c	2012-03-05 21:04:13.081981073 +0100
 @@ -0,0 +1,150 @@
 +/* -*- Mode: C; tab-width: 8; indent-tabs-mode: nil; c-basic-offset: 8 -*-
 + *
@@ -229,10 +229,10 @@ Index: gnome-settings-daemon-3.3.5/plugins/gconf/conf-watcher.c
 +
 +	return watcher;
 +}
-Index: gnome-settings-daemon-3.3.5/plugins/gconf/conf-watcher.h
+Index: gnome-settings-daemon-3.3.91/plugins/gconf/conf-watcher.h
 ===================================================================
 --- /dev/null	1970-01-01 00:00:00.000000000 +0000
-+++ gnome-settings-daemon-3.3.5/plugins/gconf/conf-watcher.h	2012-02-13 17:53:41.000436953 +0100
++++ gnome-settings-daemon-3.3.91/plugins/gconf/conf-watcher.h	2012-03-05 21:04:13.081981073 +0100
 @@ -0,0 +1,61 @@
 +/* -*- Mode: C; tab-width: 8; indent-tabs-mode: nil; c-basic-offset: 8 -*-
 + *
@@ -295,10 +295,10 @@ Index: gnome-settings-daemon-3.3.5/plugins/gconf/conf-watcher.h
 +G_END_DECLS
 +
 +#endif /* __CONF_WATCHER_H */
-Index: gnome-settings-daemon-3.3.5/plugins/gconf/gconf.gnome-settings-plugin.in
+Index: gnome-settings-daemon-3.3.91/plugins/gconf/gconf.gnome-settings-plugin.in
 ===================================================================
 --- /dev/null	1970-01-01 00:00:00.000000000 +0000
-+++ gnome-settings-daemon-3.3.5/plugins/gconf/gconf.gnome-settings-plugin.in	2012-02-13 17:53:41.000436953 +0100
++++ gnome-settings-daemon-3.3.91/plugins/gconf/gconf.gnome-settings-plugin.in	2012-03-05 21:04:13.081981073 +0100
 @@ -0,0 +1,8 @@
 +[GNOME Settings Plugin]
 +Module=gconf
@@ -308,10 +308,10 @@ Index: gnome-settings-daemon-3.3.5/plugins/gconf/gconf.gnome-settings-plugin.in
 +Authors=Rodrigo Moya <rodrigo@gnome.org>
 +Copyright=Copyright © 2010 
 +Website=
-Index: gnome-settings-daemon-3.3.5/plugins/gconf/gsd-gconf-manager.c
+Index: gnome-settings-daemon-3.3.91/plugins/gconf/gsd-gconf-manager.c
 ===================================================================
 --- /dev/null	1970-01-01 00:00:00.000000000 +0000
-+++ gnome-settings-daemon-3.3.5/plugins/gconf/gsd-gconf-manager.c	2012-02-13 17:53:41.000436953 +0100
++++ gnome-settings-daemon-3.3.91/plugins/gconf/gsd-gconf-manager.c	2012-03-05 21:04:13.085981074 +0100
 @@ -0,0 +1,159 @@
 +/* -*- Mode: C; tab-width: 8; indent-tabs-mode: nil; c-basic-offset: 8 -*-
 + *
@@ -472,10 +472,10 @@ Index: gnome-settings-daemon-3.3.5/plugins/gconf/gsd-gconf-manager.c
 +                manager->priv->conf_watchers = NULL;
 +        }
 +}
-Index: gnome-settings-daemon-3.3.5/plugins/gconf/gsd-gconf-manager.h
+Index: gnome-settings-daemon-3.3.91/plugins/gconf/gsd-gconf-manager.h
 ===================================================================
 --- /dev/null	1970-01-01 00:00:00.000000000 +0000
-+++ gnome-settings-daemon-3.3.5/plugins/gconf/gsd-gconf-manager.h	2012-02-13 17:53:41.000436953 +0100
++++ gnome-settings-daemon-3.3.91/plugins/gconf/gsd-gconf-manager.h	2012-03-05 21:04:13.085981074 +0100
 @@ -0,0 +1,57 @@
 +/* -*- Mode: C; tab-width: 8; indent-tabs-mode: nil; c-basic-offset: 8 -*-
 + *
@@ -534,10 +534,10 @@ Index: gnome-settings-daemon-3.3.5/plugins/gconf/gsd-gconf-manager.h
 +G_END_DECLS
 +
 +#endif /* __GSD_GCONF_MANAGER_H */
-Index: gnome-settings-daemon-3.3.5/plugins/gconf/gsd-gconf-plugin.c
+Index: gnome-settings-daemon-3.3.91/plugins/gconf/gsd-gconf-plugin.c
 ===================================================================
 --- /dev/null	1970-01-01 00:00:00.000000000 +0000
-+++ gnome-settings-daemon-3.3.5/plugins/gconf/gsd-gconf-plugin.c	2012-02-13 17:53:41.000436953 +0100
++++ gnome-settings-daemon-3.3.91/plugins/gconf/gsd-gconf-plugin.c	2012-03-05 21:04:13.085981074 +0100
 @@ -0,0 +1,95 @@
 +/* -*- Mode: C; tab-width: 8; indent-tabs-mode: nil; c-basic-offset: 8 -*-
 + *
@@ -634,10 +634,10 @@ Index: gnome-settings-daemon-3.3.5/plugins/gconf/gsd-gconf-plugin.c
 +gsd_gconf_plugin_class_finalize (GsdGconfPluginClass *klass)
 +{
 +}
-Index: gnome-settings-daemon-3.3.5/plugins/gconf/gsd-gconf-plugin.h
+Index: gnome-settings-daemon-3.3.91/plugins/gconf/gsd-gconf-plugin.h
 ===================================================================
 --- /dev/null	1970-01-01 00:00:00.000000000 +0000
-+++ gnome-settings-daemon-3.3.5/plugins/gconf/gsd-gconf-plugin.h	2012-02-13 17:53:41.004436953 +0100
++++ gnome-settings-daemon-3.3.91/plugins/gconf/gsd-gconf-plugin.h	2012-03-05 21:04:13.085981074 +0100
 @@ -0,0 +1,59 @@
 +/* -*- Mode: C; tab-width: 8; indent-tabs-mode: nil; c-basic-offset: 8 -*-
 + *
@@ -698,10 +698,10 @@ Index: gnome-settings-daemon-3.3.5/plugins/gconf/gsd-gconf-plugin.h
 +G_END_DECLS
 +
 +#endif /* __GSD_GCONF_PLUGIN_H__ */
-Index: gnome-settings-daemon-3.3.5/plugins/gconf/Makefile.am
+Index: gnome-settings-daemon-3.3.91/plugins/gconf/Makefile.am
 ===================================================================
 --- /dev/null	1970-01-01 00:00:00.000000000 +0000
-+++ gnome-settings-daemon-3.3.5/plugins/gconf/Makefile.am	2012-02-13 17:53:41.004436953 +0100
++++ gnome-settings-daemon-3.3.91/plugins/gconf/Makefile.am	2012-03-05 21:04:13.085981074 +0100
 @@ -0,0 +1,40 @@
 +plugin_name = gconf
 +
@@ -743,10 +743,10 @@ Index: gnome-settings-daemon-3.3.5/plugins/gconf/Makefile.am
 +DISTCLEANFILES = $(plugin_DATA)
 +
 +@GSD_INTLTOOL_PLUGIN_RULE@
-Index: gnome-settings-daemon-3.3.5/plugins/Makefile.am
+Index: gnome-settings-daemon-3.3.91/plugins/Makefile.am
 ===================================================================
---- gnome-settings-daemon-3.3.5.orig/plugins/Makefile.am	2012-02-13 17:53:40.976436952 +0100
-+++ gnome-settings-daemon-3.3.5/plugins/Makefile.am	2012-02-13 17:53:41.008436953 +0100
+--- gnome-settings-daemon-3.3.91.orig/plugins/Makefile.am	2012-03-05 21:04:13.061981072 +0100
++++ gnome-settings-daemon-3.3.91/plugins/Makefile.am	2012-03-05 21:04:13.089981074 +0100
 @@ -23,6 +23,12 @@
  
  disabled_plugins = $(NULL)

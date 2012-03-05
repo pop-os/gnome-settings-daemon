@@ -1,7 +1,7 @@
-Index: gnome-settings-daemon-3.3.90/configure.ac
+Index: gnome-settings-daemon-3.3.91/configure.ac
 ===================================================================
---- gnome-settings-daemon-3.3.90.orig/configure.ac	2012-02-29 16:10:19.102870154 +0100
-+++ gnome-settings-daemon-3.3.90/configure.ac	2012-02-29 16:10:21.146870253 +0100
+--- gnome-settings-daemon-3.3.91.orig/configure.ac	2012-03-05 21:04:12.701981055 +0100
++++ gnome-settings-daemon-3.3.91/configure.ac	2012-03-05 21:04:16.877981257 +0100
 @@ -53,6 +53,7 @@
  PA_REQUIRED_VERSION=0.9.16
  LIBWACOM_REQUIRED_VERSION=0.3
@@ -51,10 +51,10 @@ Index: gnome-settings-daemon-3.3.90/configure.ac
          PackageKit support:       ${have_packagekit}
          Smartcard support:        ${have_smartcard_support}
          Cups support:             ${have_cups}
-Index: gnome-settings-daemon-3.3.90/plugins/a11y-keyboard/gsd-a11y-keyboard-manager.c
+Index: gnome-settings-daemon-3.3.91/plugins/a11y-keyboard/gsd-a11y-keyboard-manager.c
 ===================================================================
---- gnome-settings-daemon-3.3.90.orig/plugins/a11y-keyboard/gsd-a11y-keyboard-manager.c	2012-02-29 16:10:19.118870155 +0100
-+++ gnome-settings-daemon-3.3.90/plugins/a11y-keyboard/gsd-a11y-keyboard-manager.c	2012-02-29 16:10:21.150870253 +0100
+--- gnome-settings-daemon-3.3.91.orig/plugins/a11y-keyboard/gsd-a11y-keyboard-manager.c	2012-02-01 20:33:14.000000000 +0100
++++ gnome-settings-daemon-3.3.91/plugins/a11y-keyboard/gsd-a11y-keyboard-manager.c	2012-03-05 21:04:12.929981066 +0100
 @@ -41,6 +41,10 @@
  #include <X11/XKBlib.h>
  #include <X11/extensions/XKBstr.h>
@@ -193,10 +193,10 @@ Index: gnome-settings-daemon-3.3.90/plugins/a11y-keyboard/gsd-a11y-keyboard-mana
  
          gnome_settings_profile_end (NULL);
  }
-Index: gnome-settings-daemon-3.3.90/plugins/a11y-keyboard/Makefile.am
+Index: gnome-settings-daemon-3.3.91/plugins/a11y-keyboard/Makefile.am
 ===================================================================
---- gnome-settings-daemon-3.3.90.orig/plugins/a11y-keyboard/Makefile.am	2012-02-29 16:10:19.130870157 +0100
-+++ gnome-settings-daemon-3.3.90/plugins/a11y-keyboard/Makefile.am	2012-02-29 16:10:21.150870253 +0100
+--- gnome-settings-daemon-3.3.91.orig/plugins/a11y-keyboard/Makefile.am	2011-09-07 16:40:46.000000000 +0200
++++ gnome-settings-daemon-3.3.91/plugins/a11y-keyboard/Makefile.am	2012-03-05 21:04:12.929981066 +0100
 @@ -56,6 +56,7 @@
  liba11y_keyboard_la_CFLAGS = \
  	$(SETTINGS_PLUGIN_CFLAGS)	\
@@ -213,10 +213,10 @@ Index: gnome-settings-daemon-3.3.90/plugins/a11y-keyboard/Makefile.am
  	$(NULL)
  
  plugin_in_files = 		\
-Index: gnome-settings-daemon-3.3.90/plugins/keyboard/gkbd-configuration.c
+Index: gnome-settings-daemon-3.3.91/plugins/keyboard/gkbd-configuration.c
 ===================================================================
 --- /dev/null	1970-01-01 00:00:00.000000000 +0000
-+++ gnome-settings-daemon-3.3.90/plugins/keyboard/gkbd-configuration.c	2012-02-29 16:10:21.150870253 +0100
++++ gnome-settings-daemon-3.3.91/plugins/keyboard/gkbd-configuration.c	2012-03-05 21:04:12.933981066 +0100
 @@ -0,0 +1,350 @@
 +/*
 + * Copyright (C) 2010 Canonical Ltd.
@@ -568,10 +568,10 @@ Index: gnome-settings-daemon-3.3.90/plugins/keyboard/gkbd-configuration.c
 +{
 +	return configuration->priv->short_group_names;
 +}
-Index: gnome-settings-daemon-3.3.90/plugins/keyboard/gkbd-configuration.h
+Index: gnome-settings-daemon-3.3.91/plugins/keyboard/gkbd-configuration.h
 ===================================================================
 --- /dev/null	1970-01-01 00:00:00.000000000 +0000
-+++ gnome-settings-daemon-3.3.90/plugins/keyboard/gkbd-configuration.h	2012-02-29 16:10:21.150870253 +0100
++++ gnome-settings-daemon-3.3.91/plugins/keyboard/gkbd-configuration.h	2012-03-05 21:04:12.933981066 +0100
 @@ -0,0 +1,65 @@
 +/*
 + * Copyright (C) 2010 Canonical Ltd.
@@ -638,10 +638,10 @@ Index: gnome-settings-daemon-3.3.90/plugins/keyboard/gkbd-configuration.h
 +G_END_DECLS
 +
 +#endif
-Index: gnome-settings-daemon-3.3.90/plugins/keyboard/gsd-keyboard-xkb.c
+Index: gnome-settings-daemon-3.3.91/plugins/keyboard/gsd-keyboard-xkb.c
 ===================================================================
---- gnome-settings-daemon-3.3.90.orig/plugins/keyboard/gsd-keyboard-xkb.c	2012-02-29 16:10:19.154870157 +0100
-+++ gnome-settings-daemon-3.3.90/plugins/keyboard/gsd-keyboard-xkb.c	2012-02-29 16:11:14.886872854 +0100
+--- gnome-settings-daemon-3.3.91.orig/plugins/keyboard/gsd-keyboard-xkb.c	2012-02-01 20:33:15.000000000 +0100
++++ gnome-settings-daemon-3.3.91/plugins/keyboard/gsd-keyboard-xkb.c	2012-03-05 21:04:12.933981066 +0100
 @@ -30,12 +30,20 @@
  #include <gdk/gdkx.h>
  #include <gtk/gtk.h>
@@ -1107,10 +1107,10 @@ Index: gnome-settings-daemon-3.3.90/plugins/keyboard/gsd-keyboard-xkb.c
 +
  	inited_ok = FALSE;
  }
-Index: gnome-settings-daemon-3.3.90/plugins/keyboard/Makefile.am
+Index: gnome-settings-daemon-3.3.91/plugins/keyboard/Makefile.am
 ===================================================================
---- gnome-settings-daemon-3.3.90.orig/plugins/keyboard/Makefile.am	2012-02-29 16:10:19.166870157 +0100
-+++ gnome-settings-daemon-3.3.90/plugins/keyboard/Makefile.am	2012-02-29 16:10:21.154870254 +0100
+--- gnome-settings-daemon-3.3.91.orig/plugins/keyboard/Makefile.am	2011-10-17 19:36:56.000000000 +0200
++++ gnome-settings-daemon-3.3.91/plugins/keyboard/Makefile.am	2012-03-05 21:04:12.937981066 +0100
 @@ -24,6 +24,8 @@
  	gsd-keyboard-xkb.c	\
  	delayed-dialog.h	\

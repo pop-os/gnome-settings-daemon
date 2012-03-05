@@ -1,10 +1,10 @@
 Description: OpenOffice.org subpixel font rendering broken with new cairo
 Bug: https://bugs.launchpad.net/bugs/271283
 
-Index: gnome-settings-daemon-3.3.5/plugins/xsettings/gsd-xsettings-manager.c
+Index: gnome-settings-daemon-3.3.91/plugins/xsettings/gsd-xsettings-manager.c
 ===================================================================
---- gnome-settings-daemon-3.3.5.orig/plugins/xsettings/gsd-xsettings-manager.c	2012-02-01 20:33:15.000000000 +0100
-+++ gnome-settings-daemon-3.3.5/plugins/xsettings/gsd-xsettings-manager.c	2012-02-13 17:31:02.616427556 +0100
+--- gnome-settings-daemon-3.3.91.orig/plugins/xsettings/gsd-xsettings-manager.c	2012-02-08 17:59:31.000000000 +0100
++++ gnome-settings-daemon-3.3.91/plugins/xsettings/gsd-xsettings-manager.c	2012-03-05 21:04:18.289981325 +0100
 @@ -383,6 +383,9 @@
          int         dpi;
          const char *rgba;

@@ -1,8 +1,8 @@
-Index: gnome-settings-daemon-3.3.5/plugins/xsettings/gsd-xsettings-manager.c
+Index: gnome-settings-daemon-3.3.91/plugins/xsettings/gsd-xsettings-manager.c
 ===================================================================
---- gnome-settings-daemon-3.3.5.orig/plugins/xsettings/gsd-xsettings-manager.c	2012-02-13 17:53:40.772436952 +0100
-+++ gnome-settings-daemon-3.3.5/plugins/xsettings/gsd-xsettings-manager.c	2012-02-13 17:53:40.948436953 +0100
-@@ -682,6 +682,7 @@
+--- gnome-settings-daemon-3.3.91.orig/plugins/xsettings/gsd-xsettings-manager.c	2012-03-05 21:04:12.737981057 +0100
++++ gnome-settings-daemon-3.3.91/plugins/xsettings/gsd-xsettings-manager.c	2012-03-05 21:04:12.989981069 +0100
+@@ -681,6 +681,7 @@
  
          for (i = 0; manager->priv->managers [i]; i++) {
                  xsettings_manager_set_int (manager->priv->managers [i], "Gtk/ShellShowsAppMenu", have_shell);
@@ -10,7 +10,7 @@ Index: gnome-settings-daemon-3.3.5/plugins/xsettings/gsd-xsettings-manager.c
                  xsettings_manager_notify (manager->priv->managers [i]);
          }
          gnome_settings_profile_end (NULL);
-@@ -892,7 +893,7 @@
+@@ -891,7 +892,7 @@
  
          /* Shell flag */
          manager->priv->shell_name_watch_id = g_bus_watch_name (G_BUS_TYPE_SESSION,

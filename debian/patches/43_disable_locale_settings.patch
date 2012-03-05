@@ -7,10 +7,10 @@ Author: Gunnar Hjalmarsson <ubuntu@gunnar.cc>
 * sourced (by gdm) which prevents users from fine tuning the locale settings that way.
 *
 
-Index: gnome-settings-daemon-3.3.5/gnome-settings-daemon/main.c
+Index: gnome-settings-daemon-3.3.91/gnome-settings-daemon/main.c
 ===================================================================
---- gnome-settings-daemon-3.3.5.orig/gnome-settings-daemon/main.c	2012-02-01 20:33:14.000000000 +0100
-+++ gnome-settings-daemon-3.3.5/gnome-settings-daemon/main.c	2012-02-13 17:31:06.248427581 +0100
+--- gnome-settings-daemon-3.3.91.orig/gnome-settings-daemon/main.c	2012-02-08 17:59:31.000000000 +0100
++++ gnome-settings-daemon-3.3.91/gnome-settings-daemon/main.c	2012-03-05 21:04:22.481981528 +0100
 @@ -234,10 +234,6 @@
          } else {
                  const char *startup_id;

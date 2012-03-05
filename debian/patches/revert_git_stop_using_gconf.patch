@@ -1,8 +1,8 @@
-Index: gnome-settings-daemon-3.3.5/configure.ac
+Index: gnome-settings-daemon-3.3.91/configure.ac
 ===================================================================
---- gnome-settings-daemon-3.3.5.orig/configure.ac	2012-02-13 17:53:40.996436953 +0100
-+++ gnome-settings-daemon-3.3.5/configure.ac	2012-02-13 17:53:44.996436981 +0100
-@@ -58,10 +58,13 @@
+--- gnome-settings-daemon-3.3.91.orig/configure.ac	2012-03-05 21:04:31.325981956 +0100
++++ gnome-settings-daemon-3.3.91/configure.ac	2012-03-05 21:04:33.613982067 +0100
+@@ -57,10 +57,13 @@
  
  EXTRA_COMPILE_WARNINGS(yes)
  
@@ -16,7 +16,7 @@ Index: gnome-settings-daemon-3.3.5/configure.ac
          gmodule-2.0
          gthread-2.0
  	gsettings-desktop-schemas >= 3.3.0
-@@ -69,6 +72,7 @@
+@@ -68,6 +71,7 @@
  
  PKG_CHECK_MODULES(SETTINGS_PLUGIN,
          gtk+-3.0 >= $GTK_REQUIRED_VERSION

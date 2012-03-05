@@ -4,11 +4,11 @@ Author: Marc Deslauriers <marc.deslauriers@canonical.com>
 Forwarded: no, likely a Ubuntu-specific preference
 Bug-Ubuntu: https://bugs.launchpad.net/ubuntu/+source/gnome-session/+bug/847814
 
-Index: gnome-settings-daemon-3.3.5/plugins/power/gsd-power-manager.c
+Index: gnome-settings-daemon-3.3.91/plugins/power/gsd-power-manager.c
 ===================================================================
---- gnome-settings-daemon-3.3.5.orig/plugins/power/gsd-power-manager.c	2012-02-13 17:31:02.536427556 +0100
-+++ gnome-settings-daemon-3.3.5/plugins/power/gsd-power-manager.c	2012-02-13 17:31:03.948427566 +0100
-@@ -56,6 +56,10 @@
+--- gnome-settings-daemon-3.3.91.orig/plugins/power/gsd-power-manager.c	2012-03-05 18:27:43.000000000 +0100
++++ gnome-settings-daemon-3.3.91/plugins/power/gsd-power-manager.c	2012-03-05 21:04:20.945981454 +0100
+@@ -57,6 +57,10 @@
  #define SYSTEMD_DBUS_PATH                       "/org/freedesktop/login1"
  #define SYSTEMD_DBUS_INTERFACE                  "org.freedesktop.login1.Manager"
  
@@ -19,7 +19,7 @@ Index: gnome-settings-daemon-3.3.5/plugins/power/gsd-power-manager.c
  #define UPOWER_DBUS_NAME                        "org.freedesktop.UPower"
  #define UPOWER_DBUS_PATH                        "/org/freedesktop/UPower"
  #define UPOWER_DBUS_PATH_KBDBACKLIGHT           "/org/freedesktop/UPower/KbdBacklight"
-@@ -160,6 +164,8 @@
+@@ -165,6 +169,8 @@
          GCancellable            *bus_cancellable;
          GDBusProxy              *upower_proxy;
          GDBusProxy              *upower_kdb_proxy;
@@ -28,7 +28,7 @@ Index: gnome-settings-daemon-3.3.5/plugins/power/gsd-power-manager.c
          gint                     kbd_brightness_now;
          gint                     kbd_brightness_max;
          gint                     kbd_brightness_old;
-@@ -3101,6 +3107,57 @@
+@@ -3140,6 +3146,57 @@
  }
  
  static gboolean
@@ -86,7 +86,7 @@ Index: gnome-settings-daemon-3.3.5/plugins/power/gsd-power-manager.c
  idle_sleep_cb (GsdPowerManager *manager)
  {
          gboolean is_idle;
-@@ -3396,6 +3453,22 @@
+@@ -3435,6 +3492,22 @@
  }
  
  static void
@@ -109,7 +109,7 @@ Index: gnome-settings-daemon-3.3.5/plugins/power/gsd-power-manager.c
  power_keyboard_proxy_ready_cb (GObject             *source_object,
                                 GAsyncResult        *res,
                                 gpointer             user_data)
-@@ -3472,12 +3545,13 @@
+@@ -3511,12 +3584,13 @@
                          UpSleepKind sleep_kind,
                          GsdPowerManager *manager)
  {
@@ -127,7 +127,7 @@ Index: gnome-settings-daemon-3.3.5/plugins/power/gsd-power-manager.c
  
          if (manager->priv->screensaver_proxy != NULL) {
                  g_debug ("doing gnome-screensaver lock");
-@@ -3641,6 +3715,18 @@
+@@ -3678,6 +3752,18 @@
                                    power_keyboard_proxy_ready_cb,
                                    manager);
  
@@ -146,7 +146,7 @@ Index: gnome-settings-daemon-3.3.5/plugins/power/gsd-power-manager.c
          /* connect to the screensaver */
          g_dbus_proxy_new_for_bus (G_BUS_TYPE_SESSION,
                                    G_DBUS_PROXY_FLAGS_DO_NOT_LOAD_PROPERTIES,
-@@ -3808,6 +3894,10 @@
+@@ -3845,6 +3931,10 @@
                  manager->priv->upower_proxy = NULL;
          }
  

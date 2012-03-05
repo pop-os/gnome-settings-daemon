@@ -1,7 +1,7 @@
-Index: gnome-settings-daemon-3.3.5/plugins/keyboard/gsd-keyboard-manager.c
+Index: gnome-settings-daemon-3.3.91/plugins/keyboard/gsd-keyboard-manager.c
 ===================================================================
---- gnome-settings-daemon-3.3.5.orig/plugins/keyboard/gsd-keyboard-manager.c	2012-02-01 20:33:15.000000000 +0100
-+++ gnome-settings-daemon-3.3.5/plugins/keyboard/gsd-keyboard-manager.c	2012-02-13 22:01:17.244809647 +0100
+--- gnome-settings-daemon-3.3.91.orig/plugins/keyboard/gsd-keyboard-manager.c	2012-02-08 19:23:44.000000000 +0100
++++ gnome-settings-daemon-3.3.91/plugins/keyboard/gsd-keyboard-manager.c	2012-03-05 21:04:13.009981070 +0100
 @@ -66,10 +66,14 @@
  #define KEY_BELL_DURATION  "bell-duration"
  #define KEY_BELL_MODE      "bell-mode"

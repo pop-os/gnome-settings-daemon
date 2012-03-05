@@ -1,3 +1,13 @@
+gnome-settings-daemon (3.3.91-0ubuntu1) UNRELEASED; urgency=low
+
+  * New upstream version:
+    - fix segfault with some wacom devices (lp: #945477)
+  * debian/patches/git_wacom_fix.patch:
+    - dropped, the fix is in the new version
+  * debian/rules: disable pkgkit support explicitly
+
+ -- Sebastien Bacher <seb128@ubuntu.com>  Mon, 05 Mar 2012 20:53:09 +0100
+
 gnome-settings-daemon (3.3.90-0ubuntu4) precise; urgency=low
 
   * Renamed unity patches to start with <num>_unity and be in the same range,

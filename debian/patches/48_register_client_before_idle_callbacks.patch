@@ -1,7 +1,7 @@
-Index: gnome-settings-daemon-3.3.5/gnome-settings-daemon/main.c
+Index: gnome-settings-daemon-3.3.91/gnome-settings-daemon/main.c
 ===================================================================
---- gnome-settings-daemon-3.3.5.orig/gnome-settings-daemon/main.c	2012-02-13 17:31:02.652427556 +0100
-+++ gnome-settings-daemon-3.3.5/gnome-settings-daemon/main.c	2012-02-13 17:31:02.688427557 +0100
+--- gnome-settings-daemon-3.3.91.orig/gnome-settings-daemon/main.c	2012-03-05 21:04:12.757981058 +0100
++++ gnome-settings-daemon-3.3.91/gnome-settings-daemon/main.c	2012-03-05 21:04:12.817981061 +0100
 @@ -219,36 +219,6 @@
          g_object_unref (locale_settings);
  }
@@ -113,7 +113,7 @@ Index: gnome-settings-daemon-3.3.5/gnome-settings-daemon/main.c
  static void
  bus_register (void)
  {
-@@ -429,6 +439,8 @@
+@@ -423,6 +433,8 @@
  
          notify_init ("gnome-settings-daemon");
  

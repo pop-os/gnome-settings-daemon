@@ -2,10 +2,10 @@ Description: Disable gsd-printer plugin under Unity. We are still using system-c
 Author: Martin Pitt <martin.pitt@ubuntu.com>
 Forwarded: No, Ubuntu specific
 
-Index: gnome-settings-daemon-3.3.5/plugins/print-notifications/gsd-print-notifications-plugin.c
+Index: gnome-settings-daemon-3.3.91/plugins/print-notifications/gsd-print-notifications-plugin.c
 ===================================================================
---- gnome-settings-daemon-3.3.5.orig/plugins/print-notifications/gsd-print-notifications-plugin.c	2011-09-07 16:40:46.000000000 +0200
-+++ gnome-settings-daemon-3.3.5/plugins/print-notifications/gsd-print-notifications-plugin.c	2012-02-13 17:31:02.752427557 +0100
+--- gnome-settings-daemon-3.3.91.orig/plugins/print-notifications/gsd-print-notifications-plugin.c	2011-09-07 16:40:46.000000000 +0200
++++ gnome-settings-daemon-3.3.91/plugins/print-notifications/gsd-print-notifications-plugin.c	2012-03-05 21:04:12.953981067 +0100
 @@ -38,6 +38,12 @@
  static void
  gsd_print_notifications_plugin_init (GsdPrintNotificationsPlugin *plugin)
