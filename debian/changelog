@@ -1,9 +1,9 @@
-gnome-settings-daemon (3.3.91-0ubuntu2) UNRELEASED; urgency=low
+gnome-settings-daemon (3.3.91-0ubuntu2) precise; urgency=low
 
   * debian/patches/git_power_logic.patch: fix logic error, should restore
     the screen controls (lp: #947748)
 
- -- Sebastien Bacher <seb128@ubuntu.com>  Wed, 07 Mar 2012 11:44:32 +0100
+ -- Sebastien Bacher <seb128@ubuntu.com>  Wed, 07 Mar 2012 11:46:50 +0100
 
 gnome-settings-daemon (3.3.91-0ubuntu1) precise; urgency=low
 
