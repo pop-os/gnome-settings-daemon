@@ -175,7 +175,7 @@ Index: gnome-settings-daemon-3.3.91/plugins/a11y-keyboard/gsd-a11y-keyboard-mana
 +		gtk_menu_shell_append (GTK_MENU_SHELL (menu), item);
 +		gtk_widget_show_all (menu);
 +
-+		manager->priv->app_indicator = app_indicator_new ("gsd-a11y-keyboard",
++		manager->priv->app_indicator = app_indicator_new ("a11y-keyboard",
 +								  "preferences-desktop-accessibility",
 +								  APP_INDICATOR_CATEGORY_OTHER);
 +		app_indicator_set_menu (manager->priv->app_indicator,
@@ -989,7 +989,7 @@ Index: gnome-settings-daemon-3.3.91/plugins/keyboard/gsd-keyboard-xkb.c
 +		if (app_indicator == NULL) {
 +			GtkMenu *popup_menu = create_status_menu ();
 +
-+			app_indicator = app_indicator_new ("gsd-keyboard-xkb",
++			app_indicator = app_indicator_new ("keyboard",
 +							   "keyboard",
 +							   APP_INDICATOR_CATEGORY_HARDWARE);
 +	                int group = get_current_group();

@@ -3,6 +3,9 @@ gnome-settings-daemon (3.3.91-0ubuntu3) UNRELEASED; urgency=low
   * debian/control.in:
     - updated gsettings-desktop-schemas requirement for the lock key
   * debian/patches/61_unity_use_application_indicator.patch:
+    - updated indicators ids, combined with the libappindicator new version
+      that should give the correct wm_class to the fallback gtkstatusicon
+      which should fix some gnome-shell issues (lp: #878951)
     - use set_icon_full() with "Keyboard" as a11y description (lp: #740726)
 
   [ Marc Deslauriers ]
