@@ -765,7 +765,7 @@ Index: gnome-settings-daemon-3.3.91/plugins/keyboard/gsd-keyboard-xkb.c
 +						              st->group);
 +
 +        
-+                app_indicator_set_icon(app_indicator, image_file);
++                app_indicator_set_icon_full(app_indicator, image_file, _("Keyboard"));
 +	        app_indicator_set_label(app_indicator, NULL, NULL);
 +                g_free(image_file);
 +        } else {

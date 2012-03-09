@@ -1,3 +1,10 @@
+gnome-settings-daemon (3.3.91-0ubuntu3) UNRELEASED; urgency=low
+
+  * debian/patches/61_unity_use_application_indicator.patch:
+    - use set_icon_full() with "Keyboard" as a11y description (lp: #740726)
+
+ -- Sebastien Bacher <seb128@ubuntu.com>  Fri, 09 Mar 2012 10:42:52 +0100
+
 gnome-settings-daemon (3.3.91-0ubuntu2) precise; urgency=low
 
   * debian/patches/git_power_logic.patch: fix logic error, should restore
