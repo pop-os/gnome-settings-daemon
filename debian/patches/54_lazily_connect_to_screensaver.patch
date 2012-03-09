@@ -15,9 +15,9 @@ Bug-Ubuntu: https://launchpad.net/bugs/912186
 
 Index: gnome-settings-daemon-3.3.91/plugins/power/gsd-power-manager.c
 ===================================================================
---- gnome-settings-daemon-3.3.91.orig/plugins/power/gsd-power-manager.c	2012-03-05 21:04:12.841981062 +0100
-+++ gnome-settings-daemon-3.3.91/plugins/power/gsd-power-manager.c	2012-03-05 21:04:20.465981431 +0100
-@@ -3397,7 +3397,7 @@
+--- gnome-settings-daemon-3.3.91.orig/plugins/power/gsd-power-manager.c	2012-03-08 13:59:54.758131653 -0500
++++ gnome-settings-daemon-3.3.91/plugins/power/gsd-power-manager.c	2012-03-08 13:59:58.974131762 -0500
+@@ -3340,7 +3340,7 @@
  }
  
  static void
@@ -26,7 +26,7 @@ Index: gnome-settings-daemon-3.3.91/plugins/power/gsd-power-manager.c
                              GAsyncResult *res,
                              gpointer user_data)
  {
-@@ -3409,7 +3409,15 @@
+@@ -3352,7 +3352,15 @@
                  g_warning ("Could not connect to gnome-screensaver: %s",
                             error->message);
                  g_error_free (error);
@@ -42,7 +42,7 @@ Index: gnome-settings-daemon-3.3.91/plugins/power/gsd-power-manager.c
  }
  
  static void
-@@ -3598,6 +3606,17 @@
+@@ -3524,6 +3532,17 @@
                                     "Lock",
                                     NULL, G_DBUS_CALL_FLAGS_NONE, -1,
                                     NULL, NULL, NULL);
@@ -60,8 +60,8 @@ Index: gnome-settings-daemon-3.3.91/plugins/power/gsd-power-manager.c
          }
  }
  
-@@ -3764,17 +3783,6 @@
-                                   accounts_proxy_ready_cb,
+@@ -3678,17 +3697,6 @@
+                                   power_keyboard_proxy_ready_cb,
                                    manager);
  
 -        /* connect to the screensaver */

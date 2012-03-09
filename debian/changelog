@@ -1,9 +1,18 @@
 gnome-settings-daemon (3.3.91-0ubuntu3) UNRELEASED; urgency=low
 
+  [ Sebastien Bacher ]
   * debian/patches/61_unity_use_application_indicator.patch:
     - use set_icon_full() with "Keyboard" as a11y description (lp: #740726)
 
- -- Sebastien Bacher <seb128@ubuntu.com>  Fri, 09 Mar 2012 10:42:52 +0100
+  * Add a new preference to lock the screen when the system suspends.
+    (LP: #938076)
+    - 51_lock_screen_on_suspend.patch: use lock-on-suspend gsettings to
+      determine if screen should be locked.
+    - 51_always_lock_screen_on_suspend.patch: removed.
+    - 54_lazily_connect_to_screensaver.patch: refreshed.
+    - 60_unity_hide_status_icon.patch: refreshed.
+
+ -- Marc Deslauriers <marc.deslauriers@ubuntu.com>  Thu, 08 Mar 2012 14:01:28 -0500
 
 gnome-settings-daemon (3.3.91-0ubuntu2) precise; urgency=low
 

@@ -1,0 +1,19 @@
+Description: when suspending or hibernating, use the new lock-on-suspend preference.
+Author: Marc Deslauriers <marc.deslauriers@canonical.com>
+Forwarded: no, likely a Ubuntu-specific preference
+Bug-Ubuntu: https://bugs.launchpad.net/bugs/938076
+Bug-Ubuntu: https://bugs.launchpad.net/bugs/847814
+
+Index: gnome-settings-daemon-3.3.91/plugins/power/gsd-power-manager.c
+===================================================================
+--- gnome-settings-daemon-3.3.91.orig/plugins/power/gsd-power-manager.c	2012-03-08 13:55:55.470125526 -0500
++++ gnome-settings-daemon-3.3.91/plugins/power/gsd-power-manager.c	2012-03-08 13:57:59.610128703 -0500
+@@ -3514,7 +3514,7 @@
+         gboolean do_lock;
+ 
+         do_lock = g_settings_get_boolean (manager->priv->settings_screensaver,
+-                                          "lock-enabled");
++                                          "ubuntu-lock-on-suspend");
+         if (!do_lock)
+                 return;
+ 
