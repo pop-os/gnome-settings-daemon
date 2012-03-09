@@ -1,4 +1,4 @@
-gnome-settings-daemon (3.3.91-0ubuntu3) UNRELEASED; urgency=low
+gnome-settings-daemon (3.3.91-0ubuntu3) precise; urgency=low
 
   * debian/control.in:
     - updated gsettings-desktop-schemas requirement for the lock key
@@ -17,7 +17,7 @@ gnome-settings-daemon (3.3.91-0ubuntu3) UNRELEASED; urgency=low
     - 54_lazily_connect_to_screensaver.patch: refreshed.
     - 60_unity_hide_status_icon.patch: refreshed.
 
- -- Sebastien Bacher <seb128@ubuntu.com>  Fri, 09 Mar 2012 16:04:53 +0100
+ -- Sebastien Bacher <seb128@ubuntu.com>  Fri, 09 Mar 2012 18:25:40 +0100
 
 gnome-settings-daemon (3.3.91-0ubuntu2) precise; urgency=low
 
