@@ -1,3 +1,4 @@
+01_fix_multiple_syndaemons.patch
 05_disable_corner_tapping.patch
 10_smaller_syndaemon_timeout.patch
 16_use_synchronous_notifications.patch

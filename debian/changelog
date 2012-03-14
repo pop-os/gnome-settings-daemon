@@ -1,3 +1,12 @@
+gnome-settings-daemon (3.3.91-0ubuntu4) UNRELEASED; urgency=low
+
+  * Add 01_fix_multiple_syndaemons.patch: Ensure that a spawned syndaemon gets
+    killed when settings-daemon exists due to a crash, a keyboard interrupt,
+    etc. This avoids having multiple syndaemons run at the same time, which
+    can lead to the trackpad malfunctioning. (LP: #868400)
+
+ -- Martin Pitt <martin.pitt@ubuntu.com>  Wed, 14 Mar 2012 11:16:13 +0100
+
 gnome-settings-daemon (3.3.91-0ubuntu3) precise; urgency=low
 
   * debian/control.in:
