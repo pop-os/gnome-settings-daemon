@@ -1,4 +1,4 @@
-gnome-settings-daemon (3.3.91-0ubuntu5) UNRELEASED; urgency=low
+gnome-settings-daemon (3.3.91-0ubuntu5) precise; urgency=low
 
   * debian/patches/52_sync_background_to_accountsservice.patch:
     - don't trigger a warning when using a solid color (lp: #954590)
@@ -9,7 +9,7 @@ gnome-settings-daemon (3.3.91-0ubuntu5) UNRELEASED; urgency=low
   * debian/patches/43_disable_locale_settings.patch:
     Description updated.
 
- -- Sebastien Bacher <seb128@ubuntu.com>  Thu, 15 Mar 2012 18:42:11 +0100
+ -- Sebastien Bacher <seb128@ubuntu.com>  Thu, 15 Mar 2012 19:15:43 +0100
 
 gnome-settings-daemon (3.3.91-0ubuntu4) precise; urgency=low
 
