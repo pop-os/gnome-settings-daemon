@@ -1,5 +1,7 @@
 gnome-settings-daemon (3.3.91-0ubuntu5) UNRELEASED; urgency=low
 
+  * debian/patches/52_sync_background_to_accountsservice.patch:
+    - don't trigger a warning when using a solid color (lp: #954590)
   * debian/patches/90_set_gmenus_xsettings.patch:
     - update from Ryan Lortie to handle correctly new shell sessions
 
