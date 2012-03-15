@@ -1,10 +1,12 @@
-Description: Don't set locales since they are set in Oneiric by sourcing ~/.profile.
+Description: Make sure that no locales are set, even if the gsettings "region" key has
+ been assigned a value in the past, since they are set in Ubuntu via ~/.pam_environment.
 Forwarded: not-needed
 Author: Gunnar Hjalmarsson <ubuntu@gunnar.cc>
 
 *
-* The set_locale() function is questionable anyhow, since it's called after ~/.profile is
-* sourced (by gdm) which prevents users from fine tuning the locale settings that way.
+* The set_locale() function is questionable anyhow, since it's called after ~/.profile
+* is sourced by e.g. lightdm or gdm, which prevents users from fine tuning the locale
+* settings by editing ~/.profile.
 *
 
 Index: gnome-settings-daemon-3.3.91/gnome-settings-daemon/main.c

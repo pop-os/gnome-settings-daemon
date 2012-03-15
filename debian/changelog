@@ -1,3 +1,10 @@
+gnome-settings-daemon (3.3.91-0ubuntu5) UNRELEASED; urgency=low
+
+  * debian/patches/43_disable_locale_settings.patch:
+    Description updated.
+
+ -- Gunnar Hjalmarsson <gunnarhj@ubuntu.com>  Wed, 07 Mar 2012 02:31:00 +0100
+
 gnome-settings-daemon (3.3.91-0ubuntu4) precise; urgency=low
 
   * Add 01_fix_multiple_syndaemons.patch: Ensure that a spawned syndaemon gets
