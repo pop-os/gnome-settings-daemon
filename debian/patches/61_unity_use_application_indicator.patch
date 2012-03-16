@@ -671,8 +671,8 @@ Index: gnome-settings-daemon-3.3.91/plugins/keyboard/gsd-keyboard-xkb.c
 +static AppIndicator *app_indicator = NULL;
 +static GkbdConfiguration *gkbd_configuration = NULL;
 +static GkbdIndicatorConfig current_ind_config;
-+GSList *groups_items_group = NULL;
-+size_t lang_menu_items = 0;
++static GSList *groups_items_group = NULL;
++static size_t lang_menu_items = 0;
 +
 +static void state_callback (XklEngine * engine,
 +                            XklEngineStateChange changeType,
@@ -869,8 +869,8 @@ Index: gnome-settings-daemon-3.3.91/plugins/keyboard/gsd-keyboard-xkb.c
 +		XklEngineStateChange changeType,
 +		gint group, gboolean restore)
 +{
-+	if (changeType == GROUP_CHANGED)
-+		popup_menu_set_group(GINT_TO_POINTER(group), TRUE);
++	if ((changeType == GROUP_CHANGED) || (changeType == INDICATORS_CHANGED))
++		popup_menu_set_group (GINT_TO_POINTER(group), TRUE);
 +}
 +
 +static int
@@ -1009,17 +1009,14 @@ Index: gnome-settings-daemon-3.3.91/plugins/keyboard/gsd-keyboard-xkb.c
  		if (icon == NULL) {
  			xkl_debug (150, "Creating keyboard status icon\n");
  			icon = gkbd_status_new ();
-@@ -305,12 +558,20 @@
+@@ -305,12 +558,17 @@
  					  NULL);
  
  		}
 +#endif
  	} else {
 +#ifdef HAVE_APPINDICATOR
-+		if (app_indicator != NULL) {
-+			g_object_unref (app_indicator);
-+			app_indicator = NULL;
-+		}
++		g_clear_object (&app_indicator);
 +#else
  		if (icon != NULL) {
  			xkl_debug (150, "Destroying icon\n");
@@ -1093,16 +1090,13 @@ Index: gnome-settings-daemon-3.3.91/plugins/keyboard/gsd-keyboard-xkb.c
  		gdk_window_add_filter (NULL, (GdkFilterFunc)
  				       gsd_keyboard_xkb_evt_filter, NULL);
  
-@@ -549,5 +845,13 @@
+@@ -549,5 +845,10 @@
  	g_object_unref (xkl_engine);
  
  	xkl_engine = NULL;
 +
 +#ifdef HAVE_APPINDICATOR
-+	if (gkbd_configuration) {
-+		g_object_unref (gkbd_configuration);
-+		gkbd_configuration = NULL;
-+	}
++	g_clear_object (&gkbd_configuration);
 +#endif
 +
  	inited_ok = FALSE;

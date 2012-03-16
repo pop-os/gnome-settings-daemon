@@ -1,3 +1,12 @@
+gnome-settings-daemon (3.3.91-0ubuntu6) UNRELEASED; urgency=low
+
+  * debian/patches/61_unity_use_application_indicator.patch:
+    - update to fix issues where the keyboard indicator would not update
+      or reflect the correct layout when changing layout with the keyboard, 
+      thanks Charles Kerr (lp: #885730)
+
+ -- Sebastien Bacher <seb128@ubuntu.com>  Thu, 15 Mar 2012 21:48:36 +0100
+
 gnome-settings-daemon (3.3.91-0ubuntu5) precise; urgency=low
 
   * debian/patches/52_sync_background_to_accountsservice.patch:
