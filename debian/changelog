@@ -1,5 +1,6 @@
 gnome-settings-daemon (3.3.92-0ubuntu1) UNRELEASED; urgency=low
 
+  [ Sebastien Bacher ]
   * New upstream version, should fix
     - "Option to "Lock screen afer screen turns off" is ignored"
       (lp: #959184)
@@ -8,7 +9,10 @@ gnome-settings-daemon (3.3.92-0ubuntu1) UNRELEASED; urgency=low
   * Dropped patches included in the new version
   * Refreshed the other patches
 
- -- Sebastien Bacher <seb128@ubuntu.com>  Mon, 19 Mar 2012 16:32:06 +0100
+  [ Marc Deslauriers ]
+    - 51_lock_screen_on_suspend.patch: refreshed for 3.3.92.
+
+ -- Marc Deslauriers <marc.deslauriers@ubuntu.com>  Mon, 19 Mar 2012 13:43:57 -0400
 
 gnome-settings-daemon (3.3.91-0ubuntu6) precise; urgency=low
 

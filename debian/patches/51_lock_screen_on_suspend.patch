@@ -1,4 +1,4 @@
-Description: when suspending or hibernating, use the new lock-on-suspend preference.
+Description: when suspending or hibernating, use the new ubuntu-lock-on-suspend preference.
 Author: Marc Deslauriers <marc.deslauriers@canonical.com>
 Forwarded: no, likely a Ubuntu-specific preference
 Bug-Ubuntu: https://bugs.launchpad.net/bugs/938076
@@ -6,16 +6,38 @@ Bug-Ubuntu: https://bugs.launchpad.net/bugs/847814
 
 Index: gnome-settings-daemon-3.3.92/plugins/power/gsd-power-manager.c
 ===================================================================
---- gnome-settings-daemon-3.3.92.orig/plugins/power/gsd-power-manager.c	2012-03-18 21:16:10.000000000 +0100
-+++ gnome-settings-daemon-3.3.92/plugins/power/gsd-power-manager.c	2012-03-19 18:19:15.214572797 +0100
-@@ -3559,6 +3564,10 @@
+--- gnome-settings-daemon-3.3.92.orig/plugins/power/gsd-power-manager.c	2012-03-19 13:39:03.097992171 -0400
++++ gnome-settings-daemon-3.3.92/plugins/power/gsd-power-manager.c	2012-03-19 13:41:13.989990923 -0400
+@@ -3559,7 +3559,31 @@
                          UpSleepKind sleep_kind,
                          GsdPowerManager *manager)
  {
-+        if (!g_settings_get_boolean (manager->priv->settings_screensaver,
-+                                          "ubuntu-lock-on-suspend"));
+-        lock_screensaver (manager);
++        gboolean do_lock;
++
++        do_lock = g_settings_get_boolean (manager->priv->settings_screensaver,
++                                          "ubuntu-lock-on-suspend");
++        if (!do_lock)
 +                return;
 +
-         lock_screensaver (manager);
++        if (manager->priv->screensaver_proxy != NULL) {
++                g_debug ("doing gnome-screensaver lock");
++                g_dbus_proxy_call (manager->priv->screensaver_proxy,
++                                   "Lock",
++                                   NULL, G_DBUS_CALL_FLAGS_NONE, -1,
++                                   NULL, NULL, NULL);
++        } else {
++                /* connect to the screensaver first */
++                g_dbus_proxy_new_for_bus (G_BUS_TYPE_SESSION,
++                                          G_DBUS_PROXY_FLAGS_DO_NOT_LOAD_PROPERTIES,
++                                          NULL,
++                                          GS_DBUS_NAME,
++                                          GS_DBUS_PATH,
++                                          GS_DBUS_INTERFACE,
++                                          NULL,
++                                          sleep_cb_screensaver_proxy_ready_cb,
++                                          manager);
++        }
  }
  
+ static void
