@@ -1,3 +1,15 @@
+gnome-settings-daemon (3.3.92-0ubuntu1) UNRELEASED; urgency=low
+
+  * New upstream version, should fix
+    - "Option to "Lock screen afer screen turns off" is ignored"
+      (lp: #959184)
+    - "color-plugin-WARNING **: failed to get edid: unable to get 
+       EDID for output" (lp: #863359)
+  * Dropped patches included in the new version
+  * Refreshed the other patches
+
+ -- Sebastien Bacher <seb128@ubuntu.com>  Mon, 19 Mar 2012 16:32:06 +0100
+
 gnome-settings-daemon (3.3.91-0ubuntu6) precise; urgency=low
 
   * debian/patches/61_unity_use_application_indicator.patch:

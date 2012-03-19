@@ -4,16 +4,18 @@ Forwarded: no, likely a Ubuntu-specific preference
 Bug-Ubuntu: https://bugs.launchpad.net/bugs/938076
 Bug-Ubuntu: https://bugs.launchpad.net/bugs/847814
 
-Index: gnome-settings-daemon-3.3.91/plugins/power/gsd-power-manager.c
+Index: gnome-settings-daemon-3.3.92/plugins/power/gsd-power-manager.c
 ===================================================================
---- gnome-settings-daemon-3.3.91.orig/plugins/power/gsd-power-manager.c	2012-03-08 13:55:55.470125526 -0500
-+++ gnome-settings-daemon-3.3.91/plugins/power/gsd-power-manager.c	2012-03-08 13:57:59.610128703 -0500
-@@ -3514,7 +3514,7 @@
-         gboolean do_lock;
- 
-         do_lock = g_settings_get_boolean (manager->priv->settings_screensaver,
--                                          "lock-enabled");
-+                                          "ubuntu-lock-on-suspend");
-         if (!do_lock)
-                 return;
+--- gnome-settings-daemon-3.3.92.orig/plugins/power/gsd-power-manager.c	2012-03-18 21:16:10.000000000 +0100
++++ gnome-settings-daemon-3.3.92/plugins/power/gsd-power-manager.c	2012-03-19 18:19:15.214572797 +0100
+@@ -3559,6 +3564,10 @@
+                         UpSleepKind sleep_kind,
+                         GsdPowerManager *manager)
+ {
++        if (!g_settings_get_boolean (manager->priv->settings_screensaver,
++                                          "ubuntu-lock-on-suspend"));
++                return;
++
+         lock_screensaver (manager);
+ }
  

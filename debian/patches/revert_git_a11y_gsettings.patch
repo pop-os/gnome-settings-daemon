@@ -1,7 +1,7 @@
-Index: gnome-settings-daemon-3.3.91/plugins/a11y-keyboard/gsd-a11y-preferences-dialog.c
+Index: gnome-settings-daemon-3.3.92/plugins/a11y-keyboard/gsd-a11y-preferences-dialog.c
 ===================================================================
---- gnome-settings-daemon-3.3.91.orig/plugins/a11y-keyboard/gsd-a11y-preferences-dialog.c	2012-02-01 20:33:14.000000000 +0100
-+++ gnome-settings-daemon-3.3.91/plugins/a11y-keyboard/gsd-a11y-preferences-dialog.c	2012-03-05 21:04:31.433981962 +0100
+--- gnome-settings-daemon-3.3.92.orig/plugins/a11y-keyboard/gsd-a11y-preferences-dialog.c	2012-03-16 18:29:35.000000000 +0100
++++ gnome-settings-daemon-3.3.92/plugins/a11y-keyboard/gsd-a11y-preferences-dialog.c	2012-03-19 17:38:50.270556023 +0100
 @@ -31,6 +31,8 @@
  #include <gio/gio.h>
  #include <gtk/gtk.h>

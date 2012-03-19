@@ -1,4 +1,3 @@
-01_fix_multiple_syndaemons.patch
 05_disable_corner_tapping.patch
 10_smaller_syndaemon_timeout.patch
 16_use_synchronous_notifications.patch
@@ -10,7 +9,6 @@
 48_register_client_before_idle_callbacks.patch
 51_lock_screen_on_suspend.patch
 52_sync_background_to_accountsservice.patch
-54_lazily_connect_to_screensaver.patch
 60_unity_hide_status_icon.patch
 61_unity_use_application_indicator.patch
 62_unity_disable_gsd_printer.patch
@@ -24,4 +22,3 @@ revert_git_stop_using_gconf.patch
 revert_git_use_gsetting_keybindings.patch
 revert_git_a11y_gsettings.patch
 
-git_power_logic.patch
