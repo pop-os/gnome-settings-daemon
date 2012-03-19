@@ -1,4 +1,4 @@
-gnome-settings-daemon (3.3.92-0ubuntu1) UNRELEASED; urgency=low
+gnome-settings-daemon (3.3.92-0ubuntu1) precise; urgency=low
 
   [ Sebastien Bacher ]
   * New upstream version, should fix
@@ -12,7 +12,7 @@ gnome-settings-daemon (3.3.92-0ubuntu1) UNRELEASED; urgency=low
   [ Marc Deslauriers ]
     - 51_lock_screen_on_suspend.patch: refreshed for 3.3.92.
 
- -- Marc Deslauriers <marc.deslauriers@ubuntu.com>  Mon, 19 Mar 2012 13:43:57 -0400
+ -- Sebastien Bacher <seb128@ubuntu.com>  Mon, 19 Mar 2012 18:57:50 +0100
 
 gnome-settings-daemon (3.3.91-0ubuntu6) precise; urgency=low
 
