@@ -1,3 +1,10 @@
+gnome-settings-daemon (3.3.92-0ubuntu2) precise; urgency=low
+
+  * 51_lock_screen_on_suspend.patch: when closing the lid, only lock the
+    screen at this step if we're not going to suspend or hibernate.
+
+ -- Marc Deslauriers <marc.deslauriers@ubuntu.com>  Tue, 20 Mar 2012 08:39:38 -0400
+
 gnome-settings-daemon (3.3.92-0ubuntu1) precise; urgency=low
 
   [ Sebastien Bacher ]
