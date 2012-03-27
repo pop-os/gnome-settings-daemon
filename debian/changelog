@@ -1,3 +1,12 @@
+gnome-settings-daemon (3.4.0-0ubuntu1) UNRELEASED; urgency=low
+
+  * New upstream release:
+    - Wacom:
+      Check if the "last-stylus" property has been set
+    - updated translations
+
+ -- Didier Roche <didrocks@ubuntu.com>  Tue, 27 Mar 2012 10:50:10 +0200
+
 gnome-settings-daemon (3.3.92-0ubuntu2) precise; urgency=low
 
   * 51_lock_screen_on_suspend.patch: when closing the lid, only lock the
