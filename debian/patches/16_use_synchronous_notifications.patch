@@ -1,10 +1,10 @@
 Description: Use synchronous notifications when they are supported
 Author: ?
 Upstream: that's Ubuntu specific (notify-osd)
-Index: gnome-settings-daemon-3.3.92/plugins/media-keys/gsd-media-keys-manager.c
+Index: gnome-settings-daemon-3.4.0/plugins/media-keys/gsd-media-keys-manager.c
 ===================================================================
---- gnome-settings-daemon-3.3.92.orig/plugins/media-keys/gsd-media-keys-manager.c	2012-03-16 18:29:35.000000000 +0100
-+++ gnome-settings-daemon-3.3.92/plugins/media-keys/gsd-media-keys-manager.c	2012-03-19 17:49:38.734560510 +0100
+--- gnome-settings-daemon-3.4.0.orig/plugins/media-keys/gsd-media-keys-manager.c	2012-03-16 17:29:35.000000000 +0000
++++ gnome-settings-daemon-3.4.0/plugins/media-keys/gsd-media-keys-manager.c	2012-03-28 00:15:12.222791529 +0100
 @@ -57,6 +57,8 @@
  #include <pulse/pulseaudio.h>
  #include "gvc-mixer-control.h"
@@ -370,17 +370,7 @@ Index: gnome-settings-daemon-3.3.92/plugins/media-keys/gsd-media-keys-manager.c
  }
  
  static void
-@@ -1677,7 +1875,8 @@
-         GError *error = NULL;
-         guint percentage;
-         GVariant *new_percentage;
--        GsdMediaKeysManager *manager = GSD_MEDIA_KEYS_MANAGER (user_data);
-+        GsdBrightnessActionData *data = (GsdBrightnessActionData *) user_data;
-+        GsdMediaKeysManager *manager = data->manager;
- 
-         new_percentage = g_dbus_proxy_call_finish (G_DBUS_PROXY (source_object),
-                                                    res, &error);
-@@ -1690,13 +1889,18 @@
+@@ -1690,13 +1888,18 @@
  
          /* update the dialog with the new value */
          g_variant_get (new_percentage, "(u)", &percentage);
@@ -406,7 +396,7 @@ Index: gnome-settings-daemon-3.3.92/plugins/media-keys/gsd-media-keys-manager.c
          g_variant_unref (new_percentage);
  }
  
-@@ -1817,23 +2021,23 @@
+@@ -1817,23 +2020,23 @@
                  do_execute_desktop (manager, "gcalctool.desktop", timestamp);
                  break;
          case PLAY_KEY:
@@ -439,7 +429,7 @@ Index: gnome-settings-daemon-3.3.92/plugins/media-keys/gsd-media-keys-manager.c
          case VIDEO_OUT_KEY:
                  do_video_out_action (manager, timestamp);
                  break;
-@@ -2208,6 +2412,24 @@
+@@ -2208,6 +2411,24 @@
                  priv->connection = NULL;
          }
  
@@ -464,10 +454,10 @@ Index: gnome-settings-daemon-3.3.92/plugins/media-keys/gsd-media-keys-manager.c
          if (priv->keys != NULL) {
                  gdk_error_trap_push ();
                  for (i = 0; i < priv->keys->len; ++i) {
-Index: gnome-settings-daemon-3.3.92/configure.ac
+Index: gnome-settings-daemon-3.4.0/configure.ac
 ===================================================================
---- gnome-settings-daemon-3.3.92.orig/configure.ac	2012-03-19 09:53:38.000000000 +0100
-+++ gnome-settings-daemon-3.3.92/configure.ac	2012-03-19 17:49:06.850560288 +0100
+--- gnome-settings-daemon-3.4.0.orig/configure.ac	2012-03-26 17:11:43.000000000 +0100
++++ gnome-settings-daemon-3.4.0/configure.ac	2012-03-28 00:13:43.494291967 +0100
 @@ -188,7 +188,7 @@
  dnl - media-keys plugin stuff
  dnl ---------------------------------------------------------------------------

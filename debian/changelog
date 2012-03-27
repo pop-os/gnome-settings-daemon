@@ -1,3 +1,10 @@
+gnome-settings-daemon (3.4.0-0ubuntu2) UNRELEASED; urgency=low
+
+  * debian/patches/16_use_synchronous_notifications.patch: Fix invalid cast
+    causing segfault when using keyboard backlight keys. (LP: #959874)
+
+ -- Iain Lane <laney@ubuntu.com>  Wed, 28 Mar 2012 00:02:15 +0100
+
 gnome-settings-daemon (3.4.0-0ubuntu1) precise-proposed; urgency=low
 
   * New upstream release:
