@@ -1,9 +1,14 @@
 gnome-settings-daemon (3.4.0-0ubuntu2) UNRELEASED; urgency=low
 
+  * debian/patches/61_unity_use_application_indicator.patch:
+    - small tweaks to be consistant with other indicators, 
+      change the order and label from the two bottom items (lp: #964178)
+    
+  [ Iain Lane ]
   * debian/patches/16_use_synchronous_notifications.patch: Fix invalid cast
     causing segfault when using keyboard backlight keys. (LP: #959874)
 
- -- Iain Lane <laney@ubuntu.com>  Wed, 28 Mar 2012 00:02:15 +0100
+ -- Sebastien Bacher <seb128@ubuntu.com>  Thu, 29 Mar 2012 18:06:11 +0200
 
 gnome-settings-daemon (3.4.0-0ubuntu1) precise-proposed; urgency=low
 
