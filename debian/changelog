@@ -3,6 +3,8 @@ gnome-settings-daemon (3.4.0-0ubuntu2) UNRELEASED; urgency=low
   * debian/patches/61_unity_use_application_indicator.patch:
     - small tweaks to be consistant with other indicators, 
       change the order and label from the two bottom items (lp: #964178)
+  * debian/patches/bugzilla_segfault_dpms.patch:
+    - upstream fix for a segfault (lp: #956824)
     
   [ Iain Lane ]
   * debian/patches/16_use_synchronous_notifications.patch: Fix invalid cast
