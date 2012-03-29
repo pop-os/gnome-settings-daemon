@@ -1,4 +1,4 @@
-gnome-settings-daemon (3.4.0-0ubuntu2) UNRELEASED; urgency=low
+gnome-settings-daemon (3.4.0-0ubuntu2) precise; urgency=low
 
   * debian/patches/10_smaller_syndaemon_timeout.patch:
     - don't change delay, use -t option to block the clicks (lp: #962958)
@@ -12,7 +12,7 @@ gnome-settings-daemon (3.4.0-0ubuntu2) UNRELEASED; urgency=low
   * debian/patches/16_use_synchronous_notifications.patch: Fix invalid cast
     causing segfault when using keyboard backlight keys. (LP: #959874)
 
- -- Sebastien Bacher <seb128@ubuntu.com>  Thu, 29 Mar 2012 18:06:11 +0200
+ -- Sebastien Bacher <seb128@ubuntu.com>  Thu, 29 Mar 2012 21:43:49 +0200
 
 gnome-settings-daemon (3.4.0-0ubuntu1) precise-proposed; urgency=low
 
