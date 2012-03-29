@@ -1,5 +1,7 @@
 gnome-settings-daemon (3.4.0-0ubuntu2) UNRELEASED; urgency=low
 
+  * debian/patches/10_smaller_syndaemon_timeout.patch:
+    - don't change delay, use -t option to block the clicks (lp: #962958)
   * debian/patches/61_unity_use_application_indicator.patch:
     - small tweaks to be consistant with other indicators, 
       change the order and label from the two bottom items (lp: #964178)
