@@ -1,34 +1,29 @@
-Index: gnome-settings-daemon-3.3.91/plugins/power/gsd-power-manager.c
+Index: gnome-settings-daemon-3.4.0/plugins/power/gsd-power-manager.c
 ===================================================================
---- gnome-settings-daemon-3.3.91.orig/plugins/power/gsd-power-manager.c	2012-03-08 13:59:58.974131762 -0500
-+++ gnome-settings-daemon-3.3.91/plugins/power/gsd-power-manager.c	2012-03-08 14:00:13.250132125 -0500
-@@ -687,7 +687,10 @@
+--- gnome-settings-daemon-3.4.0.orig/plugins/power/gsd-power-manager.c	2012-03-30 13:37:14.511949756 +0200
++++ gnome-settings-daemon-3.4.0/plugins/power/gsd-power-manager.c	2012-03-30 13:37:16.211949839 +0200
+@@ -688,7 +688,7 @@
  
          /* show a different icon if we are disconnected */
          icon = engine_get_icon (manager);
 -        gtk_status_icon_set_visible (manager->priv->status_icon, icon != NULL);
-+        if (g_strcmp0 (g_getenv ("XDG_CURRENT_DESKTOP"), "Unity") == 0)
-+                gtk_status_icon_set_visible (manager->priv->status_icon, FALSE);
-+        else
-+                gtk_status_icon_set_visible (manager->priv->status_icon, icon != NULL);  
++        gtk_status_icon_set_visible (manager->priv->status_icon, FALSE);
  
          if (icon == NULL) {
                  /* none before, now none */
-@@ -703,6 +706,8 @@
+@@ -704,6 +704,7 @@
          if (manager->priv->previous_icon == NULL) {
  
                  /* set fallback icon */
-+                if (g_strcmp0 (g_getenv ("XDG_CURRENT_DESKTOP"), "Unity") == 0)
-+                        gtk_status_icon_set_visible (manager->priv->status_icon, FALSE);
++                gtk_status_icon_set_visible (manager->priv->status_icon, FALSE);
                  gtk_status_icon_set_from_gicon (manager->priv->status_icon, icon);
                  manager->priv->previous_icon = icon;
                  return TRUE;
-@@ -3674,6 +3679,8 @@
+@@ -3714,6 +3715,7 @@
          /* TRANSLATORS: this is the title of the power manager status icon
           * that is only shown in fallback mode */
          gtk_status_icon_set_title (manager->priv->status_icon, _("Power Manager"));
-+        if (g_strcmp0 (g_getenv ("XDG_CURRENT_DESKTOP"), "Unity") == 0)
-+                gtk_status_icon_set_visible (manager->priv->status_icon, FALSE);
++        gtk_status_icon_set_visible (manager->priv->status_icon, FALSE);
  
          /* connect to UPower for async power operations */
          g_dbus_proxy_new_for_bus (G_BUS_TYPE_SYSTEM,

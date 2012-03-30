@@ -1,3 +1,10 @@
+gnome-settings-daemon (3.4.0-0ubuntu3) UNRELEASED; urgency=low
+
+  * debian/patches/60_unity_hide_status_icon.patch:
+    - don't show the power status icon under classic either (lp: #965279)
+
+ -- Sebastien Bacher <seb128@ubuntu.com>  Fri, 30 Mar 2012 13:40:48 +0200
+
 gnome-settings-daemon (3.4.0-0ubuntu2) precise; urgency=low
 
   * debian/patches/10_smaller_syndaemon_timeout.patch:
