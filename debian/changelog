@@ -1,7 +1,12 @@
 gnome-settings-daemon (3.4.0-0ubuntu3) UNRELEASED; urgency=low
 
+  [ Sebastien Bacher ]
   * debian/patches/60_unity_hide_status_icon.patch:
     - don't show the power status icon under classic either (lp: #965279)
+
+  [ Jeremy Bicha ]
+  * debian/control.in: Build-depend on libpackagekit-glib2-dev
+  * debian/rules: Don't disable packagekit (LP: #871602)
 
  -- Sebastien Bacher <seb128@ubuntu.com>  Fri, 30 Mar 2012 13:40:48 +0200
 
