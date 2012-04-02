@@ -7,6 +7,8 @@ gnome-settings-daemon (3.4.0-0ubuntu3) UNRELEASED; urgency=low
   [ Jeremy Bicha ]
   * debian/control.in: Build-depend on libpackagekit-glib2-dev
   * debian/rules: Don't disable packagekit (LP: #871602)
+  * debian/patches/61_unity_use_application_indicator.patch:
+    - Don't use mnemonics for indicator menu items
 
  -- Sebastien Bacher <seb128@ubuntu.com>  Fri, 30 Mar 2012 13:40:48 +0200
 
