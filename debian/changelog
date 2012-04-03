@@ -1,5 +1,7 @@
 gnome-settings-daemon (3.4.0-0ubuntu3) UNRELEASED; urgency=low
 
+  * debian/patches/correct_logout_action.patch:
+    - display the logout action on ctrl-alt-del (lp: #961501)
   * debian/patches/60_unity_hide_status_icon.patch:
     - don't show the power status icon under classic either (lp: #965279)
 

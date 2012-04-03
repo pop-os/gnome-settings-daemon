@@ -22,3 +22,4 @@ revert_git_stop_using_gconf.patch
 revert_git_use_gsetting_keybindings.patch
 revert_git_a11y_gsettings.patch
 bugzilla_segfault_dpms.patch
+correct_logout_action.patch

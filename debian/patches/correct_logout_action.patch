@@ -1,0 +1,28 @@
+# Description: let the logout key do what it's supposed to do
+# Ubuntu: https://launchpad.net/bugs/961501
+# Upstream: https://bugzilla.gnome.org/show_bug.cgi?id=671979
+diff -Nur gnome-settings-daemon-3.4.0.gnome/plugins/media-keys/gsd-media-keys-manager.c gnome-settings-daemon-3.4.0/plugins/media-keys/gsd-media-keys-manager.c
+--- gnome-settings-daemon-3.4.0.gnome/plugins/media-keys/gsd-media-keys-manager.c	2012-04-03 15:21:21.168417636 +0200
++++ gnome-settings-daemon-3.4.0/plugins/media-keys/gsd-media-keys-manager.c	2012-04-03 15:26:03.508431300 +0200
+@@ -843,6 +843,12 @@
+ }
+ 
+ static void
++do_logout_action (GsdMediaKeysManager *manager)
++{
++        execute (manager, "gnome-session-quit --logout", FALSE);
++}
++
++static void
+ do_eject_action_cb (GDrive              *drive,
+                     GAsyncResult        *res,
+                     GsdMediaKeysManager *manager)
+@@ -1944,7 +1950,7 @@
+                 do_sound_action (manager, deviceid, VOLUME_UP_KEY, TRUE);
+                 break;
+         case LOGOUT_KEY:
+-                gnome_session_shutdown (manager);
++                do_logout_action (manager);
+                 break;
+         case EJECT_KEY:
+                 do_eject_action (manager);
