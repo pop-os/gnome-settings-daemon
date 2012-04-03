@@ -30,12 +30,11 @@ Build-Depends: cdbs,
                libxklavier-dev (>= 5.0),
                libgstreamer0.10-dev (>= 0.10.1.2),
                libgstreamer-plugins-base0.10-dev (>= 0.10.1.2),
-               gsettings-desktop-schemas-dev (>= 3.3.90-0ubuntu2),
+               gsettings-desktop-schemas-dev (>= 3.3.0),
                libgnome-desktop-3-dev (>= 3.3.4),
                libpulse-dev (>= 0.9.16),
                libcanberra-gtk3-dev,
                libcups2-dev,
-               libpackagekit-glib2-dev,
                libpolkit-gobject-1-dev,
                libappindicator3-dev (>= 0.4.90),
                hwdata,
@@ -53,7 +52,7 @@ Package: gnome-settings-daemon
 Architecture: any
 Depends: ${shlibs:Depends},
          ${misc:Depends},
-         gsettings-desktop-schemas (>= 3.3.90-0ubuntu2),
+         gsettings-desktop-schemas (>= 3.3.0),
          nautilus-data (>= 2.91.3-1)
 Recommends: pulseaudio
 Breaks: rhythmbox (<< 0.11.5),
