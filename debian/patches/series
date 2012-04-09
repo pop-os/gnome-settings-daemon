@@ -24,3 +24,4 @@ revert_git_a11y_gsettings.patch
 bugzilla_segfault_dpms.patch
 correct_logout_action.patch
 git_keyring_environment.patch
+disconnect_from_up_client.patch

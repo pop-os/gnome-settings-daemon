@@ -1,3 +1,12 @@
+gnome-settings-daemon (3.4.0-0ubuntu4) precise; urgency=low
+
+  * debian/patches/disconnect_from_up_client.patch:
+    - Disconnect any signals from a UpClient object before we unref it.
+      UpClients are ref-counted singletons and may stay around after
+      unref, so we have to be explicit.  LP: #965487
+
+ -- Michael Terry <mterry@ubuntu.com>  Mon, 09 Apr 2012 12:45:13 -0400
+
 gnome-settings-daemon (3.4.0-0ubuntu3) precise; urgency=low
 
   * debian/patches/correct_logout_action.patch:
