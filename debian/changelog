@@ -1,9 +1,9 @@
-gnome-settings-daemon (3.4.0-0ubuntu5) UNRELEASED; urgency=low
+gnome-settings-daemon (3.4.0-0ubuntu5) precise; urgency=low
 
   * debian/patches/git_device_setting.patch:
     - "fix applying settings to newly added touchpads" (lp: #973784)
 
- -- Sebastien Bacher <seb128@ubuntu.com>  Tue, 10 Apr 2012 22:44:43 +0200
+ -- Sebastien Bacher <seb128@ubuntu.com>  Tue, 10 Apr 2012 22:47:06 +0200
 
 gnome-settings-daemon (3.4.0-0ubuntu4) precise; urgency=low
 
