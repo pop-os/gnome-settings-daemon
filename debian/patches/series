@@ -26,3 +26,4 @@ correct_logout_action.patch
 git_keyring_environment.patch
 disconnect_from_up_client.patch
 git_device_setting.patch
+wacom-keep-touchscreen-absolute.patch

@@ -1,3 +1,10 @@
+gnome-settings-daemon (3.4.0-0ubuntu6) UNRELEASED; urgency=low
+
+  * debian/patches/wacom-keep-touchscreen-absolute.patch:
+    - Don't set touchscreens to relative mode (LP: #949097)
+
+ -- Timo Aaltonen <tjaalton@ubuntu.com>  Wed, 11 Apr 2012 17:03:42 +0300
+
 gnome-settings-daemon (3.4.0-0ubuntu5) precise; urgency=low
 
   * debian/patches/git_device_setting.patch:
