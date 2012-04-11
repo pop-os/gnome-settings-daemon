@@ -1,0 +1,22 @@
+Index: gnome-settings-daemon-3.4.0/plugins/power/gsd-power-manager.c
+===================================================================
+--- gnome-settings-daemon-3.4.0.orig/plugins/power/gsd-power-manager.c	2012-04-11 20:21:34.357809332 +0100
++++ gnome-settings-daemon-3.4.0/plugins/power/gsd-power-manager.c	2012-04-11 20:27:23.837803123 +0100
+@@ -1603,7 +1603,7 @@
+                                                                    message,
+                                                                    get_first_themed_icon_name (icon));
+         notify_notification_set_timeout (manager->priv->notification_low,
+-                                         GSD_POWER_MANAGER_NOTIFY_TIMEOUT_NEVER);
++                                         GSD_POWER_MANAGER_NOTIFY_TIMEOUT_LONG);
+         notify_notification_set_urgency (manager->priv->notification_low,
+                                          NOTIFY_URGENCY_CRITICAL);
+         notify_notification_set_app_name (manager->priv->notification_low, _("Power"));
+@@ -1752,7 +1752,7 @@
+                                                                    message,
+                                                                    get_first_themed_icon_name (icon));
+         notify_notification_set_timeout (manager->priv->notification_low,
+-                                         GSD_POWER_MANAGER_NOTIFY_TIMEOUT_NEVER);
++                                         GSD_POWER_MANAGER_NOTIFY_TIMEOUT_LONG);
+         notify_notification_set_urgency (manager->priv->notification_low,
+                                          NOTIFY_URGENCY_CRITICAL);
+         notify_notification_set_app_name (manager->priv->notification_low, _("Power"));
