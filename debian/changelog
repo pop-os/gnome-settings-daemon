@@ -1,9 +1,9 @@
-gnome-settings-daemon (3.4.0-0ubuntu7) UNRELEASED; urgency=low
+gnome-settings-daemon (3.4.0-0ubuntu7) precise; urgency=low
 
   * Fix LP: #917598 - Battery critical notification using fallback alert
     - add debian/patches/power-no-fallback-notifications.patch
 
- -- Chris Coulson <chris.coulson@canonical.com>  Wed, 11 Apr 2012 20:28:46 +0100
+ -- Chris Coulson <chris.coulson@canonical.com>  Thu, 12 Apr 2012 11:43:36 +0100
 
 gnome-settings-daemon (3.4.0-0ubuntu6) precise; urgency=low
 
