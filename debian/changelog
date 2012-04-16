@@ -1,4 +1,4 @@
-gnome-settings-daemon (3.4.1-0ubuntu1) UNRELEASED; urgency=low
+gnome-settings-daemon (3.4.1-0ubuntu1) precise-proposed; urgency=low
 
   * New upstream release:
     - Fix applying settings to touchpads
@@ -12,7 +12,7 @@ gnome-settings-daemon (3.4.1-0ubuntu1) UNRELEASED; urgency=low
     - git_device_setting.patch
     - wacom-keep-touchscreen-absolute.patch
 
- -- Martin Pitt <martin.pitt@ubuntu.com>  Mon, 16 Apr 2012 15:39:34 +0200
+ -- Martin Pitt <martin.pitt@ubuntu.com>  Mon, 16 Apr 2012 15:55:26 +0200
 
 gnome-settings-daemon (3.4.0-0ubuntu7) precise; urgency=low
 
