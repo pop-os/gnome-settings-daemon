@@ -1,3 +1,19 @@
+gnome-settings-daemon (3.4.1-0ubuntu1) UNRELEASED; urgency=low
+
+  * New upstream release:
+    - Fix applying settings to touchpads
+    - Fix possible crashes when exiting
+    - Don't put touchscreens in relative mode, just touch tablets
+      (such as the Bamboo Touch)
+    - Use PrinterAddOption method to set media size
+    - Updated translations
+  * Drop patches which are upstream now:
+    - disconnect_from_up_client.patch
+    - git_device_setting.patch
+    - wacom-keep-touchscreen-absolute.patch
+
+ -- Martin Pitt <martin.pitt@ubuntu.com>  Mon, 16 Apr 2012 15:39:34 +0200
+
 gnome-settings-daemon (3.4.0-0ubuntu7) precise; urgency=low
 
   * Fix LP: #917598 - Battery critical notification using fallback alert
