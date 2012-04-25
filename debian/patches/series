@@ -26,3 +26,4 @@ correct_logout_action.patch
 git_keyring_environment.patch
 power-no-fallback-notifications.patch
 power-check-null-devices.patch
+power-ignore-bad-dbus-requests.patch
