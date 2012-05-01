@@ -1,4 +1,4 @@
-gnome-settings-daemon (3.4.1-0ubuntu2) UNRELEASED; urgency=low
+gnome-settings-daemon (3.4.1-0ubuntu2) quantal; urgency=low
 
   * debian/patches/power-check-null-devices.patch:
     - NULL-guard the return value of up_client_get_devices.
@@ -7,7 +7,7 @@ gnome-settings-daemon (3.4.1-0ubuntu2) UNRELEASED; urgency=low
     - If we get a DBus request while the manager isn't active, ignore it.
       LP: #969535
 
- -- Michael Terry <mterry@ubuntu.com>  Wed, 25 Apr 2012 17:00:56 -0400
+ -- Michael Terry <mterry@ubuntu.com>  Tue, 01 May 2012 09:30:20 -0700
 
 gnome-settings-daemon (3.4.1-0ubuntu1) precise-proposed; urgency=low
 
