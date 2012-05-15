@@ -1,3 +1,14 @@
+gnome-settings-daemon (3.4.1-1) UNRELEASED; urgency=low
+
+  * New upstream release
+  * d/p/01-xrandr-correct-the-type-of-the-rotation-parameter.patch:
+    + Removed, fixed upstream
+  * 02-lock-screensaver-on-lid-close.patch:
+    + Removed, fixed upstream
+  * debian/patches/04_superP.patch: Refreshed
+
+ -- Sjoerd Simons <sjoerd@debian.org>  Tue, 15 May 2012 08:28:14 +0200
+
 gnome-settings-daemon (3.2.2-3) unstable; urgency=low
 
   * Correctly lock the screensaver on lid-close when lid-close action is set
