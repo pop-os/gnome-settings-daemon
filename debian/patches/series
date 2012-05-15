@@ -1,1 +1,5 @@
 04_superP.patch
+10_smaller_syndaemon_timeout.patch
+git_keyring_environment.patch
+power-check-null-devices.patch
+power-ignore-bad-dbus-requests.patch

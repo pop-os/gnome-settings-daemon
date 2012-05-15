@@ -6,8 +6,23 @@ gnome-settings-daemon (3.4.1-1) UNRELEASED; urgency=low
   * 02-lock-screensaver-on-lid-close.patch:
     + Removed, fixed upstream
   * debian/patches/04_superP.patch: Refreshed
+  * Sync with ubuntu:
+    + Update build-depend versions of various items
+    + Add build-depend on libnss3-dev for smartcard support
+    + Add build-depend on libwacom-dev, xserver-xorg-input-wacom for wacom
+      support
+    + debian/patches/10_smaller_syndaemon_timeout.patch:
+      - Added: Only disable touchpach clicks, not mouse movements (bgo: #673055)
+    + debian/patches/git_keyring_environment.patch:
+      - Added: Get the environment from gnome-keyring when launch custom apps
+          (from upstream git)
+    + debian/patches/power-check-null-devices.patch:
+      - Added: Fix crash when up_client_get_devices returns NULL (bgo: #674827)
+    + debian/patches/power-ignore-bad-dbus-requests.patch:
+      - Added: If we get a DBus request while the manager isn't active, ignore
+        it (bgo: #674829)
 
- -- Sjoerd Simons <sjoerd@debian.org>  Tue, 15 May 2012 08:28:14 +0200
+ -- Sjoerd Simons <sjoerd@debian.org>  Tue, 15 May 2012 08:43:09 +0200
 
 gnome-settings-daemon (3.2.2-3) unstable; urgency=low
 
