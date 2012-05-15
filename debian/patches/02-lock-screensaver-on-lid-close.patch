@@ -1,0 +1,59 @@
+From 2f08d3f05a71f3008ed8144212684e5754d436cf Mon Sep 17 00:00:00 2001
+From: Richard Hughes <richard@hughsie.com>
+Date: Fri, 16 Mar 2012 10:25:11 +0000
+Subject: [PATCH] power: Lock the screensaver if the lid is closed and lock is
+ enabled
+
+Resolves: https://bugzilla.gnome.org/show_bug.cgi?id=671445
+---
+ plugins/power/gsd-power-manager.c |   16 +++++++++++++---
+ 1 files changed, 13 insertions(+), 3 deletions(-)
+
+Index: gnome-settings-daemon-3.2.2/plugins/power/gsd-power-manager.c
+===================================================================
+--- gnome-settings-daemon-3.2.2.orig/plugins/power/gsd-power-manager.c	2011-11-08 14:48:52.000000000 +0100
++++ gnome-settings-daemon-3.2.2/plugins/power/gsd-power-manager.c	2012-03-16 14:26:29.547264964 +0100
+@@ -207,6 +207,7 @@
+ static UpDevice *engine_get_composite_device (GsdPowerManager *manager, UpDevice *original_device);
+ static UpDevice *engine_update_composite_device (GsdPowerManager *manager, UpDevice *original_device);
+ static void      do_power_action_type (GsdPowerManager *manager, GsdPowerActionType action_type);
++static void      lock_screensaver (GsdPowerManager *manager);
+ 
+ G_DEFINE_TYPE (GsdPowerManager, gsd_power_manager, G_TYPE_OBJECT)
+ 
+@@ -2129,6 +2130,9 @@
+                          NULL);
+ #endif /* HAVE_LIBCANBERRA */
+ 
++        /* maybe lock the screen if the lid is closed */
++        lock_screensaver (manager);
++
+         /* we have different settings depending on AC state */
+         if (up_client_get_on_battery (manager->priv->up_client)) {
+                 action_type = g_settings_get_enum (manager->priv->settings,
+@@ -3191,9 +3195,7 @@
+ }
+ 
+ static void
+-upower_notify_sleep_cb (UpClient *client,
+-                        UpSleepKind sleep_kind,
+-                        GsdPowerManager *manager)
++lock_screensaver (GsdPowerManager *manager)
+ {
+         gboolean do_lock;
+ 
+@@ -3212,6 +3214,14 @@
+ }
+ 
+ static void
++upower_notify_sleep_cb (UpClient *client,
++                        UpSleepKind sleep_kind,
++                        GsdPowerManager *manager)
++{
++        lock_screensaver (manager);
++}
++
++static void
+ upower_notify_resume_cb (UpClient *client,
+                          UpSleepKind sleep_kind,
+                          GsdPowerManager *manager)
