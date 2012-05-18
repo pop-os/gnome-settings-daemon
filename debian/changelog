@@ -1,7 +1,5 @@
 gnome-settings-daemon (3.4.1-1) UNRELEASED; urgency=low
 
-  *** TODO, decide what to do with DateTime moving to systemd upstream ***
-
   * New upstream release
   * d/p/01-xrandr-correct-the-type-of-the-rotation-parameter.patch:
     + Removed, fixed upstream
@@ -23,10 +21,10 @@ gnome-settings-daemon (3.4.1-1) UNRELEASED; urgency=low
     + debian/patches/power-ignore-bad-dbus-requests.patch:
       - Added: If we get a DBus request while the manager isn't active, ignore
         it (bgo: #674829)
+    + debian/patches/revert_git_datetime_dropping.patch
+      - Added: Don't switch to systemd for datetime functionality just yet
 
-  * debian/gnome-settings-daemon.install: Drop /etc/dbus-1
-
- -- Sjoerd Simons <sjoerd@debian.org>  Tue, 15 May 2012 09:27:01 +0200
+ -- Sjoerd Simons <sjoerd@debian.org>  Fri, 18 May 2012 22:10:13 +0200
 
 gnome-settings-daemon (3.2.2-3) unstable; urgency=low
 
