@@ -1,4 +1,4 @@
-gnome-settings-daemon (3.4.2-1) UNRELEASED; urgency=low
+gnome-settings-daemon (3.4.2-1) experimental; urgency=low
 
   [ Sjoerd Simons ]
   * New upstream release
@@ -34,7 +34,7 @@ gnome-settings-daemon (3.4.2-1) UNRELEASED; urgency=low
   * Remove libdbus-glib-1-dev dependency from gnome-settings-daemon-dev, no
     longer required.
 
- -- Sjoerd Simons <sjoerd@debian.org>  Fri, 18 May 2012 22:10:13 +0200
+ -- Michael Biebl <biebl@debian.org>  Sat, 19 May 2012 23:36:19 +0200
 
 gnome-settings-daemon (3.2.2-3) unstable; urgency=low
 
