@@ -43,7 +43,7 @@ Build-Depends: cdbs,
                libnss3-dev,
                libwacom-dev (>= 0.3) [!hurd-any !kfreebsd-any !s390 !s390x],
                xserver-xorg-input-wacom [!hurd-any !kfreebsd-any !s390 !s390x]
-Standards-Version: 3.9.2
+Standards-Version: 3.9.3
 Vcs-Browser: http://anonscm.debian.org/viewvc/pkg-gnome/desktop/unstable/gnome-settings-daemon/
 Vcs-Svn: svn://anonscm.debian.org/svn/pkg-gnome/desktop/unstable/gnome-settings-daemon/
 
