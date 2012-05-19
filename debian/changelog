@@ -30,6 +30,7 @@ gnome-settings-daemon (3.4.2-1) UNRELEASED; urgency=low
     s390x and non-Linux plattforms as xserver-xorg-input-wacom is not available
     there. Mark the xserver-xorg-input-wacom and libwacom-dev Build-Depends
     accordingly.
+  * Bump Standards-Version to 3.9.3.
 
  -- Sjoerd Simons <sjoerd@debian.org>  Fri, 18 May 2012 22:10:13 +0200
 
