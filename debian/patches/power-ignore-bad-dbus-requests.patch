@@ -1,8 +1,8 @@
-Index: gnome-settings-daemon-3.4.1/plugins/power/gsd-power-manager.c
+Index: gnome-settings-daemon-3.4.2/plugins/power/gsd-power-manager.c
 ===================================================================
---- gnome-settings-daemon-3.4.1.orig/plugins/power/gsd-power-manager.c	2012-04-25 16:53:47.385612908 -0400
-+++ gnome-settings-daemon-3.4.1/plugins/power/gsd-power-manager.c	2012-04-25 17:04:19.765619601 -0400
-@@ -4149,6 +4149,12 @@
+--- gnome-settings-daemon-3.4.2.orig/plugins/power/gsd-power-manager.c	2012-05-19 08:39:11.423704404 +0200
++++ gnome-settings-daemon-3.4.2/plugins/power/gsd-power-manager.c	2012-05-19 08:39:15.719704363 +0200
+@@ -4123,6 +4123,12 @@
  {
          GsdPowerManager *manager = GSD_POWER_MANAGER (user_data);
  
@@ -15,7 +15,7 @@ Index: gnome-settings-daemon-3.4.1/plugins/power/gsd-power-manager.c
          g_debug ("Calling method '%s.%s' for Power",
                   interface_name, method_name);
  
-@@ -4183,6 +4189,12 @@
+@@ -4157,6 +4163,12 @@
          GsdPowerManager *manager = GSD_POWER_MANAGER (user_data);
          GVariant *retval = NULL;
  

@@ -1,8 +1,8 @@
-Index: gnome-settings-daemon-3.4.0/plugins/mouse/gsd-mouse-manager.c
+Index: gnome-settings-daemon-3.4.2/plugins/mouse/gsd-mouse-manager.c
 ===================================================================
---- gnome-settings-daemon-3.4.0.orig/plugins/mouse/gsd-mouse-manager.c	2012-03-29 21:36:09.471126670 +0200
-+++ gnome-settings-daemon-3.4.0/plugins/mouse/gsd-mouse-manager.c	2012-03-29 21:36:45.007128390 +0200
-@@ -540,7 +540,8 @@
+--- gnome-settings-daemon-3.4.2.orig/plugins/mouse/gsd-mouse-manager.c	2012-05-15 12:11:58.000000000 +0200
++++ gnome-settings-daemon-3.4.2/plugins/mouse/gsd-mouse-manager.c	2012-05-19 08:39:03.315704485 +0200
+@@ -552,7 +552,8 @@
                  args[2] = "2.0";
                  args[3] = "-K";
                  args[4] = "-R";
@@ -10,5 +10,5 @@ Index: gnome-settings-daemon-3.4.0/plugins/mouse/gsd-mouse-manager.c
 +                args[5] = "-t";                
 +                args[6] = NULL;
  
-                 if (!g_find_program_in_path (args[0]))
+                 if (!have_program_in_path (args[0]))
                          return 0;
