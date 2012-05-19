@@ -1,21 +1,18 @@
-gnome-settings-daemon (3.4.1-1) UNRELEASED; urgency=low
+gnome-settings-daemon (3.4.2-1) UNRELEASED; urgency=low
 
   * New upstream release
-  * d/p/01-xrandr-correct-the-type-of-the-rotation-parameter.patch:
+  * debian/patches/01-xrandr-correct-the-type-of-the-rotation-parameter.patch:
     + Removed, fixed upstream
-  * 02-lock-screensaver-on-lid-close.patch:
+  * debian/patches/02-lock-screensaver-on-lid-close.patch:
     + Removed, fixed upstream
   * debian/patches/04_superP.patch: Refreshed
-  * Sync with ubuntu:
+  * Sync with Ubuntu:
     + Update build-depend versions of various items
     + Add build-depend on libnss3-dev for smartcard support
     + Add build-depend on libwacom-dev, xserver-xorg-input-wacom for wacom
       support
     + debian/patches/10_smaller_syndaemon_timeout.patch:
       - Added: Only disable touchpach clicks, not mouse movements (bgo: #673055)
-    + debian/patches/git_keyring_environment.patch:
-      - Added: Get the environment from gnome-keyring when launch custom apps
-          (from upstream git)
     + debian/patches/power-check-null-devices.patch:
       - Added: Fix crash when up_client_get_devices returns NULL (bgo: #674827)
     + debian/patches/power-ignore-bad-dbus-requests.patch:
