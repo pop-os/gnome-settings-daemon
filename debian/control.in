@@ -34,7 +34,6 @@ Build-Depends: cdbs,
                libupower-glib-dev (>= 0.9.11),
                libgudev-1.0-dev [linux-any],
                libcolord-dev (>= 0.1.12),
-               hwdata (>= 0.227-1),
                liblcms2-dev,
                libnss3-dev,
                libwacom-dev (>= 0.3),
@@ -51,7 +50,7 @@ Depends: ${shlibs:Depends},
          libgnome2-common,
          gsettings-desktop-schemas (>= 3.3.0),
          nautilus-data (>= 2.91.3-1)
-Recommends: pulseaudio, hwdata (>= 0.227-1)
+Recommends: pulseaudio
 Breaks: rhythmbox (<< 0.11.5),
         banshee (<< 0.13.2+dfsg-7),
         totem (<< 2.22.0),
