@@ -1,0 +1,93 @@
+From 6aa4ae5ba0d4afce8a418f6b2b3198772f5e8cb5 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Dan=20Hor=C3=A1k?= <dan@danny.cz>
+Date: Wed, 21 Mar 2012 18:40:06 +0100
+Subject: [PATCH 1/2] disable wacom support on s390/s390x
+
+https://bugzilla.gnome.org/show_bug.cgi?id=672576
+---
+ configure.ac        |   11 +++++++++--
+ data/Makefile.am    |    7 ++++++-
+ plugins/Makefile.am |    7 ++++++-
+ 3 files changed, 21 insertions(+), 4 deletions(-)
+
+Index: gnome-settings-daemon-3.4.2/configure.ac
+===================================================================
+--- gnome-settings-daemon-3.4.2.orig/configure.ac	2012-05-19 02:59:56.470485127 +0200
++++ gnome-settings-daemon-3.4.2/configure.ac	2012-05-19 02:59:57.118485100 +0200
+@@ -215,10 +215,16 @@
+ PKG_CHECK_MODULES(COLOR, [colord >= 0.1.9 gnome-desktop-3.0 >= $GNOME_DESKTOP_REQUIRED_VERSION libcanberra-gtk3])
+ 
+ dnl ---------------------------------------------------------------------------
+-dnl - wacom
++dnl - wacom (disabled for s390/s390x)
+ dnl ---------------------------------------------------------------------------
+ 
+-PKG_CHECK_MODULES(WACOM, [libwacom >= $LIBWACOM_REQUIRED_VERSION x11 xi xtst $GUDEV_PKG gnome-desktop-3.0 >= $GNOME_DESKTOP_REQUIRED_VERSION xorg-wacom])
++if test "$host_cpu" = s390 -o "$host_cpu" = s390x; then
++    have_wacom=no
++else
++    PKG_CHECK_MODULES(WACOM, [libwacom >= $LIBWACOM_REQUIRED_VERSION x11 xi xtst $GUDEV_PKG gnome-desktop-3.0 >= $GNOME_DESKTOP_REQUIRED_VERSION xorg-wacom])
++    have_wacom=yes
++fi
++AM_CONDITIONAL(HAVE_WACOM, test x$have_wacom = xyes)
+ 
+ dnl ==============================================
+ dnl PackageKit section
+@@ -565,6 +571,7 @@
+         PackageKit support:       ${have_packagekit}
+         Smartcard support:        ${have_smartcard_support}
+         Cups support:             ${have_cups}
++        Wacom support:            ${have_wacom}
+ ${NSS_DATABASE:+\
+         System nssdb:             ${NSS_DATABASE}
+ }\
+Index: gnome-settings-daemon-3.4.2/data/Makefile.am
+===================================================================
+--- gnome-settings-daemon-3.4.2.orig/data/Makefile.am	2012-05-15 12:14:49.000000000 +0200
++++ gnome-settings-daemon-3.4.2/data/Makefile.am	2012-05-19 02:59:57.118485100 +0200
+@@ -16,7 +16,6 @@
+ 	org.gnome.settings-daemon.plugins.xsettings.gschema.xml		\
+ 	org.gnome.settings-daemon.plugins.housekeeping.gschema.xml	\
+ 	org.gnome.settings-daemon.plugins.print-notifications.gschema.xml	\
+-	org.gnome.settings-daemon.peripherals.wacom.gschema.xml		\
+ 	org.gnome.settings-daemon.plugins.xrandr.gschema.xml
+ 
+ all_schemas = $(gsettings_SCHEMAS)
+@@ -33,6 +32,12 @@
+ all_schemas += org.gnome.settings-daemon.plugins.orientation.gschema.xml
+ endif
+ 
++if HAVE_WACOM
++gsettings_SCHEMAS += org.gnome.settings-daemon.peripherals.wacom.gschema.xml
++else
++all_schemas += org.gnome.settings-daemon.peripherals.wacom.gschema.xml
++endif
++
+ @INTLTOOL_XML_NOMERGE_RULE@
+ 
+ @GSETTINGS_RULES@
+Index: gnome-settings-daemon-3.4.2/plugins/Makefile.am
+===================================================================
+--- gnome-settings-daemon-3.4.2.orig/plugins/Makefile.am	2012-05-19 02:59:56.474485125 +0200
++++ gnome-settings-daemon-3.4.2/plugins/Makefile.am	2012-05-19 02:59:57.118485100 +0200
+@@ -16,7 +16,6 @@
+ 	media-keys	\
+ 	mouse		\
+ 	sound		\
+-	wacom		\
+ 	xrandr		\
+ 	xsettings	\
+ 	$(NULL)
+@@ -41,6 +40,12 @@
+ disabled_plugins += orientation
+ endif
+ 
++if HAVE_WACOM
++enabled_plugins += wacom
++else
++disabled_plugins += wacom
++endif
++
+ if BUILD_PRINT_NOTIFICATIONS
+ enabled_plugins += print-notifications
+ else
