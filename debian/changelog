@@ -9,8 +9,8 @@ gnome-settings-daemon (3.4.2-1) UNRELEASED; urgency=low
   * Sync with Ubuntu:
     + Update build-depend versions of various items
     + Add build-depend on libnss3-dev for smartcard support
-    + Add build-depend on libwacom-dev, xserver-xorg-input-wacom for wacom
-      support
+    + Add build-depend on libwacom-dev, xserver-xorg-input-wacom and
+      libxtst-dev for wacom support
     + debian/patches/10_smaller_syndaemon_timeout.patch:
       - Added: Only disable touchpach clicks, not mouse movements (bgo: #673055)
     + debian/patches/power-check-null-devices.patch:
