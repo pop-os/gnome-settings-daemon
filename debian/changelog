@@ -31,6 +31,8 @@ gnome-settings-daemon (3.4.2-1) UNRELEASED; urgency=low
     there. Mark the xserver-xorg-input-wacom and libwacom-dev Build-Depends
     accordingly.
   * Bump Standards-Version to 3.9.3.
+  * Remove libdbus-glib-1-dev dependency from gnome-settings-daemon-dev, no
+    longer required.
 
  -- Sjoerd Simons <sjoerd@debian.org>  Fri, 18 May 2012 22:10:13 +0200
 
