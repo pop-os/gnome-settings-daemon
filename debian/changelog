@@ -1,5 +1,6 @@
 gnome-settings-daemon (3.4.2-1) UNRELEASED; urgency=low
 
+  [ Sjoerd Simons ]
   * New upstream release
   * debian/patches/01-xrandr-correct-the-type-of-the-rotation-parameter.patch:
     + Removed, fixed upstream
@@ -20,6 +21,9 @@ gnome-settings-daemon (3.4.2-1) UNRELEASED; urgency=low
         it (bgo: #674829)
     + debian/patches/revert_git_datetime_dropping.patch
       - Added: Don't switch to systemd for datetime functionality just yet
+
+  [ Michael Biebl ]
+  * Refresh patches.
 
  -- Sjoerd Simons <sjoerd@debian.org>  Fri, 18 May 2012 22:10:13 +0200
 
