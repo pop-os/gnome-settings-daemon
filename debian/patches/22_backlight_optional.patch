@@ -1,4 +1,4 @@
-Description: Don't enable if backlight helper if GUdev is not available
+Description: Don't enable backlight helper if GUdev is not available
 Author: Michael Biebl <biebl@debian.org>
 Bug: https://bugzilla.gnome.org/show_bug.cgi?id=676407
 Index: gnome-settings-daemon-3.4.2/configure.ac
