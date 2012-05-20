@@ -1,9 +1,9 @@
-gnome-settings-daemon (3.4.2-2) UNRELEASED; urgency=low
+gnome-settings-daemon (3.4.2-2) experimental; urgency=low
 
   * debian/patches/22_backlight_optional.patch: Don't enable backlight helper
     if GUdev is not available.
 
- -- Michael Biebl <biebl@debian.org>  Sat, 19 May 2012 23:52:15 +0200
+ -- Michael Biebl <biebl@debian.org>  Sun, 20 May 2012 06:19:23 +0200
 
 gnome-settings-daemon (3.4.2-1) experimental; urgency=low
 
