@@ -1,3 +1,9 @@
+gnome-settings-daemon (3.4.2-3) UNRELEASED; urgency=low
+
+  * debian/control.in: Stop depending on libgnome2-common
+
+ -- Jeremy Bicha <jbicha@ubuntu.com>  Sun, 20 May 2012 02:19:24 -0400
+
 gnome-settings-daemon (3.4.2-2) experimental; urgency=low
 
   * debian/patches/22_backlight_optional.patch: Don't enable backlight helper
