@@ -1,4 +1,4 @@
-gnome-settings-daemon (3.4.2-0ubuntu1) UNRELEASED; urgency=low
+gnome-settings-daemon (3.4.2-0ubuntu1) quantal; urgency=low
 
   * New upstream version:
     Media-keys:
@@ -10,7 +10,7 @@ gnome-settings-daemon (3.4.2-0ubuntu1) UNRELEASED; urgency=low
   * debian/patches/git_keyring_environment.patch:
     - dropped, the fix is in the new version
 
- -- Sebastien Bacher <seb128@ubuntu.com>  Tue, 22 May 2012 20:09:41 +0200
+ -- Sebastien Bacher <seb128@ubuntu.com>  Tue, 22 May 2012 21:09:19 +0200
 
 gnome-settings-daemon (3.4.1-0ubuntu2) quantal; urgency=low
 
