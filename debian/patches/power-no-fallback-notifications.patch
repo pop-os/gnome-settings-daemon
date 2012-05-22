@@ -1,7 +1,7 @@
-Index: gnome-settings-daemon-3.4.0/plugins/power/gsd-power-manager.c
+Index: gnome-settings-daemon-3.4.2/plugins/power/gsd-power-manager.c
 ===================================================================
---- gnome-settings-daemon-3.4.0.orig/plugins/power/gsd-power-manager.c	2012-04-11 20:21:34.357809332 +0100
-+++ gnome-settings-daemon-3.4.0/plugins/power/gsd-power-manager.c	2012-04-11 20:27:23.837803123 +0100
+--- gnome-settings-daemon-3.4.2.orig/plugins/power/gsd-power-manager.c	2012-05-22 21:09:13.353387321 +0200
++++ gnome-settings-daemon-3.4.2/plugins/power/gsd-power-manager.c	2012-05-22 21:09:20.465387070 +0200
 @@ -1603,7 +1603,7 @@
                                                                     message,
                                                                     get_first_themed_icon_name (icon));

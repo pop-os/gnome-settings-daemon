@@ -1,3 +1,17 @@
+gnome-settings-daemon (3.4.2-0ubuntu1) UNRELEASED; urgency=low
+
+  * New upstream version:
+    Media-keys:
+    - Fix applications launching through keyboard shortcuts not using 
+      the session's ssh agent, or keyrings
+    Mouse:
+    - Fix arguments passed to the custom command
+    And a number of memory leak fixes and translation updates.
+  * debian/patches/git_keyring_environment.patch:
+    - dropped, the fix is in the new version
+
+ -- Sebastien Bacher <seb128@ubuntu.com>  Tue, 22 May 2012 20:09:41 +0200
+
 gnome-settings-daemon (3.4.1-0ubuntu2) quantal; urgency=low
 
   * debian/patches/power-check-null-devices.patch:

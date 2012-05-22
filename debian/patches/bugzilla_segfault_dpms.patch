@@ -1,9 +1,9 @@
 #upstream: https://bugzilla.gnome.org/show_bug.cgi?id=672245
-diff --git a/plugins/power/gsd-power-manager.c b/plugins/power/gsd-power-manager.c
-index d2020c1..af279f6 100644
---- a/plugins/power/gsd-power-manager.c
-+++ b/plugins/power/gsd-power-manager.c
-@@ -3654,6 +3654,11 @@ gsd_power_manager_start (GsdPowerManager *manager,
+Index: gnome-settings-daemon-3.4.2/plugins/power/gsd-power-manager.c
+===================================================================
+--- gnome-settings-daemon-3.4.2.orig/plugins/power/gsd-power-manager.c	2012-05-22 21:09:12.713387345 +0200
++++ gnome-settings-daemon-3.4.2/plugins/power/gsd-power-manager.c	2012-05-22 21:09:21.265387042 +0200
+@@ -3679,6 +3679,11 @@
          g_debug ("Starting power manager");
          gnome_settings_profile_start (NULL);
  
@@ -15,7 +15,7 @@ index d2020c1..af279f6 100644
          /* track the active session */
          manager->priv->session = gnome_settings_session_new ();
          g_signal_connect (manager->priv->session, "notify::state",
-@@ -3781,11 +3786,6 @@ gsd_power_manager_start (GsdPowerManager *manager,
+@@ -3807,11 +3812,6 @@
          g_signal_connect (manager->priv->idletime, "alarm-expired",
                            G_CALLBACK (idle_idletime_alarm_expired_cb), manager);
  
@@ -27,4 +27,3 @@ index d2020c1..af279f6 100644
          /* ensure the default dpms timeouts are cleared */
          ret = gnome_rr_screen_set_dpms_mode (manager->priv->x11_screen,
                                               GNOME_RR_DPMS_ON,
-
