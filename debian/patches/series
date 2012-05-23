@@ -26,3 +26,4 @@ correct_logout_action.patch
 power-no-fallback-notifications.patch
 power-check-null-devices.patch
 power-ignore-bad-dbus-requests.patch
+xsettings_signal_handling.patch

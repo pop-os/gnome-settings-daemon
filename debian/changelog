@@ -1,3 +1,12 @@
+gnome-settings-daemon (3.4.2-0ubuntu2) UNRELEASED; urgency=low
+
+  * debian/patches/xsettings_signal_handling.patch:
+    - upstream bugzilla patch, fix segfaults in the xsettings code which
+      seem to happen at logout 
+      (lp: #946295, #948347, #963704)
+
+ -- Sebastien Bacher <seb128@ubuntu.com>  Wed, 23 May 2012 21:41:42 +0200
+
 gnome-settings-daemon (3.4.2-0ubuntu1) quantal; urgency=low
 
   * New upstream version:

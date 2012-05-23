@@ -1,0 +1,52 @@
+From a601cb28a78d2099bcefd3d2b64684f5e51a5806 Mon Sep 17 00:00:00 2001
+From: Ryan Lortie <desrt@desrt.ca>
+Date: Fri, 4 May 2012 15:46:18 -0700
+Subject: [PATCH] xsettings: use g_signal_connect_object with GSettings
+
+This way we automatically disconnect the signal handler when our objects
+die (during shutdown).
+
+https://bugzilla.gnome.org/show_bug.cgi?id=675481
+---
+ plugins/xsettings/gsd-xsettings-gtk.c     |    3 +--
+ plugins/xsettings/gsd-xsettings-manager.c |    6 ++----
+ 2 files changed, 3 insertions(+), 6 deletions(-)
+
+diff --git a/plugins/xsettings/gsd-xsettings-gtk.c b/plugins/xsettings/gsd-xsettings-gtk.c
+index d0b94da..74aaab7 100644
+--- a/plugins/xsettings/gsd-xsettings-gtk.c
++++ b/plugins/xsettings/gsd-xsettings-gtk.c
+@@ -129,8 +129,7 @@ process_desktop_file (const char      *path,
+                 g_object_set_data_full (G_OBJECT (settings), "module-name", g_strdup (module_name), (GDestroyNotify) g_free);
+ 
+                 signal = g_strdup_printf ("changed::%s", key);
+-                g_signal_connect (G_OBJECT (settings), signal,
+-                                  G_CALLBACK (cond_setting_changed), gtk);
++                g_signal_connect_object (G_OBJECT (settings), signal, G_CALLBACK (cond_setting_changed), gtk, 0);
+                 g_free (signal);
+                 g_free (schema);
+                 g_free (key);
+diff --git a/plugins/xsettings/gsd-xsettings-manager.c b/plugins/xsettings/gsd-xsettings-manager.c
+index 19e31a1..e909b08 100644
+--- a/plugins/xsettings/gsd-xsettings-manager.c
++++ b/plugins/xsettings/gsd-xsettings-manager.c
+@@ -884,15 +884,13 @@ gnome_xsettings_manager_start (GnomeXSettingsManager *manager,
+ 
+         list = g_hash_table_get_values (manager->priv->settings);
+         for (l = list; l != NULL; l = l->next) {
+-                g_signal_connect (G_OBJECT (l->data), "changed",
+-                                  G_CALLBACK (xsettings_callback), manager);
++                g_signal_connect_object (G_OBJECT (l->data), "changed", G_CALLBACK (xsettings_callback), manager, 0);
+         }
+         g_list_free (list);
+ 
+         /* Plugin settings (GTK modules and Xft) */
+         manager->priv->plugin_settings = g_settings_new (XSETTINGS_PLUGIN_SCHEMA);
+-        g_signal_connect (manager->priv->plugin_settings, "changed",
+-                          G_CALLBACK (plugin_callback), manager);
++        g_signal_connect_object (manager->priv->plugin_settings, "changed", G_CALLBACK (plugin_callback), manager, 0);
+ 
+         manager->priv->gtk = gsd_xsettings_gtk_new ();
+         g_signal_connect (G_OBJECT (manager->priv->gtk), "notify::gtk-modules",
+-- 
+1.7.9.5
