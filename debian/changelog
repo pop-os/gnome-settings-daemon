@@ -1,6 +1,10 @@
 gnome-settings-daemon (3.4.2-3) UNRELEASED; urgency=low
 
+  [ Jeremy Bicha ]
   * debian/control.in: Stop depending on libgnome2-common
+
+  [ Michael Biebl ]
+  * Upload to unstable.
 
  -- Jeremy Bicha <jbicha@ubuntu.com>  Sun, 20 May 2012 02:19:24 -0400
 
