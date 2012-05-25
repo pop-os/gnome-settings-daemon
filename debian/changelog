@@ -1,3 +1,54 @@
+gnome-settings-daemon (3.4.2-3) UNRELEASED; urgency=low
+
+  * debian/control.in: Stop depending on libgnome2-common
+
+ -- Jeremy Bicha <jbicha@ubuntu.com>  Sun, 20 May 2012 02:19:24 -0400
+
+gnome-settings-daemon (3.4.2-2) experimental; urgency=low
+
+  * debian/patches/22_backlight_optional.patch: Don't enable backlight helper
+    if GUdev is not available.
+
+ -- Michael Biebl <biebl@debian.org>  Sun, 20 May 2012 06:19:23 +0200
+
+gnome-settings-daemon (3.4.2-1) experimental; urgency=low
+
+  [ Sjoerd Simons ]
+  * New upstream release
+  * debian/patches/01-xrandr-correct-the-type-of-the-rotation-parameter.patch:
+    + Removed, fixed upstream
+  * debian/patches/02-lock-screensaver-on-lid-close.patch:
+    + Removed, fixed upstream
+  * debian/patches/04_superP.patch: Refreshed
+  * Sync with Ubuntu:
+    + Update build-depend versions of various items
+    + Add build-depend on libnss3-dev for smartcard support
+    + Add build-depend on libwacom-dev, xserver-xorg-input-wacom and
+      libxtst-dev for wacom support
+    + debian/patches/10_smaller_syndaemon_timeout.patch:
+      - Added: Only disable touchpach clicks, not mouse movements (bgo: #673055)
+    + debian/patches/power-check-null-devices.patch:
+      - Added: Fix crash when up_client_get_devices returns NULL (bgo: #674827)
+    + debian/patches/power-ignore-bad-dbus-requests.patch:
+      - Added: If we get a DBus request while the manager isn't active, ignore
+        it (bgo: #674829)
+    + debian/patches/revert_git_datetime_dropping.patch
+      - Added: Don't switch to systemd for datetime functionality just yet
+
+  [ Michael Biebl ]
+  * Refresh patches.
+  * Drop dependency on hwdata. This is no longer necessary and handled via
+    libgnome-desktop now.
+  * Cherry-pick two upstream patches which disable wacom support on s390,
+    s390x and non-Linux plattforms as xserver-xorg-input-wacom is not available
+    there. Mark the xserver-xorg-input-wacom and libwacom-dev Build-Depends
+    accordingly.
+  * Bump Standards-Version to 3.9.3.
+  * Remove libdbus-glib-1-dev dependency from gnome-settings-daemon-dev, no
+    longer required.
+
+ -- Michael Biebl <biebl@debian.org>  Sat, 19 May 2012 23:36:19 +0200
+
 gnome-settings-daemon (3.2.2-3) unstable; urgency=low
 
   * Correctly lock the screensaver on lid-close when lid-close action is set

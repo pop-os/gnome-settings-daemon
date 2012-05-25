@@ -1,3 +1,8 @@
-01-xrandr-correct-the-type-of-the-rotation-parameter.patch
-02-lock-screensaver-on-lid-close.patch
 04_superP.patch
+10_smaller_syndaemon_timeout.patch
+power-check-null-devices.patch
+power-ignore-bad-dbus-requests.patch
+revert_git_datetime_dropping.patch
+20_disable-wacom-support-on-s390-s390x.patch
+21_disable-wacom-on-non-Linux-platforms.patch
+22_backlight_optional.patch
