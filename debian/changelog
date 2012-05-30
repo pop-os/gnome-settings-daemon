@@ -7,6 +7,7 @@ gnome-settings-daemon (3.4.2-3) UNRELEASED; urgency=low
   * Upload to unstable.
   * Drop obsolete --enable-gconf-bridge configure switch and Build-Depends on
     libgconf2-dev.
+  * Remove obsolete Breaks.
 
  -- Jeremy Bicha <jbicha@ubuntu.com>  Sun, 20 May 2012 02:19:24 -0400
 
