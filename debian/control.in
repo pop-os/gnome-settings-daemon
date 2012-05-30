@@ -52,6 +52,7 @@ Recommends: pulseaudio
 Breaks: gnome-session (<< 2.24),
         gnome-screensaver (<< 2.28.0),
         gnome-color-manager (<< 3.0),
+        gnome-shell ( << 3.4),
         gdm3 (<< 3.0)
 Suggests: x11-xserver-utils,
           gnome-screensaver,
