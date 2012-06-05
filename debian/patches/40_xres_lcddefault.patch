@@ -1,11 +1,11 @@
 Description: OpenOffice.org subpixel font rendering broken with new cairo
 Bug: https://bugs.launchpad.net/bugs/271283
 
-Index: gnome-settings-daemon-3.3.91/plugins/xsettings/gsd-xsettings-manager.c
+Index: gnome-settings-daemon-3.5.2/plugins/xsettings/gsd-xsettings-manager.c
 ===================================================================
---- gnome-settings-daemon-3.3.91.orig/plugins/xsettings/gsd-xsettings-manager.c	2012-02-08 17:59:31.000000000 +0100
-+++ gnome-settings-daemon-3.3.91/plugins/xsettings/gsd-xsettings-manager.c	2012-03-05 21:04:18.289981325 +0100
-@@ -383,6 +383,9 @@
+--- gnome-settings-daemon-3.5.2.orig/plugins/xsettings/gsd-xsettings-manager.c	2012-05-31 12:13:41.000000000 +1200
++++ gnome-settings-daemon-3.5.2/plugins/xsettings/gsd-xsettings-manager.c	2012-06-05 17:32:02.240510963 +1200
+@@ -384,6 +384,9 @@
          int         dpi;
          const char *rgba;
          const char *hintstyle;
@@ -15,7 +15,7 @@ Index: gnome-settings-daemon-3.3.91/plugins/xsettings/gsd-xsettings-manager.c
  } GnomeXftSettings;
  
  /* Read GSettings and determine the appropriate Xft settings based on them. */
-@@ -404,6 +407,7 @@
+@@ -405,6 +408,7 @@
          settings->dpi = get_dpi_from_gsettings (manager) * 1024; /* Xft wants 1/1024ths of an inch */
          settings->rgba = "rgb";
          settings->hintstyle = "hintfull";
@@ -23,7 +23,7 @@ Index: gnome-settings-daemon-3.3.91/plugins/xsettings/gsd-xsettings-manager.c
  
          switch (hinting) {
          case GSD_FONT_HINTING_NONE:
-@@ -447,10 +451,10 @@
+@@ -448,10 +452,10 @@
                  break;
          case GSD_FONT_ANTIALIASING_MODE_RGBA:
                  settings->antialias = 1;
@@ -36,7 +36,7 @@ Index: gnome-settings-daemon-3.3.91/plugins/xsettings/gsd-xsettings-manager.c
                  settings->rgba = "none";
          }
  }
-@@ -469,6 +473,7 @@
+@@ -470,6 +474,7 @@
                  xsettings_manager_set_string (manager->priv->managers [i], "Xft/HintStyle", settings->hintstyle);
                  xsettings_manager_set_int (manager->priv->managers [i], "Xft/DPI", settings->dpi);
                  xsettings_manager_set_string (manager->priv->managers [i], "Xft/RGBA", settings->rgba);
@@ -44,7 +44,7 @@ Index: gnome-settings-daemon-3.3.91/plugins/xsettings/gsd-xsettings-manager.c
          }
          gnome_settings_profile_end (NULL);
  }
-@@ -530,6 +535,8 @@
+@@ -531,6 +536,8 @@
                                  settings->hintstyle);
          update_property (add_string, "Xft.rgba",
                                  settings->rgba);

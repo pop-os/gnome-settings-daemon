@@ -1,8 +1,8 @@
-Index: gnome-settings-daemon-3.3.91/plugins/media-keys/gsd-media-keys-manager.c
+Index: gnome-settings-daemon-3.5.2/plugins/media-keys/gsd-media-keys-manager.c
 ===================================================================
---- gnome-settings-daemon-3.3.91.orig/plugins/media-keys/gsd-media-keys-manager.c	2012-03-05 21:04:12.701981055 +0100
-+++ gnome-settings-daemon-3.3.91/plugins/media-keys/gsd-media-keys-manager.c	2012-03-05 21:04:15.045981168 +0100
-@@ -2223,6 +2223,9 @@
+--- gnome-settings-daemon-3.5.2.orig/plugins/media-keys/gsd-media-keys-manager.c	2012-06-05 17:30:16.744514617 +1200
++++ gnome-settings-daemon-3.5.2/plugins/media-keys/gsd-media-keys-manager.c	2012-06-05 17:32:08.216510757 +1200
+@@ -2306,6 +2306,9 @@
          g_debug ("Starting media_keys manager");
          gnome_settings_profile_start (NULL);
  
@@ -12,7 +12,7 @@ Index: gnome-settings-daemon-3.3.91/plugins/media-keys/gsd-media-keys-manager.c
          manager->priv->settings = g_settings_new (SETTINGS_BINDING_DIR);
          g_signal_connect (G_OBJECT (manager->priv->settings), "changed",
                            G_CALLBACK (gsettings_changed_cb), manager);
-@@ -2327,8 +2330,6 @@
+@@ -2410,8 +2413,6 @@
                            G_CALLBACK (on_control_stream_removed),
                            manager);
  
