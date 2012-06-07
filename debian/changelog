@@ -1,3 +1,9 @@
+gnome-settings-daemon (3.4.2-0ubuntu3) quantal; urgency=low
+
+  * Rebuild for the libgnome-desktop SOVER bump.
+
+ -- Adam Conrad <adconrad@ubuntu.com>  Thu, 07 Jun 2012 15:59:11 -0600
+
 gnome-settings-daemon (3.4.2-0ubuntu2) quantal; urgency=low
 
   * debian/patches/xsettings_signal_handling.patch:
