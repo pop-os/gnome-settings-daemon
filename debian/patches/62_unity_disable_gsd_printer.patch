@@ -2,10 +2,10 @@ Description: Disable gsd-printer plugin under Unity. We are still using system-c
 Author: Martin Pitt <martin.pitt@ubuntu.com>
 Forwarded: No, Ubuntu specific
 
-Index: gnome-settings-daemon-3.3.91/plugins/print-notifications/gsd-print-notifications-plugin.c
+Index: gnome-settings-daemon-3.4.2/plugins/print-notifications/gsd-print-notifications-plugin.c
 ===================================================================
---- gnome-settings-daemon-3.3.91.orig/plugins/print-notifications/gsd-print-notifications-plugin.c	2011-09-07 16:40:46.000000000 +0200
-+++ gnome-settings-daemon-3.3.91/plugins/print-notifications/gsd-print-notifications-plugin.c	2012-03-05 21:04:12.953981067 +0100
+--- gnome-settings-daemon-3.4.2.orig/plugins/print-notifications/gsd-print-notifications-plugin.c	2011-09-07 16:40:46.000000000 +0200
++++ gnome-settings-daemon-3.4.2/plugins/print-notifications/gsd-print-notifications-plugin.c	2012-06-11 13:41:11.393118697 +0200
 @@ -38,6 +38,12 @@
  static void
  gsd_print_notifications_plugin_init (GsdPrintNotificationsPlugin *plugin)
@@ -19,7 +19,19 @@ Index: gnome-settings-daemon-3.3.91/plugins/print-notifications/gsd-print-notifi
          plugin->priv = GSD_PRINT_NOTIFICATIONS_PLUGIN_GET_PRIVATE (plugin);
  
          plugin->priv->manager = gsd_print_notifications_manager_new ();
-@@ -70,6 +76,11 @@
+@@ -55,6 +61,11 @@
+ 
+         plugin = GSD_PRINT_NOTIFICATIONS_PLUGIN (object);
+ 
++        if (g_strcmp0 (g_getenv ("XDG_CURRENT_DESKTOP"), "Unity") == 0) {
++            G_OBJECT_CLASS (gsd_print_notifications_plugin_parent_class)->finalize (object);
++            return;
++        }
++
+         g_return_if_fail (plugin->priv != NULL);
+ 
+         if (plugin->priv->manager != NULL) {
+@@ -70,6 +81,11 @@
          gboolean res;
          GError  *error;
  
@@ -31,7 +43,7 @@ Index: gnome-settings-daemon-3.3.91/plugins/print-notifications/gsd-print-notifi
          g_debug ("Activating print-notifications plugin");
  
          error = NULL;
-@@ -83,6 +94,11 @@
+@@ -83,6 +99,11 @@
  static void
  impl_deactivate (GnomeSettingsPlugin *plugin)
  {
