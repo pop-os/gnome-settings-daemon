@@ -1,4 +1,4 @@
-gnome-settings-daemon (3.4.2-0ubuntu5) UNRELEASED; urgency=low
+gnome-settings-daemon (3.4.2-0ubuntu5) quantal; urgency=low
 
   * debian/patches/10_smaller_syndaemon_timeout.patch: Update to increase
     the size of the stack allocated array for the extra argument passed to
