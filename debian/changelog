@@ -1,3 +1,15 @@
+gnome-settings-daemon (3.4.2-0ubuntu5) UNRELEASED; urgency=low
+
+  * debian/patches/10_smaller_syndaemon_timeout.patch: Update to increase
+    the size of the stack allocated array for the extra argument passed to
+    syndaemon. This fixes a crash in the PLT due to a corrupt %ebx register
+    (which holds the GOT base address on i386), which was caused in an earlier
+    function by writing zero in to the location on the stack where the value of
+    %ebx is saved. Thanks to Sebastien Bacher for spotting the buggy patch!
+    (fixes LP: #1007588)
+
+ -- Chris Coulson <chris.coulson@canonical.com>  Mon, 18 Jun 2012 10:27:29 +0100
+
 gnome-settings-daemon (3.4.2-0ubuntu4) quantal; urgency=low
 
   * debian/patches/62_unity_disable_gsd_printer.patch: gracefully exit the
