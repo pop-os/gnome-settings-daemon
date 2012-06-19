@@ -17,10 +17,6 @@
 sync_keyboard_layout_to_accountsservice.patch
 disable_three_touch_tap.patch
 revert_git_datetime_dropping.patch
-revert_git_dropping_gconf_wrapper.patch
-revert_git_stop_using_gconf.patch
-revert_git_use_gsetting_keybindings.patch
-revert_git_a11y_gsettings.patch
 bugzilla_segfault_dpms.patch
 correct_logout_action.patch
 power-no-fallback-notifications.patch
