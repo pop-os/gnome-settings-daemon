@@ -1,5 +1,6 @@
 gnome-settings-daemon (3.4.2-0ubuntu6) UNRELEASED; urgency=low
 
+  [ Sebastien Bacher ]
   * debian/control.in:
     - don't build-depends on gconf
   * debian/gnome-settings-daemon.gsettings-override:
@@ -11,6 +12,12 @@ gnome-settings-daemon (3.4.2-0ubuntu6) UNRELEASED; urgency=low
     - drop the gconf to gsettings migration reverts
   * debian/rules:
     - don't use deprecated --enable-gconf-bridge
+
+  [ Keng-Yu Lin ]
+  * debian/patches/git-mask-out-virtual-modifiers.patch
+    - patch from upstream git, fix the grabbing issue of the 
+      keyboard shortcut with virtual (Super, Hyper, Meta) modifier.
+      (lp: #950160)
 
  -- Sebastien Bacher <seb128@ubuntu.com>  Tue, 19 Jun 2012 10:45:45 +0200
 
