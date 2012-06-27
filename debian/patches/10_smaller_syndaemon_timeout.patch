@@ -1,5 +1,3 @@
-Index: gnome-settings-daemon-3.4.2/plugins/mouse/gsd-mouse-manager.c
-===================================================================
 --- gnome-settings-daemon-3.4.2.orig/plugins/mouse/gsd-mouse-manager.c	2012-06-18 10:26:32.759959310 +0100
 +++ gnome-settings-daemon-3.4.2/plugins/mouse/gsd-mouse-manager.c	2012-06-18 10:27:04.615958743 +0100
 @@ -542,7 +542,7 @@
@@ -11,8 +9,8 @@ Index: gnome-settings-daemon-3.4.2/plugins/mouse/gsd-mouse-manager.c
  
                  if (manager->priv->syndaemon_spawned)
                          return 0;
-@@ -552,7 +552,8 @@
-                 args[2] = "2.0";
+@@ -577,7 +577,8 @@
+                 args[2] = "1.0";
                  args[3] = "-K";
                  args[4] = "-R";
 -                args[5] = NULL;
