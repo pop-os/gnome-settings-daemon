@@ -1,12 +1,17 @@
-gnome-settings-daemon (3.5.2-0ubuntu1) UNRELEASED; urgency=low
+gnome-settings-daemon (3.5.4-0ubuntu1) UNRELEASED; urgency=low
 
+  [ Robert Ancell ]
   * New upstream release
   * debian/control:
     - Bump build-depends on libgnome-desktop-3-dev, libwacom-dev
     - Drop build-depends on libgnomekbd-dev, libxklavier-dev
     - Add build-depends on libxkbfile-dev
 
- -- Robert Ancell <robert.ancell@canonical.com>  Tue, 05 Jun 2012 17:15:52 +1200
+  [ Iain Lane ]
+  * New upstream release
+  * Refresh patches and remove those applied upstream.
+
+ -- Iain Lane <iain.lane@canonical.com>  Fri, 29 Jun 2012 14:42:04 +0100
 
 gnome-settings-daemon (3.4.2-0ubuntu6) UNRELEASED; urgency=low
 
