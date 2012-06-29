@@ -19,6 +19,9 @@ gnome-settings-daemon (3.4.2-0ubuntu6) UNRELEASED; urgency=low
       keyboard shortcut with virtual (Super, Hyper, Meta) modifier.
       (lp: #950160)
 
+  [ Edward Donovan ]
+  * debian/source_gnome-settings-daemon.py: Fix for Python 3. (LP: #1013171)
+
  -- Sebastien Bacher <seb128@ubuntu.com>  Tue, 19 Jun 2012 10:45:45 +0200
 
 gnome-settings-daemon (3.4.2-0ubuntu5) quantal; urgency=low
