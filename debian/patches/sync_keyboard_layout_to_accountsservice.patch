@@ -1,24 +1,27 @@
-Index: gnome-settings-daemon-3.3.91/plugins/keyboard/gsd-keyboard-manager.c
+Index: b/plugins/keyboard/gsd-keyboard-manager.c
 ===================================================================
---- gnome-settings-daemon-3.3.91.orig/plugins/keyboard/gsd-keyboard-manager.c	2012-02-08 19:23:44.000000000 +0100
-+++ gnome-settings-daemon-3.3.91/plugins/keyboard/gsd-keyboard-manager.c	2012-03-05 21:04:13.009981070 +0100
-@@ -66,10 +66,14 @@
+--- a/plugins/keyboard/gsd-keyboard-manager.c
++++ b/plugins/keyboard/gsd-keyboard-manager.c
+@@ -66,6 +66,9 @@
  #define KEY_BELL_DURATION  "bell-duration"
  #define KEY_BELL_MODE      "bell-mode"
  
 +#define LIBGNOMEKBD_KEYBOARD_DIR "org.gnome.libgnomekbd.keyboard"
 +#define LIBGNOMEKBD_KEY_LAYOUTS  "layouts"
 +
- struct GsdKeyboardManagerPrivate
+ #define GNOME_DESKTOP_INPUT_SOURCES_DIR "org.gnome.desktop.input-sources"
+ 
+ #define KEY_CURRENT_INPUT_SOURCE "current"
+@@ -79,6 +82,7 @@
  {
  	guint      start_idle_id;
          GSettings *settings;
 +        GSettings *libgnomekbd_settings;
-         gboolean   have_xkb;
+         GSettings *input_sources_settings;
+         GnomeXkbInfo *xkb_info;
          gint       xkb_event_base;
-         GsdNumLockState old_state;
-@@ -266,6 +270,93 @@
-         apply_settings (manager->priv->settings, NULL, manager);
+@@ -565,6 +569,93 @@
+         manager->priv->device_manager = device_manager;
  }
  
 +static void
@@ -111,34 +114,30 @@ Index: gnome-settings-daemon-3.3.91/plugins/keyboard/gsd-keyboard-manager.c
  static gboolean
  start_keyboard_idle_cb (GsdKeyboardManager *manager)
  {
-@@ -275,6 +366,7 @@
+@@ -573,6 +664,7 @@
+         g_debug ("Starting keyboard manager");
  
-         manager->priv->have_xkb = 0;
          manager->priv->settings = g_settings_new (GSD_KEYBOARD_DIR);
 +        manager->priv->libgnomekbd_settings = g_settings_new (LIBGNOMEKBD_KEYBOARD_DIR);
  
-         /* Essential - xkb initialization should happen before */
-         gsd_keyboard_xkb_init (manager);
-@@ -287,6 +379,10 @@
-         g_signal_connect (G_OBJECT (manager->priv->settings), "changed",
-                           G_CALLBACK (apply_settings), manager);
+ 	xkb_init (manager);
+ 
+@@ -591,6 +683,10 @@
+         g_signal_connect (G_OBJECT (manager->priv->input_sources_settings), "changed",
+                           G_CALLBACK (apply_input_sources_settings), manager);
  
 +        apply_libgnomekbd_settings (manager->priv->libgnomekbd_settings, NULL, manager);
 +        g_signal_connect (G_OBJECT (manager->priv->libgnomekbd_settings), "changed",
 +                          G_CALLBACK (apply_libgnomekbd_settings), manager);
 +
-         numlock_install_xkb_callback (manager);
+ 	install_xkb_filter (manager);
  
          gnome_settings_profile_end (NULL);
-@@ -321,6 +417,11 @@
-                 p->settings = NULL;
-         }
+@@ -628,6 +724,7 @@
+         g_clear_object (&p->settings);
+         g_clear_object (&p->input_sources_settings);
+         g_clear_object (&p->xkb_info);
++        g_clear_object (&p->libgnomekbd_settings);
  
-+        if (p->libgnomekbd_settings != NULL) {
-+                g_object_unref (p->libgnomekbd_settings);
-+                p->libgnomekbd_settings = NULL;
-+        }
-+
-         if (p->have_xkb) {
-                 gdk_window_remove_filter (NULL,
-                                           numlock_xkb_callback,
+         if (p->device_manager != NULL) {
+                 g_signal_handler_disconnect (p->device_manager, p->device_added_id);

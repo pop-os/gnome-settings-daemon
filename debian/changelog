@@ -1,4 +1,15 @@
-gnome-settings-daemon (3.4.2-0ubuntu6) UNRELEASED; urgency=low
+gnome-settings-daemon (3.5.4-0ubuntu1) UNRELEASED; urgency=low
+
+  [ Robert Ancell ]
+  * New upstream release
+  * debian/control:
+    - Bump build-depends on libgnome-desktop-3-dev, libwacom-dev
+    - Drop build-depends on libgnomekbd-dev, libxklavier-dev
+    - Add build-depends on libxkbfile-dev
+
+  [ Iain Lane ]
+  * New upstream release
+  * Refresh patches and remove those applied upstream.
 
   [ Sebastien Bacher ]
   * debian/control.in:
@@ -12,12 +23,6 @@ gnome-settings-daemon (3.4.2-0ubuntu6) UNRELEASED; urgency=low
     - drop the gconf to gsettings migration reverts
   * debian/rules:
     - don't use deprecated --enable-gconf-bridge
-
-  [ Keng-Yu Lin ]
-  * debian/patches/git-mask-out-virtual-modifiers.patch
-    - patch from upstream git, fix the grabbing issue of the 
-      keyboard shortcut with virtual (Super, Hyper, Meta) modifier.
-      (lp: #950160)
 
   [ Edward Donovan ]
   * debian/source_gnome-settings-daemon.py: Fix for Python 3. (LP: #1013171)

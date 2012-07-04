@@ -1,5 +1,4 @@
 05_disable_corner_tapping.patch
-10_smaller_syndaemon_timeout.patch
 16_use_synchronous_notifications.patch
 20_migrate_background_uri.patch
 40_xres_lcddefault.patch
@@ -10,7 +9,7 @@
 51_lock_screen_on_suspend.patch
 52_sync_background_to_accountsservice.patch
 60_unity_hide_status_icon.patch
-61_unity_use_application_indicator.patch
+#61_unity_use_application_indicator.patch
 62_unity_disable_gsd_printer.patch
 63_unity_start_mounter.patch
 90_set_gmenus_xsettings.patch
@@ -21,6 +20,3 @@ bugzilla_segfault_dpms.patch
 correct_logout_action.patch
 power-no-fallback-notifications.patch
 power-check-null-devices.patch
-power-ignore-bad-dbus-requests.patch
-xsettings_signal_handling.patch
-git-mask-out-virtual-modifiers.patch
