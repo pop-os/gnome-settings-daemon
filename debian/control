@@ -42,7 +42,9 @@ Build-Depends: cdbs,
                libnss3-dev,
                libgudev-1.0-dev,
                libwacom-dev (>= 0.5),
-               xserver-xorg-input-wacom
+               xserver-xorg-input-wacom,
+               libgnomekbd-dev (>= 3.5.1),
+               libxklavier-dev
 Standards-Version: 3.9.1
 Vcs-Bzr: https://code.launchpad.net/~ubuntu-desktop/gnome-settings-daemon/ubuntu
 

@@ -2,7 +2,7 @@ Index: b/configure.ac
 ===================================================================
 --- a/configure.ac
 +++ b/configure.ac
-@@ -116,6 +116,24 @@
+@@ -117,6 +117,24 @@
  AC_SUBST(LIBNOTIFY_LIBS)
  
  dnl ---------------------------------------------------------------------------
@@ -27,7 +27,7 @@ Index: b/configure.ac
  dnl - GUdev integration (default enabled)
  dnl ---------------------------------------------------------------------------
  GUDEV_PKG=""
-@@ -339,6 +357,42 @@
+@@ -367,6 +385,42 @@
  AM_CONDITIONAL(WITH_SYSTEMD, [test "$with_systemd" = "yes"], [Using systemd])
  
  # ---------------------------------------------------------------------------
@@ -70,7 +70,7 @@ Index: b/configure.ac
  # CUPS
  # ---------------------------------------------------------------------------
  
-@@ -470,6 +524,7 @@
+@@ -498,6 +552,7 @@
  plugins/color/Makefile
  plugins/common/Makefile
  plugins/cursor/Makefile
@@ -78,7 +78,7 @@ Index: b/configure.ac
  plugins/dummy/Makefile
  plugins/power/Makefile
  plugins/housekeeping/Makefile
-@@ -527,6 +582,8 @@
+@@ -555,6 +610,8 @@
          cflags:                   ${CFLAGS}
          Maintainer mode:          ${USE_MAINTAINER_MODE}
  

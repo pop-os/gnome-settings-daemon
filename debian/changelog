@@ -10,6 +10,10 @@ gnome-settings-daemon (3.5.4-0ubuntu1) UNRELEASED; urgency=low
   [ Iain Lane ]
   * New upstream release
   * Refresh patches and remove those applied upstream.
+  * Revert the upstreamp atch to drop libgnomekbd usage; breaks some Ubuntu
+    patches that we need to keep. This is not a long-term solution.
+  * Rework the indicator patch to work with upstream keyboard refactoring.
+  * Re-add BDs on libgnomekbd-dev & libxklavier-dev for above revert. 
 
   [ Sebastien Bacher ]
   * debian/control.in:
