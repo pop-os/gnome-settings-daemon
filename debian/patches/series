@@ -24,3 +24,4 @@ power-check-null-devices.patch
 power-ignore-bad-dbus-requests.patch
 xsettings_signal_handling.patch
 git-mask-out-virtual-modifiers.patch
+git_xrandr_explicitly_set_clone_state.patch
