@@ -31,7 +31,7 @@ Index: gnome-settings-daemon-3.3.91/plugins/xsettings/gsd-xsettings-manager.c
 +                 * Unity is running.
 +                 */
 +                xsettings_manager_set_int (manager->priv->managers [i], "Gtk/ShellShowsAppMenu",
-+                                           manager->priv->shell_running || manager->priv->unity_running);
++                                           manager->priv->shell_running);
 +                /* Shell is showing menubar *only* if Unity runs */
 +                xsettings_manager_set_int (manager->priv->managers [i], "Gtk/ShellShowsMenubar",
 +                                           manager->priv->unity_running);
