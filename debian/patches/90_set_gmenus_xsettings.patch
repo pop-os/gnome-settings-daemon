@@ -1,8 +1,8 @@
-Index: b/plugins/xsettings/gsd-xsettings-manager.c
+Index: gnome-settings-daemon-3.3.91/plugins/xsettings/gsd-xsettings-manager.c
 ===================================================================
---- a/plugins/xsettings/gsd-xsettings-manager.c
-+++ b/plugins/xsettings/gsd-xsettings-manager.c
-@@ -242,6 +242,10 @@
+--- gnome-settings-daemon-3.3.91.orig/plugins/xsettings/gsd-xsettings-manager.c	2012-03-15 11:28:39.869729733 -0400
++++ gnome-settings-daemon-3.3.91/plugins/xsettings/gsd-xsettings-manager.c	2012-03-15 11:28:40.469729742 -0400
+@@ -241,6 +241,10 @@
          GsdXSettingsGtk   *gtk;
  
          guint              shell_name_watch_id;
@@ -13,7 +13,7 @@ Index: b/plugins/xsettings/gsd-xsettings-manager.c
  };
  
  #define GSD_XSETTINGS_ERROR gsd_xsettings_error_quark ()
-@@ -693,15 +697,21 @@
+@@ -672,15 +676,21 @@
  }
  
  static void
@@ -38,7 +38,7 @@ Index: b/plugins/xsettings/gsd-xsettings-manager.c
                  xsettings_manager_notify (manager->priv->managers [i]);
          }
          gnome_settings_profile_end (NULL);
-@@ -713,7 +723,10 @@
+@@ -692,7 +702,10 @@
                     const gchar     *name_owner,
                     gpointer         user_data)
  {
@@ -50,7 +50,7 @@ Index: b/plugins/xsettings/gsd-xsettings-manager.c
  }
  
  static void
-@@ -721,7 +734,33 @@
+@@ -700,7 +713,33 @@
                        const gchar     *name,
                        gpointer         user_data)
  {
@@ -85,7 +85,7 @@ Index: b/plugins/xsettings/gsd-xsettings-manager.c
  }
  
  static void
-@@ -918,6 +957,15 @@
+@@ -898,6 +937,15 @@
                                                                 manager,
                                                                 NULL);
  
@@ -101,7 +101,7 @@ Index: b/plugins/xsettings/gsd-xsettings-manager.c
          for (i = 0; manager->priv->managers [i]; i++)
                  xsettings_manager_set_string (manager->priv->managers [i],
                                                "Net/FallbackIconTheme",
-@@ -962,6 +1010,9 @@
+@@ -939,6 +987,9 @@
          if (manager->priv->shell_name_watch_id > 0)
                  g_bus_unwatch_name (manager->priv->shell_name_watch_id);
  

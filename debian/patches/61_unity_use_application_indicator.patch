@@ -1,16 +1,16 @@
-Index: b/configure.ac
+Index: gnome-settings-daemon-3.3.91/configure.ac
 ===================================================================
---- a/configure.ac
-+++ b/configure.ac
+--- gnome-settings-daemon-3.3.91.orig/configure.ac	2012-03-05 21:04:12.701981055 +0100
++++ gnome-settings-daemon-3.3.91/configure.ac	2012-03-05 21:04:16.877981257 +0100
 @@ -53,6 +53,7 @@
  PA_REQUIRED_VERSION=0.9.16
- LIBWACOM_REQUIRED_VERSION=0.5
+ LIBWACOM_REQUIRED_VERSION=0.3
  UPOWER_REQUIRED_VERSION=0.9.11
 +APPINDICATOR_REQUIRED_VERSION=0.3.0
  
  EXTRA_COMPILE_WARNINGS(yes)
  
-@@ -147,6 +148,32 @@
+@@ -146,6 +147,32 @@
  
  PKG_CHECK_MODULES(AUTOMOUNT, x11 kbproto)
  
@@ -43,18 +43,18 @@ Index: b/configure.ac
  dnl ---------------------------------------------------------------------------
  dnl - background
  dnl ---------------------------------------------------------------------------
-@@ -532,6 +559,7 @@
+@@ -504,6 +531,7 @@
          LCMS DICT support:        ${have_new_lcms}
  
          Libnotify support:        ${have_libnotify}
 +	App indicator support:    ${enable_appindicator}
          PackageKit support:       ${have_packagekit}
          Smartcard support:        ${have_smartcard_support}
-         Cups support:             ${enable_cups}
-Index: b/plugins/a11y-keyboard/gsd-a11y-keyboard-manager.c
+         Cups support:             ${have_cups}
+Index: gnome-settings-daemon-3.3.91/plugins/a11y-keyboard/gsd-a11y-keyboard-manager.c
 ===================================================================
---- a/plugins/a11y-keyboard/gsd-a11y-keyboard-manager.c
-+++ b/plugins/a11y-keyboard/gsd-a11y-keyboard-manager.c
+--- gnome-settings-daemon-3.3.91.orig/plugins/a11y-keyboard/gsd-a11y-keyboard-manager.c	2012-02-01 20:33:14.000000000 +0100
++++ gnome-settings-daemon-3.3.91/plugins/a11y-keyboard/gsd-a11y-keyboard-manager.c	2012-03-05 21:04:12.929981066 +0100
 @@ -41,6 +41,10 @@
  #include <X11/XKBlib.h>
  #include <X11/extensions/XKBstr.h>
@@ -193,10 +193,10 @@ Index: b/plugins/a11y-keyboard/gsd-a11y-keyboard-manager.c
  
          gnome_settings_profile_end (NULL);
  }
-Index: b/plugins/a11y-keyboard/Makefile.am
+Index: gnome-settings-daemon-3.3.91/plugins/a11y-keyboard/Makefile.am
 ===================================================================
---- a/plugins/a11y-keyboard/Makefile.am
-+++ b/plugins/a11y-keyboard/Makefile.am
+--- gnome-settings-daemon-3.3.91.orig/plugins/a11y-keyboard/Makefile.am	2011-09-07 16:40:46.000000000 +0200
++++ gnome-settings-daemon-3.3.91/plugins/a11y-keyboard/Makefile.am	2012-03-05 21:04:12.929981066 +0100
 @@ -56,6 +56,7 @@
  liba11y_keyboard_la_CFLAGS = \
  	$(SETTINGS_PLUGIN_CFLAGS)	\
@@ -213,10 +213,10 @@ Index: b/plugins/a11y-keyboard/Makefile.am
  	$(NULL)
  
  plugin_in_files = 		\
-Index: b/plugins/keyboard/gkbd-configuration.c
+Index: gnome-settings-daemon-3.3.91/plugins/keyboard/gkbd-configuration.c
 ===================================================================
---- /dev/null
-+++ b/plugins/keyboard/gkbd-configuration.c
+--- /dev/null	1970-01-01 00:00:00.000000000 +0000
++++ gnome-settings-daemon-3.3.91/plugins/keyboard/gkbd-configuration.c	2012-03-05 21:04:12.933981066 +0100
 @@ -0,0 +1,350 @@
 +/*
 + * Copyright (C) 2010 Canonical Ltd.
@@ -560,18 +560,18 @@ Index: b/plugins/keyboard/gkbd-configuration.c
 +const char * const *
 +gkbd_configuration_get_group_names (GkbdConfiguration *configuration)
 +{
-+	return (const char * const *) configuration->priv->full_group_names;
++	return configuration->priv->full_group_names;
 +}
 +
 +const char * const *
 +gkbd_configuration_get_short_group_names (GkbdConfiguration *configuration)
 +{
-+	return (const char * const *) configuration->priv->short_group_names;
++	return configuration->priv->short_group_names;
 +}
-Index: b/plugins/keyboard/gkbd-configuration.h
+Index: gnome-settings-daemon-3.3.91/plugins/keyboard/gkbd-configuration.h
 ===================================================================
---- /dev/null
-+++ b/plugins/keyboard/gkbd-configuration.h
+--- /dev/null	1970-01-01 00:00:00.000000000 +0000
++++ gnome-settings-daemon-3.3.91/plugins/keyboard/gkbd-configuration.h	2012-03-05 21:04:12.933981066 +0100
 @@ -0,0 +1,65 @@
 +/*
 + * Copyright (C) 2010 Canonical Ltd.
@@ -638,43 +638,14 @@ Index: b/plugins/keyboard/gkbd-configuration.h
 +G_END_DECLS
 +
 +#endif
-Index: b/plugins/keyboard/Makefile.am
+Index: gnome-settings-daemon-3.3.91/plugins/keyboard/gsd-keyboard-xkb.c
 ===================================================================
---- a/plugins/keyboard/Makefile.am
-+++ b/plugins/keyboard/Makefile.am
-@@ -22,6 +22,8 @@
- 	gsd-keyboard-manager.c	\
- 	delayed-dialog.h	\
- 	delayed-dialog.c	\
-+	gkbd-configuration.c	\
-+	gkbd-configuration.h	\
- 	$(NULL)
+--- gnome-settings-daemon-3.3.91.orig/plugins/keyboard/gsd-keyboard-xkb.c	2012-02-01 20:33:15.000000000 +0100
++++ gnome-settings-daemon-3.3.91/plugins/keyboard/gsd-keyboard-xkb.c	2012-03-05 21:04:12.933981066 +0100
+@@ -30,12 +30,20 @@
+ #include <gdk/gdkx.h>
+ #include <gtk/gtk.h>
  
- libkeyboard_la_CPPFLAGS = \
-@@ -35,6 +37,7 @@
- libkeyboard_la_CFLAGS = \
- 	$(PLUGIN_CFLAGS)		\
- 	$(SETTINGS_PLUGIN_CFLAGS)	\
-+	$(APPINDICATOR_CFLAGS)		\
- 	$(KEYBOARD_CFLAGS)		\
- 	$(AM_CFLAGS)
- 
-@@ -47,6 +50,7 @@
- 	$(SETTINGS_PLUGIN_LIBS)				\
- 	$(XF86MISC_LIBS)				\
- 	$(KEYBOARD_LIBS)				\
-+	$(APPINDICATOR_LIBS)            \
- 	$(NULL)
- 
- noinst_PROGRAMS = test-keyboard
-Index: b/plugins/keyboard/gsd-keyboard-manager.c
-===================================================================
---- a/plugins/keyboard/gsd-keyboard-manager.c
-+++ b/plugins/keyboard/gsd-keyboard-manager.c
-@@ -42,12 +42,20 @@
- #include <X11/keysym.h>
- 
- #include <libxklavier/xklavier.h>
 +#ifndef HAVE_APPINDICATOR
  #include <libgnomekbd/gkbd-status.h>
 +#endif
@@ -689,77 +660,56 @@ Index: b/plugins/keyboard/gsd-keyboard-manager.c
 +#include "gkbd-configuration.h"
 +#endif
 +
+ #include "gsd-keyboard-xkb.h"
+ #include "delayed-dialog.h"
  #include "gnome-settings-profile.h"
- #include "gsd-keyboard-manager.h"
- #include "gsd-input-helper.h"
-@@ -74,7 +82,7 @@
- 
- struct GsdKeyboardManagerPrivate
- {
--	guint      start_idle_id;
-+    guint      start_idle_id;
-         GSettings *settings;
-         gint       xkb_event_base;
-         GsdNumLockState old_state;
-@@ -93,10 +101,27 @@
-         GSettings *settings_desktop;
-         GSettings *settings_keyboard;
+@@ -61,7 +69,21 @@
+ static PostActivationCallback pa_callback = NULL;
+ static void *pa_callback_user_data = NULL;
  
 +#ifdef HAVE_APPINDICATOR
-+        AppIndicator *app_indicator;
-+        GkbdConfiguration *gkbd_configuration;
-+        GkbdIndicatorConfig current_ind_config;
-+        GSList *groups_items_group;
-+        size_t lang_menu_items;
++static AppIndicator *app_indicator = NULL;
++static GkbdConfiguration *gkbd_configuration = NULL;
++static GkbdIndicatorConfig current_ind_config;
++static GSList *groups_items_group = NULL;
++static size_t lang_menu_items = 0;
++
++static void state_callback (XklEngine * engine,
++                            XklEngineStateChange changeType,
++                            gint group, gboolean restore);
++static void gsd_keyboard_configuration_changed (GkbdConfiguration *configuration);
 +
 +#else
-         GtkStatusIcon *icon;
+ static GtkStatusIcon *icon = NULL;
 +#endif
-         GtkMenu *popup_menu;
- };
  
+ static GHashTable *preview_dialogs = NULL;
+ 
+@@ -174,10 +196,14 @@
+ 	    xkl_engine_get_instance (GDK_DISPLAY_XDISPLAY
+ 				     (gdk_display_get_default ()));
+ 	XklState *xkl_state = xkl_engine_get_current_state (engine);
 +#ifdef HAVE_APPINDICATOR
-+static void state_callback (XklEngine * engine,
-+        XklEngineStateChange changeType, gint group, gboolean restore,
-+        GsdKeyboardManager *manager);
-+static void gsd_keyboard_configuration_changed (
-+        GkbdConfiguration *configuration, GsdKeyboardManager *manager);
++	gchar **group_names = gkbd_configuration_get_group_names (gkbd_configuration);
++#else
++	gchar **group_names = gkbd_status_get_group_names ();
 +#endif
-+
- static void     gsd_keyboard_manager_class_init  (GsdKeyboardManagerClass *klass);
- static void     gsd_keyboard_manager_init        (GsdKeyboardManager      *keyboard_manager);
- static void     gsd_keyboard_manager_finalize    (GObject                 *object);
-@@ -191,6 +216,17 @@
- 	gkbd_keyboard_config_load_from_x_current (&current_sys_kbd_config,
- 						  NULL);
+ 	gpointer p = g_hash_table_lookup (preview_dialogs,
+ 					  GINT_TO_POINTER
+ 					  (xkl_state->group));
+-	gchar **group_names = gkbd_status_get_group_names ();
  
-+#ifdef HAVE_APPINDICATOR
-+    gkbd_indicator_config_init (&manager->priv->current_ind_config,
-+            manager->priv->xkl_engine);
-+    gkbd_indicator_config_load (&manager->priv->current_ind_config);
-+
-+    gkbd_indicator_config_load_image_filenames
-+        (&manager->priv->current_ind_config,
-+         &manager->priv->current_kbd_config);
-+    gkbd_indicator_config_activate (&manager->priv->current_ind_config);
-+#endif /* HAVE_APPINDICATOR */
-+
- 	if (!try_activating_xkb_config_if_new (manager, &current_sys_kbd_config)) {
- 		if (filter_xkb_config (manager)) {
- 			if (!try_activating_xkb_config_if_new
-@@ -269,38 +305,213 @@
+ 	if (xkl_state->group < 0
+ 	    || xkl_state->group >= g_strv_length (group_names)) {
+@@ -205,38 +231,185 @@
  }
  
  static void
 -popup_menu_set_group (GtkMenuItem * item, gpointer param)
-+popup_menu_set_group (gint group_number, gboolean only_menu,
-+        GsdKeyboardManager * manager)
++popup_menu_set_group (gint group_number, gboolean only_menu)
  {
 -	gint group_number = GPOINTER_TO_INT (param);
 +#ifdef HAVE_APPINDICATOR
-+    AppIndicator *app_indicator = manager->priv->app_indicator;
-+    GkbdConfiguration *gkbd_configuration = manager->priv->gkbd_configuration;
-+    GkbdIndicatorConfig current_ind_config = manager->priv->current_ind_config;
 +	XklEngine *engine = gkbd_configuration_get_xkl_engine (gkbd_configuration);
 +#else
  	XklEngine *engine = gkbd_status_get_xkl_engine ();
@@ -767,34 +717,30 @@ Index: b/plugins/keyboard/gsd-keyboard-manager.c
 +#endif
 +	XklState *st = xkl_engine_get_current_state(engine);
  	Window cur;
- 
+-
 -	st.group = group_number;
 +	st->group = group_number;
  	xkl_engine_allow_one_switch_to_secondary_group (engine);
  	cur = xkl_engine_get_current_window (engine);
  	if (cur != (Window) NULL) {
- 		g_debug ("Enforcing the state %d for window %lx\n",
+ 		xkl_debug (150, "Enforcing the state %d for window %lx\n",
 -			   st.group, cur);
--		xkl_engine_save_state (engine,
--				       xkl_engine_get_current_window
--				       (engine), &st);
 +			   st->group, cur);
 +#ifdef HAVE_APPINDICATOR
-+        // Setting the state may trigger state_callback to be called, which will then
-+        // cause popup_menu_set_group to be called again.
-+        g_signal_handlers_block_by_func (engine,
-+                G_CALLBACK (state_callback), NULL);
++                // Setting the state may trigger state_callback to be called, which will then
++                // cause popup_menu_set_group to be called again.
++                g_signal_handlers_block_by_func (engine, G_CALLBACK (state_callback), NULL);
 +#endif
-+        xkl_engine_save_state (engine,
-+                xkl_engine_get_current_window
-+                (engine), st);
+ 		xkl_engine_save_state (engine,
+ 				       xkl_engine_get_current_window
+-				       (engine), &st);
++				       (engine), st);
 +#ifdef HAVE_APPINDICATOR
-+        g_signal_handlers_unblock_by_func (engine,
-+                G_CALLBACK (state_callback), NULL);
++                g_signal_handlers_unblock_by_func (engine, G_CALLBACK (state_callback), NULL);
 +#endif
  /*    XSetInputFocus( GDK_DISPLAY(), cur, RevertToNone, CurrentTime );*/
  	} else {
- 		g_debug (
+ 		xkl_debug (150,
  			   "??? Enforcing the state %d for unknown window\n",
 -			   st.group);
 +			   st->group);
@@ -804,259 +750,217 @@ Index: b/plugins/keyboard/gsd-keyboard-manager.c
 +        if (!only_menu)
 +        	xkl_engine_lock_group (engine, st->group);
 +#ifdef HAVE_APPINDICATOR
-+        XklConfigRec * xklrec = xkl_config_rec_new();
-+        xkl_config_rec_get_from_server (xklrec, engine);
-+        XklConfigRegistry *registry = xkl_config_registry_get_instance(engine);
++	XklConfigRec * xklrec = xkl_config_rec_new();
++	xkl_config_rec_get_from_server (xklrec, engine);
++	XklConfigRegistry *registry = xkl_config_registry_get_instance(engine);
 +
-+        gkbd_keyboard_config_load_from_x_current
-+            (&manager->priv->current_kbd_config, xklrec);
-+        xkl_config_registry_load (registry,
-+                manager->priv->current_config.load_extra_items);
++	gkbd_keyboard_config_load_from_x_current (&current_kbd_config, xklrec);
++	xkl_config_registry_load (registry, current_config.load_extra_items);
 +
-+        int g;
++	int g;
 +
 +        if (current_ind_config.show_flags) {
-+            gchar *image_file = gkbd_indicator_config_get_images_file (&current_ind_config,
-+                    &manager->priv->current_kbd_config,
-+                    st->group);
++	        gchar *image_file = gkbd_indicator_config_get_images_file (&current_ind_config,
++						              &current_kbd_config,
++						              st->group);
 +
-+
-+            app_indicator_set_icon_full(app_indicator, image_file, _("Keyboard"));
-+            app_indicator_set_label(app_indicator, NULL, NULL);
-+            g_free(image_file);
++        
++                app_indicator_set_icon_full(app_indicator, image_file, _("Keyboard"));
++	        app_indicator_set_label(app_indicator, NULL, NULL);
++                g_free(image_file);
 +        } else {
-+            gchar * guide = "XXX";
-+            gchar ** shortnames;
-+            gchar ** longnames;
-+            gchar * layout_name = NULL;
-+            gchar * lname = NULL;
-+            GHashTable *ln2cnt_map = g_hash_table_new_full (g_str_hash,
-+                    g_str_equal, (GDestroyNotify) g_free, NULL);
++                gchar * guide = "XXX";
++	        gchar ** shortnames;
++	        gchar ** longnames;
++	        gchar * layout_name = NULL;
++	        gchar * lname = NULL;
++	        GHashTable *ln2cnt_map = g_hash_table_new_full (g_str_hash, g_str_equal, (GDestroyNotify) g_free, NULL);
 +
-+            gkbd_desktop_config_load_group_descriptions(
-+                    &manager->priv->current_config,
-+                    registry, 
-+                    (const gchar **) xklrec->layouts, 
-+                    (const gchar **) xklrec->variants,
-+                    &shortnames,
-+                    &longnames); 
++	        gkbd_desktop_config_load_group_descriptions(&current_config, registry, 
++		        (const gchar **) xklrec->layouts, 
++		        (const gchar **) xklrec->variants,
++		        &shortnames,
++		        &longnames); 
 +
-+            for (g = 0; g < g_strv_length (shortnames);g++) {
-+                gpointer pcounter = NULL;
-+                gchar *prev_layout_name = NULL;
-+                int counter = 0;
++	        for (g = 0; g < g_strv_length (shortnames);g++) {
++		        gpointer pcounter = NULL;
++		        gchar *prev_layout_name = NULL;
++		        int counter = 0;
 +
-+                if (g < g_strv_length (shortnames)) {
-+                    if (xkl_engine_get_features (engine) &
-+                            XKLF_MULTIPLE_LAYOUTS_SUPPORTED) {
-+                        gchar *longname = (gchar *)
-+                            manager->priv->current_kbd_config.layouts_variants[g];
-+                        gchar *variant_name;
-+                        if (!gkbd_keyboard_config_split_items (longname,
-+                                    &lname, &variant_name))
-+                            /* just in case */
-+                            lname = longname;
++		        if (g < g_strv_length (shortnames)) {
++			        if (xkl_engine_get_features (engine) &
++			            XKLF_MULTIPLE_LAYOUTS_SUPPORTED) {
++				        gchar *longname = (gchar *) current_kbd_config.layouts_variants[g];
++				        gchar *variant_name;
++				        if (!gkbd_keyboard_config_split_items (longname, &lname, &variant_name))
++					        /* just in case */
++					        lname = longname;
 +
-+                        if (shortnames != NULL) {
-+                            gchar *shortname = shortnames[g];
-+                            if (shortname != NULL && *shortname != '\0') {
-+                                lname = shortname;
-+                            }
-+                        }
-+                    } else {
-+                        lname = longnames[g];
-+                    }
-+                }
-+                if (lname == NULL)
-+                    lname = "";
++				        if (shortnames != NULL) {
++					        gchar *shortname = shortnames[g];
++					        if (shortname != NULL && *shortname != '\0') {
++						        lname = shortname;
++					        }
++				        }
++			        } else {
++				        lname = longnames[g];
++			        }
++		        }
++		        if (lname == NULL)
++			        lname = "";
 +
-+                /* Process layouts with repeating description */
-+                if (g_hash_table_lookup_extended (ln2cnt_map, lname, (gpointer
-+                                *) & prev_layout_name, &pcounter)) {
-+                    /* "next" same description */
-+                    counter = GPOINTER_TO_INT (pcounter);
-+                    guide = "XXX1";
-+                }
-+                g_hash_table_insert (ln2cnt_map, g_strdup (lname),
-+                        GINT_TO_POINTER (counter+1));
++		        /* Process layouts with repeating description */
++		        if (g_hash_table_lookup_extended (ln2cnt_map, lname, (gpointer *) & prev_layout_name, &pcounter)) {
++			        /* "next" same description */
++			        counter = GPOINTER_TO_INT (pcounter);
++                                guide = "XXX1";
++		        }
++		        g_hash_table_insert (ln2cnt_map, g_strdup (lname), GINT_TO_POINTER (counter+1));
 +
-+                if (st->group == g) {
-+                    if (counter > 0) {
-+                        gchar appendix[10] = "";
-+                        gint utf8length;
-+                        gunichar cidx;
-+                        /* Unicode subscript 2, 3, 4 */
-+                        cidx = 0x2081 + counter;
-+                        utf8length = g_unichar_to_utf8 (cidx, appendix);
-+                        appendix[utf8length] = '\0';
-+                        layout_name = g_strconcat (lname, appendix, NULL);
-+                    } else {
-+                        layout_name = g_strdup(lname);
-+                    }
-+                }
-+            }
++		        if (st->group == g) {
++			        if (counter > 0) {
++				        gchar appendix[10] = "";
++				        gint utf8length;
++				        gunichar cidx;
++				        /* Unicode subscript 2, 3, 4 */
++				        cidx = 0x2081 + counter;
++				        utf8length = g_unichar_to_utf8 (cidx, appendix);
++				        appendix[utf8length] = '\0';
++				        layout_name = g_strconcat (lname, appendix, NULL);
++			        } else {
++				        layout_name = g_strdup(lname);
++			        }
++		        }
++	        }
 +
-+            // Guide of 3 wide-ish and one thin
-+            app_indicator_set_label(app_indicator, layout_name, guide);
-+            g_hash_table_destroy(ln2cnt_map);
-+            g_free(layout_name);
-+            g_strfreev(longnames);
-+            g_strfreev(shortnames);
++	        // Guide of 3 wide-ish and one thin
++	        app_indicator_set_label(app_indicator, layout_name, guide);
++	        g_hash_table_destroy(ln2cnt_map);
++	        g_free(layout_name);
++	        g_strfreev(longnames);
++	        g_strfreev(shortnames);
 +        }
 +
 +        // Refresh popup menu
-+        gsd_keyboard_configuration_changed (gkbd_configuration, manager);
++        gsd_keyboard_configuration_changed (gkbd_configuration);
 +
-+        g_object_unref (G_OBJECT (xklrec));
-+        g_object_unref (G_OBJECT (registry));
++	g_object_unref (G_OBJECT (xklrec));
++	g_object_unref (G_OBJECT (registry));
 +#endif
-+}
-+
-+struct PopupMenuData
+ }
+ 
+ static void
+-status_icon_popup_menu_cb (GtkStatusIcon * icon, guint button, guint time)
++popup_menu_set_group_cb (GtkMenuItem * item, gpointer param)
 +{
-+    gint param;
-+    GsdKeyboardManager * manager;
-+};
-+
-+static void
-+popup_menu_set_group_cb (GtkMenuItem * item, gpointer user_data)
-+{
-+
-+    PopupMenuData * data = user_data;
-+	gint group_number = data->param;
-+    GsdKeyboardManager * manager = data->manager;
++	gint group_number = GPOINTER_TO_INT (param);
 +
 +#ifdef HAVE_APPINDICATOR
 +	if ((item) != NULL && (!gtk_check_menu_item_get_active (GTK_CHECK_MENU_ITEM (item))))
 +		return;
 +#endif
 +
-+	popup_menu_set_group(group_number, FALSE, manager);
- }
- 
++	popup_menu_set_group(group_number, FALSE);
++}
++
 +#ifdef HAVE_APPINDICATOR
- static void
--ensure_popup_menu (GsdKeyboardManager *manager)
++static void
 +state_callback (XklEngine * engine,
 +		XklEngineStateChange changeType,
-+		gint group, gboolean restore,
-+        GsdKeyboardManager * manager)
++		gint group, gboolean restore)
 +{
 +	if ((changeType == GROUP_CHANGED) || (changeType == INDICATORS_CHANGED))
-+		popup_menu_set_group (group, TRUE, manager);
++		popup_menu_set_group (GINT_TO_POINTER(group), TRUE);
 +}
 +
 +static int
-+get_current_group(GsdKeyboardManager *manager)
++get_current_group(void)
 +{
-+    XklEngine *engine = gkbd_configuration_get_xkl_engine
-+        (manager->priv->gkbd_configuration);
++	XklEngine *engine = gkbd_configuration_get_xkl_engine (gkbd_configuration);
 +	return xkl_engine_get_current_window_group (engine);
 +}
 +#endif
 +
 +static GtkMenu *
-+create_status_menu (GsdKeyboardManager *manager)
++create_status_menu (void)
  {
  	GtkMenu *popup_menu = GTK_MENU (gtk_menu_new ());
 -	GtkMenu *groups_menu = GTK_MENU (gtk_menu_new ());
  	int i = 0;
 +#ifdef HAVE_APPINDICATOR
-+    const char * const *current_name = gkbd_configuration_get_group_names
-+        (manager->priv->gkbd_configuration);
-+    	manager->priv->groups_items_group = NULL;
++	const char * const *current_name = gkbd_configuration_get_group_names (gkbd_configuration);
++	groups_items_group = NULL;
 +        GtkWidget *item;
-+	int group = get_current_group(manager);
-+	manager->priv->lang_menu_items = 0;
++	int group = get_current_group();
++	lang_menu_items = 0;
 +#else
 +	GtkMenu *groups_menu = GTK_MENU (gtk_menu_new ());
  	gchar **current_name = gkbd_status_get_group_names ();
  
  	GtkWidget *item = gtk_menu_item_new_with_mnemonic (_("_Layouts"));
-@@ -311,7 +522,8 @@
- 
- 	item = gtk_menu_item_new_with_mnemonic (_("Show _Keyboard Layout..."));
- 	gtk_widget_show (item);
--	g_signal_connect (item, "activate", G_CALLBACK (popup_menu_show_layout), manager);
-+    g_signal_connect (item, "activate", G_CALLBACK (popup_menu_show_layout),
-+            manager);
- 	gtk_menu_shell_append (GTK_MENU_SHELL (popup_menu), item);
- 
- 	/* translators note:
-@@ -320,37 +532,121 @@
+@@ -256,8 +429,23 @@
  	gtk_widget_show (item);
  	g_signal_connect (item, "activate", popup_menu_launch_capplet, NULL);
  	gtk_menu_shell_append (GTK_MENU_SHELL (popup_menu), item);
 +#endif
- 
--	for (i = 0; *current_name; i++, current_name++) {
++
 +	for (i = 0; current_name && *current_name; i++, current_name++) {
 +#ifdef HAVE_APPINDICATOR
-+        item = gtk_radio_menu_item_new_with_label
-+            (manager->priv->groups_items_group, *current_name);
-+        manager->priv->groups_items_group = gtk_radio_menu_item_get_group
-+            (GTK_RADIO_MENU_ITEM (item));
++		item = gtk_radio_menu_item_new_with_label (groups_items_group, *current_name);
++		groups_items_group = gtk_radio_menu_item_get_group (GTK_RADIO_MENU_ITEM (item));
+ 
+-	for (i = 0; *current_name; i++, current_name++) {
 +		gtk_check_menu_item_set_active (GTK_CHECK_MENU_ITEM (item),
 +						i == group);
 +
 +		gtk_widget_show (item);
 +		gtk_menu_shell_append (GTK_MENU_SHELL (popup_menu), item);
-+        PopupMenuData * data = g_new0(PopupMenuData, 1);
-+        data->param = i;
-+        data->manager = manager;
 +		g_signal_connect (item, "activate",
 +				  G_CALLBACK (popup_menu_set_group_cb),
-+                  &data);
-+		manager->priv->lang_menu_items++;
++				  GINT_TO_POINTER (i));
++		lang_menu_items++;
 +#else
- 		item = gtk_menu_item_new_with_label (*current_name);
+ 		gchar *image_file = gkbd_status_get_image_filename (i);
+ 
+ 		if (image_file == NULL) {
+@@ -283,19 +471,84 @@
  		gtk_widget_show (item);
  		gtk_menu_shell_append (GTK_MENU_SHELL (groups_menu), item);
-+        PopupMenuData * data = g_new0(PopupMenuData, 1);
-+        data->param = i;
-+        data->manager = manager;
  		g_signal_connect (item, "activate",
 -				  G_CALLBACK (popup_menu_set_group),
--				  GINT_TO_POINTER (i));
-+                  G_CALLBACK (popup_menu_set_group_cb), &data); 
++				  G_CALLBACK (popup_menu_set_group_cb),
+ 				  GINT_TO_POINTER (i));
 +#endif
  	}
  
 +#ifdef HAVE_APPINDICATOR
-+    item = gtk_separator_menu_item_new();
-+    gtk_widget_show(item);
-+    gtk_menu_shell_append(GTK_MENU_SHELL (popup_menu), item);
++        item = gtk_separator_menu_item_new();
++        gtk_widget_show(item);
++        gtk_menu_shell_append(GTK_MENU_SHELL (popup_menu), item);
 +
-+    item =
-+        gtk_menu_item_new_with_mnemonic (_("Show _Layout Chart"));
-+    gtk_widget_show (item);
-+    g_signal_connect (item, "activate", G_CALLBACK(popup_menu_show_layout),
-+            NULL);
-+    gtk_menu_shell_append (GTK_MENU_SHELL (popup_menu), item);
++	item =
++	    gtk_menu_item_new_with_mnemonic (_("Show _Layout Chart"));
++	gtk_widget_show (item);
++	g_signal_connect (item, "activate", popup_menu_show_layout,
++			  NULL);
++	gtk_menu_shell_append (GTK_MENU_SHELL (popup_menu), item);
 +
-+    item = gtk_menu_item_new_with_mnemonic (_("Keyboard Layout _Settings..."));
-+    gtk_widget_show (item);
-+    g_signal_connect (item, "activate", popup_menu_launch_capplet, NULL);
-+    gtk_menu_shell_append (GTK_MENU_SHELL (popup_menu), item);
++	item = gtk_menu_item_new_with_mnemonic (_("Keyboard Layout _Settings..."));
++	gtk_widget_show (item);
++	g_signal_connect (item, "activate", popup_menu_launch_capplet, NULL);
++	gtk_menu_shell_append (GTK_MENU_SHELL (popup_menu), item);
 +#endif
 +
- 	if (manager->priv->popup_menu != NULL)
- 		gtk_widget_destroy (GTK_WIDGET (manager->priv->popup_menu));
- 	manager->priv->popup_menu = popup_menu;
++	return popup_menu;
++}
 +
-+	return manager->priv->popup_menu;
- }
- 
 +#ifndef HAVE_APPINDICATOR
- static void
- status_icon_popup_menu_cb (GtkStatusIcon      *icon,
- 			   guint               button,
- 			   guint               time,
- 			   GsdKeyboardManager *manager)
- {
-+    create_status_menu (manager);
- 	ensure_popup_menu (manager);
- 	gtk_menu_popup (manager->priv->popup_menu, NULL, NULL,
++static void
++status_icon_popup_menu_cb (GtkStatusIcon * icon, guint button, guint time)
++{
++	GtkMenu *popup_menu = create_status_menu ();
++
+ 	gtk_menu_popup (popup_menu, NULL, NULL,
  			gtk_status_icon_position_menu,
  			(gpointer) icon, button, time);
  }
@@ -1064,140 +968,165 @@ Index: b/plugins/keyboard/gsd-keyboard-manager.c
 +
 +#ifdef HAVE_APPINDICATOR
 +static void
-+scroll_event (AppIndicator *indicator, GsdKeyboardManager * manager,
-+        gint delta, guint direction)
++scroll_event (AppIndicator *indicator, gint delta, guint direction)
 +{
-+    g_return_if_fail(IS_APP_INDICATOR(indicator));
-+    int group = get_current_group(manager);
++	g_return_if_fail(IS_APP_INDICATOR(indicator));
++	int group = get_current_group();
 +
-+    if ((direction == 0 && group == 0) ||
-+            (direction == 1 && group == manager->priv->lang_menu_items-1))
-+        return;
++	if ((direction == 0 && group == 0) ||
++	    (direction == 1 && group == lang_menu_items-1))
++		return;
 +
-+    popup_menu_set_group((direction == 0 ? group-1 : group+1), FALSE, manager);
++        popup_menu_set_group((direction == 0 ? group-1 : group+1), FALSE);
 +}
 +#endif
  
  static void
- show_hide_icon (GsdKeyboardManager *manager)
+ show_hide_icon ()
  {
- 	if (g_strv_length (manager->priv->current_kbd_config.layouts_variants) > 1) {
+ 	if (g_strv_length (current_kbd_config.layouts_variants) > 1) {
 +#ifdef HAVE_APPINDICATOR
-+        if (manager->priv->app_indicator == NULL) {
-+            GtkMenu *popup_menu = create_status_menu (manager);
++		if (app_indicator == NULL) {
++			GtkMenu *popup_menu = create_status_menu ();
 +
-+            manager->priv->app_indicator = app_indicator_new ("keyboard",
-+                    "keyboard", APP_INDICATOR_CATEGORY_HARDWARE);
-+            int group = get_current_group(manager);
-+            popup_menu_set_group(group, TRUE, manager);
-+            app_indicator_set_status (manager->priv->app_indicator,
-+                    APP_INDICATOR_STATUS_ACTIVE);
-+            app_indicator_set_menu (manager->priv->app_indicator,
-+                    popup_menu);
-+            app_indicator_set_title (manager->priv->app_indicator,
-+                    _("Keyboard"));
-+            g_signal_connect (manager->priv->app_indicator, "scroll-event",
-+                    G_CALLBACK (scroll_event), manager);
-+        } else {
-+            XklEngine *engine = gkbd_configuration_get_xkl_engine
-+                (manager->priv->gkbd_configuration);
-+            XklState *st = xkl_engine_get_current_state(engine);
-+            popup_menu_set_group(st->group, TRUE, manager);
-+        }
++			app_indicator = app_indicator_new ("keyboard",
++							   "keyboard",
++							   APP_INDICATOR_CATEGORY_HARDWARE);
++	                int group = get_current_group();
++	        	popup_menu_set_group(GINT_TO_POINTER(group), TRUE);
++			app_indicator_set_status (app_indicator,
++						  APP_INDICATOR_STATUS_ACTIVE);
++			app_indicator_set_menu (app_indicator,
++						popup_menu);
++			app_indicator_set_title (app_indicator, _("Keyboard"));
++			g_signal_connect (app_indicator, "scroll-event", G_CALLBACK (scroll_event), NULL);
++		} else {
++                        XklEngine *engine = gkbd_configuration_get_xkl_engine (gkbd_configuration);
++			XklState *st = xkl_engine_get_current_state(engine);
++			popup_menu_set_group(GINT_TO_POINTER(st->group), TRUE);
++                }
 +#else
- 		if (manager->priv->icon == NULL) {
- 			g_debug ("Creating keyboard status icon\n");
- 			manager->priv->icon = gkbd_status_new ();
-@@ -360,12 +656,17 @@
- 					  manager);
+ 		if (icon == NULL) {
+ 			xkl_debug (150, "Creating keyboard status icon\n");
+ 			icon = gkbd_status_new ();
+@@ -305,12 +558,17 @@
+ 					  NULL);
  
  		}
 +#endif
  	} else {
 +#ifdef HAVE_APPINDICATOR
-+        g_clear_object(&manager->priv->app_indicator);
++		g_clear_object (&app_indicator);
 +#else
- 		if (manager->priv->icon != NULL) {
- 			g_debug ("Destroying icon\n");
- 			g_object_unref (manager->priv->icon);
- 			manager->priv->icon = NULL;
+ 		if (icon != NULL) {
+ 			xkl_debug (150, "Destroying icon\n");
+ 			g_object_unref (icon);
+ 			icon = NULL;
  		}
 +#endif
  	}
  }
  
-@@ -442,6 +743,13 @@
- 	if (!manager->priv->xkl_engine)
- 		return;
- 
-+#ifdef HAVE_APPINDICATOR
-+	manager->priv->gkbd_configuration = gkbd_configuration_get ();
-+	g_signal_connect (manager->priv->gkbd_configuration, "changed",
-+			  G_CALLBACK (gsd_keyboard_configuration_changed), manager);
-+	g_signal_connect (manager->priv->gkbd_configuration, "group-changed",
-+			  G_CALLBACK (gsd_keyboard_configuration_changed), manager);
-+#endif
- 	gkbd_desktop_config_init (&manager->priv->current_config, manager->priv->xkl_engine);
- 	gkbd_keyboard_config_init (&manager->priv->current_kbd_config,
- 				   manager->priv->xkl_engine);
-@@ -449,6 +757,10 @@
- 	gkbd_keyboard_config_init (&manager->priv->initial_sys_kbd_config, manager->priv->xkl_engine);
- 	gkbd_keyboard_config_load_from_x_initial (&manager->priv->initial_sys_kbd_config,
+@@ -399,6 +660,15 @@
+ 	gkbd_keyboard_config_load_from_x_current (&current_sys_kbd_config,
  						  NULL);
-+#ifdef HAVE_APPINDICATOR
-+        g_signal_connect (manager->priv->xkl_engine, "X-state-changed",
-+                G_CALLBACK (state_callback), manager);
-+#endif
  
- 	gnome_settings_profile_start ("xkl_engine_start_listen");
- 	xkl_engine_start_listen (manager->priv->xkl_engine,
-@@ -466,6 +778,22 @@
- 	gnome_settings_profile_end (NULL);
++#ifdef HAVE_APPINDICATOR
++	gkbd_indicator_config_init (&current_ind_config, xkl_engine);
++	gkbd_indicator_config_load (&current_ind_config);
++
++	gkbd_indicator_config_load_image_filenames (&current_ind_config,
++						    &current_kbd_config);
++	gkbd_indicator_config_activate (&current_ind_config);
++#endif /* HAVE_APPINDICATOR */
++
+ 	if (!try_activating_xkb_config_if_new (&current_sys_kbd_config)) {
+ 		if (filter_xkb_config ()) {
+ 			if (!try_activating_xkb_config_if_new
+@@ -431,6 +701,22 @@
+ 						  NULL);
  }
  
 +#ifdef HAVE_APPINDICATOR
 +/* When the configuration changed update the indicator */
 +static void
-+gsd_keyboard_configuration_changed (GkbdConfiguration *configuration,
-+        GsdKeyboardManager *manager)
++gsd_keyboard_configuration_changed (GkbdConfiguration *configuration)
 +{
-+    GtkMenu *popup_menu;
++	GtkMenu *popup_menu;
 +
-+    if (!manager->priv->app_indicator)
-+        return;
++	if (!app_indicator)
++		return;
 +
-+    popup_menu = create_status_menu (manager);
-+    app_indicator_set_menu (manager->priv->app_indicator, popup_menu);
++	popup_menu = create_status_menu ();
++	app_indicator_set_menu (app_indicator,
++			popup_menu);
 +}
 +#endif
 +
- static gboolean
- xkb_set_keyboard_autorepeat_rate (guint delay, guint interval)
- {
-@@ -790,6 +1118,13 @@
- 		g_object_unref (p->xkl_engine);
- 		p->xkl_engine = NULL;
- 	}
+ void
+ gsd_keyboard_xkb_set_post_activation_callback (PostActivationCallback fun,
+ 					       void *user_data)
+@@ -466,6 +752,13 @@
+ 					   DATADIR G_DIR_SEPARATOR_S
+ 					   "icons");
+ 
++#ifdef HAVE_APPINDICATOR
++	gkbd_configuration = gkbd_configuration_get ();
++	g_signal_connect (gkbd_configuration, "changed",
++			  G_CALLBACK (gsd_keyboard_configuration_changed), NULL);
++	g_signal_connect (gkbd_configuration, "group-changed",
++			  G_CALLBACK (gsd_keyboard_configuration_changed), NULL);
++#endif
+ 	manager = kbd_manager;
+ 	gnome_settings_profile_start ("xkl_engine_get_instance");
+ 	xkl_engine = xkl_engine_get_instance (display);
+@@ -487,6 +780,9 @@
+ 		g_signal_connect (settings_keyboard, "changed",
+ 				  (GCallback) apply_xkb_settings, NULL);
+ 
++#ifdef HAVE_APPINDICATOR
++		g_signal_connect (xkl_engine, "X-state-changed", G_CALLBACK (state_callback), NULL);
++#endif
+ 		gdk_window_add_filter (NULL, (GdkFilterFunc)
+ 				       gsd_keyboard_xkb_evt_filter, NULL);
+ 
+@@ -549,5 +845,10 @@
+ 	g_object_unref (xkl_engine);
+ 
+ 	xkl_engine = NULL;
 +
 +#ifdef HAVE_APPINDICATOR
-+    if (p->gkbd_configuration != NULL) {
-+	    g_object_unref (p->gkbd_configuration);
-+        p->gkbd_configuration = NULL;
-+    }
++	g_clear_object (&gkbd_configuration);
 +#endif
- }
- 
- static void
-Index: b/plugins/keyboard/gsd-keyboard-manager.h
-===================================================================
---- a/plugins/keyboard/gsd-keyboard-manager.h
-+++ b/plugins/keyboard/gsd-keyboard-manager.h
-@@ -34,6 +34,8 @@
- 
- typedef struct GsdKeyboardManagerPrivate GsdKeyboardManagerPrivate;
- 
-+typedef struct PopupMenuData PopupMenuData;
 +
- typedef struct
- {
-         GObject                     parent;
+ 	inited_ok = FALSE;
+ }
+Index: gnome-settings-daemon-3.3.91/plugins/keyboard/Makefile.am
+===================================================================
+--- gnome-settings-daemon-3.3.91.orig/plugins/keyboard/Makefile.am	2011-10-17 19:36:56.000000000 +0200
++++ gnome-settings-daemon-3.3.91/plugins/keyboard/Makefile.am	2012-03-05 21:04:12.937981066 +0100
+@@ -24,6 +24,8 @@
+ 	gsd-keyboard-xkb.c	\
+ 	delayed-dialog.h	\
+ 	delayed-dialog.c	\
++	gkbd-configuration.c	\
++	gkbd-configuration.h	\
+ 	$(NULL)
+ 
+ libkeyboard_la_CPPFLAGS = \
+@@ -36,6 +38,7 @@
+ libkeyboard_la_CFLAGS = \
+ 	$(PLUGIN_CFLAGS)		\
+ 	$(SETTINGS_PLUGIN_CFLAGS)	\
++	$(APPINDICATOR_CFLAGS)		\
+ 	$(KEYBOARD_CFLAGS)		\
+ 	$(AM_CFLAGS)
+ 
+@@ -47,6 +50,7 @@
+ 	$(SETTINGS_PLUGIN_LIBS)	\
+ 	$(XF86MISC_LIBS)	\
+ 	$(KEYBOARD_LIBS)	\
++	$(APPINDICATOR_LIBS)	\
+ 	$(NULL)
+ 
+ plugin_in_files = 		\

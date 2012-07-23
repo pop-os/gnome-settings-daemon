@@ -1,26 +1,24 @@
-Index: b/plugins/keyboard/gsd-keyboard-manager.c
+Index: gnome-settings-daemon-3.3.91/plugins/keyboard/gsd-keyboard-manager.c
 ===================================================================
---- a/plugins/keyboard/gsd-keyboard-manager.c
-+++ b/plugins/keyboard/gsd-keyboard-manager.c
-@@ -78,12 +78,16 @@
+--- gnome-settings-daemon-3.3.91.orig/plugins/keyboard/gsd-keyboard-manager.c	2012-02-08 19:23:44.000000000 +0100
++++ gnome-settings-daemon-3.3.91/plugins/keyboard/gsd-keyboard-manager.c	2012-03-05 21:04:13.009981070 +0100
+@@ -66,10 +66,14 @@
  #define KEY_BELL_DURATION  "bell-duration"
  #define KEY_BELL_MODE      "bell-mode"
  
 +#define LIBGNOMEKBD_KEYBOARD_DIR "org.gnome.libgnomekbd.keyboard"
 +#define LIBGNOMEKBD_KEY_LAYOUTS  "layouts"
 +
- #define DEFAULT_LANGUAGE "en_US"
- 
  struct GsdKeyboardManagerPrivate
  {
-     guint      start_idle_id;
+ 	guint      start_idle_id;
          GSettings *settings;
 +        GSettings *libgnomekbd_settings;
+         gboolean   have_xkb;
          gint       xkb_event_base;
          GsdNumLockState old_state;
-         GdkDeviceManager *device_manager;
-@@ -1021,6 +1025,93 @@
-         manager->priv->device_manager = device_manager;
+@@ -266,6 +270,93 @@
+         apply_settings (manager->priv->settings, NULL, manager);
  }
  
 +static void
@@ -113,34 +111,34 @@ Index: b/plugins/keyboard/gsd-keyboard-manager.c
  static gboolean
  start_keyboard_idle_cb (GsdKeyboardManager *manager)
  {
-@@ -1029,6 +1120,7 @@
-         g_debug ("Starting keyboard manager");
+@@ -275,6 +366,7 @@
  
+         manager->priv->have_xkb = 0;
          manager->priv->settings = g_settings_new (GSD_KEYBOARD_DIR);
 +        manager->priv->libgnomekbd_settings = g_settings_new (LIBGNOMEKBD_KEYBOARD_DIR);
- 	manager->priv->settings_desktop = g_settings_new (GKBD_DESKTOP_SCHEMA);
- 	manager->priv->settings_keyboard = g_settings_new (GKBD_KEYBOARD_SCHEMA);
  
-@@ -1047,6 +1139,10 @@
- 	g_signal_connect (manager->priv->settings_keyboard, "changed",
- 			  (GCallback) xkb_settings_changed, manager);
+         /* Essential - xkb initialization should happen before */
+         gsd_keyboard_xkb_init (manager);
+@@ -287,6 +379,10 @@
+         g_signal_connect (G_OBJECT (manager->priv->settings), "changed",
+                           G_CALLBACK (apply_settings), manager);
  
 +        apply_libgnomekbd_settings (manager->priv->libgnomekbd_settings, NULL, manager);
 +        g_signal_connect (G_OBJECT (manager->priv->libgnomekbd_settings), "changed",
 +                          G_CALLBACK (apply_libgnomekbd_settings), manager);
 +
- 	install_xkb_filter (manager);
+         numlock_install_xkb_callback (manager);
  
          gnome_settings_profile_end (NULL);
-@@ -1119,6 +1215,11 @@
- 		p->xkl_engine = NULL;
- 	}
+@@ -321,6 +417,11 @@
+                 p->settings = NULL;
+         }
  
-+    if (p->libgnomekbd_settings != NULL) {
-+        g_object_unref(p->libgnomekbd_settings);
-+        p->libgnomekbd_settings = NULL;
-+    }
++        if (p->libgnomekbd_settings != NULL) {
++                g_object_unref (p->libgnomekbd_settings);
++                p->libgnomekbd_settings = NULL;
++        }
 +
- #ifdef HAVE_APPINDICATOR
-     if (p->gkbd_configuration != NULL) {
- 	    g_object_unref (p->gkbd_configuration);
+         if (p->have_xkb) {
+                 gdk_window_remove_filter (NULL,
+                                           numlock_xkb_callback,

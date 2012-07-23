@@ -1,9 +1,9 @@
 # Ubuntu: https://launchpad.net/bugs/842768
-Index: b/plugins/print-notifications/gsd-print-notifications-manager.c
+Index: gnome-settings-daemon-3.3.91/plugins/print-notifications/gsd-print-notifications-manager.c
 ===================================================================
---- a/plugins/print-notifications/gsd-print-notifications-manager.c
-+++ b/plugins/print-notifications/gsd-print-notifications-manager.c
-@@ -283,7 +283,7 @@
+--- gnome-settings-daemon-3.3.91.orig/plugins/print-notifications/gsd-print-notifications-manager.c	2012-02-01 20:33:15.000000000 +0100
++++ gnome-settings-daemon-3.3.91/plugins/print-notifications/gsd-print-notifications-manager.c	2012-03-05 21:04:12.777981060 +0100
+@@ -281,7 +281,7 @@
          static const char * const reasons[] = {
                  "toner-low",
                  "toner-empty",
@@ -12,7 +12,7 @@ Index: b/plugins/print-notifications/gsd-print-notifications-manager.c
                  "cover-open",
                  "cups-missing-filter",
                  "door-open",
-@@ -300,7 +300,7 @@
+@@ -298,7 +298,7 @@
                  /* Translators: The printer has no toner left (same as in system-config-printer) */
                  N_("Toner empty"),
                  /* Translators: The printer is in the process of connecting to a shared network output device (same as in system-config-printer) */
@@ -21,7 +21,7 @@ Index: b/plugins/print-notifications/gsd-print-notifications-manager.c
                  /* Translators: One or more covers on the printer are open (same as in system-config-printer) */
                  N_("Cover open"),
                  /* Translators: A filter or backend is not installed (same as in system-config-printer) */
-@@ -326,7 +326,7 @@
+@@ -324,7 +324,7 @@
                  /* Translators: The printer has no toner left (same as in system-config-printer) */
                  N_("Printer '%s' has no toner left."),
                  /* Translators: The printer is in the process of connecting to a shared network output device (same as in system-config-printer) */
