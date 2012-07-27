@@ -6,3 +6,4 @@ revert_git_datetime_dropping.patch
 20_disable-wacom-support-on-s390-s390x.patch
 21_disable-wacom-on-non-Linux-platforms.patch
 22_backlight_optional.patch
+24-common-Try-XI-2.2-if-XI-2.0-fails.patch
