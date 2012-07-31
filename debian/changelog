@@ -27,6 +27,10 @@ gnome-settings-daemon (3.4.2-0ubuntu7) UNRELEASED; urgency=low
     - "xrandr; explicitly set clone state variable when generating monitor
       configs" (LP: #1014533)
 
+  [ Michael Terry ]
+  * debian/patches/git-smartcard-crash.patch:
+    - Don't crash on login with a smartcard (LP: #1031034)
+
  -- Sebastien Bacher <seb128@ubuntu.com>  Tue, 19 Jun 2012 10:45:45 +0200
 
 gnome-settings-daemon (3.4.2-0ubuntu6) quantal; urgency=low

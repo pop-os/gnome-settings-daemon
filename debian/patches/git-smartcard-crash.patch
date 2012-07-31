@@ -1,0 +1,37 @@
+From fdfd97cd737257532c8797e2a551a10f5c74cf05 Mon Sep 17 00:00:00 2001
+From: Michael Terry <michael.terry@canonical.com>
+Date: Tue, 31 Jul 2012 11:54:51 -0400
+Subject: [PATCH] [smartcard] Don't try to use smartcard drivers that didn't
+ load
+
+https://bugzilla.gnome.org/show_bug.cgi?id=668950
+---
+ plugins/smartcard/gsd-smartcard-manager.c |    8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
+
+Index: gnome-settings-daemon-3.4.2/plugins/smartcard/gsd-smartcard-manager.c
+===================================================================
+--- gnome-settings-daemon-3.4.2.orig/plugins/smartcard/gsd-smartcard-manager.c	2012-04-12 05:54:01.000000000 -0400
++++ gnome-settings-daemon-3.4.2/plugins/smartcard/gsd-smartcard-manager.c	2012-07-31 12:06:17.612835667 -0400
+@@ -731,8 +731,8 @@
+                 g_free (module_spec);
+                 module_spec = NULL;
+ 
+-                if (!SECMOD_HasRemovableSlots (module) ||
+-                    !module->loaded) {
++                if (SECMOD_HasRemovableSlots (module) &&
++                    module->loaded) {
+                         modules = g_list_prepend (modules, module);
+                 } else {
+                         g_debug ("fallback module found but not %s",
+@@ -767,8 +767,8 @@
+                         g_free (module_spec);
+                         module_spec = NULL;
+ 
+-                        if (!SECMOD_HasRemovableSlots (module) ||
+-                            !module->loaded) {
++                        if (SECMOD_HasRemovableSlots (module) &&
++                            module->loaded) {
+                                 modules = g_list_prepend (modules, module);
+                         } else {
+                                 g_debug ("fallback module found but not loaded");
