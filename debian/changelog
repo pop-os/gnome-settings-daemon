@@ -9,7 +9,7 @@ gnome-settings-daemon (3.4.2-0ubuntu8) UNRELEASED; urgency=low
     debian/patches/revert_git_dropping_gconf_wrapper.patch,
     debian/patches/revert_git_stop_using_gconf.patch,
     debian/patches/revert_git_use_gsetting_keybindings.patch:
-    - drop the gconf to gsettings migration reverts
+    - drop the gconf to gsettings migration reverts (LP: #1035261)
   * debian/rules:
     - don't use deprecated --enable-gconf-bridge
 
