@@ -3,6 +3,7 @@ gnome-settings-daemon (3.4.2-0ubuntu9) UNRELEASED; urgency=low
   [ Sebastien Bacher ]
   * debian/control.in:
     - don't build-depends on gconf
+    - updated gnome-control-center breaks version for gsettings
   * debian/patches/revert_git_a11y_gsettings.patch,
     debian/patches/revert_git_stop_using_gconf.patch,
     debian/patches/revert_git_use_gsetting_keybindings.patch:
