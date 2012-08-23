@@ -1,4 +1,4 @@
-gnome-settings-daemon (3.4.2-0ubuntu9) UNRELEASED; urgency=low
+gnome-settings-daemon (3.4.2-0ubuntu9) quantal-proposed; urgency=low
 
   [ Sebastien Bacher ]
   * debian/control.in:
@@ -27,7 +27,7 @@ gnome-settings-daemon (3.4.2-0ubuntu9) UNRELEASED; urgency=low
   * debian/patches/git-smartcard-crash.patch:
     - Don't crash on login with a smartcard (LP: #1031034)
 
- -- Sebastien Bacher <seb128@ubuntu.com>  Tue, 19 Jun 2012 10:45:45 +0200
+ -- Sebastien Bacher <seb128@ubuntu.com>  Thu, 23 Aug 2012 17:04:16 +0200
 
 gnome-settings-daemon (3.4.2-0ubuntu8) quantal; urgency=low
 
