@@ -13,6 +13,7 @@
 61_unity_use_application_indicator.patch
 62_unity_disable_gsd_printer.patch
 63_unity_start_mounter.patch
+64_restore_terminal_keyboard_shortcut_schema.patch
 90_set_gmenus_xsettings.patch
 sync_keyboard_layout_to_accountsservice.patch
 disable_three_touch_tap.patch
