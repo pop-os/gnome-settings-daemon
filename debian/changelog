@@ -1,10 +1,10 @@
-gnome-settings-daemon (3.4.2-0ubuntu10) UNRELEASED; urgency=low
+gnome-settings-daemon (3.4.2-0ubuntu10) quantal; urgency=low
 
   * 64_restore_terminal_keyboard_shortcut_schema.patch:
     - The "Launch Terminal" schema was dropped in the gconf>gsettings
       switch. Bring it back. (LP: #1010558, LP: #1040081)
 
- -- Jeremy Bicha <jbicha@ubuntu.com>  Sun, 26 Aug 2012 00:00:33 -0400
+ -- Jeremy Bicha <jbicha@ubuntu.com>  Sun, 26 Aug 2012 12:44:27 -0400
 
 gnome-settings-daemon (3.4.2-0ubuntu9) quantal-proposed; urgency=low
 
