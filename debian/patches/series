@@ -2,6 +2,7 @@
 10_smaller_syndaemon_timeout.patch
 power-check-null-devices.patch
 power-ignore-bad-dbus-requests.patch
+power-update-fallback-status-icon.patch
 revert_git_datetime_dropping.patch
 20_disable-wacom-support-on-s390-s390x.patch
 21_disable-wacom-on-non-Linux-platforms.patch

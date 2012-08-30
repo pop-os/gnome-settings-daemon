@@ -1,3 +1,11 @@
+gnome-settings-daemon (3.4.2-5) UNRELEASED; urgency=low
+
+  * debian/patches/power-update-fallback-status-icon.patch: Update battery
+    status icon in fallback mode when switching between battery and AC power.
+    Patch cherry-picked from upstream Git. (Closes: #678352)
+
+ -- Michael Biebl <biebl@debian.org>  Thu, 30 Aug 2012 23:32:02 +0200
+
 gnome-settings-daemon (3.4.2-4) unstable; urgency=low
 
   * debian/patches/24-common-Try-XI-2.2-if-XI-2.0-fails.patch:
