@@ -1,3 +1,12 @@
+gnome-settings-daemon (3.4.2-0ubuntu11) UNRELEASED; urgency=low
+
+  * debian/patches/90_set_gmenus_xsettings.patch:
+    - restore ShellShowsAppMenu xsettings to true under unity, that's the 
+      correct thing to do since it supports appmenus and we don't need to 
+      workaroud issues with the new nautils since we reverted to the old one
+
+ -- Sebastien Bacher <seb128@ubuntu.com>  Wed, 05 Sep 2012 21:13:40 +0200
+
 gnome-settings-daemon (3.4.2-0ubuntu10) quantal; urgency=low
 
   * 64_restore_terminal_keyboard_shortcut_schema.patch:
