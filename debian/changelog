@@ -1,3 +1,11 @@
+gnome-settings-daemon (3.4.2-0ubuntu12) quantal; urgency=low
+
+  * debian/gnome-settings-daemon.gsettings-override:
+    - Dropped, override moved to ubuntu-default-settings and
+      ubuntu-gnome-default-settings
+
+ -- Jeremy Bicha <jbicha@ubuntu.com>  Tue, 11 Sep 2012 20:01:09 -0400
+
 gnome-settings-daemon (3.4.2-0ubuntu11) quantal-proposed; urgency=low
 
   * debian/patches/90_set_gmenus_xsettings.patch:
