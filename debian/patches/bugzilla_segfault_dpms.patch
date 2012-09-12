@@ -1,8 +1,8 @@
 #upstream: https://bugzilla.gnome.org/show_bug.cgi?id=672245
 Index: gnome-settings-daemon-3.4.2/plugins/power/gsd-power-manager.c
 ===================================================================
---- gnome-settings-daemon-3.4.2.orig/plugins/power/gsd-power-manager.c	2012-05-22 21:09:12.713387345 +0200
-+++ gnome-settings-daemon-3.4.2/plugins/power/gsd-power-manager.c	2012-05-22 21:09:21.265387042 +0200
+--- gnome-settings-daemon-3.4.2.orig/plugins/power/gsd-power-manager.c	2012-09-05 14:30:33.276546028 -0400
++++ gnome-settings-daemon-3.4.2/plugins/power/gsd-power-manager.c	2012-09-05 15:17:22.108633972 -0400
 @@ -3679,6 +3679,11 @@
          g_debug ("Starting power manager");
          gnome_settings_profile_start (NULL);
@@ -27,3 +27,16 @@ Index: gnome-settings-daemon-3.4.2/plugins/power/gsd-power-manager.c
          /* ensure the default dpms timeouts are cleared */
          ret = gnome_rr_screen_set_dpms_mode (manager->priv->x11_screen,
                                               GNOME_RR_DPMS_ON,
+@@ -3916,6 +3916,12 @@
+ 
+         gpm_idletime_alarm_remove (manager->priv->idletime,
+                                    GSD_POWER_IDLETIME_ID);
++        g_signal_handlers_disconnect_by_func (manager->priv->idletime,
++                                              idle_idletime_reset_cb,
++                                              manager);
++        g_signal_handlers_disconnect_by_func (manager->priv->idletime,
++                                              idle_idletime_alarm_expired_cb,
++                                              manager);
+         g_object_unref (manager->priv->idletime);
+         g_object_unref (manager->priv->status_icon);
+         manager->priv->idletime = NULL;

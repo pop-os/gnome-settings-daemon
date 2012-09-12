@@ -1,10 +1,17 @@
-gnome-settings-daemon (3.4.2-0ubuntu12) quantal; urgency=low
+gnome-settings-daemon (3.4.2-0ubuntu13) quantal; urgency=low
 
   * debian/gnome-settings-daemon.gsettings-override:
     - Dropped, override moved to ubuntu-default-settings and
       ubuntu-gnome-default-settings
 
- -- Jeremy Bicha <jbicha@ubuntu.com>  Tue, 11 Sep 2012 20:01:09 -0400
+ -- Jeremy Bicha <jbicha@ubuntu.com>  Tue, 11 Sep 2012 21:14:56 -0400
+
+gnome-settings-daemon (3.4.2-0ubuntu12) quantal-proposed; urgency=low
+
+  * debian/patches/bugzilla_segfault_dpms.patch:
+    - Update to cover another way to get the same segfault. (LP: #971353)
+
+ -- Michael Terry <mterry@ubuntu.com>  Wed, 05 Sep 2012 15:42:01 -0400
 
 gnome-settings-daemon (3.4.2-0ubuntu11) quantal-proposed; urgency=low
 
