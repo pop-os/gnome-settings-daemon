@@ -1,3 +1,11 @@
+gnome-settings-daemon (3.4.2-0ubuntu14) UNRELEASED; urgency=low
+
+  * debian/patches/git_power_dbus_path.patch:
+    - Fix screen not locking when lid is closed while running
+      GNOME Shell on GDM (LP: #1048420)
+
+ -- Jeremy Bicha <jbicha@ubuntu.com>  Fri, 28 Sep 2012 20:29:05 -0400
+
 gnome-settings-daemon (3.4.2-0ubuntu13) quantal; urgency=low
 
   * debian/gnome-settings-daemon.gsettings-override:

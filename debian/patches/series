@@ -29,3 +29,4 @@ git_xrandr_explicitly_set_clone_state.patch
 git-smartcard-crash.patch
 git_better_xi_handling.patch
 git_new_cups_build.patch
+git_power_dbus_path.patch
