@@ -7,7 +7,7 @@ Source: gnome-settings-daemon
 Section: gnome
 Priority: optional
 Maintainer: Debian GNOME Maintainers <pkg-gnome-maintainers@lists.alioth.debian.org>
-Uploaders: Michael Biebl <biebl@debian.org>, Sjoerd Simons <sjoerd@debian.org>
+Uploaders: Josselin Mouette <joss@debian.org>, Michael Biebl <biebl@debian.org>, Sjoerd Simons <sjoerd@debian.org>
 Build-Depends: cdbs,
                debhelper (>= 8.1.0~),
                gnome-pkg-tools,
@@ -40,7 +40,7 @@ Build-Depends: cdbs,
                libcolord-dev (>= 0.1.12),
                liblcms2-dev,
                libnss3-dev,
-               libwacom-dev (>= 0.3) [!hurd-any !kfreebsd-any !s390 !s390x],
+               libwacom-dev (>= 0.6) [!hurd-any !kfreebsd-any !s390 !s390x],
                xserver-xorg-input-wacom [!hurd-any !kfreebsd-any !s390 !s390x]
 Standards-Version: 3.9.3
 Vcs-Browser: http://anonscm.debian.org/viewvc/pkg-gnome/desktop/unstable/gnome-settings-daemon/

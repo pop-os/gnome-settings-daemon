@@ -1,9 +1,17 @@
-gnome-settings-daemon (3.4.2-6) UNRELEASED; urgency=low
+gnome-settings-daemon (3.4.2+git20120925.a4c817-1) unstable; urgency=low
 
   * debian/g-s-d.gsettings-override: disable remember-numlock-state, 
     because of the infamous https://bugzilla.gnome.org/679151
+  * New upstream git snapshot from the stable branch (which will not be 
+    released despite the amount of useful bug fixes).
+  * 10_smaller_syndaemon_timeout.patch: refreshed.
+  * Drop merged patches: power-update-fallback-status-icon.patch,
+    20_disable-wacom-support-on-s390-s390x.patch, 
+    21_disable-wacom-on-non-Linux-platforms.patch,
+    24-common-Try-XI-2.2-if-XI-2.0-fails.patch.
+  * Bump libwacom dependency.
 
- -- Josselin Mouette <joss@debian.org>  Sat, 29 Sep 2012 11:17:52 +0200
+ -- Josselin Mouette <joss@debian.org>  Sat, 29 Sep 2012 12:17:15 +0200
 
 gnome-settings-daemon (3.4.2-5) unstable; urgency=low
 
