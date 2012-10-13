@@ -1,8 +1,48 @@
-gnome-settings-daemon (3.4.2-3) UNRELEASED; urgency=low
+gnome-settings-daemon (3.4.2+git20120925.a4c817-1) unstable; urgency=low
 
+  * debian/g-s-d.gsettings-override: disable remember-numlock-state, 
+    because of the infamous https://bugzilla.gnome.org/679151
+  * New upstream git snapshot from the stable branch (which will not be 
+    released despite the amount of useful bug fixes).
+  * 10_smaller_syndaemon_timeout.patch: refreshed.
+  * Drop merged patches: power-update-fallback-status-icon.patch,
+    20_disable-wacom-support-on-s390-s390x.patch, 
+    21_disable-wacom-on-non-Linux-platforms.patch,
+    24-common-Try-XI-2.2-if-XI-2.0-fails.patch.
+  * Bump libwacom dependency.
+
+ -- Josselin Mouette <joss@debian.org>  Sat, 29 Sep 2012 12:17:15 +0200
+
+gnome-settings-daemon (3.4.2-5) unstable; urgency=low
+
+  * debian/patches/power-update-fallback-status-icon.patch: Update battery
+    status icon in fallback mode when switching between battery and AC power.
+    Patch cherry-picked from upstream Git. (Closes: #678352)
+
+ -- Michael Biebl <biebl@debian.org>  Thu, 30 Aug 2012 23:36:38 +0200
+
+gnome-settings-daemon (3.4.2-4) unstable; urgency=low
+
+  * debian/patches/24-common-Try-XI-2.2-if-XI-2.0-fails.patch:
+    * Added: Fix keybindings for newer libxi2 (Closes: #678250) (From
+      upstream git)
+
+ -- Sjoerd Simons <sjoerd@debian.org>  Fri, 27 Jul 2012 16:06:28 +0200
+
+gnome-settings-daemon (3.4.2-3) unstable; urgency=low
+
+  [ Jeremy Bicha ]
   * debian/control.in: Stop depending on libgnome2-common
 
- -- Jeremy Bicha <jbicha@ubuntu.com>  Sun, 20 May 2012 02:19:24 -0400
+  [ Michael Biebl ]
+  * Upload to unstable.
+  * Drop obsolete --enable-gconf-bridge configure switch and Build-Depends on
+    libgconf2-dev.
+  * Remove obsolete Breaks.
+  * Add Breaks against gnome-shell (<< 3.4) for the incompatible changes in
+    the Power D-Bus API. Closes: #675130
+
+ -- Michael Biebl <biebl@debian.org>  Wed, 30 May 2012 12:43:11 +0200
 
 gnome-settings-daemon (3.4.2-2) experimental; urgency=low
 
