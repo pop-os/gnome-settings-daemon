@@ -1,8 +1,6 @@
-Index: gnome-settings-daemon-3.4.2/plugins/power/gsd-power-manager.c
-===================================================================
---- gnome-settings-daemon-3.4.2.orig/plugins/power/gsd-power-manager.c	2012-05-15 12:14:49.000000000 +0200
-+++ gnome-settings-daemon-3.4.2/plugins/power/gsd-power-manager.c	2012-05-19 08:39:11.423704404 +0200
-@@ -1160,7 +1160,7 @@
+--- a/plugins/power/gsd-power-manager.c
++++ b/plugins/power/gsd-power-manager.c
+@@ -1166,7 +1166,7 @@
  
          /* add to database */
          array = up_client_get_devices (manager->priv->up_client);

@@ -1,5 +1,3 @@
-diff --git a/data/org.gnome.settings-daemon.plugins.media-keys.gschema.xml.in.in b/data/org.gnome.settings-daemon.plugins.media-keys.gschema.xml.in.in
-index 6a63236..db9b2c4 100644
 --- a/data/org.gnome.settings-daemon.plugins.media-keys.gschema.xml.in.in
 +++ b/data/org.gnome.settings-daemon.plugins.media-keys.gschema.xml.in.in
 @@ -85,6 +85,11 @@
@@ -14,11 +12,9 @@ index 6a63236..db9b2c4 100644
      <key name="volume-down" type="s">
        <default>'XF86AudioLowerVolume'</default>
        <_summary>Volume down</_summary>
-diff --git a/plugins/media-keys/shortcuts-list.h b/plugins/media-keys/shortcuts-list.h
-index 437ed2c..8a66902 100644
 --- a/plugins/media-keys/shortcuts-list.h
 +++ b/plugins/media-keys/shortcuts-list.h
-@@ -123,7 +123,7 @@ static struct {
+@@ -125,7 +125,7 @@
          { FORWARD_KEY, NULL, "XF86AudioForward" },
          { REPEAT_KEY, NULL, "XF86AudioRepeat" },
          { RANDOM_KEY, NULL, "XF86AudioRandomPlay"},

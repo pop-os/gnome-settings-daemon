@@ -1,3 +1,15 @@
+gnome-settings-daemon (3.6.1-1) experimental; urgency=low
+
+  * New upstream release
+  * debian/patches/10_smaller_syndaemon_timeout.patch:
+    + Dropped, fixed upstream
+  * debian/patches/22_backlight_optional.patch:
+    + Dropped, fixed upstream
+  * debian/control: Update build-depends
+  * debian/patches/*: refreshed
+
+ -- Sjoerd Simons <sjoerd@debian.org>  Sun, 14 Oct 2012 21:16:55 +0200
+
 gnome-settings-daemon (3.4.2+git20120925.a4c817-1) unstable; urgency=low
 
   * debian/g-s-d.gsettings-override: disable remember-numlock-state, 
