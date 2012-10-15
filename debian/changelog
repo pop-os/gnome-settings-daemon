@@ -1,3 +1,9 @@
+gnome-settings-daemon (3.6.1-2) UNRELEASED; urgency=low
+
+  * debian/control.in: bump {build-,}dependency on gsettings-desktop-schemas.
+
+ -- Frederic Peters <fpeters@debian.org>  Mon, 15 Oct 2012 14:45:04 +0200
+
 gnome-settings-daemon (3.6.1-1) experimental; urgency=low
 
   * New upstream release
