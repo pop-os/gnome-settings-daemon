@@ -4,13 +4,13 @@ Forwarded: no, likely a Ubuntu-specific preference
 Bug-Ubuntu: https://bugs.launchpad.net/bugs/938076
 Bug-Ubuntu: https://bugs.launchpad.net/bugs/847814
 
-Index: gnome-settings-daemon-3.3.92/plugins/power/gsd-power-manager.c
+Index: gnome-settings-daemon-3.6.1/plugins/power/gsd-power-manager.c
 ===================================================================
---- gnome-settings-daemon-3.3.92.orig/plugins/power/gsd-power-manager.c	2012-03-20 08:30:29.810357813 -0400
-+++ gnome-settings-daemon-3.3.92/plugins/power/gsd-power-manager.c	2012-03-20 08:38:54.686352998 -0400
-@@ -2301,9 +2301,6 @@
-                          CA_PROP_EVENT_DESCRIPTION, _("Lid has been closed"),
-                          NULL);
+--- gnome-settings-daemon-3.6.1.orig/plugins/power/gsd-power-manager.c	2012-10-05 13:56:44.000000000 +0200
++++ gnome-settings-daemon-3.6.1/plugins/power/gsd-power-manager.c	2012-10-26 10:20:11.739005253 +0200
+@@ -2249,9 +2249,6 @@
+         GError *error = NULL;
+         GsdPowerActionType action_type;
  
 -        /* maybe lock the screen if the lid is closed */
 -        lock_screensaver (manager);
@@ -18,7 +18,7 @@ Index: gnome-settings-daemon-3.3.92/plugins/power/gsd-power-manager.c
          /* we have different settings depending on AC state */
          if (up_client_get_on_battery (manager->priv->up_client)) {
                  action_type = g_settings_get_enum (manager->priv->settings,
-@@ -2320,6 +2317,9 @@
+@@ -2268,6 +2265,9 @@
                          g_warning ("to prevent damage, now forcing suspend");
                          do_power_action_type (manager, GSD_POWER_ACTION_SUSPEND);
                          return;
@@ -28,7 +28,7 @@ Index: gnome-settings-daemon-3.3.92/plugins/power/gsd-power-manager.c
                  }
          }
  
-@@ -3559,7 +3559,31 @@
+@@ -3499,7 +3499,31 @@
                          UpSleepKind sleep_kind,
                          GsdPowerManager *manager)
  {

@@ -1,3 +1,40 @@
+gnome-settings-daemon (3.6.1-0ubuntu1) UNRELEASED; urgency=low
+  
+  * New upstream version
+  * debian/control.in:
+    - Build-Depends on libibus-1.0-dev (>= 1.4.99)
+  * debian/patches/git*,
+    debian/patches/power-ignore-bad-dbus-requests.patch,
+    debian/patches/xsettings_signal_handling.patch,
+    debian/patches/10_smaller_syndaemon_timeout.patch: 
+    - dropped, those fixes are in the new version
+  * debian/patches/20_migrate_background_uri.patch:
+    - dropped, it was only needed until the LTS
+  * debian/patches/40_xres_lcddefault.patch:
+    - dropped, that was a workaround for libreoffice that shouldn't be
+      needed and we should better fix libreoffice
+  * debian/patches/61_unity_use_application_indicator.patch:
+    - commented out, that needs porting or to be rewritten for ibus
+
+  [ Robert Ancell ]
+  * New upstream release
+  * debian/control:
+    - Bump build-depends on libgnome-desktop-3-dev, libwacom-dev
+    - Drop build-depends on libgnomekbd-dev, libxklavier-dev
+    - Add build-depends on libxkbfile-dev
+
+  [ Iain Lane ]
+  * New upstream release
+  * Refresh patches and remove those applied upstream.
+  * Revert the upstream patch to drop libgnomekbd usage; breaks some Ubuntu
+    patches that we need to keep. This is not a long-term solution.
+  * Rework the indicator patch to work with upstream keyboard refactoring.
+    - XXX: Still not /quite/ correct: XKB error on login. Needs a second pair
+           of eyes.
+  * Re-add BDs on libgnomekbd-dev & libxklavier-dev for above revert. 
+
+ -- Sebastien Bacher <seb128@ubuntu.com>  Tue, 19 Jun 2012 10:45:45 +0200
+
 gnome-settings-daemon (3.4.2-0ubuntu14) quantal; urgency=low
 
   * debian/patches/git_power_dbus_path.patch:

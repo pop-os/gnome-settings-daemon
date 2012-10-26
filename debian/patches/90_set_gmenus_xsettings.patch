@@ -1,8 +1,8 @@
-Index: gnome-settings-daemon-3.3.91/plugins/xsettings/gsd-xsettings-manager.c
+Index: gnome-settings-daemon-3.6.1/plugins/xsettings/gsd-xsettings-manager.c
 ===================================================================
---- gnome-settings-daemon-3.3.91.orig/plugins/xsettings/gsd-xsettings-manager.c	2012-03-15 11:28:39.869729733 -0400
-+++ gnome-settings-daemon-3.3.91/plugins/xsettings/gsd-xsettings-manager.c	2012-03-15 11:28:40.469729742 -0400
-@@ -241,6 +241,10 @@
+--- gnome-settings-daemon-3.6.1.orig/plugins/xsettings/gsd-xsettings-manager.c	2012-10-05 13:56:44.000000000 +0200
++++ gnome-settings-daemon-3.6.1/plugins/xsettings/gsd-xsettings-manager.c	2012-10-26 10:19:49.671004185 +0200
+@@ -242,6 +242,10 @@
          GsdXSettingsGtk   *gtk;
  
          guint              shell_name_watch_id;
@@ -13,7 +13,7 @@ Index: gnome-settings-daemon-3.3.91/plugins/xsettings/gsd-xsettings-manager.c
  };
  
  #define GSD_XSETTINGS_ERROR gsd_xsettings_error_quark ()
-@@ -672,15 +676,21 @@
+@@ -686,15 +690,21 @@
  }
  
  static void
@@ -38,7 +38,7 @@ Index: gnome-settings-daemon-3.3.91/plugins/xsettings/gsd-xsettings-manager.c
                  xsettings_manager_notify (manager->priv->managers [i]);
          }
          gnome_settings_profile_end (NULL);
-@@ -692,7 +702,10 @@
+@@ -706,7 +716,10 @@
                     const gchar     *name_owner,
                     gpointer         user_data)
  {
@@ -50,7 +50,7 @@ Index: gnome-settings-daemon-3.3.91/plugins/xsettings/gsd-xsettings-manager.c
  }
  
  static void
-@@ -700,7 +713,33 @@
+@@ -714,7 +727,33 @@
                        const gchar     *name,
                        gpointer         user_data)
  {
@@ -85,7 +85,7 @@ Index: gnome-settings-daemon-3.3.91/plugins/xsettings/gsd-xsettings-manager.c
  }
  
  static void
-@@ -898,6 +937,15 @@
+@@ -911,6 +950,15 @@
                                                                 manager,
                                                                 NULL);
  
@@ -101,7 +101,7 @@ Index: gnome-settings-daemon-3.3.91/plugins/xsettings/gsd-xsettings-manager.c
          for (i = 0; manager->priv->managers [i]; i++)
                  xsettings_manager_set_string (manager->priv->managers [i],
                                                "Net/FallbackIconTheme",
-@@ -939,6 +987,9 @@
+@@ -955,6 +1003,9 @@
          if (manager->priv->shell_name_watch_id > 0)
                  g_bus_unwatch_name (manager->priv->shell_name_watch_id);
  

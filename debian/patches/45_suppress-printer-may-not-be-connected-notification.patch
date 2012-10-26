@@ -1,9 +1,9 @@
 # Ubuntu: https://launchpad.net/bugs/842768
-Index: gnome-settings-daemon-3.3.91/plugins/print-notifications/gsd-print-notifications-manager.c
+Index: gnome-settings-daemon-3.6.1/plugins/print-notifications/gsd-print-notifications-manager.c
 ===================================================================
---- gnome-settings-daemon-3.3.91.orig/plugins/print-notifications/gsd-print-notifications-manager.c	2012-02-01 20:33:15.000000000 +0100
-+++ gnome-settings-daemon-3.3.91/plugins/print-notifications/gsd-print-notifications-manager.c	2012-03-05 21:04:12.777981060 +0100
-@@ -281,7 +281,7 @@
+--- gnome-settings-daemon-3.6.1.orig/plugins/print-notifications/gsd-print-notifications-manager.c	2012-10-05 13:56:44.000000000 +0200
++++ gnome-settings-daemon-3.6.1/plugins/print-notifications/gsd-print-notifications-manager.c	2012-10-26 10:19:49.487004175 +0200
+@@ -293,7 +293,7 @@
          static const char * const reasons[] = {
                  "toner-low",
                  "toner-empty",
@@ -12,7 +12,7 @@ Index: gnome-settings-daemon-3.3.91/plugins/print-notifications/gsd-print-notifi
                  "cover-open",
                  "cups-missing-filter",
                  "door-open",
-@@ -298,7 +298,7 @@
+@@ -310,7 +310,7 @@
                  /* Translators: The printer has no toner left (same as in system-config-printer) */
                  N_("Toner empty"),
                  /* Translators: The printer is in the process of connecting to a shared network output device (same as in system-config-printer) */
@@ -21,7 +21,7 @@ Index: gnome-settings-daemon-3.3.91/plugins/print-notifications/gsd-print-notifi
                  /* Translators: One or more covers on the printer are open (same as in system-config-printer) */
                  N_("Cover open"),
                  /* Translators: A filter or backend is not installed (same as in system-config-printer) */
-@@ -324,7 +324,7 @@
+@@ -336,7 +336,7 @@
                  /* Translators: The printer has no toner left (same as in system-config-printer) */
                  N_("Printer '%s' has no toner left."),
                  /* Translators: The printer is in the process of connecting to a shared network output device (same as in system-config-printer) */

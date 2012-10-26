@@ -1,9 +1,9 @@
 #upstream: https://bugzilla.gnome.org/show_bug.cgi?id=672245
-Index: gnome-settings-daemon-3.4.2/plugins/power/gsd-power-manager.c
+Index: gnome-settings-daemon-3.6.1/plugins/power/gsd-power-manager.c
 ===================================================================
---- gnome-settings-daemon-3.4.2.orig/plugins/power/gsd-power-manager.c	2012-09-05 14:30:33.276546028 -0400
-+++ gnome-settings-daemon-3.4.2/plugins/power/gsd-power-manager.c	2012-09-05 15:17:22.108633972 -0400
-@@ -3679,6 +3679,11 @@
+--- gnome-settings-daemon-3.6.1.orig/plugins/power/gsd-power-manager.c	2012-10-26 10:19:49.591004180 +0200
++++ gnome-settings-daemon-3.6.1/plugins/power/gsd-power-manager.c	2012-10-26 10:20:03.975004876 +0200
+@@ -3655,6 +3655,11 @@
          g_debug ("Starting power manager");
          gnome_settings_profile_start (NULL);
  
@@ -15,7 +15,7 @@ Index: gnome-settings-daemon-3.4.2/plugins/power/gsd-power-manager.c
          /* track the active session */
          manager->priv->session = gnome_settings_session_new ();
          g_signal_connect (manager->priv->session, "notify::state",
-@@ -3807,11 +3812,6 @@
+@@ -3783,11 +3788,6 @@
          g_signal_connect (manager->priv->idletime, "alarm-expired",
                            G_CALLBACK (idle_idletime_alarm_expired_cb), manager);
  
@@ -27,16 +27,16 @@ Index: gnome-settings-daemon-3.4.2/plugins/power/gsd-power-manager.c
          /* ensure the default dpms timeouts are cleared */
          ret = gnome_rr_screen_set_dpms_mode (manager->priv->x11_screen,
                                               GNOME_RR_DPMS_ON,
-@@ -3916,6 +3916,12 @@
- 
-         gpm_idletime_alarm_remove (manager->priv->idletime,
-                                    GSD_POWER_IDLETIME_ID);
+@@ -3852,6 +3852,12 @@
+                 g_source_remove (manager->priv->critical_alert_timeout_id);
+                 manager->priv->critical_alert_timeout_id = 0;
+         }
 +        g_signal_handlers_disconnect_by_func (manager->priv->idletime,
 +                                              idle_idletime_reset_cb,
 +                                              manager);
 +        g_signal_handlers_disconnect_by_func (manager->priv->idletime,
 +                                              idle_idletime_alarm_expired_cb,
 +                                              manager);
-         g_object_unref (manager->priv->idletime);
-         g_object_unref (manager->priv->status_icon);
-         manager->priv->idletime = NULL;
+ 
+         g_clear_object (&manager->priv->idletime);
+         g_clear_object (&manager->priv->status_icon);
