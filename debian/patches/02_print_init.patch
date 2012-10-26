@@ -1,0 +1,89 @@
+From 5f1df8fc7767b9d5967bbbe988346f22995a6285 Mon Sep 17 00:00:00 2001
+From: Matthias Clasen <mclasen@redhat.com>
+Date: Mon, 23 Apr 2012 15:14:28 +0000
+Subject: printers: Move expensive initialization to an idle
+
+The start() function is running before gsd finishes its
+session registration, so everything we do here is in the
+critical path for session startup. Both cupsGetDests and
+the subscription registration are potentially expensive,
+and can very well be done later.
+
+https://bugzilla.gnome.org/show_bug.cgi?id=674551
+---
+diff --git a/plugins/print-notifications/gsd-print-notifications-manager.c b/plugins/print-notifications/gsd-print-notifications-manager.c
+index 44fbbbe..33e6452 100644
+--- a/plugins/print-notifications/gsd-print-notifications-manager.c
++++ b/plugins/print-notifications/gsd-print-notifications-manager.c
+@@ -904,25 +904,17 @@ renew_subscription (gpointer data)
+         return TRUE;
+ }
+ 
+-gboolean
+-gsd_print_notifications_manager_start (GsdPrintNotificationsManager *manager,
+-                                       GError                      **error)
++static gboolean
++gsd_print_notifications_manager_start_idle (gpointer data)
+ {
+-        g_debug ("Starting print-notifications manager");
++        GsdPrintNotificationsManager *manager = data;
+ 
+         gnome_settings_profile_start (NULL);
+ 
+-        manager->priv->subscription_id = -1;
+-        manager->priv->dests = NULL;
+-        manager->priv->num_dests = 0;
+-        manager->priv->scp_handler_spawned = FALSE;
+-        manager->priv->timeouts = NULL;
+         manager->priv->printing_printers = g_hash_table_new_full (g_str_hash, g_str_equal, g_free, NULL);
+-        manager->priv->active_notifications = NULL;
+ 
+         renew_subscription (manager);
+         g_timeout_add_seconds (RENEW_INTERVAL, renew_subscription, manager);
+-        gnome_settings_profile_msg ("renewed subscriptions");
+ 
+         manager->priv->num_dests = cupsGetDests (&manager->priv->dests);
+         gnome_settings_profile_msg ("got dests");
+@@ -944,6 +936,30 @@ gsd_print_notifications_manager_start (GsdPrintNotificationsManager *manager,
+ 
+         gnome_settings_profile_end (NULL);
+ 
++        return G_SOURCE_REMOVE;
++}
++
++gboolean
++gsd_print_notifications_manager_start (GsdPrintNotificationsManager *manager,
++                                       GError                      **error)
++{
++        g_debug ("Starting print-notifications manager");
++
++        gnome_settings_profile_start (NULL);
++
++        manager->priv->subscription_id = -1;
++        manager->priv->dests = NULL;
++        manager->priv->num_dests = 0;
++        manager->priv->scp_handler_spawned = FALSE;
++        manager->priv->timeouts = NULL;
++        manager->priv->printing_printers = NULL;
++        manager->priv->active_notifications = NULL;
++        manager->priv->cups_bus_connection = NULL;
++
++        g_idle_add (gsd_print_notifications_manager_start_idle, manager);
++
++        gnome_settings_profile_end (NULL);
++
+         return TRUE;
+ }
+ 
+@@ -963,7 +979,8 @@ gsd_print_notifications_manager_stop (GsdPrintNotificationsManager *manager)
+         if (manager->priv->subscription_id >= 0)
+                 cancel_subscription (manager->priv->subscription_id);
+ 
+-        g_hash_table_destroy (manager->priv->printing_printers);
++        if (manager->priv->printing_printers)
++                g_hash_table_destroy (manager->priv->printing_printers);
+ 
+         g_clear_object (&manager->priv->cups_bus_connection);
+ 
+--
+cgit v0.9.0.2
