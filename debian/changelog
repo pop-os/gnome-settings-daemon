@@ -1,12 +1,16 @@
-gnome-settings-daemon (3.4.2+git20120925.a4c817-2) UNRELEASED; urgency=low
+gnome-settings-daemon (3.4.2+git20120925.a4c817-2) unstable; urgency=low
 
   * Pull upstream fixes for the print-notifications plugin:
     + 01_print_proxy.patch: don’t create an unused GDBusProxy.
     + 02_print_init.patch: delay CUPS initialization.
     + 03_print_async.patch: test asynchronously whether the CUPS server 
       actually works. Closes: #687978.
+  * 11_numlock_loop.patch: patch from Andrew Potter to fix infinite loop 
+    triggered by switching the numlock status.
+  * gnome-settings-daemon.gsettings-override: dropped, NumLock saving is 
+    back to work now.
 
- -- Josselin Mouette <joss@debian.org>  Fri, 26 Oct 2012 18:48:37 +0200
+ -- Josselin Mouette <joss@debian.org>  Fri, 26 Oct 2012 19:04:37 +0200
 
 gnome-settings-daemon (3.4.2+git20120925.a4c817-1) unstable; urgency=low
 
