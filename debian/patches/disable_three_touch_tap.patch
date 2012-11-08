@@ -1,3 +1,7 @@
+# Description: disable three-touch tap to click by default, it conflicts
+with the unity resize handles, see that email for details:
+https://lists.ubuntu.com/archives/ubuntu-desktop/2012-February/003694.html
+# Forwarded: no, Ubuntu specific since it's for unity
 Index: gnome-settings-daemon-3.6.1/plugins/mouse/gsd-mouse-manager.c
 ===================================================================
 --- gnome-settings-daemon-3.6.1.orig/plugins/mouse/gsd-mouse-manager.c	2012-10-26 10:19:49.427004172 +0200
