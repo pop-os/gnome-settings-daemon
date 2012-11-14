@@ -37,6 +37,7 @@ gnome-settings-daemon (3.6.1-0ubuntu1) UNRELEASED; urgency=low
     - XXX: Still not /quite/ correct: XKB error on login. Needs a second pair
            of eyes.
   * Re-add BDs on libgnomekbd-dev & libxklavier-dev for above revert. 
+  * Remove gstreamer BDs which are now obsolete. 
 
  -- Jeremy Bicha <jbicha@ubuntu.com>  Mon, 05 Nov 2012 19:45:39 -0500
 
