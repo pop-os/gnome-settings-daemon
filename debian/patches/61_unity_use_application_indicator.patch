@@ -197,6 +197,22 @@ Index: gnome-settings-daemon-3.6.3/plugins/a11y-keyboard/Makefile.am
 ===================================================================
 --- gnome-settings-daemon-3.6.3.orig/plugins/a11y-keyboard/Makefile.am	2012-11-14 13:19:27.000000000 +0100
 +++ gnome-settings-daemon-3.6.3/plugins/a11y-keyboard/Makefile.am	2012-11-19 19:54:26.275630058 +0100
+@@ -25,6 +25,7 @@
+ 	-DGTKBUILDERDIR=\""$(pkgdatadir)"\"			\
+ 	$(PLUGIN_CFLAGS)					\
+ 	$(LIBNOTIFY_CFLAGS)					\
++	$(APPINDICATOR_CFLAGS)				\
+ 	$(SETTINGS_PLUGIN_CFLAGS)				\
+ 	$(AM_CFLAGS)
+ 
+@@ -32,6 +33,7 @@
+ 	$(top_builddir)/gnome-settings-daemon/libgsd.la		\
+ 	$(top_builddir)/plugins/common/libcommon.la		\
+ 	$(LIBNOTIFY_LIBS)					\
++	$(APPINDICATOR_LIBS)				\
+ 	$(SETTINGS_PLUGIN_LIBS)
+ 
+ test_a11y_preferences_dialog_SOURCES =		\
 @@ -79,6 +79,7 @@
  liba11y_keyboard_la_CFLAGS = \
  	$(SETTINGS_PLUGIN_CFLAGS)	\

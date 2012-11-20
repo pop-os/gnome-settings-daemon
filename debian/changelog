@@ -1,4 +1,4 @@
-gnome-settings-daemon (3.6.1-0ubuntu1) UNRELEASED; urgency=low
+gnome-settings-daemon (3.6.3-0ubuntu1) UNRELEASED; urgency=low
 
   [ Sebastien Bacher ]
   * New upstream version
@@ -17,6 +17,8 @@ gnome-settings-daemon (3.6.1-0ubuntu1) UNRELEASED; urgency=low
   * debian/patches/61_unity_use_application_indicator.patch:
     - drop the keyboard indicator code, that will need to be turned 
       into a proper indicator refactored to handle the new ibus config
+  * debian/patches/90_set_gmenus_xsettings.patch:
+    - refreshed for the new version
 
   [ Robert Ancell ]
   * New upstream release

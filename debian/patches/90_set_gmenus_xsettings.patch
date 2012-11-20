@@ -1,63 +1,62 @@
-Index: gnome-settings-daemon-3.6.1/plugins/xsettings/gsd-xsettings-manager.c
+Index: gnome-settings-daemon-3.6.3/plugins/xsettings/gsd-xsettings-manager.c
 ===================================================================
---- gnome-settings-daemon-3.6.1.orig/plugins/xsettings/gsd-xsettings-manager.c	2012-10-05 13:56:44.000000000 +0200
-+++ gnome-settings-daemon-3.6.1/plugins/xsettings/gsd-xsettings-manager.c	2012-10-26 10:19:49.671004185 +0200
-@@ -242,6 +242,10 @@
+--- gnome-settings-daemon-3.6.3.orig/plugins/xsettings/gsd-xsettings-manager.c	2012-11-07 10:08:12.000000000 +0100
++++ gnome-settings-daemon-3.6.3/plugins/xsettings/gsd-xsettings-manager.c	2012-11-20 13:26:46.306775857 +0100
+@@ -242,7 +242,9 @@
          GsdXSettingsGtk   *gtk;
  
          guint              shell_name_watch_id;
 +        guint              unity_name_watch_id;
-+
-+        gboolean           shell_running;
-+        gboolean           unity_running;
- };
+         gboolean           have_shell;
++        gboolean           have_unity;
  
- #define GSD_XSETTINGS_ERROR gsd_xsettings_error_quark ()
-@@ -686,15 +690,21 @@
+         guint              notify_idle_id;
+ };
+@@ -703,17 +705,18 @@
  }
  
  static void
 -notify_have_shell (GnomeXSettingsManager   *manager,
 -                   gboolean                 have_shell)
-+notify_have_shell (GnomeXSettingsManager *manager)
++notify_have_shell (GnomeXSettingsManager   *manager)
  {
          int i;
  
          gnome_settings_profile_start (NULL);
- 
+-        if (manager->priv->have_shell == have_shell)
+-                return;
+-        manager->priv->have_shell = have_shell;
          for (i = 0; manager->priv->managers [i]; i++) {
 -                xsettings_manager_set_int (manager->priv->managers [i], "Gtk/ShellShowsAppMenu", have_shell);
-+                /* Shell is showing appmenu if either GNOME Shell or
-+                 * Unity is running.
-+                 */
++                /* Shell is showing appmenu if either GNOME Shell or Unity is running. */
 +                xsettings_manager_set_int (manager->priv->managers [i], "Gtk/ShellShowsAppMenu",
-+                                           manager->priv->shell_running || manager->priv->unity_running);
++                                           manager->priv->have_shell || manager->priv->have_unity);
 +                /* Shell is showing menubar *only* if Unity runs */
 +                xsettings_manager_set_int (manager->priv->managers [i], "Gtk/ShellShowsMenubar",
-+                                           manager->priv->unity_running);
-                 xsettings_manager_notify (manager->priv->managers [i]);
++                                           manager->priv->have_unity);
          }
+         queue_notify (manager);
          gnome_settings_profile_end (NULL);
-@@ -706,7 +716,10 @@
+@@ -725,7 +728,10 @@
                     const gchar     *name_owner,
                     gpointer         user_data)
  {
 -        notify_have_shell (user_data, TRUE);
 +        GnomeXSettingsManager *manager = user_data;
 +
-+        manager->priv->shell_running = TRUE;
++        manager->priv->have_shell = TRUE;
 +        notify_have_shell (manager);
  }
  
  static void
-@@ -714,7 +727,33 @@
+@@ -733,7 +739,33 @@
                        const gchar     *name,
                        gpointer         user_data)
  {
 -        notify_have_shell (user_data, FALSE);
 +        GnomeXSettingsManager *manager = user_data;
 +
-+        manager->priv->shell_running = FALSE;
++        manager->priv->have_shell = FALSE;
 +        notify_have_shell (manager);
 +}
 +
@@ -69,7 +68,7 @@ Index: gnome-settings-daemon-3.6.1/plugins/xsettings/gsd-xsettings-manager.c
 +{
 +        GnomeXSettingsManager *manager = user_data;
 +
-+        manager->priv->unity_running = TRUE;
++        manager->priv->have_unity = TRUE;
 +        notify_have_shell (manager);
 +}
 +
@@ -80,28 +79,50 @@ Index: gnome-settings-daemon-3.6.1/plugins/xsettings/gsd-xsettings-manager.c
 +{
 +        GnomeXSettingsManager *manager = user_data;
 +
-+        manager->priv->unity_running = FALSE;
++        manager->priv->have_unity = FALSE;
 +        notify_have_shell (manager);
  }
  
  static void
-@@ -911,6 +950,15 @@
-                                                                manager,
+@@ -856,7 +888,7 @@
+ static void
+ start_shell_monitor (GnomeXSettingsManager *manager)
+ {
+-        notify_have_shell (manager, TRUE);
++        notify_have_shell (manager);
+         manager->priv->have_shell = TRUE;
+         manager->priv->shell_name_watch_id = g_bus_watch_name (G_BUS_TYPE_SESSION,
+                                                                "org.gnome.Shell",
+@@ -867,6 +899,20 @@
                                                                 NULL);
+ }
  
-+        /* Unity flag */
-+        manager->priv->unity_name_watch_id = g_bus_watch_name (G_BUS_TYPE_SESSION,
++static void
++start_unity_monitor (GnomeXSettingsManager *manager)
++{
++        notify_have_shell (manager);
++        manager->priv->have_unity = TRUE;
++        manager->priv->shell_name_watch_id = g_bus_watch_name (G_BUS_TYPE_SESSION,
 +                                                               "com.canonical.AppMenu.Registrar",
 +                                                               0,
 +                                                               on_unity_appeared,
 +                                                               on_unity_disappeared,
 +                                                               manager,
 +                                                               NULL);
++}
 +
+ gboolean
+ gnome_xsettings_manager_start (GnomeXSettingsManager *manager,
+                                GError               **error)
+@@ -933,6 +979,7 @@
+         start_fontconfig_monitor (manager);
+ 
+         start_shell_monitor (manager);
++        start_unity_monitor (manager);
+ 
          for (i = 0; manager->priv->managers [i]; i++)
                  xsettings_manager_set_string (manager->priv->managers [i],
-                                               "Net/FallbackIconTheme",
-@@ -955,6 +1003,9 @@
+@@ -978,6 +1025,9 @@
          if (manager->priv->shell_name_watch_id > 0)
                  g_bus_unwatch_name (manager->priv->shell_name_watch_id);
  
