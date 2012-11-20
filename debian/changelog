@@ -2,8 +2,6 @@ gnome-settings-daemon (3.6.3-0ubuntu1) UNRELEASED; urgency=low
 
   [ Sebastien Bacher ]
   * New upstream version
-  * debian/control.in:
-    - Build-Depends on libibus-1.0-dev (>= 1.4.99)
   * debian/patches/git*,
     debian/patches/power-ignore-bad-dbus-requests.patch,
     debian/patches/power-ignore-bad-dbus-requests.patch,
@@ -19,6 +17,8 @@ gnome-settings-daemon (3.6.3-0ubuntu1) UNRELEASED; urgency=low
       into a proper indicator refactored to handle the new ibus config
   * debian/patches/90_set_gmenus_xsettings.patch:
     - refreshed for the new version
+  * debian/rules: 
+    - disable ibus support, we want to avoid ibus 1.5 in the first iteration
 
   [ Robert Ancell ]
   * New upstream release
