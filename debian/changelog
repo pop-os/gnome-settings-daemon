@@ -15,7 +15,8 @@ gnome-settings-daemon (3.6.1-0ubuntu1) UNRELEASED; urgency=low
     - dropped, that was a workaround for libreoffice that shouldn't be
       needed and we should better fix libreoffice
   * debian/patches/61_unity_use_application_indicator.patch:
-    - commented out, that needs porting or to be rewritten for ibus
+    - drop the keyboard indicator code, that will need to be turned 
+      into a proper indicator refactored to handle the new ibus config
 
   [ Robert Ancell ]
   * New upstream release
