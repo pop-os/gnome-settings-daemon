@@ -12,10 +12,10 @@
 63_unity_start_mounter.patch
 64_restore_terminal_keyboard_shortcut_schema.patch
 90_set_gmenus_xsettings.patch
-#sync_keyboard_layout_to_accountsservice.patch
 disable_three_touch_tap.patch
 revert_git_datetime_dropping.patch
 bugzilla_segfault_dpms.patch
 correct_logout_action.patch
 power-no-fallback-notifications.patch
 power-check-null-devices.patch
+revert_new_ibus_use.patch

@@ -7,6 +7,9 @@ gnome-settings-daemon (3.6.3-0ubuntu1) UNRELEASED; urgency=low
     debian/patches/power-ignore-bad-dbus-requests.patch,
     debian/patches/10_smaller_syndaemon_timeout.patch: 
     - dropped, those fixes are in the new version
+  * debian/control.in:
+    - restore build-depends on libgnomekbd-dev, libxklavier-dev,
+      drop the build-depends on libxkbfile-dev
   * debian/patches/20_migrate_background_uri.patch:
     - dropped, it was only needed until the LTS
   * debian/patches/40_xres_lcddefault.patch:
@@ -17,8 +20,10 @@ gnome-settings-daemon (3.6.3-0ubuntu1) UNRELEASED; urgency=low
       into a proper indicator refactored to handle the new ibus config
   * debian/patches/90_set_gmenus_xsettings.patch:
     - refreshed for the new version
-  * debian/rules: 
-    - disable ibus support, we want to avoid ibus 1.5 in the first iteration
+  * debian/patches/revert_new_ibus_use.patch:
+    - revert keyboard code to our 3.4 version
+  * debian/patches/sync_keyboard_layout_to_accountsservice.patch:
+    - dropped, the changes are included in the previous patch
 
   [ Robert Ancell ]
   * New upstream release
@@ -42,7 +47,7 @@ gnome-settings-daemon (3.6.3-0ubuntu1) UNRELEASED; urgency=low
   * Re-add BDs on libgnomekbd-dev & libxklavier-dev for above revert. 
   * Remove gstreamer BDs which are now obsolete. 
 
- -- Jeremy Bicha <jbicha@ubuntu.com>  Mon, 05 Nov 2012 19:45:39 -0500
+ -- Sebastien Bacher <seb128@ubuntu.com>  Wed, 21 Nov 2012 16:30:49 +0100
 
 gnome-settings-daemon (3.4.2-0ubuntu14) quantal; urgency=low
 
