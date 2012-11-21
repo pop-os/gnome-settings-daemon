@@ -25,7 +25,6 @@ Build-Depends: cdbs,
                libxext-dev,
                libx11-dev,
                libxtst-dev,
-               libxkbfile-dev,
                gsettings-desktop-schemas-dev (>= 3.5.90),
                libgnome-desktop-3-dev (>= 3.5.3),
                libpulse-dev (>= 0.9.16),
@@ -42,8 +41,7 @@ Build-Depends: cdbs,
                libwacom-dev (>= 0.6),
                xserver-xorg-input-wacom,
                libgnomekbd-dev (>= 3.5.1),
-               libxklavier-dev,
-               libibus-1.0-dev (>= 1.4.99)
+               libxklavier-dev
 Standards-Version: 3.9.1
 Vcs-Bzr: https://code.launchpad.net/~ubuntu-desktop/gnome-settings-daemon/ubuntu
 
