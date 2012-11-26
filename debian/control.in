@@ -37,7 +37,6 @@ Build-Depends: cdbs,
                libnss3-dev,
                libwacom-dev (>= 0.6) [!hurd-any !kfreebsd-any !s390 !s390x],
                xserver-xorg-input-wacom [!hurd-any !kfreebsd-any !s390 !s390x],
-               libibus-1.0-dev (>= 1.4.99),
                xsltproc,
                docbook-xsl,
                docbook-xsl-doc-html

@@ -1,6 +1,10 @@
 gnome-settings-daemon (3.6.1-2) UNRELEASED; urgency=low
 
+  [ Frederic Peters ]
   * debian/control.in: bump {build-,}dependency on gsettings-desktop-schemas.
+
+  [ Aron Xu ]
+  * debian/control.in debian/rules: disable ibus integration (Closes: #694301).
 
  -- Frederic Peters <fpeters@debian.org>  Mon, 15 Oct 2012 14:45:04 +0200
 
