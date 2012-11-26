@@ -6,6 +6,7 @@
 48_register_client_before_idle_callbacks.patch
 51_lock_screen_on_suspend.patch
 52_sync_background_to_accountsservice.patch
+53_update_schemas_warning.patch
 60_unity_hide_status_icon.patch
 61_unity_use_application_indicator.patch
 62_unity_disable_gsd_printer.patch

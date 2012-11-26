@@ -1,0 +1,15 @@
+# Description: don't list the updates schemas, we don't build that option on Ubuntu
+# Ubuntu: https://launchpad.net/bugs/1082986
+# Upstream: https://bugzilla.gnome.org/show_bug.cgi?id=689086
+Index: gnome-settings-daemon-3.6.3/data/org.gnome.settings-daemon.plugins.gschema.xml.in.in
+===================================================================
+--- gnome-settings-daemon-3.6.3.orig/data/org.gnome.settings-daemon.plugins.gschema.xml.in.in	2012-11-14 13:19:27.000000000 +0100
++++ gnome-settings-daemon-3.6.3/data/org.gnome.settings-daemon.plugins.gschema.xml.in.in	2012-11-26 16:22:07.564494178 +0100
+@@ -17,7 +17,6 @@
+     <child name="print-notifications" schema="org.gnome.settings-daemon.plugins.print-notifications"/>
+     <child name="smartcard" schema="org.gnome.settings-daemon.plugins.smartcard"/>
+     <child name="sound" schema="org.gnome.settings-daemon.plugins.sound"/>
+-    <child name="updates" schema="org.gnome.settings-daemon.plugins.updates"/>
+     <child name="xrandr" schema="org.gnome.settings-daemon.plugins.xrandr"/>
+     <child name="xsettings" schema="org.gnome.settings-daemon.plugins.xsettings"/>
+   </schema>
