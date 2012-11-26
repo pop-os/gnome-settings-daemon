@@ -1,10 +1,10 @@
 Description: Use synchronous notifications when they are supported
 Author: ?
 Upstream: that's Ubuntu specific (notify-osd)
-Index: gnome-settings-daemon-3.6.1/plugins/media-keys/gsd-media-keys-manager.c
+Index: gnome-settings-daemon-3.6.3/plugins/media-keys/gsd-media-keys-manager.c
 ===================================================================
---- gnome-settings-daemon-3.6.1.orig/plugins/media-keys/gsd-media-keys-manager.c	2012-10-05 13:56:44.000000000 +0200
-+++ gnome-settings-daemon-3.6.1/plugins/media-keys/gsd-media-keys-manager.c	2012-10-26 10:20:14.999005411 +0200
+--- gnome-settings-daemon-3.6.3.orig/plugins/media-keys/gsd-media-keys-manager.c	2012-11-14 13:19:28.000000000 +0100
++++ gnome-settings-daemon-3.6.3/plugins/media-keys/gsd-media-keys-manager.c	2012-11-26 16:06:37.308449155 +0100
 @@ -58,6 +58,8 @@
  #include <pulse/pulseaudio.h>
  #include "gvc-mixer-control.h"
@@ -261,14 +261,16 @@ Index: gnome-settings-daemon-3.6.1/plugins/media-keys/gsd-media-keys-manager.c
          return gsd_media_player_key_pressed (manager, key);
  }
  
-@@ -1652,6 +1800,7 @@
+@@ -1652,7 +1800,8 @@
          GError *error = NULL;
          guint percentage;
          GVariant *new_percentage;
+-        GsdMediaKeysManager *manager = GSD_MEDIA_KEYS_MANAGER (user_data);
 +        GsdBrightnessActionData *data = (GsdBrightnessActionData *) user_data;
-         GsdMediaKeysManager *manager = GSD_MEDIA_KEYS_MANAGER (user_data);
++        GsdMediaKeysManager *manager = data->manager;
  
          new_percentage = g_dbus_proxy_call_finish (G_DBUS_PROXY (source_object),
+                                                    res, &error);
 @@ -1660,22 +1809,68 @@
                  g_warning ("Failed to set new screen percentage: %s",
                             error->message);
@@ -452,11 +454,11 @@ Index: gnome-settings-daemon-3.6.1/plugins/media-keys/gsd-media-keys-manager.c
          if (priv->keys != NULL) {
                  gdk_error_trap_push ();
                  for (i = 0; i < priv->keys->len; ++i) {
-Index: gnome-settings-daemon-3.6.1/configure.ac
+Index: gnome-settings-daemon-3.6.3/configure.ac
 ===================================================================
---- gnome-settings-daemon-3.6.1.orig/configure.ac	2012-10-08 17:58:17.000000000 +0200
-+++ gnome-settings-daemon-3.6.1/configure.ac	2012-10-26 10:20:06.935005019 +0200
-@@ -202,7 +202,7 @@
+--- gnome-settings-daemon-3.6.3.orig/configure.ac	2012-11-14 13:44:32.000000000 +0100
++++ gnome-settings-daemon-3.6.3/configure.ac	2012-11-26 16:06:17.216448183 +0100
+@@ -203,7 +203,7 @@
  dnl - media-keys plugin stuff
  dnl ---------------------------------------------------------------------------
  

@@ -1,3 +1,10 @@
+gnome-settings-daemon (3.6.3-0ubuntu2) UNRELEASED; urgency=low
+
+  * debian/patches/16_use_synchronous_notifications.patch:
+    - don't segfault when using the screen hotkey (lp: #1082856)
+
+ -- Sebastien Bacher <seb128@ubuntu.com>  Mon, 26 Nov 2012 16:07:36 +0100
+
 gnome-settings-daemon (3.6.3-0ubuntu1) raring; urgency=low
 
   [ Sebastien Bacher ]
