@@ -1,4 +1,4 @@
-gnome-settings-daemon (3.6.3-0ubuntu3) UNRELEASED; urgency=low
+gnome-settings-daemon (3.6.3-0ubuntu3) raring; urgency=low
 
   * debian/control.in: 
     - Pre-Depends: ${misc:Pre-Depends}
@@ -8,7 +8,7 @@ gnome-settings-daemon (3.6.3-0ubuntu3) UNRELEASED; urgency=low
   * debian/gnome-settings-daemon.postinst:
     - clean old "/etc/gnome/config" xrdb conffiles
 
- -- Sebastien Bacher <seb128@ubuntu.com>  Thu, 06 Dec 2012 18:43:48 +0100
+ -- Sebastien Bacher <seb128@ubuntu.com>  Thu, 06 Dec 2012 19:31:20 +0100
 
 gnome-settings-daemon (3.6.3-0ubuntu2) raring; urgency=low
 
