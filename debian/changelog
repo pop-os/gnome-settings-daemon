@@ -1,3 +1,15 @@
+gnome-settings-daemon (3.6.3-0ubuntu3) UNRELEASED; urgency=low
+
+  * debian/control.in: 
+    - Pre-Depends: ${misc:Pre-Depends}
+  * debian/compat, debian/control.in:
+    - updated debhelper version
+  * debian/gnome-settings-daemon.maintscript:
+  * debian/gnome-settings-daemon.postinst:
+    - clean old "/etc/gnome/config" xrdb conffiles
+
+ -- Sebastien Bacher <seb128@ubuntu.com>  Thu, 06 Dec 2012 18:43:48 +0100
+
 gnome-settings-daemon (3.6.3-0ubuntu2) raring; urgency=low
 
   * debian/patches/16_use_synchronous_notifications.patch:
