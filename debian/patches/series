@@ -3,7 +3,6 @@
 03_print_async.patch
 04_superP.patch
 10_smaller_syndaemon_timeout.patch
-11_numlock_loop.patch
 power-check-null-devices.patch
 power-ignore-bad-dbus-requests.patch
 revert_git_datetime_dropping.patch

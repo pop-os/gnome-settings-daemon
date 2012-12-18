@@ -1,3 +1,14 @@
+gnome-settings-daemon (3.4.2+git20121218.7c1322-3) UNRELEASED; urgency=low
+
+  * New upstream git snapshot from the 3.4 branch.
+    + Fix a pair of crashers.
+    + Better fix for the keyboard infinite loop bug.
+    + Cleanup in print notifications.
+    + Translation updates.
+  * 11_numlock_loop.patch: dropped accordingly.
+
+ -- Josselin Mouette <joss@debian.org>  Tue, 18 Dec 2012 17:50:06 +0100
+
 gnome-settings-daemon (3.4.2+git20120925.a4c817-2) unstable; urgency=low
 
   * Pull upstream fixes for the print-notifications plugin:
