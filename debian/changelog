@@ -1,3 +1,11 @@
+gnome-settings-daemon (3.6.3-0ubuntu4) UNRELEASED; urgency=low
+
+  * debian/patches/migrate_metacity_keys.patch:
+    - Migrate screenshot/terminal keys from metacity gconf as well
+      (LP: #1058004)
+
+ -- Timo Jyrinki <timo-jyrinki@ubuntu.com>  Thu, 13 Dec 2012 08:49:24 +0200
+
 gnome-settings-daemon (3.6.3-0ubuntu3) raring; urgency=low
 
   * debian/control.in: 

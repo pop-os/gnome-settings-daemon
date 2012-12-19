@@ -20,3 +20,4 @@ correct_logout_action.patch
 power-no-fallback-notifications.patch
 power-check-null-devices.patch
 revert_new_ibus_use.patch
+migrate_metacity_keys.patch
