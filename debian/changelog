@@ -1,4 +1,4 @@
-gnome-settings-daemon (3.4.2+git20121218.7c1322-3) UNRELEASED; urgency=low
+gnome-settings-daemon (3.4.2+git20121218.7c1322-1) unstable; urgency=low
 
   * New upstream git snapshot from the 3.4 branch.
     + Fix a pair of crashers.
@@ -7,7 +7,7 @@ gnome-settings-daemon (3.4.2+git20121218.7c1322-3) UNRELEASED; urgency=low
     + Translation updates.
   * 11_numlock_loop.patch: dropped accordingly.
 
- -- Josselin Mouette <joss@debian.org>  Tue, 18 Dec 2012 17:50:06 +0100
+ -- Josselin Mouette <joss@debian.org>  Wed, 19 Dec 2012 23:23:04 +0100
 
 gnome-settings-daemon (3.4.2+git20120925.a4c817-2) unstable; urgency=low
 
