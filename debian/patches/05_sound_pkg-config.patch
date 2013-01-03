@@ -1,0 +1,45 @@
+From 73257c3f58e1aa5ac7487ecdf7bbe911a797a31e Mon Sep 17 00:00:00 2001
+From: Bastien Nocera <hadess@hadess.net>
+Date: Mon, 02 Jul 2012 14:05:02 +0000
+Subject: sound: Add pkg-config check for sound plugin's requirements
+
+---
+Index: gnome-settings-daemon-3.4.2+git20121218.7c1322/configure.ac
+===================================================================
+--- gnome-settings-daemon-3.4.2+git20121218.7c1322.orig/configure.ac	2013-01-03 12:13:45.000000000 +0100
++++ gnome-settings-daemon-3.4.2+git20121218.7c1322/configure.ac	2013-01-03 12:16:29.933202542 +0100
+@@ -292,6 +292,12 @@ dnl ====================================
+ dnl power section
+ dnl ==============================================
+ 
++dnl ---------------------------------------------------------------------------
++dnl - sound plugin stuff
++dnl ---------------------------------------------------------------------------
++
++PKG_CHECK_MODULES(SOUND, [libpulse >= $PA_REQUIRED_VERSION $GUDEV_PKG libpulse-mainloop-glib >= $PA_REQUIRED_VERSION])
++
+ # ---------------------------------------------------------------------------
+ # UPower
+ # ---------------------------------------------------------------------------
+Index: gnome-settings-daemon-3.4.2+git20121218.7c1322/plugins/sound/Makefile.am
+===================================================================
+--- gnome-settings-daemon-3.4.2+git20121218.7c1322.orig/plugins/sound/Makefile.am	2012-09-29 15:11:23.000000000 +0200
++++ gnome-settings-daemon-3.4.2+git20121218.7c1322/plugins/sound/Makefile.am	2013-01-03 12:18:09.393666563 +0100
+@@ -18,7 +18,7 @@ libsound_la_CFLAGS = \
+ 	$(PLUGIN_CFLAGS)		\
+ 	$(SETTINGS_PLUGIN_CFLAGS) \
+ 	$(GNOME_CFLAGS)	\
+-	$(PULSE_CFLAGS)	\
++	$(SOUND_CFLAGS)	\
+ 	$(AM_CFLAGS)
+ 
+ libsound_la_LDFLAGS = \
+@@ -26,7 +26,7 @@ libsound_la_LDFLAGS = \
+ 
+ libsound_la_LIBADD = \
+ 	$(SETTINGS_PLUGIN_LIBS)	\
+-	$(PULSE_LIBS)
++	$(SOUND_LIBS)
+ 
+ plugin_in_files = \
+ 	sound.gnome-settings-plugin.in

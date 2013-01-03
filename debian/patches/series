@@ -2,6 +2,7 @@
 02_print_init.patch
 03_print_async.patch
 04_superP.patch
+05_sound_pkg-config.patch
 10_smaller_syndaemon_timeout.patch
 power-check-null-devices.patch
 power-ignore-bad-dbus-requests.patch

@@ -1,3 +1,10 @@
+gnome-settings-daemon (3.4.2+git20121218.7c1322-2) UNRELEASED; urgency=low
+
+  * 05_sound_pkg-config.patch: backported from 3.6. Correctly link the 
+    sound plugin to libpulse.
+
+ -- Josselin Mouette <joss@debian.org>  Thu, 03 Jan 2013 12:18:24 +0100
+
 gnome-settings-daemon (3.4.2+git20121218.7c1322-1) unstable; urgency=low
 
   * New upstream git snapshot from the 3.4 branch.
