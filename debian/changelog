@@ -1,4 +1,4 @@
-gnome-settings-daemon (3.6.4-0ubuntu1) UNRELEASED; urgency=low
+gnome-settings-daemon (3.6.4-0ubuntu1) raring; urgency=low
 
   * New upstream version
   * debian/patches/53_update_schemas_warning.patch:
@@ -7,7 +7,7 @@ gnome-settings-daemon (3.6.4-0ubuntu1) UNRELEASED; urgency=low
     - dropped the part of the patch which is included in the new tarball
   * debian/patches/revert_new_ibus_use.patch: refreshed
 
- -- Sebastien Bacher <seb128@ubuntu.com>  Wed, 23 Jan 2013 12:07:18 +0100
+ -- Sebastien Bacher <seb128@ubuntu.com>  Wed, 23 Jan 2013 15:12:37 +0100
 
 gnome-settings-daemon (3.6.3-0ubuntu4) raring; urgency=low
 
