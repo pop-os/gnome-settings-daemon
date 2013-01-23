@@ -1,32 +1,10 @@
-#upstream: https://bugzilla.gnome.org/show_bug.cgi?id=672245
+# Comment: can be dropped when updating to 3.8
+# Upstream: https://bugzilla.gnome.org/show_bug.cgi?id=672245
+#
 Index: gnome-settings-daemon-3.6.1/plugins/power/gsd-power-manager.c
 ===================================================================
 --- gnome-settings-daemon-3.6.1.orig/plugins/power/gsd-power-manager.c	2012-10-26 10:19:49.591004180 +0200
 +++ gnome-settings-daemon-3.6.1/plugins/power/gsd-power-manager.c	2012-10-26 10:20:03.975004876 +0200
-@@ -3655,6 +3655,11 @@
-         g_debug ("Starting power manager");
-         gnome_settings_profile_start (NULL);
- 
-+        /* coldplug the list of screens */
-+        manager->priv->x11_screen = gnome_rr_screen_new (gdk_screen_get_default (), error);
-+        if (manager->priv->x11_screen == NULL)
-+                return FALSE;
-+
-         /* track the active session */
-         manager->priv->session = gnome_settings_session_new ();
-         g_signal_connect (manager->priv->session, "notify::state",
-@@ -3783,11 +3788,6 @@
-         g_signal_connect (manager->priv->idletime, "alarm-expired",
-                           G_CALLBACK (idle_idletime_alarm_expired_cb), manager);
- 
--        /* coldplug the list of screens */
--        manager->priv->x11_screen = gnome_rr_screen_new (gdk_screen_get_default (), error);
--        if (manager->priv->x11_screen == NULL)
--                return FALSE;
--
-         /* ensure the default dpms timeouts are cleared */
-         ret = gnome_rr_screen_set_dpms_mode (manager->priv->x11_screen,
-                                              GNOME_RR_DPMS_ON,
 @@ -3852,6 +3852,12 @@
                  g_source_remove (manager->priv->critical_alert_timeout_id);
                  manager->priv->critical_alert_timeout_id = 0;

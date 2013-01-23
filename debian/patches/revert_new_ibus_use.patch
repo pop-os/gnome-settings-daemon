@@ -1,7 +1,85 @@
-Index: gnome-settings-daemon-3.6.3/plugins/keyboard/delayed-dialog.c
-===================================================================
---- /dev/null	1970-01-01 00:00:00.000000000 +0000
-+++ gnome-settings-daemon-3.6.3/plugins/keyboard/delayed-dialog.c	2012-11-21 15:34:51.582366929 +0100
+diff --exclude .pc -Nur gnome-settings-daemon-3.6.4/configure.ac gnome-settings-daemon-3.6.4.new/configure.ac
+--- gnome-settings-daemon-3.6.4/configure.ac	2013-01-23 12:31:33.000000000 +0100
++++ gnome-settings-daemon-3.6.4.new/configure.ac	2013-01-23 12:35:14.091161343 +0100
+@@ -54,7 +54,6 @@
+ LIBWACOM_REQUIRED_VERSION=0.6
+ UPOWER_REQUIRED_VERSION=0.9.11
+ APPINDICATOR_REQUIRED_VERSION=0.3.0
+-IBUS_REQUIRED_VERSION=1.4.99
+ 
+ EXTRA_COMPILE_WARNINGS(yes)
+ 
+@@ -222,21 +221,8 @@
+ dnl - Keyboard plugin stuff
+ dnl ---------------------------------------------------------------------------
+ 
+-AC_ARG_ENABLE(ibus,
+-        AS_HELP_STRING([--disable-ibus],
+-                       [Disable IBus support]),
+-        enable_ibus=$enableval,
+-        enable_ibus=yes)
+-
+-if test "x$enable_ibus" = "xyes" ; then
+-        IBUS_MODULE="ibus-1.0 >= $IBUS_REQUIRED_VERSION"
+-        AC_DEFINE(HAVE_IBUS, 1, [Defined if IBus support is enabled])
+-else
+-        IBUS_MODULE=
+-fi
+-AM_CONDITIONAL(HAVE_IBUS, test "x$enable_ibus" == "xyes")
+-
+-PKG_CHECK_MODULES(KEYBOARD, xkbfile $IBUS_MODULE gnome-desktop-3.0 >= $GNOME_DESKTOP_REQUIRED_VERSION)
++LIBGNOMEKBD_REQUIRED=2.91.1
++PKG_CHECK_MODULES(KEYBOARD, [libgnomekbdui >= $LIBGNOMEKBD_REQUIRED libgnomekbd >= $LIBGNOMEKBD_REQUIRED libxklavier >= 5.0 kbproto])
+ 
+ dnl ---------------------------------------------------------------------------
+ dnl - Housekeeping plugin stuff
+@@ -652,7 +638,6 @@
+         PolicyKit support:        ${HAVE_POLKIT}
+         Session tracking:         ${SESSION_TRACKING}
+         LCMS DICT support:        ${have_new_lcms}
+-        IBus support:             ${enable_ibus}
+         Libnotify support:        ${have_libnotify}
+ 	App indicator support:    ${enable_appindicator}
+         PackageKit support:       ${have_packagekit}
+diff --exclude .pc -Nur gnome-settings-daemon-3.6.4/data/Makefile.am gnome-settings-daemon-3.6.4.new/data/Makefile.am
+--- gnome-settings-daemon-3.6.4/data/Makefile.am	2012-12-20 19:32:01.000000000 +0100
++++ gnome-settings-daemon-3.6.4.new/data/Makefile.am	2013-01-23 12:35:14.091161343 +0100
+@@ -67,12 +67,3 @@
+ 	Makefile.in			\
+ 	$(gsettings_SCHEMAS:.xml=.valid)
+ 
+-if HAVE_IBUS
+-dbusservicedir=${datadir}/dbus-1/services
+-dbusservice_DATA = $(dbusservice_in_files:.service.in=.service)
+-
+-org.freedesktop.IBus.service: org.freedesktop.IBus.service.in
+-	$(AM_V_GEN) sed -e "s|\@bindir\@|$(bindir)|" $< > $@.tmp && mv $@.tmp $@
+-
+-CLEANFILES = $(dbusservice_DATA)
+-endif
+diff --exclude .pc -Nur gnome-settings-daemon-3.6.4/data/org.gnome.settings-daemon.plugins.media-keys.gschema.xml.in.in gnome-settings-daemon-3.6.4.new/data/org.gnome.settings-daemon.plugins.media-keys.gschema.xml.in.in
+--- gnome-settings-daemon-3.6.4/data/org.gnome.settings-daemon.plugins.media-keys.gschema.xml.in.in	2013-01-23 12:31:33.667154707 +0100
++++ gnome-settings-daemon-3.6.4.new/data/org.gnome.settings-daemon.plugins.media-keys.gschema.xml.in.in	2013-01-23 12:35:14.087161343 +0100
+@@ -180,16 +180,6 @@
+       <_summary>Magnifier zoom out</_summary>
+       <_description>Binding for the magnifier to zoom out</_description>
+     </key>
+-    <key name="switch-input-source" type="s">
+-      <default>''</default>
+-      <_summary>Switch input source</_summary>
+-      <_description>Binding to select the next input source</_description>
+-    </key>
+-    <key name="switch-input-source-backward" type="s">
+-      <default>''</default>
+-      <_summary>Switch input source backward</_summary>
+-      <_description>Binding to select the previous input source</_description>
+-    </key>
+   </schema>
+ 
+   <schema gettext-domain="@GETTEXT_PACKAGE@" id="org.gnome.settings-daemon.plugins.media-keys.custom-keybinding">
+diff --exclude .pc -Nur gnome-settings-daemon-3.6.4/plugins/keyboard/delayed-dialog.c gnome-settings-daemon-3.6.4.new/plugins/keyboard/delayed-dialog.c
+--- gnome-settings-daemon-3.6.4/plugins/keyboard/delayed-dialog.c	1970-01-01 01:00:00.000000000 +0100
++++ gnome-settings-daemon-3.6.4.new/plugins/keyboard/delayed-dialog.c	2013-01-23 12:35:14.071161343 +0100
 @@ -0,0 +1,128 @@
 +/*
 + * Copyright © 2006 Novell, Inc.
@@ -131,10 +209,9 @@ Index: gnome-settings-daemon-3.6.3/plugins/keyboard/delayed-dialog.c
 +
 +        return GDK_FILTER_CONTINUE;
 +}
-Index: gnome-settings-daemon-3.6.3/plugins/keyboard/delayed-dialog.h
-===================================================================
---- /dev/null	1970-01-01 00:00:00.000000000 +0000
-+++ gnome-settings-daemon-3.6.3/plugins/keyboard/delayed-dialog.h	2012-11-21 15:34:51.582366929 +0100
+diff --exclude .pc -Nur gnome-settings-daemon-3.6.4/plugins/keyboard/delayed-dialog.h gnome-settings-daemon-3.6.4.new/plugins/keyboard/delayed-dialog.h
+--- gnome-settings-daemon-3.6.4/plugins/keyboard/delayed-dialog.h	1970-01-01 01:00:00.000000000 +0100
++++ gnome-settings-daemon-3.6.4.new/plugins/keyboard/delayed-dialog.h	2013-01-23 12:35:14.071161343 +0100
 @@ -0,0 +1,32 @@
 +/*
 + * Copyright © 2006 Novell, Inc.
@@ -168,10 +245,9 @@ Index: gnome-settings-daemon-3.6.3/plugins/keyboard/delayed-dialog.h
 +G_END_DECLS
 +
 +#endif
-Index: gnome-settings-daemon-3.6.3/plugins/keyboard/gkbd-configuration.c
-===================================================================
---- /dev/null	1970-01-01 00:00:00.000000000 +0000
-+++ gnome-settings-daemon-3.6.3/plugins/keyboard/gkbd-configuration.c	2012-11-21 15:34:51.586366929 +0100
+diff --exclude .pc -Nur gnome-settings-daemon-3.6.4/plugins/keyboard/gkbd-configuration.c gnome-settings-daemon-3.6.4.new/plugins/keyboard/gkbd-configuration.c
+--- gnome-settings-daemon-3.6.4/plugins/keyboard/gkbd-configuration.c	1970-01-01 01:00:00.000000000 +0100
++++ gnome-settings-daemon-3.6.4.new/plugins/keyboard/gkbd-configuration.c	2013-01-23 12:35:14.071161343 +0100
 @@ -0,0 +1,350 @@
 +/*
 + * Copyright (C) 2010 Canonical Ltd.
@@ -523,10 +599,9 @@ Index: gnome-settings-daemon-3.6.3/plugins/keyboard/gkbd-configuration.c
 +{
 +	return configuration->priv->short_group_names;
 +}
-Index: gnome-settings-daemon-3.6.3/plugins/keyboard/gkbd-configuration.h
-===================================================================
---- /dev/null	1970-01-01 00:00:00.000000000 +0000
-+++ gnome-settings-daemon-3.6.3/plugins/keyboard/gkbd-configuration.h	2012-11-21 15:34:51.586366929 +0100
+diff --exclude .pc -Nur gnome-settings-daemon-3.6.4/plugins/keyboard/gkbd-configuration.h gnome-settings-daemon-3.6.4.new/plugins/keyboard/gkbd-configuration.h
+--- gnome-settings-daemon-3.6.4/plugins/keyboard/gkbd-configuration.h	1970-01-01 01:00:00.000000000 +0100
++++ gnome-settings-daemon-3.6.4.new/plugins/keyboard/gkbd-configuration.h	2013-01-23 12:35:14.071161343 +0100
 @@ -0,0 +1,65 @@
 +/*
 + * Copyright (C) 2010 Canonical Ltd.
@@ -593,620 +668,10 @@ Index: gnome-settings-daemon-3.6.3/plugins/keyboard/gkbd-configuration.h
 +G_END_DECLS
 +
 +#endif
-Index: gnome-settings-daemon-3.6.3/plugins/keyboard/gsd-input-sources-switcher.c
-===================================================================
---- gnome-settings-daemon-3.6.3.orig/plugins/keyboard/gsd-input-sources-switcher.c	2012-11-14 11:16:43.000000000 +0100
-+++ /dev/null	1970-01-01 00:00:00.000000000 +0000
-@@ -1,596 +0,0 @@
--/*
-- * Copyright (C) 2012 Red Hat, Inc.
-- *
-- * Written by: Rui Matos <rmatos@redhat.com>
-- *
-- * This program is free software; you can redistribute it and/or modify
-- * it under the terms of the GNU General Public License as published by
-- * the Free Software Foundation; either version 2, or (at your option)
-- * any later version.
-- *
-- * This program is distributed in the hope that it will be useful,
-- * but WITHOUT ANY WARRANTY; without even the implied warranty of
-- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-- * GNU General Public License for more details.
-- *
-- * You should have received a copy of the GNU General Public License
-- * along with this program; if not, write to the Free Software
-- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
-- * 02110-1301, USA.
-- */
--
--#include <gtk/gtk.h>
--#include <gdk/gdkkeysyms.h>
--#include <gdk/gdkx.h>
--
--#include <X11/XKBlib.h>
--
--#include "gsd-enums.h"
--#include "gsd-keygrab.h"
--
--#define GNOME_DESKTOP_INPUT_SOURCES_DIR "org.gnome.desktop.input-sources"
--#define KEY_CURRENT_INPUT_SOURCE "current"
--#define KEY_INPUT_SOURCES        "sources"
--
--#define GSD_KEYBOARD_DIR "org.gnome.settings-daemon.peripherals.keyboard"
--#define KEY_SWITCHER "input-sources-switcher"
--
--static GSettings *input_sources_settings;
--
--static Key *the_keys = NULL;
--static guint n_keys = 0;
--
--static guint master_keyboard_id = 0;
--
--static gboolean includes_caps = FALSE;
--static Time caps_press_time = 0;
--
--static void
--do_switch (void)
--{
--  GVariant *sources;
--  gint i, n;
--
--  /* FIXME: this is racy with the g-s-d media-keys plugin. Instead we
--     should have a DBus API on g-s-d and poke it from here.*/
--  sources = g_settings_get_value (input_sources_settings, KEY_INPUT_SOURCES);
--
--  n = g_variant_n_children (sources);
--  if (n < 2)
--    goto out;
--
--  i = g_settings_get_uint (input_sources_settings, KEY_CURRENT_INPUT_SOURCE) + 1;
--  if (i >= n)
--    i = 0;
--
--  g_settings_set_uint (input_sources_settings, KEY_CURRENT_INPUT_SOURCE, i);
--
-- out:
--  g_variant_unref (sources);
--}
--
--static void
--init_keys (void)
--{
--  GSettings *settings;
--
--  settings = g_settings_new (GSD_KEYBOARD_DIR);
--
--  switch (g_settings_get_enum (settings, KEY_SWITCHER))
--    {
--    case GSD_INPUT_SOURCES_SWITCHER_SHIFT_L:
--      n_keys = 1;
--      the_keys = g_new0 (Key, n_keys);
--
--      the_keys[0].keysym = GDK_KEY_Shift_L;
--      the_keys[0].state = 0;
--      break;
--
--    case GSD_INPUT_SOURCES_SWITCHER_ALT_L:
--      n_keys = 1;
--      the_keys = g_new0 (Key, n_keys);
--
--      the_keys[0].keysym = GDK_KEY_Alt_L;
--      the_keys[0].state = 0;
--      break;
--
--    case GSD_INPUT_SOURCES_SWITCHER_CTRL_L:
--      n_keys = 1;
--      the_keys = g_new0 (Key, n_keys);
--
--      the_keys[0].keysym = GDK_KEY_Control_L;
--      the_keys[0].state = 0;
--      break;
--
--    case GSD_INPUT_SOURCES_SWITCHER_SHIFT_R:
--      n_keys = 1;
--      the_keys = g_new0 (Key, n_keys);
--
--      the_keys[0].keysym = GDK_KEY_Shift_R;
--      the_keys[0].state = 0;
--      break;
--
--    case GSD_INPUT_SOURCES_SWITCHER_ALT_R:
--      n_keys = 2;
--      the_keys = g_new0 (Key, n_keys);
--
--      the_keys[0].keysym = GDK_KEY_Alt_R;
--      the_keys[0].state = 0;
--      the_keys[1].keysym = GDK_KEY_ISO_Level3_Shift;
--      the_keys[1].state = 0;
--      break;
--
--    case GSD_INPUT_SOURCES_SWITCHER_CTRL_R:
--      n_keys = 1;
--      the_keys = g_new0 (Key, n_keys);
--
--      the_keys[0].keysym = GDK_KEY_Control_R;
--      the_keys[0].state = 0;
--      break;
--
--    case GSD_INPUT_SOURCES_SWITCHER_ALT_SHIFT_L:
--      n_keys = 2;
--      the_keys = g_new0 (Key, n_keys);
--
--      the_keys[0].keysym = GDK_KEY_Shift_L;
--      the_keys[0].state = GDK_MOD1_MASK;
--      the_keys[1].keysym = GDK_KEY_Alt_L;
--      the_keys[1].state = GDK_SHIFT_MASK;
--      break;
--
--    case GSD_INPUT_SOURCES_SWITCHER_ALT_SHIFT_R:
--      n_keys = 4;
--      the_keys = g_new0 (Key, n_keys);
--
--      the_keys[0].keysym = GDK_KEY_Shift_R;
--      the_keys[0].state = GDK_MOD1_MASK;
--      the_keys[1].keysym = GDK_KEY_Alt_R;
--      the_keys[1].state = GDK_SHIFT_MASK;
--      the_keys[2].keysym = GDK_KEY_Shift_R;
--      the_keys[2].state = GDK_MOD5_MASK;
--      the_keys[3].keysym = GDK_KEY_ISO_Level3_Shift;
--      the_keys[3].state = GDK_SHIFT_MASK;
--      break;
--
--    case GSD_INPUT_SOURCES_SWITCHER_CTRL_SHIFT_L:
--      n_keys = 2;
--      the_keys = g_new0 (Key, n_keys);
--
--      the_keys[0].keysym = GDK_KEY_Shift_L;
--      the_keys[0].state = GDK_CONTROL_MASK;
--      the_keys[1].keysym = GDK_KEY_Control_L;
--      the_keys[1].state = GDK_SHIFT_MASK;
--      break;
--
--    case GSD_INPUT_SOURCES_SWITCHER_CTRL_SHIFT_R:
--      n_keys = 2;
--      the_keys = g_new0 (Key, n_keys);
--
--      the_keys[0].keysym = GDK_KEY_Shift_R;
--      the_keys[0].state = GDK_CONTROL_MASK;
--      the_keys[1].keysym = GDK_KEY_Control_R;
--      the_keys[1].state = GDK_SHIFT_MASK;
--      break;
--
--    case GSD_INPUT_SOURCES_SWITCHER_SHIFT_L_SHIFT_R:
--      n_keys = 2;
--      the_keys = g_new0 (Key, n_keys);
--
--      the_keys[0].keysym = GDK_KEY_Shift_L;
--      the_keys[0].state = GDK_SHIFT_MASK;
--      the_keys[1].keysym = GDK_KEY_Shift_R;
--      the_keys[1].state = GDK_SHIFT_MASK;
--      break;
--
--    case GSD_INPUT_SOURCES_SWITCHER_ALT_L_ALT_R:
--      n_keys = 4;
--      the_keys = g_new0 (Key, n_keys);
--
--      the_keys[0].keysym = GDK_KEY_Alt_L;
--      the_keys[0].state = GDK_MOD1_MASK;
--      the_keys[1].keysym = GDK_KEY_Alt_R;
--      the_keys[1].state = GDK_MOD1_MASK;
--      the_keys[2].keysym = GDK_KEY_Alt_L;
--      the_keys[2].state = GDK_MOD5_MASK;
--      the_keys[3].keysym = GDK_KEY_ISO_Level3_Shift;
--      the_keys[3].state = GDK_MOD1_MASK;
--      break;
--
--    case GSD_INPUT_SOURCES_SWITCHER_CTRL_L_CTRL_R:
--      n_keys = 2;
--      the_keys = g_new0 (Key, n_keys);
--
--      the_keys[0].keysym = GDK_KEY_Control_L;
--      the_keys[0].state = GDK_CONTROL_MASK;
--      the_keys[1].keysym = GDK_KEY_Control_R;
--      the_keys[1].state = GDK_CONTROL_MASK;
--      break;
--
--    case GSD_INPUT_SOURCES_SWITCHER_ALT_SHIFT:
--      n_keys = 7;
--      the_keys = g_new0 (Key, n_keys);
--
--      the_keys[0].keysym = GDK_KEY_Shift_L;
--      the_keys[0].state = GDK_MOD1_MASK;
--      the_keys[1].keysym = GDK_KEY_Shift_L;
--      the_keys[1].state = GDK_MOD5_MASK;
--      the_keys[2].keysym = GDK_KEY_Shift_R;
--      the_keys[2].state = GDK_MOD1_MASK;
--      the_keys[3].keysym = GDK_KEY_Shift_R;
--      the_keys[3].state = GDK_MOD5_MASK;
--      the_keys[4].keysym = GDK_KEY_Alt_L;
--      the_keys[4].state = GDK_SHIFT_MASK;
--      the_keys[5].keysym = GDK_KEY_Alt_R;
--      the_keys[5].state = GDK_SHIFT_MASK;
--      the_keys[6].keysym = GDK_KEY_ISO_Level3_Shift;
--      the_keys[6].state = GDK_SHIFT_MASK;
--      break;
--
--    case GSD_INPUT_SOURCES_SWITCHER_CTRL_SHIFT:
--      n_keys = 4;
--      the_keys = g_new0 (Key, n_keys);
--
--      the_keys[0].keysym = GDK_KEY_Shift_L;
--      the_keys[0].state = GDK_CONTROL_MASK;
--      the_keys[1].keysym = GDK_KEY_Shift_R;
--      the_keys[1].state = GDK_CONTROL_MASK;
--      the_keys[2].keysym = GDK_KEY_Control_L;
--      the_keys[2].state = GDK_SHIFT_MASK;
--      the_keys[3].keysym = GDK_KEY_Control_R;
--      the_keys[3].state = GDK_SHIFT_MASK;
--      break;
--
--    case GSD_INPUT_SOURCES_SWITCHER_ALT_CTRL:
--      n_keys = 7;
--      the_keys = g_new0 (Key, n_keys);
--
--      the_keys[0].keysym = GDK_KEY_Control_L;
--      the_keys[0].state = GDK_MOD1_MASK;
--      the_keys[1].keysym = GDK_KEY_Control_L;
--      the_keys[1].state = GDK_MOD5_MASK;
--      the_keys[2].keysym = GDK_KEY_Control_R;
--      the_keys[2].state = GDK_MOD1_MASK;
--      the_keys[3].keysym = GDK_KEY_Control_R;
--      the_keys[3].state = GDK_MOD5_MASK;
--      the_keys[4].keysym = GDK_KEY_Alt_L;
--      the_keys[4].state = GDK_CONTROL_MASK;
--      the_keys[5].keysym = GDK_KEY_Alt_R;
--      the_keys[5].state = GDK_CONTROL_MASK;
--      the_keys[6].keysym = GDK_KEY_ISO_Level3_Shift;
--      the_keys[6].state = GDK_CONTROL_MASK;
--      break;
--
--    case GSD_INPUT_SOURCES_SWITCHER_CAPS:
--      includes_caps = TRUE;
--      n_keys = 1;
--      the_keys = g_new0 (Key, n_keys);
--
--      the_keys[0].keysym = GDK_KEY_Caps_Lock;
--      the_keys[0].state = 0;
--      break;
--
--    case GSD_INPUT_SOURCES_SWITCHER_SHIFT_CAPS:
--      includes_caps = TRUE;
--      n_keys = 3;
--      the_keys = g_new0 (Key, n_keys);
--
--      the_keys[0].keysym = GDK_KEY_Caps_Lock;
--      the_keys[0].state = GDK_SHIFT_MASK;
--      the_keys[1].keysym = GDK_KEY_Shift_L;
--      the_keys[1].state = GDK_LOCK_MASK;
--      the_keys[2].keysym = GDK_KEY_Shift_R;
--      the_keys[2].state = GDK_LOCK_MASK;
--      break;
--
--    case GSD_INPUT_SOURCES_SWITCHER_ALT_CAPS:
--      includes_caps = TRUE;
--      n_keys = 5;
--      the_keys = g_new0 (Key, n_keys);
--
--      the_keys[0].keysym = GDK_KEY_Caps_Lock;
--      the_keys[0].state = GDK_MOD1_MASK;
--      the_keys[1].keysym = GDK_KEY_Caps_Lock;
--      the_keys[1].state = GDK_MOD5_MASK;
--      the_keys[2].keysym = GDK_KEY_Alt_L;
--      the_keys[2].state = GDK_LOCK_MASK;
--      the_keys[3].keysym = GDK_KEY_Alt_R;
--      the_keys[3].state = GDK_LOCK_MASK;
--      the_keys[4].keysym = GDK_KEY_ISO_Level3_Shift;
--      the_keys[4].state = GDK_LOCK_MASK;
--      break;
--
--    case GSD_INPUT_SOURCES_SWITCHER_CTRL_CAPS:
--      includes_caps = TRUE;
--      n_keys = 3;
--      the_keys = g_new0 (Key, n_keys);
--
--      the_keys[0].keysym = GDK_KEY_Caps_Lock;
--      the_keys[0].state = GDK_CONTROL_MASK;
--      the_keys[1].keysym = GDK_KEY_Control_L;
--      the_keys[1].state = GDK_LOCK_MASK;
--      the_keys[2].keysym = GDK_KEY_Control_R;
--      the_keys[2].state = GDK_LOCK_MASK;
--      break;
--    }
--
--  g_object_unref (settings);
--}
--
--static void
--free_keys (void)
--{
--  gint i;
--
--  for (i = 0; i < n_keys; ++i)
--    g_free (the_keys[i].keycodes);
--
--  g_free (the_keys);
--}
--
--static gboolean
--match_caps_locked (const Key     *key,
--                   XIDeviceEvent *xev)
--{
--  if (key->state & xev->mods.effective &&
--      key->keysym == XkbKeycodeToKeysym (xev->display, xev->detail, 0, 0))
--    return TRUE;
--
--  return FALSE;
--}
--
--static gboolean
--match_modifier (const Key *key,
--                XIEvent   *xiev)
--{
--  Key meta;
--
--  /* When the grab is established with Caps Lock as the modifier
--     (i.e. key->state == GDK_LOCK_MASK) we can't use match_xi2_key()
--     as this modifier is black listed there, so we do the match
--     ourselves. */
--  if (key->state == GDK_LOCK_MASK)
--    return match_caps_locked (key, (XIDeviceEvent *) xiev);
--
--  meta = *key;
--
--  switch (key->keysym)
--    {
--    case GDK_KEY_Shift_L:
--    case GDK_KEY_Shift_R:
--      if (xiev->evtype == XI_KeyRelease)
--        meta.state |= GDK_SHIFT_MASK;
--      break;
--
--    case GDK_KEY_Control_L:
--    case GDK_KEY_Control_R:
--      if (xiev->evtype == XI_KeyRelease)
--        meta.state |= GDK_CONTROL_MASK;
--      break;
--
--    case GDK_KEY_ISO_Level3_Shift:
--      if (xiev->evtype == XI_KeyRelease)
--        meta.state |= GDK_MOD5_MASK;
--      break;
--
--    case GDK_KEY_Alt_L:
--    case GDK_KEY_Alt_R:
--      if (key->state == GDK_SHIFT_MASK)
--        meta.keysym = key->keysym == GDK_KEY_Alt_L ? GDK_KEY_Meta_L : GDK_KEY_Meta_R;
--
--      if (xiev->evtype == XI_KeyRelease)
--        meta.state |= GDK_MOD1_MASK;
--      break;
--    }
--
--  return match_xi2_key (&meta, (XIDeviceEvent *) xiev);
--}
--
--static gboolean
--matches_key (XIEvent *xiev)
--{
--  gint i;
--
--  for (i = 0; i < n_keys; ++i)
--    if (match_modifier (&the_keys[i], xiev))
--      return TRUE;
--
--  return FALSE;
--}
--
--/* Owen magic, ported to XI2 */
--static GdkFilterReturn
--filter (XEvent   *xevent,
--        GdkEvent *event,
--        gpointer  data)
--{
--  XIEvent *xiev;
--  XIDeviceEvent *xev;
--  XIGrabModifiers mods;
--  XIEventMask evmask;
--  unsigned char mask[(XI_LASTEVENT + 7)/8] = { 0 };
--
--  if (xevent->type != GenericEvent)
--    return GDK_FILTER_CONTINUE;
--
--  xiev = (XIEvent *) xevent->xcookie.data;
--
--  if (xiev->evtype != XI_ButtonPress &&
--      xiev->evtype != XI_KeyPress &&
--      xiev->evtype != XI_KeyRelease)
--    return GDK_FILTER_CONTINUE;
--
--  xev = (XIDeviceEvent *) xiev;
--
--  mods.modifiers = XIAnyModifier;
--  XISetMask (mask, XI_ButtonPress);
--  evmask.deviceid = XIAllMasterDevices;
--  evmask.mask_len = sizeof (mask);
--  evmask.mask = mask;
--
--  if (xiev->evtype != XI_ButtonPress &&
--      matches_key (xiev))
--    {
--      if (xiev->evtype == XI_KeyPress)
--        {
--          XIAllowEvents (xev->display,
--                         xev->deviceid,
--                         XISyncDevice,
--                         xev->time);
--          XIGrabButton (xev->display,
--                        XIAllMasterDevices,
--                        XIAnyButton,
--                        xev->root,
--                        None,
--                        XIGrabModeSync,
--                        XIGrabModeSync,
--                        False,
--                        &evmask,
--                        1,
--                        &mods);
--          if (includes_caps)
--            caps_press_time = xev->time;
--        }
--      else
--        {
--          do_switch ();
--          XIUngrabDevice (xev->display,
--                          master_keyboard_id,
--                          xev->time);
--          XIUngrabButton (xev->display,
--                          XIAllMasterDevices,
--                          XIAnyButton,
--                          xev->root,
--                          1,
--                          &mods);
--          if (includes_caps && caps_press_time < xev->time)
--            {
--              XkbLockModifiers (xev->display, XkbUseCoreKbd, LockMask, 0);
--              caps_press_time = xev->time;
--            }
--        }
--    }
--  else
--    {
--      XIAllowEvents (xev->display,
--                     xev->deviceid,
--                     XIReplayDevice,
--                     xev->time);
--      XIUngrabDevice (xev->display,
--                      master_keyboard_id,
--                      xev->time);
--      XIUngrabButton (xev->display,
--                      XIAllMasterDevices,
--                      XIAnyButton,
--                      xev->root,
--                      1,
--                      &mods);
--    }
--
--  return GDK_FILTER_CONTINUE;
--}
--
--static void
--grab_key (Key        *key,
--          GdkDisplay *display,
--          GSList     *screens)
--{
--  GdkKeymapKey *keys;
--  gboolean has_entries;
--  GArray *keycodes;
--  gint n, i;
--
--  has_entries = gdk_keymap_get_entries_for_keyval (gdk_keymap_get_default (),
--                                                   key->keysym,
--                                                   &keys,
--                                                   &n);
--  if (!has_entries)
--    return;
--
--  keycodes = g_array_sized_new (TRUE, TRUE, sizeof (guint), n);
--  for (i = 0; i < n; ++i)
--    g_array_append_val (keycodes, keys[i].keycode);
--
--  key->keycodes = (guint *) g_array_free (keycodes, FALSE);
--
--  gdk_x11_display_error_trap_push (display);
--
--  grab_key_unsafe (key, GSD_KEYGRAB_ALLOW_UNMODIFIED | GSD_KEYGRAB_SYNCHRONOUS, screens);
--
--  gdk_x11_display_error_trap_pop_ignored (display);
--
--  g_free (keys);
--}
--
--static guint
--get_master_keyboard_id (GdkDisplay *display)
--{
--  XIDeviceInfo *info;
--  guint id;
--  int i, n;
--
--  id = 0;
--  info = XIQueryDevice (GDK_DISPLAY_XDISPLAY (display), XIAllMasterDevices, &n);
--  for (i = 0; i < n; ++i)
--    if (info[i].use == XIMasterKeyboard && info[i].enabled)
--      {
--        id = info[i].deviceid;
--        break;
--      }
--  XIFreeDeviceInfo (info);
--
--  return id;
--}
--
--static void
--set_input_sources_switcher (void)
--{
--  GdkDisplay *display;
--  gint n_screens;
--  GSList *screens, *l;
--  gint i;
--
--  display = gdk_display_get_default ();
--  n_screens = gdk_display_get_n_screens (display);
--  screens = NULL;
--  for (i = 0; i < n_screens; ++i)
--    screens = g_slist_prepend (screens, gdk_display_get_screen (display, i));
--
--  for (i = 0; i < n_keys; ++i)
--    grab_key (&the_keys[i], display, screens);
--
--  for (l = screens; l; l = l->next)
--    {
--      GdkScreen *screen;
--
--      screen = (GdkScreen *) l->data;
--      gdk_window_add_filter (gdk_screen_get_root_window (screen),
--                             (GdkFilterFunc) filter,
--                             screen);
--    }
--
--  g_slist_free (screens);
--
--  master_keyboard_id = get_master_keyboard_id (display);
--}
--
--int
--main (int argc, char *argv[])
--{
--  gtk_init (&argc, &argv);
--
--  init_keys ();
--  if (n_keys == 0)
--    {
--      g_warning ("No shortcut defined, exiting");
--      return -1;
--    }
--  input_sources_settings = g_settings_new (GNOME_DESKTOP_INPUT_SOURCES_DIR);
--
--  set_input_sources_switcher ();
--  gtk_main ();
--
--  g_object_unref (input_sources_settings);
--  free_keys ();
--
--  return 0;
--}
-Index: gnome-settings-daemon-3.6.3/plugins/keyboard/gsd-keyboard-manager.c
-===================================================================
---- gnome-settings-daemon-3.6.3.orig/plugins/keyboard/gsd-keyboard-manager.c	2012-11-14 13:19:28.000000000 +0100
-+++ gnome-settings-daemon-3.6.3/plugins/keyboard/gsd-keyboard-manager.c	2012-11-21 15:34:51.594366928 +0100
-@@ -2,7 +2,6 @@
-  *
-  * Copyright © 2001 Ximian, Inc.
-  * Copyright (C) 2007 William Jon McCann <mccann@jhu.edu>
-- * Written by Sergey V. Oudaltsov <svu@users.sourceforge.net>
-  *
-  * This program is free software; you can redistribute it and/or modify
-  * it under the terms of the GNU General Public License as published by
-@@ -40,22 +39,19 @@
+diff --exclude .pc -Nur gnome-settings-daemon-3.6.4/plugins/keyboard/gsd-keyboard-manager.c gnome-settings-daemon-3.6.4.new/plugins/keyboard/gsd-keyboard-manager.c
+--- gnome-settings-daemon-3.6.4/plugins/keyboard/gsd-keyboard-manager.c	2013-01-10 14:37:58.000000000 +0100
++++ gnome-settings-daemon-3.6.4.new/plugins/keyboard/gsd-keyboard-manager.c	2013-01-23 12:35:14.075161343 +0100
+@@ -40,22 +40,19 @@
  
  #include <X11/XKBlib.h>
  #include <X11/keysym.h>
@@ -1235,7 +700,7 @@ Index: gnome-settings-daemon-3.6.3/plugins/keyboard/gsd-keyboard-manager.c
  #define GSD_KEYBOARD_DIR "org.gnome.settings-daemon.peripherals.keyboard"
  
  #define KEY_REPEAT         "repeat"
-@@ -63,7 +59,6 @@
+@@ -63,7 +60,6 @@
  #define KEY_INTERVAL       "repeat-interval"
  #define KEY_DELAY          "delay"
  #define KEY_CLICK_VOLUME   "click-volume"
@@ -1243,7 +708,7 @@ Index: gnome-settings-daemon-3.6.3/plugins/keyboard/gsd-keyboard-manager.c
  #define KEY_NUMLOCK_STATE  "numlock-state"
  
  #define KEY_BELL_VOLUME    "bell-volume"
-@@ -71,557 +66,27 @@
+@@ -71,560 +67,27 @@
  #define KEY_BELL_DURATION  "bell-duration"
  #define KEY_BELL_MODE      "bell-mode"
  
@@ -1792,8 +1257,11 @@ Index: gnome-settings-daemon-3.6.3/plugins/keyboard/gsd-keyboard-manager.c
 -
 -        ibus_settings = g_settings_new ("org.freedesktop.ibus.general");
 -        engines = g_settings_get_strv (ibus_settings, "preload-engines");
--        for (e = engines; *e; ++e)
+-        for (e = engines; *e; ++e) {
+-                if (g_str_has_prefix (*e, "xkb:"))
+-                        continue;
 -                g_variant_builder_add (&builder, "(ss)", INPUT_SOURCE_TYPE_IBUS, *e);
+-        }
 -
 -        g_settings_set_value (settings, KEY_INPUT_SOURCES, g_variant_builder_end (&builder));
 -
@@ -1805,7 +1273,7 @@ Index: gnome-settings-daemon-3.6.3/plugins/keyboard/gsd-keyboard-manager.c
  static gboolean
  xkb_set_keyboard_autorepeat_rate (guint delay, guint interval)
  {
-@@ -631,33 +96,32 @@
+@@ -634,33 +97,32 @@
                                       interval);
  }
  
@@ -1854,7 +1322,7 @@ Index: gnome-settings-daemon-3.6.3/plugins/keyboard/gsd-keyboard-manager.c
  }
  
  static unsigned
-@@ -678,32 +142,19 @@
+@@ -681,32 +143,19 @@
          XkbLockModifiers (dpy, XkbUseCoreKbd, num_mask, new_state == GSD_NUM_LOCK_STATE_ON ? num_mask : 0);
  }
  
@@ -1894,7 +1362,7 @@ Index: gnome-settings-daemon-3.6.3/plugins/keyboard/gsd-keyboard-manager.c
  		return GDK_FILTER_CONTINUE;
  
  	if (xkbev->state.changed & XkbModifierLockMask) {
-@@ -714,9 +165,6 @@
+@@ -717,9 +166,6 @@
  		numlock_state = (num_mask & locked_mods) ? GSD_NUM_LOCK_STATE_ON : GSD_NUM_LOCK_STATE_OFF;
  
  		if (numlock_state != manager->priv->old_state) {
@@ -1904,12 +1372,13 @@ Index: gnome-settings-daemon-3.6.3/plugins/keyboard/gsd-keyboard-manager.c
  			g_settings_set_enum (manager->priv->settings,
  					     KEY_NUMLOCK_STATE,
  					     numlock_state);
-@@ -728,509 +176,57 @@
+@@ -731,509 +177,57 @@
  }
  
  static void
 -install_xkb_filter (GsdKeyboardManager *manager)
--{
++numlock_install_xkb_callback (GsdKeyboardManager *manager)
+ {
 -        gdk_window_add_filter (NULL,
 -                               xkb_events_filter,
 -                               manager);
@@ -1956,13 +1425,14 @@ Index: gnome-settings-daemon-3.6.3/plugins/keyboard/gsd-keyboard-manager.c
 -                                         (~XkbGBN_GeometryMask), True);
 -        if (!xkb_desc) {
 -                g_warning ("Couldn't upload new XKB keyboard description");
--                return;
++        if (!manager->priv->have_xkb)
+                 return;
 -        }
 -
 -        XkbFreeKeyboard (xkb_desc, 0, True);
 -
 -        rules_file = g_path_get_basename (rules_file_path);
--
+ 
 -        if (!XkbRF_SetNamesProp (display, rules_file, var_defs))
 -                g_warning ("Couldn't update the XKB root window property");
 -
@@ -2033,8 +1503,7 @@ Index: gnome-settings-daemon-3.6.3/plugins/keyboard/gsd-keyboard-manager.c
 -                            XkbRF_VarDefsRec   *xkb_var_defs,
 -                            const gchar        *layout,
 -                            const gchar        *variant)
-+numlock_install_xkb_callback (GsdKeyboardManager *manager)
- {
+-{
 -        /* Toolkits need to know about both a latin layout to handle
 -         * accelerators which are usually defined like Ctrl+C and a
 -         * layout with the symbols for the language used in UI strings
@@ -2049,9 +1518,8 @@ Index: gnome-settings-daemon-3.6.3/plugins/keyboard/gsd-keyboard-manager.c
 -        gchar *language;
 -
 -        if (!layout)
-+        if (!manager->priv->have_xkb)
-                 return;
- 
+-                return;
+-
 -        if (!variant)
 -                variant = "";
 -
@@ -2439,7 +1907,7 @@ Index: gnome-settings-daemon-3.6.3/plugins/keyboard/gsd-keyboard-manager.c
          gdk_error_trap_push ();
          if (repeat) {
                  gboolean rate_set = FALSE;
-@@ -1246,319 +242,124 @@
+@@ -1249,319 +243,124 @@
                  XAutoRepeatOff (GDK_DISPLAY_XDISPLAY (gdk_display_get_default ()));
          }
  
@@ -2848,7 +2316,7 @@ Index: gnome-settings-daemon-3.6.3/plugins/keyboard/gsd-keyboard-manager.c
  }
  
  static gboolean
-@@ -1568,41 +369,26 @@
+@@ -1571,41 +370,26 @@
  
          g_debug ("Starting keyboard manager");
  
@@ -2902,7 +2370,7 @@ Index: gnome-settings-daemon-3.6.3/plugins/keyboard/gsd-keyboard-manager.c
  
          gnome_settings_profile_end (NULL);
  
-@@ -1617,11 +403,6 @@
+@@ -1620,11 +404,6 @@
  {
          gnome_settings_profile_start (NULL);
  
@@ -2914,7 +2382,7 @@ Index: gnome-settings-daemon-3.6.3/plugins/keyboard/gsd-keyboard-manager.c
          manager->priv->start_idle_id = g_idle_add ((GSourceFunc) start_keyboard_idle_cb, manager);
  
          gnome_settings_profile_end (NULL);
-@@ -1636,24 +417,37 @@
+@@ -1639,24 +418,37 @@
  
          g_debug ("Stopping keyboard manager");
  
@@ -2965,7 +2433,7 @@ Index: gnome-settings-daemon-3.6.3/plugins/keyboard/gsd-keyboard-manager.c
  }
  
  static void
-@@ -1661,6 +455,7 @@
+@@ -1664,6 +456,7 @@
  {
          GObjectClass   *object_class = G_OBJECT_CLASS (klass);
  
@@ -2973,10 +2441,9 @@ Index: gnome-settings-daemon-3.6.3/plugins/keyboard/gsd-keyboard-manager.c
          object_class->finalize = gsd_keyboard_manager_finalize;
  
          g_type_class_add_private (klass, sizeof (GsdKeyboardManagerPrivate));
-Index: gnome-settings-daemon-3.6.3/plugins/keyboard/gsd-keyboard-manager.h
-===================================================================
---- gnome-settings-daemon-3.6.3.orig/plugins/keyboard/gsd-keyboard-manager.h	2012-11-07 10:08:12.000000000 +0100
-+++ gnome-settings-daemon-3.6.3/plugins/keyboard/gsd-keyboard-manager.h	2012-11-21 15:34:51.598366928 +0100
+diff --exclude .pc -Nur gnome-settings-daemon-3.6.4/plugins/keyboard/gsd-keyboard-manager.h gnome-settings-daemon-3.6.4.new/plugins/keyboard/gsd-keyboard-manager.h
+--- gnome-settings-daemon-3.6.4/plugins/keyboard/gsd-keyboard-manager.h	2012-08-30 20:55:28.000000000 +0200
++++ gnome-settings-daemon-3.6.4.new/plugins/keyboard/gsd-keyboard-manager.h	2013-01-23 12:35:14.079161343 +0100
 @@ -51,6 +51,7 @@
  gboolean                gsd_keyboard_manager_start               (GsdKeyboardManager *manager,
                                                                 GError         **error);
@@ -2985,10 +2452,9 @@ Index: gnome-settings-daemon-3.6.3/plugins/keyboard/gsd-keyboard-manager.h
  
  G_END_DECLS
  
-Index: gnome-settings-daemon-3.6.3/plugins/keyboard/gsd-keyboard-xkb.c
-===================================================================
---- /dev/null	1970-01-01 00:00:00.000000000 +0000
-+++ gnome-settings-daemon-3.6.3/plugins/keyboard/gsd-keyboard-xkb.c	2012-11-21 15:34:51.606366929 +0100
+diff --exclude .pc -Nur gnome-settings-daemon-3.6.4/plugins/keyboard/gsd-keyboard-xkb.c gnome-settings-daemon-3.6.4.new/plugins/keyboard/gsd-keyboard-xkb.c
+--- gnome-settings-daemon-3.6.4/plugins/keyboard/gsd-keyboard-xkb.c	1970-01-01 01:00:00.000000000 +0100
++++ gnome-settings-daemon-3.6.4.new/plugins/keyboard/gsd-keyboard-xkb.c	2013-01-23 12:35:14.079161343 +0100
 @@ -0,0 +1,851 @@
 +/* -*- Mode: C; tab-width: 8; indent-tabs-mode: nil; c-basic-offset: 8 -*-
 + *
@@ -3841,10 +3307,9 @@ Index: gnome-settings-daemon-3.6.3/plugins/keyboard/gsd-keyboard-xkb.c
 +
 +	inited_ok = FALSE;
 +}
-Index: gnome-settings-daemon-3.6.3/plugins/keyboard/gsd-keyboard-xkb.h
-===================================================================
---- /dev/null	1970-01-01 00:00:00.000000000 +0000
-+++ gnome-settings-daemon-3.6.3/plugins/keyboard/gsd-keyboard-xkb.h	2012-11-21 15:34:51.622366928 +0100
+diff --exclude .pc -Nur gnome-settings-daemon-3.6.4/plugins/keyboard/gsd-keyboard-xkb.h gnome-settings-daemon-3.6.4.new/plugins/keyboard/gsd-keyboard-xkb.h
+--- gnome-settings-daemon-3.6.4/plugins/keyboard/gsd-keyboard-xkb.h	1970-01-01 01:00:00.000000000 +0100
++++ gnome-settings-daemon-3.6.4.new/plugins/keyboard/gsd-keyboard-xkb.h	2013-01-23 12:35:14.079161343 +0100
 @@ -0,0 +1,39 @@
 +/* -*- Mode: C; tab-width: 8; indent-tabs-mode: nil; c-basic-offset: 8 -*-
 + * gnome-settings-keyboard-xkb.h
@@ -3885,10 +3350,9 @@ Index: gnome-settings-daemon-3.6.3/plugins/keyboard/gsd-keyboard-xkb.h
 +                                               void                  *userData);
 +
 +#endif
-Index: gnome-settings-daemon-3.6.3/plugins/keyboard/Makefile.am
-===================================================================
---- gnome-settings-daemon-3.6.3.orig/plugins/keyboard/Makefile.am	2012-11-07 10:08:12.000000000 +0100
-+++ gnome-settings-daemon-3.6.3/plugins/keyboard/Makefile.am	2012-11-21 15:34:51.622366928 +0100
+diff --exclude .pc -Nur gnome-settings-daemon-3.6.4/plugins/keyboard/Makefile.am gnome-settings-daemon-3.6.4.new/plugins/keyboard/Makefile.am
+--- gnome-settings-daemon-3.6.4/plugins/keyboard/Makefile.am	2013-01-10 14:37:58.000000000 +0100
++++ gnome-settings-daemon-3.6.4.new/plugins/keyboard/Makefile.am	2013-01-23 12:35:14.079161343 +0100
 @@ -20,20 +20,25 @@
  	gsd-keyboard-plugin.c	\
  	gsd-keyboard-manager.h	\
@@ -3986,10 +3450,9 @@ Index: gnome-settings-daemon-3.6.3/plugins/keyboard/Makefile.am
  EXTRA_DIST = 			\
  	$(icons_DATA)		\
  	$(plugin_in_files)	\
-Index: gnome-settings-daemon-3.6.3/plugins/keyboard/Makefile.in
-===================================================================
---- gnome-settings-daemon-3.6.3.orig/plugins/keyboard/Makefile.in	2012-11-14 13:46:23.000000000 +0100
-+++ gnome-settings-daemon-3.6.3/plugins/keyboard/Makefile.in	2012-11-21 15:34:51.626366928 +0100
+diff --exclude .pc -Nur gnome-settings-daemon-3.6.4/plugins/keyboard/Makefile.in gnome-settings-daemon-3.6.4.new/plugins/keyboard/Makefile.in
+--- gnome-settings-daemon-3.6.4/plugins/keyboard/Makefile.in	2013-01-10 15:00:27.000000000 +0100
++++ gnome-settings-daemon-3.6.4.new/plugins/keyboard/Makefile.in	2013-01-23 12:35:14.083161343 +0100
 @@ -1,8 +1,9 @@
 -# Makefile.in generated by automake 1.12.2 from Makefile.am.
 +# Makefile.in generated by automake 1.11.3 from Makefile.am.
@@ -4613,10 +4076,9 @@ Index: gnome-settings-daemon-3.6.3/plugins/keyboard/Makefile.in
  
  @GSD_INTLTOOL_PLUGIN_RULE@
  
-Index: gnome-settings-daemon-3.6.3/plugins/keyboard/test-keyboard.c
-===================================================================
---- gnome-settings-daemon-3.6.3.orig/plugins/keyboard/test-keyboard.c	2012-11-07 10:08:12.000000000 +0100
-+++ /dev/null	1970-01-01 00:00:00.000000000 +0000
+diff --exclude .pc -Nur gnome-settings-daemon-3.6.4/plugins/keyboard/test-keyboard.c gnome-settings-daemon-3.6.4.new/plugins/keyboard/test-keyboard.c
+--- gnome-settings-daemon-3.6.4/plugins/keyboard/test-keyboard.c	2012-09-03 17:39:14.000000000 +0200
++++ gnome-settings-daemon-3.6.4.new/plugins/keyboard/test-keyboard.c	1970-01-01 01:00:00.000000000 +0100
 @@ -1,7 +0,0 @@
 -#define NEW gsd_keyboard_manager_new
 -#define START gsd_keyboard_manager_start
@@ -4625,10 +4087,9 @@ Index: gnome-settings-daemon-3.6.3/plugins/keyboard/test-keyboard.c
 -#include "gsd-keyboard-manager.h"
 -
 -#include "test-plugin.h"
-Index: gnome-settings-daemon-3.6.3/plugins/keyboard/test-keyboard-ibus-utils.c
-===================================================================
---- gnome-settings-daemon-3.6.3.orig/plugins/keyboard/test-keyboard-ibus-utils.c	2012-11-07 10:08:12.000000000 +0100
-+++ /dev/null	1970-01-01 00:00:00.000000000 +0000
+diff --exclude .pc -Nur gnome-settings-daemon-3.6.4/plugins/keyboard/test-keyboard-ibus-utils.c gnome-settings-daemon-3.6.4.new/plugins/keyboard/test-keyboard-ibus-utils.c
+--- gnome-settings-daemon-3.6.4/plugins/keyboard/test-keyboard-ibus-utils.c	2012-10-05 16:22:43.000000000 +0200
++++ gnome-settings-daemon-3.6.4.new/plugins/keyboard/test-keyboard-ibus-utils.c	1970-01-01 01:00:00.000000000 +0100
 @@ -1,116 +0,0 @@
 -#include "gsd-keyboard-manager.c"
 -
@@ -4746,31 +4207,9 @@ Index: gnome-settings-daemon-3.6.3/plugins/keyboard/test-keyboard-ibus-utils.c
 -
 -        return 0;
 -}
-Index: gnome-settings-daemon-3.6.3/data/org.gnome.settings-daemon.plugins.media-keys.gschema.xml.in.in
-===================================================================
---- gnome-settings-daemon-3.6.3.orig/data/org.gnome.settings-daemon.plugins.media-keys.gschema.xml.in.in	2012-11-21 15:34:51.350366916 +0100
-+++ gnome-settings-daemon-3.6.3/data/org.gnome.settings-daemon.plugins.media-keys.gschema.xml.in.in	2012-11-21 15:34:51.646366931 +0100
-@@ -180,16 +180,6 @@
-       <_summary>Magnifier zoom out</_summary>
-       <_description>Binding for the magnifier to zoom out</_description>
-     </key>
--    <key name="switch-input-source" type="s">
--      <default>''</default>
--      <_summary>Switch input source</_summary>
--      <_description>Binding to select the next input source</_description>
--    </key>
--    <key name="switch-input-source-backward" type="s">
--      <default>''</default>
--      <_summary>Switch input source backward</_summary>
--      <_description>Binding to select the previous input source</_description>
--    </key>
-   </schema>
- 
-   <schema gettext-domain="@GETTEXT_PACKAGE@" id="org.gnome.settings-daemon.plugins.media-keys.custom-keybinding">
-Index: gnome-settings-daemon-3.6.3/plugins/media-keys/gsd-media-keys-manager.c
-===================================================================
---- gnome-settings-daemon-3.6.3.orig/plugins/media-keys/gsd-media-keys-manager.c	2012-11-21 15:34:51.518366925 +0100
-+++ gnome-settings-daemon-3.6.3/plugins/media-keys/gsd-media-keys-manager.c	2012-11-21 15:34:51.646366931 +0100
+diff --exclude .pc -Nur gnome-settings-daemon-3.6.4/plugins/media-keys/gsd-media-keys-manager.c gnome-settings-daemon-3.6.4.new/plugins/media-keys/gsd-media-keys-manager.c
+--- gnome-settings-daemon-3.6.4/plugins/media-keys/gsd-media-keys-manager.c	2013-01-23 12:31:33.827154712 +0100
++++ gnome-settings-daemon-3.6.4.new/plugins/media-keys/gsd-media-keys-manager.c	2013-01-23 12:35:14.091161343 +0100
 @@ -103,10 +103,6 @@
  #define VOLUME_STEP 6           /* percents for one volume button press */
  #define MAX_VOLUME 65536.0
@@ -4834,10 +4273,9 @@ Index: gnome-settings-daemon-3.6.3/plugins/media-keys/gsd-media-keys-manager.c
          /* Note, no default so compiler catches missing keys */
          case CUSTOM_KEY:
                  g_assert_not_reached ();
-Index: gnome-settings-daemon-3.6.3/plugins/media-keys/shortcuts-list.h
-===================================================================
---- gnome-settings-daemon-3.6.3.orig/plugins/media-keys/shortcuts-list.h	2012-11-21 15:34:51.382366917 +0100
-+++ gnome-settings-daemon-3.6.3/plugins/media-keys/shortcuts-list.h	2012-11-21 15:34:51.646366931 +0100
+diff --exclude .pc -Nur gnome-settings-daemon-3.6.4/plugins/media-keys/shortcuts-list.h gnome-settings-daemon-3.6.4.new/plugins/media-keys/shortcuts-list.h
+--- gnome-settings-daemon-3.6.4/plugins/media-keys/shortcuts-list.h	2013-01-23 12:31:33.000000000 +0100
++++ gnome-settings-daemon-3.6.4.new/plugins/media-keys/shortcuts-list.h	2013-01-23 12:35:14.091161343 +0100
 @@ -81,8 +81,6 @@
          KEYBOARD_BRIGHTNESS_DOWN_KEY,
          KEYBOARD_BRIGHTNESS_TOGGLE_KEY,
@@ -4856,64 +4294,3 @@ Index: gnome-settings-daemon-3.6.3/plugins/media-keys/shortcuts-list.h
          { BATTERY_KEY, NULL, "XF86Battery" },
  };
  
-Index: gnome-settings-daemon-3.6.3/configure.ac
-===================================================================
---- gnome-settings-daemon-3.6.3.orig/configure.ac	2012-11-21 15:34:51.438366919 +0100
-+++ gnome-settings-daemon-3.6.3/configure.ac	2012-11-21 15:34:51.650366931 +0100
-@@ -54,7 +54,6 @@
- LIBWACOM_REQUIRED_VERSION=0.6
- UPOWER_REQUIRED_VERSION=0.9.11
- APPINDICATOR_REQUIRED_VERSION=0.3.0
--IBUS_REQUIRED_VERSION=1.4.99
- 
- EXTRA_COMPILE_WARNINGS(yes)
- 
-@@ -222,21 +221,8 @@
- dnl - Keyboard plugin stuff
- dnl ---------------------------------------------------------------------------
- 
--AC_ARG_ENABLE(ibus,
--        AS_HELP_STRING([--disable-ibus],
--                       [Disable IBus support]),
--        enable_ibus=$enableval,
--        enable_ibus=yes)
--
--if test "x$enable_ibus" = "xyes" ; then
--        IBUS_MODULE="ibus-1.0 >= $IBUS_REQUIRED_VERSION"
--        AC_DEFINE(HAVE_IBUS, 1, [Defined if IBus support is enabled])
--else
--        IBUS_MODULE=
--fi
--AM_CONDITIONAL(HAVE_IBUS, test "x$enable_ibus" == "xyes")
--
--PKG_CHECK_MODULES(KEYBOARD, xkbfile $IBUS_MODULE gnome-desktop-3.0 >= $GNOME_DESKTOP_REQUIRED_VERSION)
-+LIBGNOMEKBD_REQUIRED=2.91.1
-+PKG_CHECK_MODULES(KEYBOARD, [libgnomekbdui >= $LIBGNOMEKBD_REQUIRED libgnomekbd >= $LIBGNOMEKBD_REQUIRED libxklavier >= 5.0 kbproto])
- 
- dnl ---------------------------------------------------------------------------
- dnl - Housekeeping plugin stuff
-@@ -651,7 +637,6 @@
-         PolicyKit support:        ${HAVE_POLKIT}
-         Session tracking:         ${SESSION_TRACKING}
-         LCMS DICT support:        ${have_new_lcms}
--        IBus support:             ${enable_ibus}
-         Libnotify support:        ${have_libnotify}
- 	App indicator support:    ${enable_appindicator}
-         PackageKit support:       ${have_packagekit}
-Index: gnome-settings-daemon-3.6.3/data/Makefile.am
-===================================================================
---- gnome-settings-daemon-3.6.3.orig/data/Makefile.am	2012-11-07 10:08:11.000000000 +0100
-+++ gnome-settings-daemon-3.6.3/data/Makefile.am	2012-11-21 15:34:51.650366931 +0100
-@@ -84,12 +84,3 @@
- 	Makefile.in			\
- 	$(all_schemas:.xml=.valid)
- 
--if HAVE_IBUS
--dbusservicedir=${datadir}/dbus-1/services
--dbusservice_DATA = $(dbusservice_in_files:.service.in=.service)
--
--org.freedesktop.IBus.service: org.freedesktop.IBus.service.in
--	$(AM_V_GEN) sed -e "s|\@bindir\@|$(bindir)|" $< > $@.tmp && mv $@.tmp $@
--
--CLEANFILES = $(dbusservice_DATA)
--endif
