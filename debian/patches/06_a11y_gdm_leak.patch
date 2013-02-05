@@ -20,8 +20,8 @@ https://bugzilla.gnome.org/show_bug.cgi?id=685063
 ---
 Index: gnome-settings-daemon-3.4.2+git20121218.7c1322/plugins/a11y-keyboard/gsd-a11y-keyboard-manager.c
 ===================================================================
---- gnome-settings-daemon-3.4.2+git20121218.7c1322.orig/plugins/a11y-keyboard/gsd-a11y-keyboard-manager.c	2013-02-05 16:32:31.098112464 +0100
-+++ gnome-settings-daemon-3.4.2+git20121218.7c1322/plugins/a11y-keyboard/gsd-a11y-keyboard-manager.c	2013-02-05 16:32:31.090112428 +0100
+--- gnome-settings-daemon-3.4.2+git20121218.7c1322.orig/plugins/a11y-keyboard/gsd-a11y-keyboard-manager.c	2013-02-05 16:38:44.911939950 +0100
++++ gnome-settings-daemon-3.4.2+git20121218.7c1322/plugins/a11y-keyboard/gsd-a11y-keyboard-manager.c	2013-02-05 16:38:44.903939914 +0100
 @@ -63,6 +63,8 @@ struct GsdA11yKeyboardManagerPrivate
          GtkWidget        *preferences_dialog;
          GtkStatusIcon    *status_icon;
@@ -31,7 +31,7 @@ Index: gnome-settings-daemon-3.4.2+git20121218.7c1322/plugins/a11y-keyboard/gsd-
          GSettings        *settings;
  
          NotifyNotification *notification;
-@@ -947,6 +949,9 @@ start_a11y_keyboard_idle_cb (GsdA11yKeyb
+@@ -950,6 +952,9 @@ start_a11y_keyboard_idle_cb (GsdA11yKeyb
  
          set_devicepresence_handler (manager);
  
@@ -41,7 +41,7 @@ Index: gnome-settings-daemon-3.4.2+git20121218.7c1322/plugins/a11y-keyboard/gsd-
          event_mask = XkbControlsNotifyMask;
          event_mask |= XkbAccessXNotifyMask; /* make default when AXN_AXKWarning works */
  
-@@ -992,6 +997,26 @@ gsd_a11y_keyboard_manager_stop (GsdA11yK
+@@ -995,6 +1000,26 @@ gsd_a11y_keyboard_manager_stop (GsdA11yK
  
          g_debug ("Stopping a11y_keyboard manager");
  

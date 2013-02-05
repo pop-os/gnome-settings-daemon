@@ -4,6 +4,8 @@ gnome-settings-daemon (3.4.2+git20121218.7c1322-3) unstable; urgency=low
     accessibility settings when shutting down the settings daemon. This 
     avoids leaking them from the GDM session to the user’s.
     Closes: #682581.
+    + 06_a11y_macro.patch: a bit of refactoring that the previous patch 
+      depends on.
 
  -- Josselin Mouette <joss@debian.org>  Tue, 05 Feb 2013 16:34:56 +0100
 
