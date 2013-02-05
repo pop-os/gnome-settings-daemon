@@ -1,3 +1,12 @@
+gnome-settings-daemon (3.4.2+git20121218.7c1322-3) unstable; urgency=low
+
+  * 06_a11y_gdm_leak.patch: backported from git master. Reset keyboard
+    accessibility settings when shutting down the settings daemon. This 
+    avoids leaking them from the GDM session to the user’s.
+    Closes: #682581.
+
+ -- Josselin Mouette <joss@debian.org>  Tue, 05 Feb 2013 16:34:56 +0100
+
 gnome-settings-daemon (3.4.2+git20121218.7c1322-2) unstable; urgency=low
 
   * 05_sound_pkg-config.patch: backported from 3.6. Correctly link the 
