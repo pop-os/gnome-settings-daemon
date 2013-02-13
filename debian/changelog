@@ -1,3 +1,14 @@
+gnome-settings-daemon (3.6.4-0ubuntu3) raring; urgency=low
+
+  * debian/patches/nexus_orientation.patch: Set up a timer to poll
+    sysfs attributes when an MPU6050 sensor is detected and calculate
+    screen orientation based on these raw accelerometer readings.
+    The kernel driver for this sensor used on the Nexus 7 does not currently
+    provide the interface expected by the current code in g-s-d, hence
+    this approach until the final one is decided upon.
+
+ -- Jani Monoses <jani.monoses@canonical.com>  Wed, 30 Jan 2013 14:13:45 +0200
+
 gnome-settings-daemon (3.6.4-0ubuntu2) raring; urgency=low
 
   * debian/patches/touchscreen_rotation.patch:  On touchscreens 

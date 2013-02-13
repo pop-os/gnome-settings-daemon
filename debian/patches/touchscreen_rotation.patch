@@ -1,6 +1,6 @@
-## Description: add some description
-## Origin/Author: add some origin or author
-## Bug: bug URL
+## Description: correctly set up input coordinates when rotating touchscreens
+## Origin/Author: jani@ubuntu.com
+## Bug: https://bugzilla.gnome.org/show_bug.cgi?id=691691
 Index: gnome-settings-daemon-3.6.4/plugins/xrandr/gsd-xrandr-manager.c
 ===================================================================
 --- gnome-settings-daemon-3.6.4.orig/plugins/xrandr/gsd-xrandr-manager.c	2013-01-10 15:37:58.000000000 +0200
