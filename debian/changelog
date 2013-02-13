@@ -1,3 +1,11 @@
+gnome-settings-daemon (3.6.4-0ubuntu2) raring; urgency=low
+
+  * debian/patches/touchscreen_rotation.patch:  On touchscreens 
+    rotate input coordinates by changing the Coordinate Transform Matrix
+    property instead of evdev axis properties.
+
+ -- Jani Monoses <jani.monoses@canonical.com>  Tue, 29 Jan 2013 16:28:12 +0200
+
 gnome-settings-daemon (3.6.4-0ubuntu1) raring; urgency=low
 
   * New upstream version
