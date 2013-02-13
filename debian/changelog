@@ -1,3 +1,11 @@
+gnome-settings-daemon (3.6.4-0ubuntu4) raring; urgency=low
+
+  * debian/patches/nexus_orientation.patch: Correctly set up portrait
+    orientation on first run. Disable the timer that polls the accelerometer
+    on the Nexus 7 if the orientation-lock gsetting is set.
+
+ -- Jani Monoses <jani.monoses@canonical.com>  Mon, 11 Feb 2013 13:14:46 +0200
+
 gnome-settings-daemon (3.6.4-0ubuntu3) raring; urgency=low
 
   * debian/patches/nexus_orientation.patch: Set up a timer to poll
