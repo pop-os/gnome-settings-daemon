@@ -3,8 +3,8 @@
 ## Bug: https://bugs.launchpad.net/ubuntu-nexus7/+bug/1110360
 Index: gnome-settings-daemon-3.6.4/plugins/orientation/gsd-orientation-manager.c
 ===================================================================
---- gnome-settings-daemon-3.6.4.orig/plugins/orientation/gsd-orientation-manager.c	2013-02-11 16:07:35.251380620 +0200
-+++ gnome-settings-daemon-3.6.4/plugins/orientation/gsd-orientation-manager.c	2013-02-11 16:09:26.639932959 +0200
+--- gnome-settings-daemon-3.6.4.orig/plugins/orientation/gsd-orientation-manager.c	2013-02-12 00:05:48.337661954 +0200
++++ gnome-settings-daemon-3.6.4/plugins/orientation/gsd-orientation-manager.c	2013-02-12 00:07:02.370029051 +0200
 @@ -23,6 +23,7 @@
  
  #include "config.h"
@@ -55,7 +55,7 @@ Index: gnome-settings-daemon-3.6.4/plugins/orientation/gsd-orientation-manager.c
          for (l = list; l != NULL; l = l->next) {
                  GUdevDevice *dev;
  
-@@ -408,6 +420,50 @@
+@@ -408,6 +420,53 @@
          return ret;
  }
  
@@ -78,6 +78,9 @@ Index: gnome-settings-daemon-3.6.4/plugins/orientation/gsd-orientation-manager.c
 +	int x, y;
 +	static gboolean first = TRUE;
 +	OrientationUp orientation = manager->priv->prev_orientation;
++
++        if (manager->priv->xrandr_proxy == NULL)
++                return TRUE;
 +
 +	x = read_sysfs_attr_as_int(g_build_filename(manager->priv->sysfs_path, "in_accel_x_raw", NULL));
 +	y = read_sysfs_attr_as_int(g_build_filename(manager->priv->sysfs_path, "in_accel_y_raw", NULL));
@@ -106,7 +109,7 @@ Index: gnome-settings-daemon-3.6.4/plugins/orientation/gsd-orientation-manager.c
  static gboolean
  gsd_orientation_manager_idle_cb (GsdOrientationManager *manager)
  {
-@@ -432,6 +488,14 @@
+@@ -432,6 +491,14 @@
          g_debug ("Found accelerometer at sysfs path '%s'", manager->priv->sysfs_path);
  
          manager->priv->prev_orientation = get_orientation_from_device (dev);

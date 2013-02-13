@@ -1,3 +1,10 @@
+gnome-settings-daemon (3.6.4-0ubuntu5) raring; urgency=low
+
+  * debian/patches/nexus_orientation.patch: Wait until a DBus connection to
+    the xrandr module is in place before trying to change orientation.
+
+ -- Jani Monoses <jani.monoses@canonical.com>  Tue, 12 Feb 2013 00:07:12 +0200
+
 gnome-settings-daemon (3.6.4-0ubuntu4) raring; urgency=low
 
   * debian/patches/nexus_orientation.patch: Correctly set up portrait
