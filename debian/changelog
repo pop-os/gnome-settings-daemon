@@ -1,3 +1,10 @@
+gnome-settings-daemon (3.6.4-0ubuntu6) raring; urgency=low
+
+  * debian/patches/nexus_orientation.patch: Fix memory leak when building
+    pathnames, thanks Jean-Baptiste Lallement! (LP: #1123930)
+
+ -- Jani Monoses <jani.monoses@canonical.com>  Wed, 13 Feb 2013 13:25:19 +0200
+
 gnome-settings-daemon (3.6.4-0ubuntu5) raring; urgency=low
 
   * debian/patches/nexus_orientation.patch: Wait until a DBus connection to
