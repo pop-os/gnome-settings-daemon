@@ -1,5 +1,7 @@
---- a/data/org.gnome.settings-daemon.plugins.media-keys.gschema.xml.in.in
-+++ b/data/org.gnome.settings-daemon.plugins.media-keys.gschema.xml.in.in
+Index: gnome-settings-daemon-3.7.91/data/org.gnome.settings-daemon.plugins.media-keys.gschema.xml.in.in
+===================================================================
+--- gnome-settings-daemon-3.7.91.orig/data/org.gnome.settings-daemon.plugins.media-keys.gschema.xml.in.in	2013-03-08 14:33:20.000000000 +0000
++++ gnome-settings-daemon-3.7.91/data/org.gnome.settings-daemon.plugins.media-keys.gschema.xml.in.in	2013-03-08 14:33:20.000000000 +0000
 @@ -85,6 +85,11 @@
        <_summary>Stop playback</_summary>
        <_description>Binding to stop playback.</_description>
@@ -12,14 +14,16 @@
      <key name="volume-down" type="s">
        <default>'XF86AudioLowerVolume'</default>
        <_summary>Volume down</_summary>
---- a/plugins/media-keys/shortcuts-list.h
-+++ b/plugins/media-keys/shortcuts-list.h
-@@ -125,7 +125,7 @@
-         { FORWARD_KEY, NULL, "XF86AudioForward" },
-         { REPEAT_KEY, NULL, "XF86AudioRepeat" },
-         { RANDOM_KEY, NULL, "XF86AudioRandomPlay"},
--        { VIDEO_OUT_KEY, NULL, "<Super>p" },
-+        { VIDEO_OUT_KEY, "video-out", NULL, NULL },
+Index: gnome-settings-daemon-3.7.91/plugins/media-keys/shortcuts-list.h
+===================================================================
+--- gnome-settings-daemon-3.7.91.orig/plugins/media-keys/shortcuts-list.h	2013-03-08 14:33:20.000000000 +0000
++++ gnome-settings-daemon-3.7.91/plugins/media-keys/shortcuts-list.h	2013-03-08 14:34:41.000000000 +0000
+@@ -132,7 +132,7 @@
+         { FORWARD_KEY, NULL, N_("Forward"), "XF86AudioForward", SHELL_KEYBINDING_MODE_ALL },
+         { REPEAT_KEY, NULL, N_("Repeat"), "XF86AudioRepeat", SHELL_KEYBINDING_MODE_ALL },
+         { RANDOM_KEY, NULL, N_("Random Play"), "XF86AudioRandomPlay", SHELL_KEYBINDING_MODE_ALL },
+-        { VIDEO_OUT_KEY, NULL, N_("Video Out"), "<Super>p", SHELL_KEYBINDING_MODE_ALL },
++        { VIDEO_OUT_KEY, "video-out", N_("Video Out"), NULL, SHELL_KEYBINDING_MODE_ALL },
          /* Key code of the XF86Display key (Fn-F7 on Thinkpads, Fn-F4 on HP machines, etc.) */
-         { VIDEO_OUT_KEY, NULL, "XF86Display" },
+         { VIDEO_OUT_KEY, NULL, N_("Video Out"), "XF86Display", SHELL_KEYBINDING_MODE_ALL },
          /* Key code of the XF86RotateWindows key (present on some tablets) */

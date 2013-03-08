@@ -1,4 +1,2 @@
 04_superP.patch
-power-check-null-devices.patch
-power-ignore-bad-dbus-requests.patch
 revert_git_datetime_dropping.patch

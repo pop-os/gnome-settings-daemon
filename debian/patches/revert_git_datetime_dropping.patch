@@ -1,6 +1,8 @@
---- a/configure.ac
-+++ b/configure.ac
-@@ -117,6 +117,24 @@
+Index: gnome-settings-daemon-3.7.91/configure.ac
+===================================================================
+--- gnome-settings-daemon-3.7.91.orig/configure.ac	2013-03-08 14:25:07.000000000 +0000
++++ gnome-settings-daemon-3.7.91/configure.ac	2013-03-08 14:25:07.000000000 +0000
+@@ -120,6 +120,24 @@
  AC_SUBST(LIBNOTIFY_LIBS)
  
  dnl ---------------------------------------------------------------------------
@@ -25,8 +27,8 @@
  dnl - GUdev integration (default enabled)
  dnl ---------------------------------------------------------------------------
  GUDEV_PKG=""
-@@ -360,6 +378,42 @@
- AM_CONDITIONAL(WITH_SYSTEMD, [test "$with_systemd" = "yes"], [Using systemd])
+@@ -341,6 +359,42 @@
+ 
  
  # ---------------------------------------------------------------------------
 +# PolicyKit for the date & time mechanism
@@ -68,7 +70,7 @@
  # CUPS
  # ---------------------------------------------------------------------------
  
-@@ -506,6 +560,7 @@
+@@ -485,6 +539,7 @@
  plugins/color/Makefile
  plugins/common/Makefile
  plugins/cursor/Makefile
@@ -76,7 +78,7 @@
  plugins/dummy/Makefile
  plugins/power/Makefile
  plugins/housekeeping/Makefile
-@@ -564,6 +619,8 @@
+@@ -546,6 +601,8 @@
          cflags:                   ${CFLAGS}
          Maintainer mode:          ${USE_MAINTAINER_MODE}
  
@@ -85,8 +87,10 @@
          Session tracking:         ${SESSION_TRACKING}
          LCMS DICT support:        ${have_new_lcms}
          IBus support:             ${enable_ibus}
---- /dev/null
-+++ b/plugins/datetime/gsd-datetime-mechanism.c
+Index: gnome-settings-daemon-3.7.91/plugins/datetime/gsd-datetime-mechanism.c
+===================================================================
+--- /dev/null	1970-01-01 00:00:00.000000000 +0000
++++ gnome-settings-daemon-3.7.91/plugins/datetime/gsd-datetime-mechanism.c	2013-03-08 14:25:07.000000000 +0000
 @@ -0,0 +1,755 @@
 +/* -*- Mode: C; tab-width: 8; indent-tabs-mode: nil; c-basic-offset: 8 -*-
 + *
@@ -843,8 +847,10 @@
 +
 +        return TRUE;
 +}
---- /dev/null
-+++ b/plugins/datetime/gsd-datetime-mechanism-debian.c
+Index: gnome-settings-daemon-3.7.91/plugins/datetime/gsd-datetime-mechanism-debian.c
+===================================================================
+--- /dev/null	1970-01-01 00:00:00.000000000 +0000
++++ gnome-settings-daemon-3.7.91/plugins/datetime/gsd-datetime-mechanism-debian.c	2013-03-08 14:25:07.000000000 +0000
 @@ -0,0 +1,200 @@
 +/* -*- Mode: C; tab-width: 8; indent-tabs-mode: nil; c-basic-offset: 8 -*-
 + *
@@ -1046,8 +1052,10 @@
 +        }
 +}
 +
---- /dev/null
-+++ b/plugins/datetime/gsd-datetime-mechanism-debian.h
+Index: gnome-settings-daemon-3.7.91/plugins/datetime/gsd-datetime-mechanism-debian.h
+===================================================================
+--- /dev/null	1970-01-01 00:00:00.000000000 +0000
++++ gnome-settings-daemon-3.7.91/plugins/datetime/gsd-datetime-mechanism-debian.h	2013-03-08 14:25:07.000000000 +0000
 @@ -0,0 +1,27 @@
 +/* -*- Mode: C; tab-width: 8; indent-tabs-mode: nil; c-basic-offset: 8 -*-
 + *
@@ -1076,8 +1084,10 @@
 +gboolean _get_using_ntp_debian (DBusGMethodInvocation   *context);
 +gboolean _set_using_ntp_debian  (DBusGMethodInvocation   *context,
 +                                 gboolean                 using_ntp);
---- /dev/null
-+++ b/plugins/datetime/gsd-datetime-mechanism.h
+Index: gnome-settings-daemon-3.7.91/plugins/datetime/gsd-datetime-mechanism.h
+===================================================================
+--- /dev/null	1970-01-01 00:00:00.000000000 +0000
++++ gnome-settings-daemon-3.7.91/plugins/datetime/gsd-datetime-mechanism.h	2013-03-08 14:25:07.000000000 +0000
 @@ -0,0 +1,112 @@
 +/* -*- Mode: C; tab-width: 8; indent-tabs-mode: nil; c-basic-offset: 8 -*-
 + *
@@ -1191,8 +1201,10 @@
 +G_END_DECLS
 +
 +#endif /* GSD_DATETIME_MECHANISM_H */
---- /dev/null
-+++ b/plugins/datetime/gsd-datetime-mechanism-main.c
+Index: gnome-settings-daemon-3.7.91/plugins/datetime/gsd-datetime-mechanism-main.c
+===================================================================
+--- /dev/null	1970-01-01 00:00:00.000000000 +0000
++++ gnome-settings-daemon-3.7.91/plugins/datetime/gsd-datetime-mechanism-main.c	2013-03-08 14:25:07.000000000 +0000
 @@ -0,0 +1,171 @@
 +/* -*- Mode: C; tab-width: 8; indent-tabs-mode: nil; c-basic-offset: 8 -*-
 + *
@@ -1365,8 +1377,10 @@
 +out:
 +        return ret;
 +}
---- /dev/null
-+++ b/plugins/datetime/gsd-datetime-mechanism.xml
+Index: gnome-settings-daemon-3.7.91/plugins/datetime/gsd-datetime-mechanism.xml
+===================================================================
+--- /dev/null	1970-01-01 00:00:00.000000000 +0000
++++ gnome-settings-daemon-3.7.91/plugins/datetime/gsd-datetime-mechanism.xml	2013-03-08 14:25:07.000000000 +0000
 @@ -0,0 +1,129 @@
 +<!DOCTYPE node PUBLIC "-//freedesktop//DTD D-BUS Object Introspection 1.0//EN" "http://www.freedesktop.org/standards/dbus/1.0/introspect.dtd">
 +<node name="/">
@@ -1497,8 +1511,10 @@
 +    </method>
 +  </interface>
 +</node>
---- /dev/null
-+++ b/plugins/datetime/Makefile.am
+Index: gnome-settings-daemon-3.7.91/plugins/datetime/Makefile.am
+===================================================================
+--- /dev/null	1970-01-01 00:00:00.000000000 +0000
++++ gnome-settings-daemon-3.7.91/plugins/datetime/Makefile.am	2013-03-08 14:25:07.000000000 +0000
 @@ -0,0 +1,68 @@
 +plugin_name = datetime
 +
@@ -1568,8 +1584,10 @@
 +	org.gnome.SettingsDaemon.DateTimeMechanism.service	\
 +	org.gnome.settingsdaemon.datetimemechanism.policy	\
 +	$(BUILT_SOURCES)
---- /dev/null
-+++ b/plugins/datetime/org.gnome.SettingsDaemon.DateTimeMechanism.conf
+Index: gnome-settings-daemon-3.7.91/plugins/datetime/org.gnome.SettingsDaemon.DateTimeMechanism.conf
+===================================================================
+--- /dev/null	1970-01-01 00:00:00.000000000 +0000
++++ gnome-settings-daemon-3.7.91/plugins/datetime/org.gnome.SettingsDaemon.DateTimeMechanism.conf	2013-03-08 14:25:07.000000000 +0000
 @@ -0,0 +1,19 @@
 +<?xml version="1.0" encoding="UTF-8"?> <!-- -*- XML -*- -->
 +
@@ -1590,8 +1608,10 @@
 +  </policy>
 +
 +</busconfig>
---- /dev/null
-+++ b/plugins/datetime/org.gnome.settingsdaemon.datetimemechanism.policy.in
+Index: gnome-settings-daemon-3.7.91/plugins/datetime/org.gnome.settingsdaemon.datetimemechanism.policy.in
+===================================================================
+--- /dev/null	1970-01-01 00:00:00.000000000 +0000
++++ gnome-settings-daemon-3.7.91/plugins/datetime/org.gnome.settingsdaemon.datetimemechanism.policy.in	2013-03-08 14:25:07.000000000 +0000
 @@ -0,0 +1,21 @@
 +<?xml version="1.0" encoding="UTF-8"?>
 +<!DOCTYPE policyconfig PUBLIC
@@ -1614,15 +1634,19 @@
 +  </action>
 +
 +</policyconfig>
---- /dev/null
-+++ b/plugins/datetime/org.gnome.SettingsDaemon.DateTimeMechanism.service.in
+Index: gnome-settings-daemon-3.7.91/plugins/datetime/org.gnome.SettingsDaemon.DateTimeMechanism.service.in
+===================================================================
+--- /dev/null	1970-01-01 00:00:00.000000000 +0000
++++ gnome-settings-daemon-3.7.91/plugins/datetime/org.gnome.SettingsDaemon.DateTimeMechanism.service.in	2013-03-08 14:25:07.000000000 +0000
 @@ -0,0 +1,4 @@
 +[D-BUS Service]
 +Name=org.gnome.SettingsDaemon.DateTimeMechanism
 +Exec=@LIBEXECDIR@/gsd-datetime-mechanism
 +User=root
---- /dev/null
-+++ b/plugins/datetime/system-timezone.c
+Index: gnome-settings-daemon-3.7.91/plugins/datetime/system-timezone.c
+===================================================================
+--- /dev/null	1970-01-01 00:00:00.000000000 +0000
++++ gnome-settings-daemon-3.7.91/plugins/datetime/system-timezone.c	2013-03-08 14:25:07.000000000 +0000
 @@ -0,0 +1,924 @@
 +/* System timezone handling
 + *
@@ -2548,8 +2572,10 @@
 +
 +        return ret;
 +}
---- /dev/null
-+++ b/plugins/datetime/system-timezone.h
+Index: gnome-settings-daemon-3.7.91/plugins/datetime/system-timezone.h
+===================================================================
+--- /dev/null	1970-01-01 00:00:00.000000000 +0000
++++ gnome-settings-daemon-3.7.91/plugins/datetime/system-timezone.h	2013-03-08 14:25:07.000000000 +0000
 @@ -0,0 +1,80 @@
 +/* System timezone handling
 + *
@@ -2631,8 +2657,10 @@
 +
 +G_END_DECLS
 +#endif /* __SYSTEM_TIMEZONE_H__ */
---- /dev/null
-+++ b/plugins/datetime/test-system-timezone.c
+Index: gnome-settings-daemon-3.7.91/plugins/datetime/test-system-timezone.c
+===================================================================
+--- /dev/null	1970-01-01 00:00:00.000000000 +0000
++++ gnome-settings-daemon-3.7.91/plugins/datetime/test-system-timezone.c	2013-03-08 14:25:07.000000000 +0000
 @@ -0,0 +1,93 @@
 +/* Test for system timezone handling
 + *
@@ -2727,9 +2755,11 @@
 +
 +        return retval;
 +}
---- a/plugins/Makefile.am
-+++ b/plugins/Makefile.am
-@@ -8,6 +8,7 @@
+Index: gnome-settings-daemon-3.7.91/plugins/Makefile.am
+===================================================================
+--- gnome-settings-daemon-3.7.91.orig/plugins/Makefile.am	2013-03-08 14:25:07.000000000 +0000
++++ gnome-settings-daemon-3.7.91/plugins/Makefile.am	2013-03-08 14:25:07.000000000 +0000
+@@ -6,6 +6,7 @@
  	clipboard	\
  	color		\
  	cursor		\
