@@ -1,3 +1,9 @@
+gnome-settings-daemon (3.6.4-0ubuntu7) UNRELEASED; urgency=low
+
+  * Add upstart user session job for gnome-settings-daemon.
+
+ -- Stéphane Graber <stgraber@ubuntu.com>  Mon, 11 Mar 2013 14:48:14 -0400
+
 gnome-settings-daemon (3.6.4-0ubuntu6) raring; urgency=low
 
   * debian/patches/nexus_orientation.patch: Fix memory leak when building

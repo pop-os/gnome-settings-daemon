@@ -17,6 +17,7 @@ build/gnome-settings-daemon::
 
 install/gnome-settings-daemon::
 	/usr/bin/install -c gnome-settings-daemon/gnome-update-wallpaper-cache 'debian/tmp/usr/lib/gnome-settings-daemon'
+	install -m 644 -D debian/gnome-settings-daemon.user-session.upstart debian/gnome-settings-daemon/usr/share/upstart/sessions/gnome-settings-daemon.conf
 
 binary-install/gnome-settings-daemon::
 	find debian -name '*.a' -delete
