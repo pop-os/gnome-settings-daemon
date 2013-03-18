@@ -1,5 +1,6 @@
 gnome-settings-daemon (3.7.91-1) UNRELEASED; urgency=low
 
+  [ Andreas Henriksson ]
   * New upstream release
   * Bump the following build-dependencies according to configure.ac
     - libglib2.0-dev, libgtk-3-dev, gsettings-desktop-schemas-dev,
@@ -11,7 +12,14 @@ gnome-settings-daemon (3.7.91-1) UNRELEASED; urgency=low
   * Drop debian/patches/power-ignore-bad-dbus-requests.patch, fixed upstream.
   * Remaining patches refreshed to apply cleanly.
 
- -- Andreas Henriksson <andreas@fatal.se>  Fri, 08 Mar 2013 14:09:48 +0100
+  [ Sjoerd Simons ]
+  * debian/patches/revert_git_datetime_dropping.patch:
+    - Dropped. Control center uses datetime directly now
+  * debian/control.in: Break gnome-control-center (<< 3.7) as the DateTime
+    mechanism is now dropped.
+  * debian/control.in: Remove gstreamer build-depends, no longer needed
+
+ -- Sjoerd Simons <sjoerd@debian.org>  Mon, 18 Mar 2013 20:40:56 +0100
 
 gnome-settings-daemon (3.6.4-1) experimental; urgency=low
 
