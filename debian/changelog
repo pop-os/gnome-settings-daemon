@@ -1,4 +1,4 @@
-gnome-settings-daemon (3.7.92-1) UNRELEASED; urgency=low
+gnome-settings-daemon (3.7.92-1) experimental; urgency=low
 
   [ Andreas Henriksson ]
   * New upstream release
@@ -23,7 +23,7 @@ gnome-settings-daemon (3.7.92-1) UNRELEASED; urgency=low
     + Added. Disable the cursor manager, causes crashes with Xorg 1.12. Remove
     once Xorg 1.14 is available or when bgo#696118 is fixed upstream
 
- -- Sjoerd Simons <sjoerd@debian.org>  Sat, 23 Mar 2013 13:15:01 +0100
+ -- Sjoerd Simons <sjoerd@debian.org>  Sat, 23 Mar 2013 16:34:51 +0100
 
 gnome-settings-daemon (3.6.4-1) experimental; urgency=low
 
