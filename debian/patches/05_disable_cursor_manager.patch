@@ -7,7 +7,7 @@ index 611392b..563169c 100644
          gnome_settings_profile_start (NULL);
  
 +        g_debug ("Not starting curor manager, assuming old X server");
-+        return FALSE;
++        return TRUE;
 +
          if (supports_cursor_xfixes () == FALSE) {
                  g_debug ("XFixes cursor extension not available, will not hide the cursor");
