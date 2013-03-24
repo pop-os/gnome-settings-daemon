@@ -1,0 +1,28 @@
+From e3decb2a02ef2704bd395992bbc94d130c0c91f7 Mon Sep 17 00:00:00 2001
+From: Emilio Pozuelo Monfort <pochu27@gmail.com>
+Date: Sun, 24 Mar 2013 21:38:17 +0100
+Subject: [PATCH] Fix build on non-Linux platforms
+
+We need stdlib.h to get the definition of NULL.
+
+https://bugzilla.gnome.org/show_bug.cgi?id=696515
+---
+ plugins/power/gsd-backlight-linux.c |    2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/plugins/power/gsd-backlight-linux.c b/plugins/power/gsd-backlight-linux.c
+index f8f91a0..bbaf490 100644
+--- a/plugins/power/gsd-backlight-linux.c
++++ b/plugins/power/gsd-backlight-linux.c
+@@ -19,6 +19,8 @@
+  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+  */
+ 
++#include <stdlib.h>
++
+ #include "config.h"
+ 
+ #include "gsd-backlight-linux.h"
+-- 
+1.7.10.4
+
