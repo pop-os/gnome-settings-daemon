@@ -1,3 +1,11 @@
+gnome-settings-daemon (3.7.92-1.1) UNRELEASED; urgency=low
+
+  * debian/patches/08-Fix-build-on-non-Linux-platforms.patch:
+    + Fix the build on kfreebsd and hurd by including stdlib.h
+      before using NULL.
+
+ -- Emilio Pozuelo Monfort <pochu@debian.org>  Sun, 24 Mar 2013 21:57:44 +0100
+
 gnome-settings-daemon (3.7.92-1) experimental; urgency=low
 
   [ Andreas Henriksson ]

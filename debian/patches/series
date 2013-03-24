@@ -1,2 +1,3 @@
 04_superP.patch
 05_disable_cursor_manager.patch
+08-Fix-build-on-non-Linux-platforms.patch
