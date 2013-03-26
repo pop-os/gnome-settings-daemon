@@ -6,6 +6,8 @@ gnome-settings-daemon (3.8.0-1) UNRELEASED; urgency=low
   * New upstream release.
     + debian/control.in:
       - Bump libgnome-desktop3-dev requirement for the cursor fix.
+    + debian/patches/05_disable_cursor_manager.patch:
+      - Dropped, fixed upstream in a different way.
 
  -- Emilio Pozuelo Monfort <pochu@debian.org>  Sun, 24 Mar 2013 21:57:44 +0100
 
