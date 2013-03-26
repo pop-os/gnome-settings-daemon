@@ -4,6 +4,8 @@ gnome-settings-daemon (3.8.0-1) UNRELEASED; urgency=low
     + Fix the build on kfreebsd and hurd by including stdlib.h
       before using NULL.
   * New upstream release.
+    + debian/control.in:
+      - Bump libgnome-desktop3-dev requirement for the cursor fix.
 
  -- Emilio Pozuelo Monfort <pochu@debian.org>  Sun, 24 Mar 2013 21:57:44 +0100
 
