@@ -1,4 +1,4 @@
-gnome-settings-daemon (3.6.4-0ubuntu8) UNRELEASED; urgency=low
+gnome-settings-daemon (3.6.4-0ubuntu8) raring; urgency=low
 
   * debian/control.in:
     - Breaks on g-c-c and indicator-datetime versions using the old interface
@@ -10,7 +10,7 @@ gnome-settings-daemon (3.6.4-0ubuntu8) UNRELEASED; urgency=low
   * debian/patches/revert_git_datetime_dropping.patch:
     - drop the upstream's revert
 
- -- Sebastien Bacher <seb128@ubuntu.com>  Mon, 18 Feb 2013 12:53:53 +0000
+ -- Sebastien Bacher <seb128@ubuntu.com>  Tue, 26 Mar 2013 21:20:26 +0100
 
 gnome-settings-daemon (3.6.4-0ubuntu7) raring; urgency=low
 
