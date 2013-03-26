@@ -1,3 +1,17 @@
+gnome-settings-daemon (3.6.4-0ubuntu8) UNRELEASED; urgency=low
+
+  * debian/control.in:
+    - Breaks on g-c-c and indicator-datetime versions using the old interface
+    - recommends systemd-service (lp: #1153567)
+  * debian/gnome-settings-daemon.install:
+    - updated for the patch being dropped
+  * debian/gnome-settings-daemon.main:
+    - clean org.gnome.SettingsDaemon.DateTimeMechanism.conf conffile
+  * debian/patches/revert_git_datetime_dropping.patch:
+    - drop the upstream's revert
+
+ -- Sebastien Bacher <seb128@ubuntu.com>  Mon, 18 Feb 2013 12:53:53 +0000
+
 gnome-settings-daemon (3.6.4-0ubuntu7) raring; urgency=low
 
   * Add upstart user session job for gnome-settings-daemon.

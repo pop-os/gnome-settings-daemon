@@ -9,7 +9,7 @@ Maintainer: Ubuntu Desktop Team <ubuntu-desktop@lists.ubuntu.com>
 XSBC-Original-Maintainer: Debian GNOME Maintainers <pkg-gnome-maintainers@lists.alioth.debian.org>
 Uploaders: Debian GNOME Maintainers <pkg-gnome-maintainers@lists.alioth.debian.org>
 Build-Depends: cdbs,
-               debhelper (>= 5),
+               debhelper (>= 9),
                gnome-pkg-tools,
                gtk-doc-tools,
                dh-autoreconf,
@@ -42,7 +42,7 @@ Build-Depends: cdbs,
                xserver-xorg-input-wacom,
                libgnomekbd-dev (>= 3.5.1),
                libxklavier-dev
-Standards-Version: 3.9.1
+Standards-Version: 3.9.3
 Vcs-Bzr: https://code.launchpad.net/~ubuntu-desktop/gnome-settings-daemon/ubuntu
 
 Package: gnome-settings-daemon
@@ -51,7 +51,9 @@ Depends: ${shlibs:Depends},
          ${misc:Depends},
          gsettings-desktop-schemas (>= 3.3.90-0ubuntu2),
          nautilus-data (>= 2.91.3-1)
-Recommends: pulseaudio
+Recommends: pulseaudio,
+            systemd-services,
+Pre-Depends: ${misc:Pre-Depends}
 Breaks: rhythmbox (<< 0.11.5),
         banshee (<< 0.13.2+dfsg-7),
         totem (<< 2.22.0),

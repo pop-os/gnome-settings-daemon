@@ -1,6 +1,7 @@
-diff --exclude .pc -Nur gnome-settings-daemon-3.6.4/configure.ac gnome-settings-daemon-3.6.4.new/configure.ac
---- gnome-settings-daemon-3.6.4/configure.ac	2013-01-23 12:31:33.000000000 +0100
-+++ gnome-settings-daemon-3.6.4.new/configure.ac	2013-01-23 12:35:14.091161343 +0100
+Index: gnome-settings-daemon-3.6.4/configure.ac
+===================================================================
+--- gnome-settings-daemon-3.6.4.orig/configure.ac	2013-02-18 12:57:16.535698777 +0000
++++ gnome-settings-daemon-3.6.4/configure.ac	2013-02-18 12:57:16.511698776 +0000
 @@ -54,7 +54,6 @@
  LIBWACOM_REQUIRED_VERSION=0.6
  UPOWER_REQUIRED_VERSION=0.9.11
@@ -9,7 +10,7 @@ diff --exclude .pc -Nur gnome-settings-daemon-3.6.4/configure.ac gnome-settings-
  
  EXTRA_COMPILE_WARNINGS(yes)
  
-@@ -222,21 +221,8 @@
+@@ -204,21 +203,8 @@
  dnl - Keyboard plugin stuff
  dnl ---------------------------------------------------------------------------
  
@@ -33,17 +34,18 @@ diff --exclude .pc -Nur gnome-settings-daemon-3.6.4/configure.ac gnome-settings-
  
  dnl ---------------------------------------------------------------------------
  dnl - Housekeeping plugin stuff
-@@ -652,7 +638,6 @@
-         PolicyKit support:        ${HAVE_POLKIT}
+@@ -595,7 +581,6 @@
+ 
          Session tracking:         ${SESSION_TRACKING}
          LCMS DICT support:        ${have_new_lcms}
 -        IBus support:             ${enable_ibus}
          Libnotify support:        ${have_libnotify}
  	App indicator support:    ${enable_appindicator}
          PackageKit support:       ${have_packagekit}
-diff --exclude .pc -Nur gnome-settings-daemon-3.6.4/data/Makefile.am gnome-settings-daemon-3.6.4.new/data/Makefile.am
---- gnome-settings-daemon-3.6.4/data/Makefile.am	2012-12-20 19:32:01.000000000 +0100
-+++ gnome-settings-daemon-3.6.4.new/data/Makefile.am	2013-01-23 12:35:14.091161343 +0100
+Index: gnome-settings-daemon-3.6.4/data/Makefile.am
+===================================================================
+--- gnome-settings-daemon-3.6.4.orig/data/Makefile.am	2013-02-18 12:57:16.535698777 +0000
++++ gnome-settings-daemon-3.6.4/data/Makefile.am	2013-02-18 12:57:16.511698776 +0000
 @@ -67,12 +67,3 @@
  	Makefile.in			\
  	$(gsettings_SCHEMAS:.xml=.valid)
@@ -57,9 +59,10 @@ diff --exclude .pc -Nur gnome-settings-daemon-3.6.4/data/Makefile.am gnome-setti
 -
 -CLEANFILES = $(dbusservice_DATA)
 -endif
-diff --exclude .pc -Nur gnome-settings-daemon-3.6.4/data/org.gnome.settings-daemon.plugins.media-keys.gschema.xml.in.in gnome-settings-daemon-3.6.4.new/data/org.gnome.settings-daemon.plugins.media-keys.gschema.xml.in.in
---- gnome-settings-daemon-3.6.4/data/org.gnome.settings-daemon.plugins.media-keys.gschema.xml.in.in	2013-01-23 12:31:33.667154707 +0100
-+++ gnome-settings-daemon-3.6.4.new/data/org.gnome.settings-daemon.plugins.media-keys.gschema.xml.in.in	2013-01-23 12:35:14.087161343 +0100
+Index: gnome-settings-daemon-3.6.4/data/org.gnome.settings-daemon.plugins.media-keys.gschema.xml.in.in
+===================================================================
+--- gnome-settings-daemon-3.6.4.orig/data/org.gnome.settings-daemon.plugins.media-keys.gschema.xml.in.in	2013-02-18 12:57:16.535698777 +0000
++++ gnome-settings-daemon-3.6.4/data/org.gnome.settings-daemon.plugins.media-keys.gschema.xml.in.in	2013-02-18 12:57:16.515698776 +0000
 @@ -180,16 +180,6 @@
        <_summary>Magnifier zoom out</_summary>
        <_description>Binding for the magnifier to zoom out</_description>
@@ -77,9 +80,10 @@ diff --exclude .pc -Nur gnome-settings-daemon-3.6.4/data/org.gnome.settings-daem
    </schema>
  
    <schema gettext-domain="@GETTEXT_PACKAGE@" id="org.gnome.settings-daemon.plugins.media-keys.custom-keybinding">
-diff --exclude .pc -Nur gnome-settings-daemon-3.6.4/plugins/keyboard/delayed-dialog.c gnome-settings-daemon-3.6.4.new/plugins/keyboard/delayed-dialog.c
---- gnome-settings-daemon-3.6.4/plugins/keyboard/delayed-dialog.c	1970-01-01 01:00:00.000000000 +0100
-+++ gnome-settings-daemon-3.6.4.new/plugins/keyboard/delayed-dialog.c	2013-01-23 12:35:14.071161343 +0100
+Index: gnome-settings-daemon-3.6.4/plugins/keyboard/delayed-dialog.c
+===================================================================
+--- /dev/null	1970-01-01 00:00:00.000000000 +0000
++++ gnome-settings-daemon-3.6.4/plugins/keyboard/delayed-dialog.c	2013-02-18 12:57:16.515698776 +0000
 @@ -0,0 +1,128 @@
 +/*
 + * Copyright © 2006 Novell, Inc.
@@ -209,9 +213,10 @@ diff --exclude .pc -Nur gnome-settings-daemon-3.6.4/plugins/keyboard/delayed-dia
 +
 +        return GDK_FILTER_CONTINUE;
 +}
-diff --exclude .pc -Nur gnome-settings-daemon-3.6.4/plugins/keyboard/delayed-dialog.h gnome-settings-daemon-3.6.4.new/plugins/keyboard/delayed-dialog.h
---- gnome-settings-daemon-3.6.4/plugins/keyboard/delayed-dialog.h	1970-01-01 01:00:00.000000000 +0100
-+++ gnome-settings-daemon-3.6.4.new/plugins/keyboard/delayed-dialog.h	2013-01-23 12:35:14.071161343 +0100
+Index: gnome-settings-daemon-3.6.4/plugins/keyboard/delayed-dialog.h
+===================================================================
+--- /dev/null	1970-01-01 00:00:00.000000000 +0000
++++ gnome-settings-daemon-3.6.4/plugins/keyboard/delayed-dialog.h	2013-02-18 12:57:16.515698776 +0000
 @@ -0,0 +1,32 @@
 +/*
 + * Copyright © 2006 Novell, Inc.
@@ -245,9 +250,10 @@ diff --exclude .pc -Nur gnome-settings-daemon-3.6.4/plugins/keyboard/delayed-dia
 +G_END_DECLS
 +
 +#endif
-diff --exclude .pc -Nur gnome-settings-daemon-3.6.4/plugins/keyboard/gkbd-configuration.c gnome-settings-daemon-3.6.4.new/plugins/keyboard/gkbd-configuration.c
---- gnome-settings-daemon-3.6.4/plugins/keyboard/gkbd-configuration.c	1970-01-01 01:00:00.000000000 +0100
-+++ gnome-settings-daemon-3.6.4.new/plugins/keyboard/gkbd-configuration.c	2013-01-23 12:35:14.071161343 +0100
+Index: gnome-settings-daemon-3.6.4/plugins/keyboard/gkbd-configuration.c
+===================================================================
+--- /dev/null	1970-01-01 00:00:00.000000000 +0000
++++ gnome-settings-daemon-3.6.4/plugins/keyboard/gkbd-configuration.c	2013-02-18 12:57:16.515698776 +0000
 @@ -0,0 +1,350 @@
 +/*
 + * Copyright (C) 2010 Canonical Ltd.
@@ -599,9 +605,10 @@ diff --exclude .pc -Nur gnome-settings-daemon-3.6.4/plugins/keyboard/gkbd-config
 +{
 +	return configuration->priv->short_group_names;
 +}
-diff --exclude .pc -Nur gnome-settings-daemon-3.6.4/plugins/keyboard/gkbd-configuration.h gnome-settings-daemon-3.6.4.new/plugins/keyboard/gkbd-configuration.h
---- gnome-settings-daemon-3.6.4/plugins/keyboard/gkbd-configuration.h	1970-01-01 01:00:00.000000000 +0100
-+++ gnome-settings-daemon-3.6.4.new/plugins/keyboard/gkbd-configuration.h	2013-01-23 12:35:14.071161343 +0100
+Index: gnome-settings-daemon-3.6.4/plugins/keyboard/gkbd-configuration.h
+===================================================================
+--- /dev/null	1970-01-01 00:00:00.000000000 +0000
++++ gnome-settings-daemon-3.6.4/plugins/keyboard/gkbd-configuration.h	2013-02-18 12:57:16.515698776 +0000
 @@ -0,0 +1,65 @@
 +/*
 + * Copyright (C) 2010 Canonical Ltd.
@@ -668,9 +675,10 @@ diff --exclude .pc -Nur gnome-settings-daemon-3.6.4/plugins/keyboard/gkbd-config
 +G_END_DECLS
 +
 +#endif
-diff --exclude .pc -Nur gnome-settings-daemon-3.6.4/plugins/keyboard/gsd-keyboard-manager.c gnome-settings-daemon-3.6.4.new/plugins/keyboard/gsd-keyboard-manager.c
---- gnome-settings-daemon-3.6.4/plugins/keyboard/gsd-keyboard-manager.c	2013-01-10 14:37:58.000000000 +0100
-+++ gnome-settings-daemon-3.6.4.new/plugins/keyboard/gsd-keyboard-manager.c	2013-01-23 12:35:14.075161343 +0100
+Index: gnome-settings-daemon-3.6.4/plugins/keyboard/gsd-keyboard-manager.c
+===================================================================
+--- gnome-settings-daemon-3.6.4.orig/plugins/keyboard/gsd-keyboard-manager.c	2013-02-18 12:57:16.535698777 +0000
++++ gnome-settings-daemon-3.6.4/plugins/keyboard/gsd-keyboard-manager.c	2013-02-18 12:57:16.519698776 +0000
 @@ -40,22 +40,19 @@
  
  #include <X11/XKBlib.h>
@@ -2441,9 +2449,10 @@ diff --exclude .pc -Nur gnome-settings-daemon-3.6.4/plugins/keyboard/gsd-keyboar
          object_class->finalize = gsd_keyboard_manager_finalize;
  
          g_type_class_add_private (klass, sizeof (GsdKeyboardManagerPrivate));
-diff --exclude .pc -Nur gnome-settings-daemon-3.6.4/plugins/keyboard/gsd-keyboard-manager.h gnome-settings-daemon-3.6.4.new/plugins/keyboard/gsd-keyboard-manager.h
---- gnome-settings-daemon-3.6.4/plugins/keyboard/gsd-keyboard-manager.h	2012-08-30 20:55:28.000000000 +0200
-+++ gnome-settings-daemon-3.6.4.new/plugins/keyboard/gsd-keyboard-manager.h	2013-01-23 12:35:14.079161343 +0100
+Index: gnome-settings-daemon-3.6.4/plugins/keyboard/gsd-keyboard-manager.h
+===================================================================
+--- gnome-settings-daemon-3.6.4.orig/plugins/keyboard/gsd-keyboard-manager.h	2013-02-18 12:57:16.535698777 +0000
++++ gnome-settings-daemon-3.6.4/plugins/keyboard/gsd-keyboard-manager.h	2013-02-18 12:57:16.523698776 +0000
 @@ -51,6 +51,7 @@
  gboolean                gsd_keyboard_manager_start               (GsdKeyboardManager *manager,
                                                                 GError         **error);
@@ -2452,9 +2461,10 @@ diff --exclude .pc -Nur gnome-settings-daemon-3.6.4/plugins/keyboard/gsd-keyboar
  
  G_END_DECLS
  
-diff --exclude .pc -Nur gnome-settings-daemon-3.6.4/plugins/keyboard/gsd-keyboard-xkb.c gnome-settings-daemon-3.6.4.new/plugins/keyboard/gsd-keyboard-xkb.c
---- gnome-settings-daemon-3.6.4/plugins/keyboard/gsd-keyboard-xkb.c	1970-01-01 01:00:00.000000000 +0100
-+++ gnome-settings-daemon-3.6.4.new/plugins/keyboard/gsd-keyboard-xkb.c	2013-01-23 12:35:14.079161343 +0100
+Index: gnome-settings-daemon-3.6.4/plugins/keyboard/gsd-keyboard-xkb.c
+===================================================================
+--- /dev/null	1970-01-01 00:00:00.000000000 +0000
++++ gnome-settings-daemon-3.6.4/plugins/keyboard/gsd-keyboard-xkb.c	2013-02-18 12:57:16.523698776 +0000
 @@ -0,0 +1,851 @@
 +/* -*- Mode: C; tab-width: 8; indent-tabs-mode: nil; c-basic-offset: 8 -*-
 + *
@@ -3307,9 +3317,10 @@ diff --exclude .pc -Nur gnome-settings-daemon-3.6.4/plugins/keyboard/gsd-keyboar
 +
 +	inited_ok = FALSE;
 +}
-diff --exclude .pc -Nur gnome-settings-daemon-3.6.4/plugins/keyboard/gsd-keyboard-xkb.h gnome-settings-daemon-3.6.4.new/plugins/keyboard/gsd-keyboard-xkb.h
---- gnome-settings-daemon-3.6.4/plugins/keyboard/gsd-keyboard-xkb.h	1970-01-01 01:00:00.000000000 +0100
-+++ gnome-settings-daemon-3.6.4.new/plugins/keyboard/gsd-keyboard-xkb.h	2013-01-23 12:35:14.079161343 +0100
+Index: gnome-settings-daemon-3.6.4/plugins/keyboard/gsd-keyboard-xkb.h
+===================================================================
+--- /dev/null	1970-01-01 00:00:00.000000000 +0000
++++ gnome-settings-daemon-3.6.4/plugins/keyboard/gsd-keyboard-xkb.h	2013-02-18 12:57:16.523698776 +0000
 @@ -0,0 +1,39 @@
 +/* -*- Mode: C; tab-width: 8; indent-tabs-mode: nil; c-basic-offset: 8 -*-
 + * gnome-settings-keyboard-xkb.h
@@ -3350,9 +3361,10 @@ diff --exclude .pc -Nur gnome-settings-daemon-3.6.4/plugins/keyboard/gsd-keyboar
 +                                               void                  *userData);
 +
 +#endif
-diff --exclude .pc -Nur gnome-settings-daemon-3.6.4/plugins/keyboard/Makefile.am gnome-settings-daemon-3.6.4.new/plugins/keyboard/Makefile.am
---- gnome-settings-daemon-3.6.4/plugins/keyboard/Makefile.am	2013-01-10 14:37:58.000000000 +0100
-+++ gnome-settings-daemon-3.6.4.new/plugins/keyboard/Makefile.am	2013-01-23 12:35:14.079161343 +0100
+Index: gnome-settings-daemon-3.6.4/plugins/keyboard/Makefile.am
+===================================================================
+--- gnome-settings-daemon-3.6.4.orig/plugins/keyboard/Makefile.am	2013-02-18 12:57:16.535698777 +0000
++++ gnome-settings-daemon-3.6.4/plugins/keyboard/Makefile.am	2013-02-18 12:57:16.523698776 +0000
 @@ -20,20 +20,25 @@
  	gsd-keyboard-plugin.c	\
  	gsd-keyboard-manager.h	\
@@ -3450,9 +3462,10 @@ diff --exclude .pc -Nur gnome-settings-daemon-3.6.4/plugins/keyboard/Makefile.am
  EXTRA_DIST = 			\
  	$(icons_DATA)		\
  	$(plugin_in_files)	\
-diff --exclude .pc -Nur gnome-settings-daemon-3.6.4/plugins/keyboard/Makefile.in gnome-settings-daemon-3.6.4.new/plugins/keyboard/Makefile.in
---- gnome-settings-daemon-3.6.4/plugins/keyboard/Makefile.in	2013-01-10 15:00:27.000000000 +0100
-+++ gnome-settings-daemon-3.6.4.new/plugins/keyboard/Makefile.in	2013-01-23 12:35:14.083161343 +0100
+Index: gnome-settings-daemon-3.6.4/plugins/keyboard/Makefile.in
+===================================================================
+--- gnome-settings-daemon-3.6.4.orig/plugins/keyboard/Makefile.in	2013-02-18 12:57:16.535698777 +0000
++++ gnome-settings-daemon-3.6.4/plugins/keyboard/Makefile.in	2013-02-18 12:57:16.527698777 +0000
 @@ -1,8 +1,9 @@
 -# Makefile.in generated by automake 1.12.2 from Makefile.am.
 +# Makefile.in generated by automake 1.11.3 from Makefile.am.
@@ -4076,9 +4089,10 @@ diff --exclude .pc -Nur gnome-settings-daemon-3.6.4/plugins/keyboard/Makefile.in
  
  @GSD_INTLTOOL_PLUGIN_RULE@
  
-diff --exclude .pc -Nur gnome-settings-daemon-3.6.4/plugins/keyboard/test-keyboard.c gnome-settings-daemon-3.6.4.new/plugins/keyboard/test-keyboard.c
---- gnome-settings-daemon-3.6.4/plugins/keyboard/test-keyboard.c	2012-09-03 17:39:14.000000000 +0200
-+++ gnome-settings-daemon-3.6.4.new/plugins/keyboard/test-keyboard.c	1970-01-01 01:00:00.000000000 +0100
+Index: gnome-settings-daemon-3.6.4/plugins/keyboard/test-keyboard.c
+===================================================================
+--- gnome-settings-daemon-3.6.4.orig/plugins/keyboard/test-keyboard.c	2013-02-18 12:57:16.535698777 +0000
++++ /dev/null	1970-01-01 00:00:00.000000000 +0000
 @@ -1,7 +0,0 @@
 -#define NEW gsd_keyboard_manager_new
 -#define START gsd_keyboard_manager_start
@@ -4087,9 +4101,10 @@ diff --exclude .pc -Nur gnome-settings-daemon-3.6.4/plugins/keyboard/test-keyboa
 -#include "gsd-keyboard-manager.h"
 -
 -#include "test-plugin.h"
-diff --exclude .pc -Nur gnome-settings-daemon-3.6.4/plugins/keyboard/test-keyboard-ibus-utils.c gnome-settings-daemon-3.6.4.new/plugins/keyboard/test-keyboard-ibus-utils.c
---- gnome-settings-daemon-3.6.4/plugins/keyboard/test-keyboard-ibus-utils.c	2012-10-05 16:22:43.000000000 +0200
-+++ gnome-settings-daemon-3.6.4.new/plugins/keyboard/test-keyboard-ibus-utils.c	1970-01-01 01:00:00.000000000 +0100
+Index: gnome-settings-daemon-3.6.4/plugins/keyboard/test-keyboard-ibus-utils.c
+===================================================================
+--- gnome-settings-daemon-3.6.4.orig/plugins/keyboard/test-keyboard-ibus-utils.c	2013-02-18 12:57:16.535698777 +0000
++++ /dev/null	1970-01-01 00:00:00.000000000 +0000
 @@ -1,116 +0,0 @@
 -#include "gsd-keyboard-manager.c"
 -
@@ -4207,9 +4222,10 @@ diff --exclude .pc -Nur gnome-settings-daemon-3.6.4/plugins/keyboard/test-keyboa
 -
 -        return 0;
 -}
-diff --exclude .pc -Nur gnome-settings-daemon-3.6.4/plugins/media-keys/gsd-media-keys-manager.c gnome-settings-daemon-3.6.4.new/plugins/media-keys/gsd-media-keys-manager.c
---- gnome-settings-daemon-3.6.4/plugins/media-keys/gsd-media-keys-manager.c	2013-01-23 12:31:33.827154712 +0100
-+++ gnome-settings-daemon-3.6.4.new/plugins/media-keys/gsd-media-keys-manager.c	2013-01-23 12:35:14.091161343 +0100
+Index: gnome-settings-daemon-3.6.4/plugins/media-keys/gsd-media-keys-manager.c
+===================================================================
+--- gnome-settings-daemon-3.6.4.orig/plugins/media-keys/gsd-media-keys-manager.c	2013-02-18 12:57:16.535698777 +0000
++++ gnome-settings-daemon-3.6.4/plugins/media-keys/gsd-media-keys-manager.c	2013-02-18 12:57:16.531698777 +0000
 @@ -103,10 +103,6 @@
  #define VOLUME_STEP 6           /* percents for one volume button press */
  #define MAX_VOLUME 65536.0
@@ -4273,9 +4289,10 @@ diff --exclude .pc -Nur gnome-settings-daemon-3.6.4/plugins/media-keys/gsd-media
          /* Note, no default so compiler catches missing keys */
          case CUSTOM_KEY:
                  g_assert_not_reached ();
-diff --exclude .pc -Nur gnome-settings-daemon-3.6.4/plugins/media-keys/shortcuts-list.h gnome-settings-daemon-3.6.4.new/plugins/media-keys/shortcuts-list.h
---- gnome-settings-daemon-3.6.4/plugins/media-keys/shortcuts-list.h	2013-01-23 12:31:33.000000000 +0100
-+++ gnome-settings-daemon-3.6.4.new/plugins/media-keys/shortcuts-list.h	2013-01-23 12:35:14.091161343 +0100
+Index: gnome-settings-daemon-3.6.4/plugins/media-keys/shortcuts-list.h
+===================================================================
+--- gnome-settings-daemon-3.6.4.orig/plugins/media-keys/shortcuts-list.h	2013-02-18 12:57:16.535698777 +0000
++++ gnome-settings-daemon-3.6.4/plugins/media-keys/shortcuts-list.h	2013-02-18 12:57:16.531698777 +0000
 @@ -81,8 +81,6 @@
          KEYBOARD_BRIGHTNESS_DOWN_KEY,
          KEYBOARD_BRIGHTNESS_TOGGLE_KEY,

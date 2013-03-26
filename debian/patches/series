@@ -13,7 +13,6 @@
 64_restore_terminal_keyboard_shortcut_schema.patch
 90_set_gmenus_xsettings.patch
 disable_three_touch_tap.patch
-revert_git_datetime_dropping.patch
 bugzilla_segfault_dpms.patch
 correct_logout_action.patch
 power-no-fallback-notifications.patch
