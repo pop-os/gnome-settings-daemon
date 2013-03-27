@@ -8,6 +8,13 @@ gnome-settings-daemon (3.8.0-1) UNRELEASED; urgency=low
       - Bump libgnome-desktop3-dev requirement for the cursor fix.
     + debian/patches/05_disable_cursor_manager.patch:
       - Dropped, fixed upstream in a different way.
+    + d/p/11-cursor-add-error-quark.patch
+      d/p/12-cursor-set-an-error-if-we-can-t-create-a-monitor.patch
+      d/p/13-cursor-set-error-if-we-don-t-have-the-necessary-X-su.patch:
+      - New patches. The upstream fix to disable the cursor with
+        Xorg < 1.14 was incomplete. With these patches we gracefully
+        fail with Xorg < 1.14 and the cursor plugin will be enabled with
+        Xorg >= 1.14.
 
  -- Emilio Pozuelo Monfort <pochu@debian.org>  Sun, 24 Mar 2013 21:57:44 +0100
 
