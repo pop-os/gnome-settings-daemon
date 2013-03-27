@@ -1,4 +1,4 @@
-gnome-settings-daemon (3.8.0-1) UNRELEASED; urgency=low
+gnome-settings-daemon (3.8.0-1) experimental; urgency=low
 
   * debian/patches/08-Fix-build-on-non-Linux-platforms.patch:
     + Fix the build on kfreebsd and hurd by including stdlib.h
@@ -16,7 +16,7 @@ gnome-settings-daemon (3.8.0-1) UNRELEASED; urgency=low
         fail with Xorg < 1.14 and the cursor plugin will be enabled with
         Xorg >= 1.14.
 
- -- Emilio Pozuelo Monfort <pochu@debian.org>  Sun, 24 Mar 2013 21:57:44 +0100
+ -- Emilio Pozuelo Monfort <pochu@debian.org>  Wed, 27 Mar 2013 16:48:21 +0100
 
 gnome-settings-daemon (3.7.92-1) experimental; urgency=low
 
