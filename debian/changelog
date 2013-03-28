@@ -1,3 +1,12 @@
+gnome-settings-daemon (3.8.0-2) UNRELEASED; urgency=low
+
+  * debian/control.in:
+    + Bump libgnome-desktop-3-dev build dependency to get a .symbols
+      file with Build-Depends-Package, to ensure a proper runtime
+      dependency.
+
+ -- Emilio Pozuelo Monfort <pochu@debian.org>  Thu, 28 Mar 2013 12:26:21 +0100
+
 gnome-settings-daemon (3.8.0-1) experimental; urgency=low
 
   * debian/patches/08-Fix-build-on-non-Linux-platforms.patch:
