@@ -1,7 +1,7 @@
 Index: gnome-settings-daemon-3.6.4/configure.ac
 ===================================================================
---- gnome-settings-daemon-3.6.4.orig/configure.ac	2013-02-18 12:57:16.535698777 +0000
-+++ gnome-settings-daemon-3.6.4/configure.ac	2013-02-18 12:57:16.511698776 +0000
+--- gnome-settings-daemon-3.6.4.orig/configure.ac	2013-04-17 17:52:29.768040154 +0200
++++ gnome-settings-daemon-3.6.4/configure.ac	2013-04-17 17:52:29.748040153 +0200
 @@ -54,7 +54,6 @@
  LIBWACOM_REQUIRED_VERSION=0.6
  UPOWER_REQUIRED_VERSION=0.9.11
@@ -44,8 +44,8 @@ Index: gnome-settings-daemon-3.6.4/configure.ac
          PackageKit support:       ${have_packagekit}
 Index: gnome-settings-daemon-3.6.4/data/Makefile.am
 ===================================================================
---- gnome-settings-daemon-3.6.4.orig/data/Makefile.am	2013-02-18 12:57:16.535698777 +0000
-+++ gnome-settings-daemon-3.6.4/data/Makefile.am	2013-02-18 12:57:16.511698776 +0000
+--- gnome-settings-daemon-3.6.4.orig/data/Makefile.am	2013-04-17 17:52:29.768040154 +0200
++++ gnome-settings-daemon-3.6.4/data/Makefile.am	2013-04-17 17:52:29.748040153 +0200
 @@ -67,12 +67,3 @@
  	Makefile.in			\
  	$(gsettings_SCHEMAS:.xml=.valid)
@@ -61,8 +61,8 @@ Index: gnome-settings-daemon-3.6.4/data/Makefile.am
 -endif
 Index: gnome-settings-daemon-3.6.4/data/org.gnome.settings-daemon.plugins.media-keys.gschema.xml.in.in
 ===================================================================
---- gnome-settings-daemon-3.6.4.orig/data/org.gnome.settings-daemon.plugins.media-keys.gschema.xml.in.in	2013-02-18 12:57:16.535698777 +0000
-+++ gnome-settings-daemon-3.6.4/data/org.gnome.settings-daemon.plugins.media-keys.gschema.xml.in.in	2013-02-18 12:57:16.515698776 +0000
+--- gnome-settings-daemon-3.6.4.orig/data/org.gnome.settings-daemon.plugins.media-keys.gschema.xml.in.in	2013-04-17 17:52:29.768040154 +0200
++++ gnome-settings-daemon-3.6.4/data/org.gnome.settings-daemon.plugins.media-keys.gschema.xml.in.in	2013-04-17 17:52:29.748040153 +0200
 @@ -180,16 +180,6 @@
        <_summary>Magnifier zoom out</_summary>
        <_description>Binding for the magnifier to zoom out</_description>
@@ -83,7 +83,7 @@ Index: gnome-settings-daemon-3.6.4/data/org.gnome.settings-daemon.plugins.media-
 Index: gnome-settings-daemon-3.6.4/plugins/keyboard/delayed-dialog.c
 ===================================================================
 --- /dev/null	1970-01-01 00:00:00.000000000 +0000
-+++ gnome-settings-daemon-3.6.4/plugins/keyboard/delayed-dialog.c	2013-02-18 12:57:16.515698776 +0000
++++ gnome-settings-daemon-3.6.4/plugins/keyboard/delayed-dialog.c	2013-04-17 17:52:29.748040153 +0200
 @@ -0,0 +1,128 @@
 +/*
 + * Copyright © 2006 Novell, Inc.
@@ -216,7 +216,7 @@ Index: gnome-settings-daemon-3.6.4/plugins/keyboard/delayed-dialog.c
 Index: gnome-settings-daemon-3.6.4/plugins/keyboard/delayed-dialog.h
 ===================================================================
 --- /dev/null	1970-01-01 00:00:00.000000000 +0000
-+++ gnome-settings-daemon-3.6.4/plugins/keyboard/delayed-dialog.h	2013-02-18 12:57:16.515698776 +0000
++++ gnome-settings-daemon-3.6.4/plugins/keyboard/delayed-dialog.h	2013-04-17 17:52:29.748040153 +0200
 @@ -0,0 +1,32 @@
 +/*
 + * Copyright © 2006 Novell, Inc.
@@ -253,7 +253,7 @@ Index: gnome-settings-daemon-3.6.4/plugins/keyboard/delayed-dialog.h
 Index: gnome-settings-daemon-3.6.4/plugins/keyboard/gkbd-configuration.c
 ===================================================================
 --- /dev/null	1970-01-01 00:00:00.000000000 +0000
-+++ gnome-settings-daemon-3.6.4/plugins/keyboard/gkbd-configuration.c	2013-02-18 12:57:16.515698776 +0000
++++ gnome-settings-daemon-3.6.4/plugins/keyboard/gkbd-configuration.c	2013-04-17 17:52:29.752040153 +0200
 @@ -0,0 +1,350 @@
 +/*
 + * Copyright (C) 2010 Canonical Ltd.
@@ -608,7 +608,7 @@ Index: gnome-settings-daemon-3.6.4/plugins/keyboard/gkbd-configuration.c
 Index: gnome-settings-daemon-3.6.4/plugins/keyboard/gkbd-configuration.h
 ===================================================================
 --- /dev/null	1970-01-01 00:00:00.000000000 +0000
-+++ gnome-settings-daemon-3.6.4/plugins/keyboard/gkbd-configuration.h	2013-02-18 12:57:16.515698776 +0000
++++ gnome-settings-daemon-3.6.4/plugins/keyboard/gkbd-configuration.h	2013-04-17 17:52:29.752040153 +0200
 @@ -0,0 +1,65 @@
 +/*
 + * Copyright (C) 2010 Canonical Ltd.
@@ -677,8 +677,8 @@ Index: gnome-settings-daemon-3.6.4/plugins/keyboard/gkbd-configuration.h
 +#endif
 Index: gnome-settings-daemon-3.6.4/plugins/keyboard/gsd-keyboard-manager.c
 ===================================================================
---- gnome-settings-daemon-3.6.4.orig/plugins/keyboard/gsd-keyboard-manager.c	2013-02-18 12:57:16.535698777 +0000
-+++ gnome-settings-daemon-3.6.4/plugins/keyboard/gsd-keyboard-manager.c	2013-02-18 12:57:16.519698776 +0000
+--- gnome-settings-daemon-3.6.4.orig/plugins/keyboard/gsd-keyboard-manager.c	2013-04-17 17:52:29.768040154 +0200
++++ gnome-settings-daemon-3.6.4/plugins/keyboard/gsd-keyboard-manager.c	2013-04-17 17:52:29.756040153 +0200
 @@ -40,22 +40,19 @@
  
  #include <X11/XKBlib.h>
@@ -2451,8 +2451,8 @@ Index: gnome-settings-daemon-3.6.4/plugins/keyboard/gsd-keyboard-manager.c
          g_type_class_add_private (klass, sizeof (GsdKeyboardManagerPrivate));
 Index: gnome-settings-daemon-3.6.4/plugins/keyboard/gsd-keyboard-manager.h
 ===================================================================
---- gnome-settings-daemon-3.6.4.orig/plugins/keyboard/gsd-keyboard-manager.h	2013-02-18 12:57:16.535698777 +0000
-+++ gnome-settings-daemon-3.6.4/plugins/keyboard/gsd-keyboard-manager.h	2013-02-18 12:57:16.523698776 +0000
+--- gnome-settings-daemon-3.6.4.orig/plugins/keyboard/gsd-keyboard-manager.h	2013-04-17 17:52:29.768040154 +0200
++++ gnome-settings-daemon-3.6.4/plugins/keyboard/gsd-keyboard-manager.h	2013-04-17 17:52:29.756040153 +0200
 @@ -51,6 +51,7 @@
  gboolean                gsd_keyboard_manager_start               (GsdKeyboardManager *manager,
                                                                 GError         **error);
@@ -2464,7 +2464,7 @@ Index: gnome-settings-daemon-3.6.4/plugins/keyboard/gsd-keyboard-manager.h
 Index: gnome-settings-daemon-3.6.4/plugins/keyboard/gsd-keyboard-xkb.c
 ===================================================================
 --- /dev/null	1970-01-01 00:00:00.000000000 +0000
-+++ gnome-settings-daemon-3.6.4/plugins/keyboard/gsd-keyboard-xkb.c	2013-02-18 12:57:16.523698776 +0000
++++ gnome-settings-daemon-3.6.4/plugins/keyboard/gsd-keyboard-xkb.c	2013-04-17 17:52:29.760040153 +0200
 @@ -0,0 +1,851 @@
 +/* -*- Mode: C; tab-width: 8; indent-tabs-mode: nil; c-basic-offset: 8 -*-
 + *
@@ -3320,7 +3320,7 @@ Index: gnome-settings-daemon-3.6.4/plugins/keyboard/gsd-keyboard-xkb.c
 Index: gnome-settings-daemon-3.6.4/plugins/keyboard/gsd-keyboard-xkb.h
 ===================================================================
 --- /dev/null	1970-01-01 00:00:00.000000000 +0000
-+++ gnome-settings-daemon-3.6.4/plugins/keyboard/gsd-keyboard-xkb.h	2013-02-18 12:57:16.523698776 +0000
++++ gnome-settings-daemon-3.6.4/plugins/keyboard/gsd-keyboard-xkb.h	2013-04-17 17:52:29.760040153 +0200
 @@ -0,0 +1,39 @@
 +/* -*- Mode: C; tab-width: 8; indent-tabs-mode: nil; c-basic-offset: 8 -*-
 + * gnome-settings-keyboard-xkb.h
@@ -3363,8 +3363,8 @@ Index: gnome-settings-daemon-3.6.4/plugins/keyboard/gsd-keyboard-xkb.h
 +#endif
 Index: gnome-settings-daemon-3.6.4/plugins/keyboard/Makefile.am
 ===================================================================
---- gnome-settings-daemon-3.6.4.orig/plugins/keyboard/Makefile.am	2013-02-18 12:57:16.535698777 +0000
-+++ gnome-settings-daemon-3.6.4/plugins/keyboard/Makefile.am	2013-02-18 12:57:16.523698776 +0000
+--- gnome-settings-daemon-3.6.4.orig/plugins/keyboard/Makefile.am	2013-04-17 17:52:29.768040154 +0200
++++ gnome-settings-daemon-3.6.4/plugins/keyboard/Makefile.am	2013-04-17 17:52:29.760040153 +0200
 @@ -20,20 +20,25 @@
  	gsd-keyboard-plugin.c	\
  	gsd-keyboard-manager.h	\
@@ -3464,8 +3464,8 @@ Index: gnome-settings-daemon-3.6.4/plugins/keyboard/Makefile.am
  	$(plugin_in_files)	\
 Index: gnome-settings-daemon-3.6.4/plugins/keyboard/Makefile.in
 ===================================================================
---- gnome-settings-daemon-3.6.4.orig/plugins/keyboard/Makefile.in	2013-02-18 12:57:16.535698777 +0000
-+++ gnome-settings-daemon-3.6.4/plugins/keyboard/Makefile.in	2013-02-18 12:57:16.527698777 +0000
+--- gnome-settings-daemon-3.6.4.orig/plugins/keyboard/Makefile.in	2013-04-17 17:52:29.768040154 +0200
++++ gnome-settings-daemon-3.6.4/plugins/keyboard/Makefile.in	2013-04-17 17:52:29.760040153 +0200
 @@ -1,8 +1,9 @@
 -# Makefile.in generated by automake 1.12.2 from Makefile.am.
 +# Makefile.in generated by automake 1.11.3 from Makefile.am.
@@ -4091,7 +4091,7 @@ Index: gnome-settings-daemon-3.6.4/plugins/keyboard/Makefile.in
  
 Index: gnome-settings-daemon-3.6.4/plugins/keyboard/test-keyboard.c
 ===================================================================
---- gnome-settings-daemon-3.6.4.orig/plugins/keyboard/test-keyboard.c	2013-02-18 12:57:16.535698777 +0000
+--- gnome-settings-daemon-3.6.4.orig/plugins/keyboard/test-keyboard.c	2013-04-17 17:52:29.768040154 +0200
 +++ /dev/null	1970-01-01 00:00:00.000000000 +0000
 @@ -1,7 +0,0 @@
 -#define NEW gsd_keyboard_manager_new
@@ -4103,7 +4103,7 @@ Index: gnome-settings-daemon-3.6.4/plugins/keyboard/test-keyboard.c
 -#include "test-plugin.h"
 Index: gnome-settings-daemon-3.6.4/plugins/keyboard/test-keyboard-ibus-utils.c
 ===================================================================
---- gnome-settings-daemon-3.6.4.orig/plugins/keyboard/test-keyboard-ibus-utils.c	2013-02-18 12:57:16.535698777 +0000
+--- gnome-settings-daemon-3.6.4.orig/plugins/keyboard/test-keyboard-ibus-utils.c	2013-04-17 17:52:29.768040154 +0200
 +++ /dev/null	1970-01-01 00:00:00.000000000 +0000
 @@ -1,116 +0,0 @@
 -#include "gsd-keyboard-manager.c"
@@ -4224,8 +4224,8 @@ Index: gnome-settings-daemon-3.6.4/plugins/keyboard/test-keyboard-ibus-utils.c
 -}
 Index: gnome-settings-daemon-3.6.4/plugins/media-keys/gsd-media-keys-manager.c
 ===================================================================
---- gnome-settings-daemon-3.6.4.orig/plugins/media-keys/gsd-media-keys-manager.c	2013-02-18 12:57:16.535698777 +0000
-+++ gnome-settings-daemon-3.6.4/plugins/media-keys/gsd-media-keys-manager.c	2013-02-18 12:57:16.531698777 +0000
+--- gnome-settings-daemon-3.6.4.orig/plugins/media-keys/gsd-media-keys-manager.c	2013-04-17 17:52:29.768040154 +0200
++++ gnome-settings-daemon-3.6.4/plugins/media-keys/gsd-media-keys-manager.c	2013-04-17 17:52:29.764040154 +0200
 @@ -103,10 +103,6 @@
  #define VOLUME_STEP 6           /* percents for one volume button press */
  #define MAX_VOLUME 65536.0
@@ -4291,8 +4291,8 @@ Index: gnome-settings-daemon-3.6.4/plugins/media-keys/gsd-media-keys-manager.c
                  g_assert_not_reached ();
 Index: gnome-settings-daemon-3.6.4/plugins/media-keys/shortcuts-list.h
 ===================================================================
---- gnome-settings-daemon-3.6.4.orig/plugins/media-keys/shortcuts-list.h	2013-02-18 12:57:16.535698777 +0000
-+++ gnome-settings-daemon-3.6.4/plugins/media-keys/shortcuts-list.h	2013-02-18 12:57:16.531698777 +0000
+--- gnome-settings-daemon-3.6.4.orig/plugins/media-keys/shortcuts-list.h	2013-04-17 17:52:29.768040154 +0200
++++ gnome-settings-daemon-3.6.4/plugins/media-keys/shortcuts-list.h	2013-04-17 17:52:29.764040154 +0200
 @@ -81,8 +81,6 @@
          KEYBOARD_BRIGHTNESS_DOWN_KEY,
          KEYBOARD_BRIGHTNESS_TOGGLE_KEY,
@@ -4311,3 +4311,15 @@ Index: gnome-settings-daemon-3.6.4/plugins/media-keys/shortcuts-list.h
          { BATTERY_KEY, NULL, "XF86Battery" },
  };
  
+Index: gnome-settings-daemon-3.6.4/po/POTFILES.in
+===================================================================
+--- gnome-settings-daemon-3.6.4.orig/po/POTFILES.in	2013-01-10 14:37:58.000000000 +0100
++++ gnome-settings-daemon-3.6.4/po/POTFILES.in	2013-04-17 17:53:04.860041210 +0200
+@@ -31,6 +31,7 @@
+ plugins/housekeeping/gsd-disk-space.c
+ plugins/housekeeping/gsd-ldsm-dialog.c
+ plugins/keyboard/gsd-keyboard-manager.c
++plugins/keyboard/gsd-keyboard-xkb.c
+ [type: gettext/ini]plugins/keyboard/keyboard.gnome-settings-plugin.in
+ plugins/media-keys/cut-n-paste/gvc-mixer-control.c
+ plugins/media-keys/gsd-media-keys-manager.c

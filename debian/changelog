@@ -1,3 +1,10 @@
+gnome-settings-daemon (3.6.4-0ubuntu9) UNRELEASED; urgency=low
+
+  * debian/patches/revert_new_ibus_use.patch:
+    - list gsd-keyboard-xkb.c for translation
+
+ -- Sebastien Bacher <seb128@ubuntu.com>  Wed, 17 Apr 2013 17:53:25 +0200
+
 gnome-settings-daemon (3.6.4-0ubuntu8) raring; urgency=low
 
   * debian/control.in:
