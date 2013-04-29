@@ -1,4 +1,4 @@
-gnome-settings-daemon (3.6.4-0ubuntu9) UNRELEASED; urgency=low
+gnome-settings-daemon (3.6.4-0ubuntu9) saucy; urgency=low
 
   [ Sebastien Bacher ]
   * debian/patches/revert_new_ibus_use.patch:
@@ -7,7 +7,7 @@ gnome-settings-daemon (3.6.4-0ubuntu9) UNRELEASED; urgency=low
   [ Martin Pitt ]
   * Switch to logind for session tracking.
 
- -- Sebastien Bacher <seb128@ubuntu.com>  Wed, 17 Apr 2013 17:53:25 +0200
+ -- Martin Pitt <martin.pitt@ubuntu.com>  Mon, 29 Apr 2013 10:13:43 -0700
 
 gnome-settings-daemon (3.6.4-0ubuntu8) raring; urgency=low
 
