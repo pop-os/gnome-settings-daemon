@@ -1,7 +1,11 @@
 gnome-settings-daemon (3.6.4-0ubuntu9) UNRELEASED; urgency=low
 
+  [ Sebastien Bacher ]
   * debian/patches/revert_new_ibus_use.patch:
     - list gsd-keyboard-xkb.c for translation
+
+  [ Martin Pitt ]
+  * Switch to logind for session tracking.
 
  -- Sebastien Bacher <seb128@ubuntu.com>  Wed, 17 Apr 2013 17:53:25 +0200
 
