@@ -1,3 +1,11 @@
+gnome-settings-daemon (3.6.4-0ubuntu10) UNRELEASED; urgency=low
+
+  * Drop 51_lock_screen_on_suspend.patch: Superseded by handling this key in
+    gnome-screensaver. With that, g-screensaver mirrors what's being done in
+    g-shell, and avoids patching settings-daemon.
+
+ -- Martin Pitt <martin.pitt@ubuntu.com>  Wed, 01 May 2013 11:09:54 -0700
+
 gnome-settings-daemon (3.6.4-0ubuntu9) saucy; urgency=low
 
   [ Sebastien Bacher ]
