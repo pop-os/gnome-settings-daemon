@@ -1,0 +1,36 @@
+From 75b8bae1e71199ea7b19769be1c4f423722dffc7 Mon Sep 17 00:00:00 2001
+From: Arjan van de Ven <arjanvandeven@gmail.com>
+Date: Mon, 18 Feb 2013 23:26:00 +0000
+Subject: sound: Avoid polling for non-existent directory
+
+Create the user sound theme directory if it doesn't exist,
+to avoid GLib polling. Also make sure that the system directories
+exist before monitoring them for the same reason
+
+https://bugzilla.gnome.org/show_bug.cgi?id=694134
+---
+diff --git a/plugins/sound/gsd-sound-manager.c b/plugins/sound/gsd-sound-manager.c
+index 0cafaf7..a3c7704 100644
+--- a/plugins/sound/gsd-sound-manager.c
++++ b/plugins/sound/gsd-sound-manager.c
+@@ -268,14 +268,16 @@ gsd_sound_manager_start (GsdSoundManager *manager,
+         /* ... and we listen to changes of the theme base directories
+          * in $HOME ...*/
+         p = g_build_filename (g_get_user_data_dir (), "sounds", NULL);
+-        register_directory_callback (manager, p, NULL);
++        if (g_mkdir_with_parents(p, 0600) == 0)
++                register_directory_callback (manager, p, NULL);
+         g_free (p);
+ 
+         /* ... and globally. */
+         dirs = g_get_system_data_dirs ();
+         for (i = 0; dirs[i] != NULL; i++) {
+                 p = g_build_filename (dirs[i], "sounds", NULL);
+-                register_directory_callback (manager, p, NULL);
++                if (g_file_test (p, G_FILE_TEST_IS_DIR))
++                        register_directory_callback (manager, p, NULL);
+                 g_free (p);
+         }
+ 
+ 
+

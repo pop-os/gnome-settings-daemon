@@ -1,8 +1,17 @@
 gnome-settings-daemon (3.6.4-0ubuntu10) UNRELEASED; urgency=low
 
+  [ Martin Pitt ]
   * Drop 51_lock_screen_on_suspend.patch: Superseded by handling this key in
     gnome-screensaver. With that, g-screensaver mirrors what's being done in
     g-shell, and avoids patching settings-daemon.
+
+  [ Sebastien Bacher ]
+  * debian/patches/git_housekeeping_ignore_list.patch:
+    - correctly handle ignore list for disk space notifications (lp: #881376)
+  * debian/patches/git_glib_get_xdg_dirs.patch:
+    - use glib to get xdg dirs (rather than reading the environment)
+  * debian/patches/git_sound_not_polling.patch:
+    - don't poll on non existant directories
 
  -- Martin Pitt <martin.pitt@ubuntu.com>  Wed, 01 May 2013 11:09:54 -0700
 
