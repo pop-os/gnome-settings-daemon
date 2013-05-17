@@ -23,3 +23,4 @@ nexus-orientation.patch
 git_housekeeping_ignore_list.patch
 git_glib_get_xdg_dirs.patch
 git_sound_not_polling.patch
+fix_broken_user_sounds_permissions.patch

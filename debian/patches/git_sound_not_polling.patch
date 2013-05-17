@@ -18,7 +18,7 @@ index 0cafaf7..a3c7704 100644
           * in $HOME ...*/
          p = g_build_filename (g_get_user_data_dir (), "sounds", NULL);
 -        register_directory_callback (manager, p, NULL);
-+        if (g_mkdir_with_parents(p, 0600) == 0)
++        if (g_mkdir_with_parents(p, 0700) == 0)
 +                register_directory_callback (manager, p, NULL);
          g_free (p);
  

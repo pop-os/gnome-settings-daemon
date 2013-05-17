@@ -1,3 +1,12 @@
+gnome-settings-daemon (3.6.4-0ubuntu11) UNRELEASED; urgency=low
+
+  * debian/patches/git_sound_not_polling.patch: Create directory with correct
+    permissions
+  * debian/patches/fix_broken_user_sounds_permissions.patch: Fix broken
+    permissions from previous upload if necessary.
+
+ -- Iain Lane <iain.lane@canonical.com>  Fri, 17 May 2013 12:04:26 +0100
+
 gnome-settings-daemon (3.6.4-0ubuntu10) saucy; urgency=low
 
   [ Martin Pitt ]
