@@ -1,5 +1,1 @@
 04_superP.patch
-08-Fix-build-on-non-Linux-platforms.patch
-11-cursor-add-error-quark.patch
-12-cursor-set-an-error-if-we-can-t-create-a-monitor.patch
-13-cursor-set-error-if-we-don-t-have-the-necessary-X-su.patch
