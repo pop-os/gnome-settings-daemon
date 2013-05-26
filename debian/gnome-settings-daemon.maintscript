@@ -6,4 +6,4 @@ rm_conffile /etc/gnome/config/Emacs.ad 3.0.3-3~ gnome-settings-daemon
 rm_conffile /etc/gnome/config/Motif.ad 3.0.3-3~ gnome-settings-daemon
 rm_conffile /etc/gnome/config/General.ad 3.0.3-3~ gnome-settings-daemon
 rm_conffile /etc/gnome/config/Xaw.ad 3.0.3-3~ gnome-settings-daemon
-rm_conffile /etc/dbus-1/system.d/org.gnome.SettingsDaemon.DateTimeMechanism.conf 3.7.92-1~ gnome-settings-daemon
+rm_conffile /etc/dbus-1/system.d/org.gnome.SettingsDaemon.DateTimeMechanism.conf 3.8.2-2~ gnome-settings-daemon
