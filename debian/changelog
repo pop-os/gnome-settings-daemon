@@ -1,3 +1,10 @@
+gnome-settings-daemon (3.6.4-0ubuntu12) saucy; urgency=low
+
+  * Rebuild for gnome-desktop 3.8 transition (LP: 1184812)
+    - debian/patches/git_xrandr_dont_include_labeller_widget.patch
+
+ -- Tim Lunn <tim@feathertop.org>  Tue, 28 May 2013 10:04:36 +1000
+
 gnome-settings-daemon (3.6.4-0ubuntu11) saucy; urgency=low
 
   * debian/patches/git_sound_not_polling.patch: Create directory with correct

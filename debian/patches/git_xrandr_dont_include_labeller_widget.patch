@@ -1,0 +1,21 @@
+From ec21e9a74a9091250e3161e47bafdffd355b454a Mon Sep 17 00:00:00 2001
+From: Bastien Nocera <hadess@hadess.net>
+Date: Wed, 21 Nov 2012 21:08:21 +0000
+Subject: xrandr: Don't include unneeded labeler widget
+
+---
+diff --git a/plugins/xrandr/gsd-xrandr-manager.c b/plugins/xrandr/gsd-xrandr-manager.c
+index 7b459c3..9cf1561 100644
+--- a/plugins/xrandr/gsd-xrandr-manager.c
++++ b/plugins/xrandr/gsd-xrandr-manager.c
+@@ -45,7 +45,6 @@
+ 
+ #include <libgnome-desktop/gnome-rr-config.h>
+ #include <libgnome-desktop/gnome-rr.h>
+-#include <libgnome-desktop/gnome-rr-labeler.h>
+ 
+ #ifdef HAVE_WACOM
+ #include <libwacom/libwacom.h>
+--
+cgit v0.9.1
+
