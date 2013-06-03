@@ -1,4 +1,4 @@
-gnome-settings-daemon (3.4.2+git20121218.7c1322-4) UNRELEASED; urgency=low
+gnome-settings-daemon (3.4.2+git20121218.7c1322-4) unstable; urgency=low
 
   * Disable "-Wl,-z,defs" on mipsel in order to fix segfault.
     (Closes: #629351)
