@@ -1,4 +1,4 @@
-gnome-settings-daemon (3.4.2+git20121218.7c1322-5) UNRELEASED; urgency=low
+gnome-settings-daemon (3.4.2+git20121218.7c1322-5) unstable; urgency=low
 
   [ Emilio Pozuelo Monfort ]
   * debian/patches/10_smaller_syndaemon_timeout.patch:
@@ -9,7 +9,7 @@ gnome-settings-daemon (3.4.2+git20121218.7c1322-5) UNRELEASED; urgency=low
   [ Michael Biebl ]
   * Cherry-pick patches from upstream Git to fix build failures with CUPS 1.6.
 
- -- Michael Biebl <biebl@debian.org>  Wed, 05 Jun 2013 01:13:08 +0200
+ -- Michael Biebl <biebl@debian.org>  Wed, 05 Jun 2013 01:23:05 +0200
 
 gnome-settings-daemon (3.4.2+git20121218.7c1322-4) unstable; urgency=low
 
