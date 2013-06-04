@@ -6,6 +6,9 @@ gnome-settings-daemon (3.4.2+git20121218.7c1322-5) UNRELEASED; urgency=low
       when the "Disable touchpad while typing" option is activated.
       Closes: #684998.
 
+  [ Michael Biebl ]
+  * Cherry-pick patches from upstream Git to fix build failures with CUPS 1.6.
+
  -- Michael Biebl <biebl@debian.org>  Wed, 05 Jun 2013 01:13:08 +0200
 
 gnome-settings-daemon (3.4.2+git20121218.7c1322-4) unstable; urgency=low

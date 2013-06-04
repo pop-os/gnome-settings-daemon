@@ -1,0 +1,57 @@
+commit 393ea9b0fd2445023296ad26716b0b2e7e0e6f25
+Author: Marek Kasik <mkasik@redhat.com>
+Date:   Tue Mar 26 17:21:34 2013 +0100
+
+    print-notifications: Don't show deprecation warnings
+    
+    Hide deprecation warnings by definition of
+    _PPD_DEPRECATED="" because of missing replacement for
+    deprecated function ppdLocalizeIPPReason().
+    
+    https://bugzilla.gnome.org/show_bug.cgi?id=696571
+
+Index: gnome-settings-daemon-3.4.2+git20121218.7c1322/configure.ac
+===================================================================
+--- gnome-settings-daemon-3.4.2+git20121218.7c1322.orig/configure.ac	2013-06-05 01:03:33.586089565 +0200
++++ gnome-settings-daemon-3.4.2+git20121218.7c1322/configure.ac	2013-06-05 01:03:33.578089474 +0200
+@@ -411,8 +411,16 @@
+       AC_MSG_ERROR([CUPS 1.4 or newer not found, but CUPS support requested])
+    fi
+ 
++   # https://bugzilla.gnome.org/show_bug.cgi?id=696571
++   CUPS_CPPFLAGS=""
++   if test $CUPS_API_MAJOR -gt 1 -o \
++           $CUPS_API_MAJOR -eq 1 -a $CUPS_API_MINOR -ge 6 ; then
++      CUPS_CPPFLAGS=-D_PPD_DEPRECATED=""
++   fi
++
+    CUPS_CFLAGS=`$CUPS_CONFIG --cflags | $SED -e 's/-O\w*//g' -e 's/-m\w*//g'`
+    CUPS_LIBS=`$CUPS_CONFIG --libs`
++   AC_SUBST(CUPS_CPPFLAGS)
+    AC_SUBST(CUPS_CFLAGS)
+    AC_SUBST(CUPS_LIBS)
+ fi
+Index: gnome-settings-daemon-3.4.2+git20121218.7c1322/plugins/print-notifications/Makefile.am
+===================================================================
+--- gnome-settings-daemon-3.4.2+git20121218.7c1322.orig/plugins/print-notifications/Makefile.am	2013-06-05 01:03:33.586089565 +0200
++++ gnome-settings-daemon-3.4.2+git20121218.7c1322/plugins/print-notifications/Makefile.am	2013-06-05 01:03:33.578089474 +0200
+@@ -13,7 +13,8 @@
+ 	-I$(top_srcdir)/gnome-settings-daemon		\
+ 	-DGNOME_SETTINGS_LOCALEDIR=\""$(datadir)/locale"\" \
+ 	-DLIBEXECDIR=\""$(libexecdir)"\" \
+-	$(AM_CPPFLAGS)
++	$(AM_CPPFLAGS)			\
++	$(CUPS_CPPFLAGS)
+ 
+ libprint_notifications_la_CFLAGS = \
+ 	$(PLUGIN_CFLAGS)		\
+@@ -60,7 +61,8 @@
+ 	-I$(top_srcdir)/gnome-settings-daemon			\
+ 	-DGNOME_SETTINGS_LOCALEDIR=\""$(datadir)/locale"\" 	\
+ 	-DLIBEXECDIR=\""$(libexecdir)"\"			\
+-	$(AM_CPPFLAGS)
++	$(AM_CPPFLAGS)						\
++	$(CUPS_CPPFLAGS)
+ 
+ test_print_notifications_CFLAGS =	\
+ 	$(PLUGIN_CFLAGS)		\

@@ -10,3 +10,5 @@ power-check-null-devices.patch
 power-ignore-bad-dbus-requests.patch
 revert_git_datetime_dropping.patch
 22_backlight_optional.patch
+23_cups-1.6_IPP_API.patch
+24_hide_ppd_deprecation_warnings.patch
