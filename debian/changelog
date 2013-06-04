@@ -1,3 +1,13 @@
+gnome-settings-daemon (3.4.2+git20121218.7c1322-5) UNRELEASED; urgency=low
+
+  [ Emilio Pozuelo Monfort ]
+  * debian/patches/10_smaller_syndaemon_timeout.patch:
+    + Update patch to not write out of the array bounds. Fixes a crash
+      when the "Disable touchpad while typing" option is activated.
+      Closes: #684998.
+
+ -- Michael Biebl <biebl@debian.org>  Wed, 05 Jun 2013 01:13:08 +0200
+
 gnome-settings-daemon (3.4.2+git20121218.7c1322-4) unstable; urgency=low
 
   * Disable "-Wl,-z,defs" on mipsel in order to fix segfault.
