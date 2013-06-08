@@ -1,4 +1,4 @@
-gnome-settings-daemon (3.8.3-1) UNRELEASED; urgency=low
+gnome-settings-daemon (3.8.3-1) experimental; urgency=low
 
   [ Deng Xiyue ]
   * Disable "-Wl,-z,defs" on mipsel in order to fix segfault.
@@ -7,7 +7,7 @@ gnome-settings-daemon (3.8.3-1) UNRELEASED; urgency=low
   [ Emilio Pozuelo Monfort ]
   * New upstream release.
 
- -- Deng Xiyue <manphiz-guest@users.alioth.debian.org>  Sun, 02 Jun 2013 14:59:01 -0700
+ -- Emilio Pozuelo Monfort <pochu@debian.org>  Sat, 08 Jun 2013 18:48:22 +0200
 
 gnome-settings-daemon (3.8.2-2) experimental; urgency=low
 
