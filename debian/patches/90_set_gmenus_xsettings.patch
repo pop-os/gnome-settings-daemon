@@ -1,7 +1,5 @@
-Index: gnome-settings-daemon-3.6.3/plugins/xsettings/gsd-xsettings-manager.c
-===================================================================
---- gnome-settings-daemon-3.6.3.orig/plugins/xsettings/gsd-xsettings-manager.c	2012-11-07 10:08:12.000000000 +0100
-+++ gnome-settings-daemon-3.6.3/plugins/xsettings/gsd-xsettings-manager.c	2012-11-20 13:26:46.306775857 +0100
+--- a/plugins/xsettings/gsd-xsettings-manager.c
++++ b/plugins/xsettings/gsd-xsettings-manager.c
 @@ -242,7 +242,9 @@
          GsdXSettingsGtk   *gtk;
  

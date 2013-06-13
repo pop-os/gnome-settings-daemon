@@ -9,11 +9,9 @@ exist before monitoring them for the same reason
 
 https://bugzilla.gnome.org/show_bug.cgi?id=694134
 ---
-diff --git a/plugins/sound/gsd-sound-manager.c b/plugins/sound/gsd-sound-manager.c
-index 0cafaf7..a3c7704 100644
 --- a/plugins/sound/gsd-sound-manager.c
 +++ b/plugins/sound/gsd-sound-manager.c
-@@ -268,14 +268,16 @@ gsd_sound_manager_start (GsdSoundManager *manager,
+@@ -268,14 +268,16 @@
          /* ... and we listen to changes of the theme base directories
           * in $HOME ...*/
          p = g_build_filename (g_get_user_data_dir (), "sounds", NULL);
@@ -32,5 +30,3 @@ index 0cafaf7..a3c7704 100644
                  g_free (p);
          }
  
- 
-

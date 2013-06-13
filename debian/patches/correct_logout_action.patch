@@ -1,10 +1,8 @@
 # Description: let the logout key do what it's supposed to do
 # Ubuntu: https://launchpad.net/bugs/961501
 # Upstream: https://bugzilla.gnome.org/show_bug.cgi?id=671979
-Index: gnome-settings-daemon-3.6.1/plugins/media-keys/gsd-media-keys-manager.c
-===================================================================
---- gnome-settings-daemon-3.6.1.orig/plugins/media-keys/gsd-media-keys-manager.c	2012-10-26 10:19:49.651004184 +0200
-+++ gnome-settings-daemon-3.6.1/plugins/media-keys/gsd-media-keys-manager.c	2012-10-26 10:19:50.103004206 +0200
+--- a/plugins/media-keys/gsd-media-keys-manager.c
++++ b/plugins/media-keys/gsd-media-keys-manager.c
 @@ -938,6 +938,12 @@
  }
  

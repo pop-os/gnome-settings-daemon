@@ -2,8 +2,6 @@ Description: Fix up temporarily broken permissions that users may have if they u
 Author: Iain Lane <iain.lane@canonical.com>
 Forwarded: not-needed (temporary)
 
-Index: b/plugins/sound/gsd-sound-manager.c
-===================================================================
 --- a/plugins/sound/gsd-sound-manager.c
 +++ b/plugins/sound/gsd-sound-manager.c
 @@ -20,6 +20,7 @@

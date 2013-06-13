@@ -38,7 +38,8 @@ Build-Depends: cdbs,
                libwacom-dev (>= 0.6),
                xserver-xorg-input-wacom,
                libgnomekbd-dev (>= 3.5.1),
-               libxklavier-dev
+               libxklavier-dev,
+               libibus-1.0-dev (>= 1.5.0)
 Standards-Version: 3.9.3
 Vcs-Bzr: https://code.launchpad.net/~ubuntu-desktop/gnome-settings-daemon/ubuntu
 
@@ -47,7 +48,8 @@ Architecture: any
 Depends: ${shlibs:Depends},
          ${misc:Depends},
          gsettings-desktop-schemas (>= 3.3.90-0ubuntu2),
-         nautilus-data (>= 2.91.3-1)
+         nautilus-data (>= 2.91.3-1),
+         ibus (>= 1.5.0)
 Recommends: pulseaudio,
             systemd-services,
 Pre-Depends: ${misc:Pre-Depends}
