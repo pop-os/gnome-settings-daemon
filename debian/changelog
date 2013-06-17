@@ -1,3 +1,10 @@
+gnome-settings-daemon (3.6.4-0ubuntu13) UNRELEASED; urgency=low
+
+  * Start gsd via user session if starting 'unity' too. This is in preparation
+    for starting unity directly.
+
+ -- Iain Lane <iain.lane@canonical.com>  Mon, 17 Jun 2013 13:12:35 +0100
+
 gnome-settings-daemon (3.6.4-0ubuntu12) saucy; urgency=low
 
   * Rebuild for gnome-desktop 3.8 transition (LP: 1184812)
