@@ -1,7 +1,13 @@
 gnome-settings-daemon (3.6.4-0ubuntu13) UNRELEASED; urgency=low
 
+  [ Iain Lane ]
   * Start gsd via user session if starting 'unity' too. This is in preparation
     for starting unity directly.
+
+  [ Martin Pitt ]
+  * Add logind_support.patch: Inhibit logind's lid handling while g-s-d is
+    running, as in g-s-d 3.6 the power plugin is handling the lid by itself
+    still. This can be dropped when moving to 3.8. (LP: #1180513)
 
  -- Iain Lane <iain.lane@canonical.com>  Mon, 17 Jun 2013 13:12:35 +0100
 
