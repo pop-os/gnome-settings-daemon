@@ -1,4 +1,4 @@
-gnome-settings-daemon (3.6.4-0ubuntu13) UNRELEASED; urgency=low
+gnome-settings-daemon (3.6.4-0ubuntu13) saucy; urgency=low
 
   [ Iain Lane ]
   * Start gsd via user session if starting 'unity' too. This is in preparation
@@ -9,7 +9,7 @@ gnome-settings-daemon (3.6.4-0ubuntu13) UNRELEASED; urgency=low
     running, as in g-s-d 3.6 the power plugin is handling the lid by itself
     still. This can be dropped when moving to 3.8. (LP: #1180513)
 
- -- Iain Lane <iain.lane@canonical.com>  Mon, 17 Jun 2013 13:12:35 +0100
+ -- Martin Pitt <martin.pitt@ubuntu.com>  Tue, 18 Jun 2013 16:42:10 +0200
 
 gnome-settings-daemon (3.6.4-0ubuntu12) saucy; urgency=low
 
