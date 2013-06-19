@@ -1,8 +1,8 @@
 gnome-settings-daemon (3.4.2+git20121218.7c1322-6) unstable; urgency=low
 
- * gnome-settings-daemon.gsettings-override: stop installing security 
-   updates without a confirmation. This just leads to an obnoxious popup 
-   asking for the root password. Closes: #708548.
+  * gnome-settings-daemon.gsettings-override: stop installing security 
+    updates without a confirmation. This just leads to an obnoxious popup 
+    asking for the root password. Closes: #708548.
 
  -- Josselin Mouette <joss@debian.org>  Wed, 19 Jun 2013 23:28:42 +0200
 
