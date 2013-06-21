@@ -1,3 +1,10 @@
+gnome-settings-daemon (3.6.4-0ubuntu14) UNRELEASED; urgency=low
+
+  * Actually, gnome-session will still be used with Unity 7; remove the
+    unnecessary 'starting unity' condition from the user session job. 
+
+ -- Iain Lane <iain.lane@canonical.com>  Fri, 21 Jun 2013 17:32:28 +0100
+
 gnome-settings-daemon (3.6.4-0ubuntu13) saucy; urgency=low
 
   [ Iain Lane ]
