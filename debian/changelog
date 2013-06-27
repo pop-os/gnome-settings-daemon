@@ -1,3 +1,10 @@
+gnome-settings-daemon (3.6.4-0ubuntu15) UNRELEASED; urgency=low
+
+  * debian/patches/0001-Fix-media-keys-handling-with-GTK-3.7.8.patch: Fix
+    media-keys handling with GTK 3.8 and XI 2.3. 
+
+ -- Iain Lane <iain@orangesquash.org.uk>  Thu, 27 Jun 2013 10:13:22 +0100
+
 gnome-settings-daemon (3.6.4-0ubuntu14) saucy; urgency=low
 
   * Actually, gnome-session will still be used with Unity 7; remove the
