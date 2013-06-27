@@ -9,11 +9,9 @@ Author: Gunnar Hjalmarsson <ubuntu@gunnar.cc>
 * settings by editing ~/.profile.
 *
 
-Index: gnome-settings-daemon-3.6.1/gnome-settings-daemon/main.c
-===================================================================
---- gnome-settings-daemon-3.6.1.orig/gnome-settings-daemon/main.c	2012-10-05 14:41:44.000000000 +0200
-+++ gnome-settings-daemon-3.6.1/gnome-settings-daemon/main.c	2012-10-26 10:20:14.163005369 +0200
-@@ -316,9 +316,6 @@
+--- a/gnome-settings-daemon/main.c
++++ b/gnome-settings-daemon/main.c
+@@ -330,9 +330,6 @@
                  g_debug ("Could not connect to the Session manager: %s", error->message);
                  g_error_free (error);
          } else {

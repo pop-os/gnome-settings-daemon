@@ -1,10 +1,8 @@
 ## Description: Autorotate Nexus screen
 ## Origin/Author: jani@ubuntu.com
 ## Bug: https://bugs.launchpad.net/ubuntu-nexus7/+bug/1110360
-Index: gnome-settings-daemon-3.6.4/plugins/orientation/gsd-orientation-manager.c
-===================================================================
---- gnome-settings-daemon-3.6.4.orig/plugins/orientation/gsd-orientation-manager.c	2013-02-13 13:36:14.606221356 +0200
-+++ gnome-settings-daemon-3.6.4/plugins/orientation/gsd-orientation-manager.c	2013-02-13 13:36:38.130337989 +0200
+--- a/plugins/orientation/gsd-orientation-manager.c
++++ b/plugins/orientation/gsd-orientation-manager.c
 @@ -23,6 +23,7 @@
  
  #include "config.h"

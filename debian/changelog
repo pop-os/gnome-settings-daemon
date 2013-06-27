@@ -1,3 +1,16 @@
+gnome-settings-daemon (3.6.4-0ubuntu15) UNRELEASED; urgency=low
+
+  * debian/control.in:
+    - Depend on IBus 1.5.0.
+  * debian/patches/revert_new_ibus_use.patch:
+    - Drop upstream revert.
+  * debian/patches/ibus-ubuntu-session.patch:
+    - Check for Ubuntu sessions.
+  * debian/patches/gnome-desktop-3-8.patch:
+    - Don't use symbol from gnome-desktop 3.8.
+
+ -- William Hua <william.hua@canonical.com>  Fri, 07 Jun 2013 16:50:35 -0400
+
 gnome-settings-daemon (3.6.4-0ubuntu14) saucy; urgency=low
 
   * Actually, gnome-session will still be used with Unity 7; remove the

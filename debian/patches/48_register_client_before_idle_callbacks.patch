@@ -1,8 +1,6 @@
-Index: gnome-settings-daemon-3.6.1/gnome-settings-daemon/main.c
-===================================================================
---- gnome-settings-daemon-3.6.1.orig/gnome-settings-daemon/main.c	2012-10-26 10:19:49.467004174 +0200
-+++ gnome-settings-daemon-3.6.1/gnome-settings-daemon/main.c	2012-10-26 10:19:49.527004177 +0200
-@@ -303,28 +303,6 @@
+--- a/gnome-settings-daemon/main.c
++++ b/gnome-settings-daemon/main.c
+@@ -317,28 +317,6 @@
  }
  #endif
  
@@ -31,7 +29,7 @@ Index: gnome-settings-daemon-3.6.1/gnome-settings-daemon/main.c
  static gboolean
  on_term_signal_pipe_closed (GIOChannel *source,
                              GIOCondition condition,
-@@ -374,16 +352,6 @@
+@@ -388,16 +366,6 @@
  {
          g_assert (bus != NULL);
  
@@ -48,7 +46,7 @@ Index: gnome-settings-daemon-3.6.1/gnome-settings-daemon/main.c
          watch_for_term_signal (manager);
  }
  
-@@ -406,6 +374,56 @@
+@@ -420,6 +388,56 @@
          gtk_main_quit ();
  }
  
@@ -105,7 +103,7 @@ Index: gnome-settings-daemon-3.6.1/gnome-settings-daemon/main.c
  static void
  bus_register (void)
  {
-@@ -499,6 +517,8 @@
+@@ -513,6 +531,8 @@
  
          notify_init ("gnome-settings-daemon");
  

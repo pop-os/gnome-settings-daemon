@@ -4,8 +4,6 @@ Date: Wed, 21 Nov 2012 21:08:21 +0000
 Subject: xrandr: Don't include unneeded labeler widget
 
 ---
-diff --git a/plugins/xrandr/gsd-xrandr-manager.c b/plugins/xrandr/gsd-xrandr-manager.c
-index 7b459c3..9cf1561 100644
 --- a/plugins/xrandr/gsd-xrandr-manager.c
 +++ b/plugins/xrandr/gsd-xrandr-manager.c
 @@ -45,7 +45,6 @@
@@ -16,6 +14,3 @@ index 7b459c3..9cf1561 100644
  
  #ifdef HAVE_WACOM
  #include <libwacom/libwacom.h>
---
-cgit v0.9.1
-

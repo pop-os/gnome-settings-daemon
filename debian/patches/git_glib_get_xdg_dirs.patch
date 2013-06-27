@@ -7,11 +7,9 @@ Instead of processing the environment variables by hand.
 
 https://bugzilla.gnome.org/show_bug.cgi?id=691589
 ---
-diff --git a/plugins/sound/gsd-sound-manager.c b/plugins/sound/gsd-sound-manager.c
-index e41d4db..0cafaf7 100644
 --- a/plugins/sound/gsd-sound-manager.c
 +++ b/plugins/sound/gsd-sound-manager.c
-@@ -255,8 +255,9 @@ gboolean
+@@ -255,8 +255,9 @@
  gsd_sound_manager_start (GsdSoundManager *manager,
                           GError **error)
  {
@@ -23,7 +21,7 @@ index e41d4db..0cafaf7 100644
  
          g_debug ("Starting sound manager");
          gnome_settings_profile_start (NULL);
-@@ -266,30 +267,18 @@ gsd_sound_manager_start (GsdSoundManager *manager,
+@@ -266,30 +267,18 @@
  
          /* ... and we listen to changes of the theme base directories
           * in $HOME ...*/
@@ -61,4 +59,3 @@ index e41d4db..0cafaf7 100644
          gnome_settings_profile_end (NULL);
  
          return TRUE;
---
