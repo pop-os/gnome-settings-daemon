@@ -1,5 +1,7 @@
---- a/data/org.gnome.settings-daemon.plugins.media-keys.gschema.xml.in.in
-+++ b/data/org.gnome.settings-daemon.plugins.media-keys.gschema.xml.in.in
+Index: gnome-settings-daemon-3.6.1/data/org.gnome.settings-daemon.plugins.media-keys.gschema.xml.in.in
+===================================================================
+--- gnome-settings-daemon-3.6.1.orig/data/org.gnome.settings-daemon.plugins.media-keys.gschema.xml.in.in	2012-10-05 13:56:43.000000000 +0200
++++ gnome-settings-daemon-3.6.1/data/org.gnome.settings-daemon.plugins.media-keys.gschema.xml.in.in	2012-10-26 10:19:49.647004183 +0200
 @@ -130,6 +130,11 @@
        <_summary>Copy a screenshot of an area to clipboard</_summary>
        <_description>Binding to copy a screenshot of an area to clipboard.</_description>
@@ -12,8 +14,10 @@
      <key name="www" type="s">
        <default>'XF86WWW'</default>
        <_summary>Launch web browser</_summary>
---- a/plugins/media-keys/gsd-media-keys-manager.c
-+++ b/plugins/media-keys/gsd-media-keys-manager.c
+Index: gnome-settings-daemon-3.6.1/plugins/media-keys/gsd-media-keys-manager.c
+===================================================================
+--- gnome-settings-daemon-3.6.1.orig/plugins/media-keys/gsd-media-keys-manager.c	2012-10-26 10:19:49.507004176 +0200
++++ gnome-settings-daemon-3.6.1/plugins/media-keys/gsd-media-keys-manager.c	2012-10-26 10:20:04.815004917 +0200
 @@ -891,6 +891,22 @@
  }
  
@@ -47,8 +51,10 @@
          case WWW_KEY:
                  do_url_action (manager, "http", timestamp);
                  break;
---- a/plugins/media-keys/shortcuts-list.h
-+++ b/plugins/media-keys/shortcuts-list.h
+Index: gnome-settings-daemon-3.6.1/plugins/media-keys/shortcuts-list.h
+===================================================================
+--- gnome-settings-daemon-3.6.1.orig/plugins/media-keys/shortcuts-list.h	2012-10-05 13:56:44.000000000 +0200
++++ gnome-settings-daemon-3.6.1/plugins/media-keys/shortcuts-list.h	2012-10-26 10:19:49.651004184 +0200
 @@ -50,6 +50,7 @@
          SCREENSHOT_CLIP_KEY,
          WINDOW_SCREENSHOT_CLIP_KEY,

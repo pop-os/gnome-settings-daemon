@@ -1,5 +1,7 @@
---- a/plugins/background/gsd-background-manager.c
-+++ b/plugins/background/gsd-background-manager.c
+Index: gnome-settings-daemon-3.6.1/plugins/background/gsd-background-manager.c
+===================================================================
+--- gnome-settings-daemon-3.6.1.orig/plugins/background/gsd-background-manager.c	2012-05-24 11:50:44.000000000 +0200
++++ gnome-settings-daemon-3.6.1/plugins/background/gsd-background-manager.c	2012-10-26 10:19:49.567004179 +0200
 @@ -412,6 +412,98 @@
                  setup_bg_and_draw_background (manager);
  }

@@ -8,9 +8,11 @@ You can't use G_N_ELEMENTS() on a non-static array.
 Also use a guint to iterate, and prepend to the list (which
 is quicker than appending for long lists).
 ---
+diff --git a/plugins/housekeeping/gsd-disk-space.c b/plugins/housekeeping/gsd-disk-space.c
+index b2976ea..704dd6c 100644
 --- a/plugins/housekeeping/gsd-disk-space.c
 +++ b/plugins/housekeeping/gsd-disk-space.c
-@@ -733,12 +733,10 @@
+@@ -965,12 +965,10 @@ gsd_ldsm_get_config (void)
  
          settings_list = g_settings_get_strv (settings, SETTINGS_IGNORE_PATHS);
          if (settings_list != NULL) {
