@@ -27,4 +27,5 @@ git_xrandr_dont_include_labeller_widget.patch
 logind_support.patch
 0001-Fix-media-keys-handling-with-GTK-3.7.8.patch
 ibus-ubuntu-session.patch
-gnome-desktop-3-8.patch
+git_keyboard_Adapt_to_gnome_xkb_info_API_change.patch
+git_keyboard_Adapt_to_gnome_xkb_info_API_change_2.patch

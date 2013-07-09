@@ -1,0 +1,93 @@
+From 8174dcd701de399ff28a19efbe9744744b802ce8 Mon Sep 17 00:00:00 2001
+From: Rui Matos <tiagomatos@gmail.com>
+Date: Wed, 23 Jan 2013 20:01:49 +0100
+Subject: [PATCH] keyboard: Adapt to gnome-xkb-info API change
+
+https://bugzilla.gnome.org/show_bug.cgi?id=692525
+---
+ configure.ac                            |  2 +-
+ plugins/keyboard/gsd-keyboard-manager.c | 49 ++++++++++++---------------------
+ 2 files changed, 19 insertions(+), 32 deletions(-)
+
+--- a/configure.ac
++++ b/configure.ac
+@@ -47,7 +47,7 @@
+ GTK_REQUIRED_VERSION=3.3.18
+ GCONF_REQUIRED_VERSION=2.6.1
+ GIO_REQUIRED_VERSION=2.26.0
+-GNOME_DESKTOP_REQUIRED_VERSION=3.5.3
++GNOME_DESKTOP_REQUIRED_VERSION=3.7.5
+ LIBNOTIFY_REQUIRED_VERSION=0.7.3
+ UPOWER_GLIB_REQUIRED_VERSION=0.9.1
+ PA_REQUIRED_VERSION=0.9.16
+--- a/plugins/keyboard/gsd-keyboard-manager.c
++++ b/plugins/keyboard/gsd-keyboard-manager.c
+@@ -793,21 +793,6 @@
+ }
+ 
+ static gchar *
+-language_code_from_locale (const gchar *locale)
+-{
+-        if (!locale || !locale[0] || !locale[1])
+-                return NULL;
+-
+-        if (!locale[2] || locale[2] == '_' || locale[2] == '.')
+-                return g_strndup (locale, 2);
+-
+-        if (!locale[3] || locale[3] == '_' || locale[3] == '.')
+-                return g_strndup (locale, 3);
+-
+-        return NULL;
+-}
+-
+-static gchar *
+ build_xkb_group_string (const gchar *user,
+                         const gchar *locale,
+                         const gchar *latin)
+@@ -868,7 +853,7 @@
+         const gchar *locale_layout = NULL;
+         const gchar *locale_variant = NULL;
+         const gchar *locale;
+-        gchar *language;
++        gboolean got_info;
+ 
+         if (!layout)
+                 return;
+@@ -879,21 +864,23 @@
+         locale = setlocale (LC_MESSAGES, NULL);
+         /* If LANG is empty, default to en_US */
+         if (!locale)
+-                language = g_strdup (DEFAULT_LANGUAGE);
+-        else
+-                language = language_code_from_locale (locale);
+-
+-        if (!language)
+-                language = language_code_from_locale (DEFAULT_LANGUAGE);
++                locale = DEFAULT_LANGUAGE;
+ 
+-        gnome_xkb_info_get_layout_info_for_language (manager->priv->xkb_info,
+-                                                     language,
+-                                                     NULL,
+-                                                     NULL,
+-                                                     NULL,
+-                                                     &locale_layout,
+-                                                     &locale_variant);
+-        g_free (language);
++        got_info = gnome_xkb_info_get_layout_info_for_locale (manager->priv->xkb_info,
++                                                              locale,
++                                                              NULL,
++                                                              NULL,
++                                                              NULL,
++                                                              &locale_layout,
++                                                              &locale_variant);
++        if (!got_info)
++                gnome_xkb_info_get_layout_info_for_locale (manager->priv->xkb_info,
++                                                           DEFAULT_LANGUAGE,
++                                                           NULL,
++                                                           NULL,
++                                                           NULL,
++                                                           &locale_layout,
++                                                           &locale_variant);
+ 
+         /* We want to minimize the number of XKB groups if we have
+          * duplicated layout+variant pairs.

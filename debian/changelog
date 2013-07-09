@@ -6,8 +6,11 @@ gnome-settings-daemon (3.6.4-0ubuntu16) UNRELEASED; urgency=low
     - Drop upstream revert.
   * debian/patches/ibus-ubuntu-session.patch:
     - Check for Ubuntu sessions.
-  * debian/patches/gnome-desktop-3-8.patch:
-    - Don't use symbol from gnome-desktop 3.8.
+  * debian/patches/git_keyboard_Adapt_to_gnome_xkb_info_API_change.patch:
+  * debian/patches/git_keyboard_Adapt_to_gnome_xkb_info_API_change_2.patch:
+    - Take upstream's 8174dcd701de399ff28a19efbe9744744b802ce8 and
+      55fee0c57563b95deddc4396eec87ab6bee35d34 and so we can work with
+      gnome-desktop 3.8.
 
  -- William Hua <william.hua@canonical.com>  Fri, 07 Jun 2013 16:50:35 -0400
 
