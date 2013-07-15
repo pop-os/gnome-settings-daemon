@@ -16,7 +16,6 @@ bugzilla_segfault_dpms.patch
 correct_logout_action.patch
 power-no-fallback-notifications.patch
 power-check-null-devices.patch
-revert_new_ibus_use.patch
 migrate_metacity_keys.patch
 touchscreen_rotation.patch
 nexus-orientation.patch
@@ -27,3 +26,6 @@ fix_broken_user_sounds_permissions.patch
 git_xrandr_dont_include_labeller_widget.patch
 logind_support.patch
 0001-Fix-media-keys-handling-with-GTK-3.7.8.patch
+ibus-ubuntu-session.patch
+git_keyboard_Adapt_to_gnome_xkb_info_API_change.patch
+git_keyboard_Adapt_to_gnome_xkb_info_API_change_2.patch

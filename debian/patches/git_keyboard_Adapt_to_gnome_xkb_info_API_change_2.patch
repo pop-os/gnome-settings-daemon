@@ -1,0 +1,109 @@
+From 55fee0c57563b95deddc4396eec87ab6bee35d34 Mon Sep 17 00:00:00 2001
+From: Rui Matos <tiagomatos@gmail.com>
+Date: Tue, 29 Jan 2013 14:57:08 +0100
+Subject: [PATCH] keyboard: Adapt to gnome-xkb-info API change
+
+---
+ configure.ac                            |  2 +-
+ plugins/keyboard/gsd-keyboard-manager.c | 58 ++++++++++++++++++++-------------
+ 2 files changed, 37 insertions(+), 23 deletions(-)
+
+--- a/configure.ac
++++ b/configure.ac
+@@ -47,7 +47,7 @@
+ GTK_REQUIRED_VERSION=3.3.18
+ GCONF_REQUIRED_VERSION=2.6.1
+ GIO_REQUIRED_VERSION=2.26.0
+-GNOME_DESKTOP_REQUIRED_VERSION=3.7.5
++GNOME_DESKTOP_REQUIRED_VERSION=3.7.90
+ LIBNOTIFY_REQUIRED_VERSION=0.7.3
+ UPOWER_GLIB_REQUIRED_VERSION=0.9.1
+ PA_REQUIRED_VERSION=0.9.16
+--- a/plugins/keyboard/gsd-keyboard-manager.c
++++ b/plugins/keyboard/gsd-keyboard-manager.c
+@@ -43,6 +43,7 @@
+ #include <X11/extensions/XKBrules.h>
+ 
+ #define GNOME_DESKTOP_USE_UNSTABLE_API
++#include <libgnome-desktop/gnome-languages.h>
+ #include <libgnome-desktop/gnome-xkb-info.h>
+ 
+ #ifdef HAVE_IBUS
+@@ -837,6 +838,40 @@
+ }
+ 
+ static void
++get_locale_layout (GsdKeyboardManager  *manager,
++                   const gchar        **layout,
++                   const gchar        **variant)
++{
++        const gchar *locale;
++        const gchar *type;
++        const gchar *id;
++        gboolean got_info;
++
++        *layout = NULL;
++        *variant = NULL;
++
++        locale = setlocale (LC_MESSAGES, NULL);
++        /* If LANG is empty, default to en_US */
++        if (!locale)
++                locale = DEFAULT_LANGUAGE;
++
++        got_info = gnome_get_input_source_from_locale (locale, &type, &id);
++        if (!got_info)
++                if (!gnome_get_input_source_from_locale (DEFAULT_LANGUAGE, &type, &id))
++                        return;
++
++        if (!g_str_equal (type, INPUT_SOURCE_TYPE_XKB))
++                return;
++
++        gnome_xkb_info_get_layout_info (manager->priv->xkb_info,
++                                        id,
++                                        NULL,
++                                        NULL,
++                                        layout,
++                                        variant);
++}
++
++static void
+ replace_layout_and_variant (GsdKeyboardManager *manager,
+                             XkbRF_VarDefsRec   *xkb_var_defs,
+                             const gchar        *layout,
+@@ -852,8 +887,6 @@
+         const gchar *latin_variant = "";
+         const gchar *locale_layout = NULL;
+         const gchar *locale_variant = NULL;
+-        const gchar *locale;
+-        gboolean got_info;
+ 
+         if (!layout)
+                 return;
+@@ -861,26 +894,7 @@
+         if (!variant)
+                 variant = "";
+ 
+-        locale = setlocale (LC_MESSAGES, NULL);
+-        /* If LANG is empty, default to en_US */
+-        if (!locale)
+-                locale = DEFAULT_LANGUAGE;
+-
+-        got_info = gnome_xkb_info_get_layout_info_for_locale (manager->priv->xkb_info,
+-                                                              locale,
+-                                                              NULL,
+-                                                              NULL,
+-                                                              NULL,
+-                                                              &locale_layout,
+-                                                              &locale_variant);
+-        if (!got_info)
+-                gnome_xkb_info_get_layout_info_for_locale (manager->priv->xkb_info,
+-                                                           DEFAULT_LANGUAGE,
+-                                                           NULL,
+-                                                           NULL,
+-                                                           NULL,
+-                                                           &locale_layout,
+-                                                           &locale_variant);
++        get_locale_layout (manager, &locale_layout, &locale_variant);
+ 
+         /* We want to minimize the number of XKB groups if we have
+          * duplicated layout+variant pairs.
