@@ -1,5 +1,6 @@
 gnome-settings-daemon (3.6.4-0ubuntu16) UNRELEASED; urgency=low
 
+  [ William Hua ]
   * debian/control.in:
     - Depend on IBus 1.5.0.
   * debian/patches/revert_new_ibus_use.patch:
@@ -11,6 +12,11 @@ gnome-settings-daemon (3.6.4-0ubuntu16) UNRELEASED; urgency=low
     - Take upstream's 8174dcd701de399ff28a19efbe9744744b802ce8 and
       55fee0c57563b95deddc4396eec87ab6bee35d34 and so we can work with
       gnome-desktop 3.8.
+
+  [ Jeremy Bicha ]
+  * debian/gnome-settings-daemon.gsettings-override:
+    - Set switch-input-source keyboard shortcut to Super+Space to match ibus,
+      GNOME 3.8 and Windows 8 default
 
  -- William Hua <william.hua@canonical.com>  Mon, 15 Jul 2013 17:20:35 -0400
 
