@@ -44,7 +44,7 @@ Build-Depends: cdbs,
                xsltproc,
                docbook-xsl,
                docbook-xsl-doc-html
-Standards-Version: 3.9.3
+Standards-Version: 3.9.4
 Vcs-Browser: http://anonscm.debian.org/viewvc/pkg-gnome/desktop/unstable/gnome-settings-daemon/
 Vcs-Svn: svn://anonscm.debian.org/svn/pkg-gnome/desktop/unstable/gnome-settings-daemon/
 
