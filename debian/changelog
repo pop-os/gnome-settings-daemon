@@ -1,9 +1,10 @@
-gnome-settings-daemon (3.8.4-1) UNRELEASED; urgency=low
+gnome-settings-daemon (3.8.4-1) experimental; urgency=low
 
+  [ Thomas Bechtold ]
   * New upstream release.
   * Bump Standards-Version to 3.9.4.
 
- -- Thomas Bechtold <thomasbechtold@jpberlin.de>  Sat, 20 Jul 2013 09:16:26 +0200
+ -- Andreas Henriksson <andreas@fatal.se>  Fri, 16 Aug 2013 20:06:53 +0200
 
 gnome-settings-daemon (3.8.3-1) experimental; urgency=low
 
