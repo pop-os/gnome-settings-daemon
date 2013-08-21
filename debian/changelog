@@ -1,4 +1,4 @@
-gnome-settings-daemon (3.6.4-0ubuntu16) UNRELEASED; urgency=low
+gnome-settings-daemon (3.6.4-0ubuntu16) saucy; urgency=low
 
   [ William Hua ]
   * debian/control.in:
@@ -18,7 +18,7 @@ gnome-settings-daemon (3.6.4-0ubuntu16) UNRELEASED; urgency=low
     - Set switch-input-source keyboard shortcut to Super+Space to match ibus,
       GNOME 3.8 and Windows 8 default
 
- -- William Hua <william.hua@canonical.com>  Mon, 15 Jul 2013 17:20:35 -0400
+ -- Jeremy Bicha <jbicha@ubuntu.com>  Wed, 21 Aug 2013 11:22:42 -0400
 
 gnome-settings-daemon (3.6.4-0ubuntu15) saucy; urgency=low
 
