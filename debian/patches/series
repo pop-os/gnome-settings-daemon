@@ -29,3 +29,4 @@ logind_support.patch
 ibus-ubuntu-session.patch
 git_keyboard_Adapt_to_gnome_xkb_info_API_change.patch
 git_keyboard_Adapt_to_gnome_xkb_info_API_change_2.patch
+git_keybindings_add_screen_reader_toggle.patch
