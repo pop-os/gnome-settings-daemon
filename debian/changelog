@@ -1,9 +1,9 @@
-gnome-settings-daemon (3.6.4-0ubuntu17) UNRELEASED; urgency=low
+gnome-settings-daemon (3.6.4-0ubuntu17) saucy; urgency=low
 
   * debian/patches/git_keybindings_add_screen_reader_toggle.patch:
     - Add keyboard shortcut to enable/disable the screen reader.
 
- -- Luke Yelavich <themuso@ubuntu.com>  Thu, 22 Aug 2013 12:55:35 +1000
+ -- Luke Yelavich <themuso@ubuntu.com>  Fri, 23 Aug 2013 16:08:29 +1000
 
 gnome-settings-daemon (3.6.4-0ubuntu16) saucy; urgency=low
 
