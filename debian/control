@@ -7,7 +7,7 @@ Source: gnome-settings-daemon
 Section: gnome
 Priority: optional
 Maintainer: Debian GNOME Maintainers <pkg-gnome-maintainers@lists.alioth.debian.org>
-Uploaders: Andreas Henriksson <andreas@fatal.se>, Emilio Pozuelo Monfort <pochu@debian.org>, Josselin Mouette <joss@debian.org>, Michael Biebl <biebl@debian.org>, Sjoerd Simons <sjoerd@debian.org>
+Uploaders: Andreas Henriksson <andreas@fatal.se>, Emilio Pozuelo Monfort <pochu@debian.org>, Laurent Bigonville <bigon@debian.org>, Sjoerd Simons <sjoerd@debian.org>
 Build-Depends: cdbs,
                debhelper (>= 8.1.0~),
                gnome-pkg-tools,
@@ -26,6 +26,7 @@ Build-Depends: cdbs,
                libx11-dev,
                libgnomekbd-dev (>= 2.91.90),
                libxklavier-dev (>= 5.0),
+               libibus-1.0-dev (>= 1.5.2),
                gsettings-desktop-schemas-dev (>= 3.7.2.1),
                libgnome-desktop-3-dev (>= 3.8.0.1-2~),
                libpulse-dev (>= 2.0),
