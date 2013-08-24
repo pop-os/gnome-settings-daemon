@@ -1,10 +1,10 @@
-gnome-settings-daemon (3.8.4-2) UNRELEASED; urgency=low
+gnome-settings-daemon (3.8.4-2) experimental; urgency=low
 
   * debian/control.in, debian/rules: Re-enable ibus support (Closes: #720489)
   * debian/control.in: Bump Standards-Version to 3.9.4 (no further changes)
   * debian/rules: Drop removed --enable-pulse configure flag
 
- -- Laurent Bigonville <bigon@debian.org>  Sat, 24 Aug 2013 13:30:34 +0200
+ -- Laurent Bigonville <bigon@debian.org>  Sat, 24 Aug 2013 14:25:09 +0200
 
 gnome-settings-daemon (3.8.4-1) experimental; urgency=low
 
