@@ -22,10 +22,6 @@ gnome-settings-daemon (3.8.4-0ubuntu1~saucy2) UNRELEASED; urgency=low
 
   [ Jeremy Bicha ]
   * New upstream release.
-    - Note that power management was intentionally broken. Specific
-      examples include autosuspend, suspend on lid close, and "media keys"
-      such as brightness control.
-    - Theming is broken in Unity
   * debian/control.in:
     - Bump minimum glib, gsettings-desktop-schemas, gnome-desktop3, gtk,
       libpulse, and libwacom
