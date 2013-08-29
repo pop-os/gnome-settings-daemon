@@ -14,6 +14,7 @@ correct_logout_action.patch
 migrate_metacity_keys.patch
 touchscreen_rotation.patch
 nexus-orientation.patch
+fix_broken_user_sounds_permissions.patch
 fix_media_keys_on_unity.patch
 fix_screenshots_on_unity.patch
 git_keybindings_add_screen_reader_toggle.patch
