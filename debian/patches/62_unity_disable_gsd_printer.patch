@@ -1,57 +1,33 @@
 Description: Disable gsd-printer plugin under Unity. We are still using system-config-printer for this, so no need to start another service for this.
-Author: Martin Pitt <martin.pitt@ubuntu.com>
 Forwarded: No, Ubuntu specific
+Author: Tim Lunn <tim@feathertop.org>
+Date: Mon, 3 Jun 2013 09:46:56 +1000
+Subject: [PATCH] Disable print notification plugin on unity.
 
-Index: gnome-settings-daemon-3.6.1/plugins/print-notifications/gsd-print-notifications-plugin.c
-===================================================================
---- gnome-settings-daemon-3.6.1.orig/plugins/print-notifications/gsd-print-notifications-plugin.c	2012-10-05 13:56:44.000000000 +0200
-+++ gnome-settings-daemon-3.6.1/plugins/print-notifications/gsd-print-notifications-plugin.c	2012-10-26 10:19:49.611004182 +0200
-@@ -38,6 +38,12 @@
- static void
- gsd_print_notifications_plugin_init (GsdPrintNotificationsPlugin *plugin)
- {
-+        if (g_strcmp0 (g_getenv ("XDG_CURRENT_DESKTOP"), "Unity") == 0) {
-+            plugin->priv = NULL;
-+            g_debug ("GsdPrintNotificationsPlugin: Disabling for Unity, using system-config-printer");
-+            return;
+---
+ gnome-settings-daemon/gnome-settings-plugin-info.c | 14 ++++++++++++++
+ 1 file changed, 14 insertions(+)
+
+--- a/gnome-settings-daemon/gnome-settings-plugin-info.c
++++ b/gnome-settings-daemon/gnome-settings-plugin-info.c
+@@ -381,6 +381,20 @@
+                 goto out;
+         }
+ 
++        if (g_strcmp0 (g_getenv ("XDG_CURRENT_DESKTOP"), "Unity") == 0
++            && g_strcmp0 (info->priv->name, "Print-notifications") == 0) {
++
++                g_warning ("Disable print plugin under Unity");
++
++                g_object_unref (G_OBJECT (info->priv->module));
++                info->priv->module = NULL;
++
++                /* Mark plugin as unavailable */
++                info->priv->available = FALSE;
++
++                goto out;
 +        }
 +
-         plugin->priv = GSD_PRINT_NOTIFICATIONS_PLUGIN_GET_PRIVATE (plugin);
+         info->priv->plugin = GNOME_SETTINGS_PLUGIN (gnome_settings_module_new_object (GNOME_SETTINGS_MODULE (info->priv->module)));
  
-         plugin->priv->manager = gsd_print_notifications_manager_new ();
-@@ -55,6 +61,11 @@
- 
-         plugin = GSD_PRINT_NOTIFICATIONS_PLUGIN (object);
- 
-+        if (g_strcmp0 (g_getenv ("XDG_CURRENT_DESKTOP"), "Unity") == 0) {
-+            G_OBJECT_CLASS (gsd_print_notifications_plugin_parent_class)->finalize (object);
-+            return;
-+        }
-+
-         g_return_if_fail (plugin->priv != NULL);
- 
-         if (plugin->priv->manager != NULL) {
-@@ -70,6 +81,11 @@
-         gboolean res;
-         GError  *error;
- 
-+        if (GSD_PRINT_NOTIFICATIONS_PLUGIN (plugin)->priv == NULL) {
-+            g_debug ("Not activating disabled print-notifications plugin");
-+            return;
-+        }
-+
-         g_debug ("Activating print-notifications plugin");
- 
-         error = NULL;
-@@ -83,6 +99,11 @@
- static void
- impl_deactivate (GnomeSettingsPlugin *plugin)
- {
-+        if (GSD_PRINT_NOTIFICATIONS_PLUGIN (plugin)->priv == NULL) {
-+            g_debug ("Not deactivating disabled print-notifications plugin");
-+            return;
-+        }
-+
-         g_debug ("Deactivating print_notifications plugin");
-         gsd_print_notifications_manager_stop (GSD_PRINT_NOTIFICATIONS_PLUGIN (plugin)->priv->manager);
- }
+         g_type_module_unuse (info->priv->module);

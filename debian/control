@@ -16,8 +16,8 @@ Build-Depends: cdbs,
                autotools-dev,
                intltool (>= 0.37.1),
                libdbus-glib-1-dev (>= 0.74),
-               libglib2.0-dev (>= 2.31.0),
-               libgtk-3-dev (>= 3.3.4),
+               libglib2.0-dev (>= 2.35.3),
+               libgtk-3-dev (>= 3.7.8),
                libnotify-dev (>= 0.7.0),
                libxt-dev,
                libxi-dev,
@@ -25,24 +25,25 @@ Build-Depends: cdbs,
                libxext-dev,
                libx11-dev,
                libxtst-dev,
-               gsettings-desktop-schemas-dev (>= 3.5.90),
-               libgnome-desktop-3-dev (>= 3.5.3),
-               libpulse-dev (>= 0.9.16),
+               gsettings-desktop-schemas-dev (>= 3.7.2.1),
+               libgnome-desktop-3-dev (>= 3.7.90),
+               libpulse-dev (>= 1:2.0),
+               librsvg2-dev (>= 2.36.2),
                libcanberra-gtk3-dev,
                libcups2-dev,
                libpolkit-gobject-1-dev,
                libappindicator3-dev (>= 0.4.90),
                hwdata,
                libupower-glib-dev (>= 0.9.11),
-               libsystemd-login-dev,
                libcolord-dev (>= 0.1.12),
                liblcms2-dev,
                libnss3-dev,
                libgudev-1.0-dev,
-               libwacom-dev (>= 0.6),
+               libwacom-dev (>= 0.7),
                xserver-xorg-input-wacom,
                libgnomekbd-dev (>= 3.5.1),
                libxklavier-dev,
+               libsystemd-login-dev (>= 183),
                libibus-1.0-dev (>= 1.5.0)
 Standards-Version: 3.9.3
 Vcs-Bzr: https://code.launchpad.net/~ubuntu-desktop/gnome-settings-daemon/ubuntu
@@ -51,11 +52,10 @@ Package: gnome-settings-daemon
 Architecture: any
 Depends: ${shlibs:Depends},
          ${misc:Depends},
-         gsettings-desktop-schemas (>= 3.3.90-0ubuntu2),
+         gsettings-desktop-schemas (>= 3.7.2.1),
          nautilus-data (>= 2.91.3-1),
          ibus (>= 1.5.0)
-Recommends: pulseaudio,
-            systemd-services,
+Recommends: pulseaudio
 Pre-Depends: ${misc:Pre-Depends}
 Breaks: rhythmbox (<< 0.11.5),
         banshee (<< 0.13.2+dfsg-7),
@@ -65,7 +65,7 @@ Breaks: rhythmbox (<< 0.11.5),
         gnome-screensaver (<< 2.28.0),
         gnome-color-manager (<< 3.0),
         unity-greeter (<< 0.2.1-0ubuntu1),
-        indicator-datetime (<< 12.10.3daily13.03.26),
+        indicator-datetime (<< 12.10.3daily13.03.26)
 Suggests: x11-xserver-utils,
           gnome-screensaver,
           metacity | x-window-manager
@@ -90,7 +90,7 @@ Architecture: any
 Depends: ${shlibs:Depends},
          ${misc:Depends},
          libdbus-glib-1-dev (>= 0.74),
-         libglib2.0-dev (>= 2.26.0)
+         libglib2.0-dev (>= 2.35.3)
 Description: Headers for building applications communicating with gnome-settings-daemon
  This package contains header files required to build applications that
  communicate with the GNOME settings daemon over D-Bus.

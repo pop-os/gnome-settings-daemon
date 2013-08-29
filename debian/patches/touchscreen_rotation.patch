@@ -1,11 +1,20 @@
-## Description: correctly set up input coordinates when rotating touchscreens
-## Origin/Author: jani@ubuntu.com
-## Bug: https://bugzilla.gnome.org/show_bug.cgi?id=691691
-Index: gnome-settings-daemon-3.6.4/plugins/xrandr/gsd-xrandr-manager.c
-===================================================================
---- gnome-settings-daemon-3.6.4.orig/plugins/xrandr/gsd-xrandr-manager.c	2013-01-10 15:37:58.000000000 +0200
-+++ gnome-settings-daemon-3.6.4/plugins/xrandr/gsd-xrandr-manager.c	2013-01-29 16:28:08.946019381 +0200
-@@ -1492,15 +1492,16 @@
+From c1dbf0ad1b49356346f1eb0690e66be428814ef0 Mon Sep 17 00:00:00 2001
+From: Jani Monoses <jani@ubuntu.com>
+Date: Wed, 30 Jan 2013 11:18:48 +0200
+Subject: [PATCH] Use transformation matrix to rotate touchscreens.
+
+Bug #691691.
+
+Signed-off-by: Jani Monoses <jani@ubuntu.com>
+---
+ plugins/xrandr/gsd-xrandr-manager.c | 61 ++++++++++++++++---------------------
+ 1 file changed, 27 insertions(+), 34 deletions(-)
+
+diff --git a/plugins/xrandr/gsd-xrandr-manager.c b/plugins/xrandr/gsd-xrandr-manager.c
+index 2fb6204..790d9c9 100644
+--- a/plugins/xrandr/gsd-xrandr-manager.c
++++ b/plugins/xrandr/gsd-xrandr-manager.c
+@@ -1502,15 +1502,13 @@ get_next_rotation (GnomeRRRotation allowed_rotations, GnomeRRRotation current_ro
  
  struct {
          GnomeRRRotation rotation;
@@ -13,34 +22,40 @@ Index: gnome-settings-daemon-3.6.4/plugins/xrandr/gsd-xrandr-manager.c
 -        gboolean x_axis_inversion;
 -        gboolean y_axis_inversion;
 -        gboolean axes_swap;
++        /* Coordinate Transformation Matrix */
 +        gfloat matrix[9];
  } evdev_rotations[] = {
 -        { GNOME_RR_ROTATION_0, 0, 0, 0 },
 -        { GNOME_RR_ROTATION_90, 1, 0, 1 },
 -        { GNOME_RR_ROTATION_180, 1, 1, 0 },
 -        { GNOME_RR_ROTATION_270, 0, 1, 1 }
-+        { GNOME_RR_ROTATION_0,
-+                                 {1, 0, 0, 0, 1, 0, 0, 0, 1}},
-+        { GNOME_RR_ROTATION_90,
-+                                 {0, -1, 1, 1, 0, 0, 0, 0, 1}},
-+        { GNOME_RR_ROTATION_180,
-+                                 {-1, 0, 1, 0, -1, 1, 0, 0, 1}},
-+        { GNOME_RR_ROTATION_270,
-+                                 {0, 1, 0, -1, 0, 1, 0,  0, 1}}
++        { GNOME_RR_ROTATION_0, {1, 0, 0, 0, 1, 0, 0, 0, 1}},
++        { GNOME_RR_ROTATION_90, {0, -1, 1, 1, 0, 0, 0, 0, 1}},
++        { GNOME_RR_ROTATION_180, {-1, 0, 1, 0, -1, 1, 0, 0, 1}},
++        { GNOME_RR_ROTATION_270, {0, 1, 0, -1, 0, 1, 0,  0, 1}}
  };
  
  static guint
-@@ -1556,6 +1557,7 @@
+@@ -1566,6 +1564,7 @@ rotate_touchscreens (GsdXrandrManager *mgr,
          XDeviceInfo *device_info;
          gint n_devices;
          guint i, rot_idx;
-+        Atom float_atom = XInternAtom(GDK_DISPLAY_XDISPLAY(gdk_display_get_default()), "FLOAT", True);
++        Atom float_atom;
  
          if (!supports_xinput_devices ())
                  return;
-@@ -1576,13 +1578,13 @@
+@@ -1578,6 +1577,8 @@ rotate_touchscreens (GsdXrandrManager *mgr,
  
-                 if (device_info_is_touchscreen (&device_info[i])) {
+         rot_idx = get_rotation_index (rotation);
+ 
++        float_atom = XInternAtom(GDK_DISPLAY_XDISPLAY(gdk_display_get_default()), "FLOAT", True);
++
+         for (i = 0; i < n_devices; i++) {
+                 if (is_wacom_tablet_device  (mgr, &device_info[i])) {
+                         g_debug ("Not rotating tablet device '%s'", device_info[i].name);
+@@ -1587,13 +1588,13 @@ rotate_touchscreens (GsdXrandrManager *mgr,
+                 if (device_info_is_touchscreen (&device_info[i]) ||
+                             device_info_is_tablet (&device_info[i])) {
                          XDevice *device;
 -                        char c = evdev_rotations[rot_idx].axes_swap;
 -                        PropertyHelper axes_swap = {
@@ -59,7 +74,7 @@ Index: gnome-settings-daemon-3.6.4/plugins/xrandr/gsd-xrandr-manager.c
                          };
  
                          g_debug ("About to rotate '%s'", device_info[i].name);
-@@ -1592,26 +1594,18 @@
+@@ -1603,26 +1604,18 @@ rotate_touchscreens (GsdXrandrManager *mgr,
                          if (gdk_error_trap_pop () || (device == NULL))
                                  continue;
  
@@ -80,7 +95,7 @@ Index: gnome-settings-daemon-3.6.4/plugins/xrandr/gsd-xrandr-manager.c
 -
 -                                g_debug ("Rotated '%s' to configuration '%d, %d, %d'",
 +                        if (device_set_property (device, device_info[i].name, &matrix) != FALSE) {
-+                                g_print ("Rotated '%s' to configuration '%f, %f, %f, %f, %f, %f, %f, %f, %f'\n",
++                                g_debug ("Rotated '%s' to configuration '%f, %f, %f, %f, %f, %f, %f, %f, %f'\n",
                                           device_info[i].name,
 -                                         evdev_rotations[rot_idx].x_axis_inversion,
 -                                         evdev_rotations[rot_idx].y_axis_inversion,

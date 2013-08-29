@@ -1,3 +1,62 @@
+gnome-settings-daemon (3.8.4-0ubuntu1~saucy2) UNRELEASED; urgency=low
+
+  * Re-merge from Ubuntu
+  * debian/patches/revert_input_source_switch_helper_dropping.patch:
+    - Unity still uses this so don't drop it yet
+
+ -- Jeremy Bicha <jbicha@ubuntu.com>  Thu, 29 Aug 2013 04:36:59 -0400
+
+gnome-settings-daemon (3.8.4-0ubuntu1~saucy1) saucy; urgency=medium
+
+  * New upstream release
+
+ -- Tim Lunn <tim@feathertop.org>  Fri, 23 Aug 2013 19:50:05 +1000
+
+gnome-settings-daemon (3.8.3-0ubuntu1~saucy4) saucy; urgency=medium
+
+  * Correct path for switch-input-source gsettings override
+
+ -- Tim Lunn <tim@feathertop.org>  Fri, 23 Aug 2013 07:32:01 +1000
+
+gnome-settings-daemon (3.8.3-0ubuntu1~saucy3) saucy; urgency=medium
+
+  * New upstream release
+  * debian/control.in:
+    - Bump minimum glib, gsettings-desktop-schemas, gnome-desktop3, gtk,
+      libpulse, and libwacom
+    - Build-depend on librsvg2-dev
+  * debian/patches:
+    - git_revert_remove_automount_helper.patch, bring back the automount
+      helper, revert upstream commit and port to dbus session tracking.
+    - fix_media_keys_on_unity.patch, we need to watch for unity and
+      fire up the legacy keygrabber.
+    - fix_screenshots_on_unity.patch, bring back support for screenshots
+      vi gnome-screenshot when using unity.
+    - touchscreen_rotation.patch, Updated with latest version from bugzilla
+    - 16_use_synchronous_notifications.patch, refreshed
+    - 62_unity_disable_gsd_printer.patch, Updated for 3.8
+    - 64_restore_terminal_keyboard_shortcut_schema.patch, Refreshed
+    - revert_background_dropping.patch:
+      Don't drop the background plugin yet, GNOME Fallback & Unity
+      still need it (when Nautilus isn't handling the desktop)
+    - ubuntu-lid-close-suspend.patch:
+      Reimplement support for setting lid close suspend actions
+  * Dropped obsolete patches:
+    - bugzilla_segfault_dpms.patch: Applied in new version
+    - 47_delay_pa_connect_to_idle.patch: Applied in new version
+    - power-no-fallback-notifications.patch: Applied in new version
+    - power-check-null-devices.patch, Dropped: Applied in new version
+    - 51_lock_screen_on_suspend.patch, Superseded by handling this key
+      in gnome-screensaver. With that, g-screensaver mirrors what's
+      done in g-shell, and avoids patching settings-daemon.
+    - 60_unity_hide_status_icon.patch
+    - 61_unity_use_application_indicator.patch
+    - 63_unity_start_mounter.patch
+  * Disabled patches that need to be rewritten or dropped:
+    - 48_register_client_before_idle_callbacks.patch  
+
+ -- Tim Lunn <tim@feathertop.org>  Sun, 09 Jun 2013 11:27:37 +1000
+
 gnome-settings-daemon (3.6.4-0ubuntu17) saucy; urgency=low
 
   * debian/patches/git_keybindings_add_screen_reader_toggle.patch:
