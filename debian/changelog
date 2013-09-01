@@ -26,7 +26,9 @@ gnome-settings-daemon (3.8.4-0ubuntu1~saucy5) UNRELEASED; urgency=low
     - Update switch input source keys for 3.8
 
   [ Jeremy Bicha ]
-  * New upstream release.
+  * New upstream release (LP: #1219486)
+    - Two-finger scrolling enabled by default (LP: #1217166)
+    - Fix Super+Space switch-input-source shortcut in Unity (LP: #1201679)
   * debian/control.in:
     - Bump minimum glib, gsettings-desktop-schemas, gnome-desktop3, gtk,
       libpulse, and libwacom
