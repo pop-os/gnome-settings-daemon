@@ -12,6 +12,11 @@ gnome-settings-daemon (3.8.4-0ubuntu1~saucy2) UNRELEASED; urgency=low
     - ubuntu-lid-close-suspend.patch:
        Reimplement support for setting lid close suspend actions
     - ubuntu-fix-desktop-file.patch: Autostart in Unity too
+    - fix_input_switching_on_unity.patch: Bring back support for input switching
+    under unity.
+    - 63_gnome_disable_background_plugin.patch: Disable loading
+    of background plugin for GNOME session (LP: #1219148)
+
   * Dropped obsolete patches:
     - power-check-null-devices.patch, Dropped: Applied in new version
     - 51_lock_screen_on_suspend.patch, Superseded by handling this key

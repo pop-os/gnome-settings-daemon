@@ -6,6 +6,7 @@
 revert_background_dropping.patch
 52_sync_background_to_accountsservice.patch
 62_unity_disable_gsd_printer.patch
+63_gnome_disable_background_plugin.patch
 64_restore_terminal_keyboard_shortcut_schema.patch
 90_set_gmenus_xsettings.patch
 disable_three_touch_tap.patch
@@ -16,10 +17,10 @@ touchscreen_rotation.patch
 nexus-orientation.patch
 fix_broken_user_sounds_permissions.patch
 fix_media_keys_on_unity.patch
+fix_input_switching_on_unity.patch
 fix_screenshots_on_unity.patch
 git_keybindings_add_screen_reader_toggle.patch
 git_revert_gsd-keygrab.patch
 ubuntu-fix-desktop-file.patch
 git_revert_remove_automount_helper.patch
 ubuntu-lid-close-suspend.patch
-revert_input_source_switch_helper_dropping.patch
