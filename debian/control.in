@@ -28,6 +28,7 @@ Build-Depends: cdbs,
                libcanberra-gtk3-dev,
                libcups2-dev,
                libpolkit-gobject-1-dev,
+               libaccountsservice-dev (>= 0.6.34),
                libappindicator3-dev (>= 0.4.90),
                hwdata,
                libupower-glib-dev (>= 0.9.11),
@@ -48,10 +49,12 @@ Package: gnome-settings-daemon
 Architecture: any
 Depends: ${shlibs:Depends},
          ${misc:Depends},
+         accountsservice (>= 0.6.34),
          gsettings-desktop-schemas (>= 3.7.2.1),
-         nautilus-data (>= 2.91.3-1),
-         ibus (>= 1.5.0)
-Recommends: pulseaudio
+         nautilus-data (>= 2.91.3-1)
+Recommends: ibus (>= 1.5.0),
+            pulseaudio,
+            systemd-services
 Pre-Depends: ${misc:Pre-Depends}
 Breaks: rhythmbox (<< 0.11.5),
         banshee (<< 0.13.2+dfsg-7),

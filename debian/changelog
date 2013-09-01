@@ -1,4 +1,4 @@
-gnome-settings-daemon (3.8.4-0ubuntu1~saucy2) UNRELEASED; urgency=low
+gnome-settings-daemon (3.8.4-0ubuntu1~saucy5) UNRELEASED; urgency=low
 
   [ Tim Lunn ]
   * Refreshed patches
@@ -12,8 +12,8 @@ gnome-settings-daemon (3.8.4-0ubuntu1~saucy2) UNRELEASED; urgency=low
     - ubuntu-lid-close-suspend.patch:
        Reimplement support for setting lid close suspend actions
     - ubuntu-fix-desktop-file.patch: Autostart in Unity too
-    - fix_input_switching_on_unity.patch: Bring back support for input switching
-    under unity.
+    - fix_input_switching_on_unity.patch: Bring back support for input
+      switching under Unity
     - 63_gnome_disable_background_plugin.patch: Disable loading
     of background plugin for GNOME session (LP: #1219148)
 
@@ -35,8 +35,6 @@ gnome-settings-daemon (3.8.4-0ubuntu1~saucy2) UNRELEASED; urgency=low
   * revert_background_dropping.patch:
     - Don't drop the background plugin yet, GNOME Fallback & Unity
       still need it (when Nautilus isn't handling the desktop)
-  * revert_input_source_switch_helper_dropping.patch:
-    - Unity still uses this so don't drop it yet
   * Dropped obsolete patches:
     - bugzilla_segfault_dpms.patch: Applied in new version
     - 47_delay_pa_connect_to_idle.patch: Applied in new version
@@ -56,6 +54,23 @@ gnome-settings-daemon (3.8.4-0ubuntu1~saucy2) UNRELEASED; urgency=low
     - 16_use_synchronous_notifications.patch: Refreshed
 
  -- Jeremy Bicha <jbicha@ubuntu.com>  Thu, 29 Aug 2013 04:56:20 -0400
+
+gnome-settings-daemon (3.6.4-0ubuntu19) saucy; urgency=low
+
+  * Install the ibus dbus service (LP: #1194138)
+
+ -- Jeremy Bicha <jbicha@ubuntu.com>  Thu, 29 Aug 2013 11:14:56 -0400
+
+gnome-settings-daemon (3.6.4-0ubuntu18) saucy; urgency=low
+
+  * debian/patches/sync_input_sources_to_accountsservice.patch:
+    - Update user's accountsservice input sources whenever they change.
+
+  [ Aron Xu ]
+  * debian/control.in:
+    - Move ibus from Depends to Recommends (lp: #1218342).
+
+ -- William Hua <william.hua@canonical.com>  Thu, 29 Aug 2013 16:10:41 +0200
 
 gnome-settings-daemon (3.6.4-0ubuntu17) saucy; urgency=low
 
