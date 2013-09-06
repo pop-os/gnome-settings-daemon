@@ -1,4 +1,4 @@
-gnome-settings-daemon (3.8.4-0ubuntu1~saucy5) UNRELEASED; urgency=low
+gnome-settings-daemon (3.8.5-0ubuntu1~saucy1) UNRELEASED; urgency=low
 
   [ Tim Lunn ]
   * Refreshed patches
@@ -28,6 +28,8 @@ gnome-settings-daemon (3.8.4-0ubuntu1~saucy5) UNRELEASED; urgency=low
   [ Jeremy Bicha ]
   * New upstream release (LP: #1219486)
     - Two-finger scrolling enabled by default (LP: #1217166)
+    - But use edge scrolling if two-finger scrolling isn't
+      available (LP: #1221367)
     - Fix Super+Space switch-input-source shortcut in Unity (LP: #1201679)
   * debian/control.in:
     - Bump minimum glib, gsettings-desktop-schemas, gnome-desktop3, gtk,
