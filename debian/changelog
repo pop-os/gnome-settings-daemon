@@ -1,4 +1,4 @@
-gnome-settings-daemon (3.8.5-0ubuntu1) UNRELEASED; urgency=low
+gnome-settings-daemon (3.8.5-0ubuntu1) saucy; urgency=low
 
   [ Tim Lunn ]
   * Refreshed patches
@@ -15,7 +15,7 @@ gnome-settings-daemon (3.8.5-0ubuntu1) UNRELEASED; urgency=low
     - fix_input_switching_on_unity.patch: Bring back support for input
       switching under Unity
     - 63_gnome_disable_background_plugin.patch: Disable loading
-    of background plugin for GNOME session (LP: #1219148)
+      of background plugin for GNOME session (LP: #1219148)
 
   * Dropped obsolete patches:
     - power-check-null-devices.patch, Dropped: Applied in new version
@@ -62,7 +62,7 @@ gnome-settings-daemon (3.8.5-0ubuntu1) UNRELEASED; urgency=low
   * debian/patches:
     - 16_use_synchronous_notifications.patch: Refreshed
 
- -- Jeremy Bicha <jbicha@ubuntu.com>  Thu, 29 Aug 2013 04:56:20 -0400
+ -- Jeremy Bicha <jbicha@ubuntu.com>  Mon, 09 Sep 2013 10:21:09 -0400
 
 gnome-settings-daemon (3.6.4-0ubuntu19) saucy; urgency=low
 
