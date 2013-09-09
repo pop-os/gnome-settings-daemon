@@ -1,4 +1,4 @@
-gnome-settings-daemon (3.8.5-1) UNRELEASED; urgency=low
+gnome-settings-daemon (3.8.5-1) experimental; urgency=low
 
   * New upstream release.
   * debian/rules: Call dh-autoreconf with --as-needed to minimize the runtime
@@ -6,7 +6,7 @@ gnome-settings-daemon (3.8.5-1) UNRELEASED; urgency=low
   * debian/gnome-settings-daemon.install: Install dbus service files, IBus
     support is shipping org.freedesktop.IBus.service
 
- -- Laurent Bigonville <bigon@debian.org>  Mon, 09 Sep 2013 12:33:15 +0200
+ -- Laurent Bigonville <bigon@debian.org>  Mon, 09 Sep 2013 20:14:29 +0200
 
 gnome-settings-daemon (3.8.4-2) experimental; urgency=low
 
