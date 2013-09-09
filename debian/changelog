@@ -1,3 +1,11 @@
+gnome-settings-daemon (3.8.5-0ubuntu2) UNRELEASED; urgency=low
+
+  * debian/patches/ubuntu-lid-close-suspend.patch:
+    - Updated to make sure we lock the screen when closing lid without
+      suspend action (LP: #1223070)
+
+ -- Tim Lunn <tim@feathertop.org>  Tue, 10 Sep 2013 09:28:14 +1000
+
 gnome-settings-daemon (3.8.5-0ubuntu1) saucy; urgency=low
 
   [ Tim Lunn ]

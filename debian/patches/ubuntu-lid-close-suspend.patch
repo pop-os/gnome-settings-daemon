@@ -59,7 +59,7 @@ This reverts commit 58cb4eee64bbd8ca43111b1f80fdaacde8ad5f12.
  static void      uninhibit_lid_switch (GsdPowerManager *manager);
  static void      main_battery_or_ups_low_changed (GsdPowerManager *manager, gboolean is_low);
  static gboolean  idle_is_session_inhibited (GsdPowerManager *manager, guint mask, gboolean *is_inhibited);
-@@ -2140,6 +2142,9 @@
+@@ -2141,6 +2143,9 @@
  {
          GsdXrandrBootBehaviour val;
  
@@ -69,7 +69,7 @@ This reverts commit 58cb4eee64bbd8ca43111b1f80fdaacde8ad5f12.
          if (!external_monitor_is_connected (manager->priv->rr_screen))
                  return TRUE;
  
-@@ -2193,6 +2198,26 @@
+@@ -2194,6 +2199,26 @@
  }
  
  static void
@@ -96,7 +96,18 @@ This reverts commit 58cb4eee64bbd8ca43111b1f80fdaacde8ad5f12.
  do_lid_open_action (GsdPowerManager *manager)
  {
          /* play a sound, using sounds from the naming spec */
-@@ -2272,6 +2297,8 @@
+@@ -2259,6 +2284,10 @@
+                         lock_screensaver (manager);
+                 }
+         }
++        else {
++                if (manager->priv->inhibit_lid_switch_action)
++                        lock_screensaver (manager);
++        }
+ }
+ 
+ static void
+@@ -2273,6 +2302,8 @@
              main_battery_or_ups_low_changed (manager, FALSE);
          }
  
@@ -105,7 +116,7 @@ This reverts commit 58cb4eee64bbd8ca43111b1f80fdaacde8ad5f12.
          /* same state */
          tmp = up_client_get_lid_is_closed (manager->priv->up_client);
          if (manager->priv->lid_is_closed == tmp)
-@@ -3129,6 +3156,10 @@
+@@ -3130,6 +3161,10 @@
                  idle_configure (manager);
                  return;
          }
@@ -116,7 +127,7 @@ This reverts commit 58cb4eee64bbd8ca43111b1f80fdaacde8ad5f12.
  }
  
  static void
-@@ -3538,6 +3569,7 @@
+@@ -3539,6 +3574,7 @@
          /* don't blank inside a VM */
          manager->priv->is_virtual_machine = gsd_power_is_hardware_a_vm ();
  
@@ -124,7 +135,7 @@ This reverts commit 58cb4eee64bbd8ca43111b1f80fdaacde8ad5f12.
          gnome_settings_profile_end (NULL);
          return TRUE;
  }
-@@ -3585,6 +3617,7 @@
+@@ -3586,6 +3622,7 @@
                  close (manager->priv->inhibit_lid_switch_fd);
                  manager->priv->inhibit_lid_switch_fd = -1;
                  manager->priv->inhibit_lid_switch_taken = FALSE;
@@ -132,7 +143,7 @@ This reverts commit 58cb4eee64bbd8ca43111b1f80fdaacde8ad5f12.
          }
          if (manager->priv->inhibit_suspend_fd != -1) {
                  close (manager->priv->inhibit_suspend_fd);
-@@ -3621,6 +3654,7 @@
+@@ -3622,6 +3659,7 @@
          manager->priv = GSD_POWER_MANAGER_GET_PRIVATE (manager);
          manager->priv->inhibit_lid_switch_fd = -1;
          manager->priv->inhibit_suspend_fd = -1;
