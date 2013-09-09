@@ -1,4 +1,4 @@
-gnome-settings-daemon (3.8.5-0ubuntu1~saucy1) UNRELEASED; urgency=low
+gnome-settings-daemon (3.8.5-0ubuntu1) UNRELEASED; urgency=low
 
   [ Tim Lunn ]
   * Refreshed patches
@@ -35,6 +35,8 @@ gnome-settings-daemon (3.8.5-0ubuntu1~saucy1) UNRELEASED; urgency=low
     - Bump minimum glib, gsettings-desktop-schemas, gnome-desktop3, gtk,
       libpulse, and libwacom
     - Build-depend on librsvg2-dev
+    - This update needs changes to gnome-control-center so break older
+      versions
   * Refreshed patches
   * revert_background_dropping.patch:
     - Don't drop the background plugin yet, GNOME Fallback & Unity
