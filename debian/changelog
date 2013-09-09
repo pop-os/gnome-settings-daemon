@@ -48,10 +48,13 @@ gnome-settings-daemon (3.8.5-0ubuntu1~saucy1) UNRELEASED; urgency=low
     - 63_unity_start_mounter.patch
     - logind_support.patch
     - and patches backported from 3.8
-  * Disabled patches that need to be rewritten or dropped:
+  * Disabled patch that need to be rewritten or dropped:
     - 48_register_client_before_idle_callbacks.patch
   * debian/patches/touchscreen_rotation.patch:
     - Updated with latest version from bugzilla
+  * debian/patches/git_revert_hardcoded_input_methods.patch:
+    - Add patch from git (and also applied in Fedora 19) to not hardcode
+      input methods based on the current locale
 
   [ Rico Tzschichholz ]
   * debian/patches:
