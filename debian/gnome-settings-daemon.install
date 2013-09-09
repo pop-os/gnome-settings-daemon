@@ -1,5 +1,6 @@
 etc/xdg/autostart /usr/share/gnome
 usr/lib/gnome-settings-daemon*
+usr/share/dbus-1/services
 usr/share/icons
 usr/share/locale
 usr/share/gnome-settings-daemon
