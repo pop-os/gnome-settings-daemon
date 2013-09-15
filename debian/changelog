@@ -1,3 +1,10 @@
+gnome-settings-daemon (3.8.5-0ubuntu3) UNRELEASED; urgency=low
+
+  * debian/patches/53_sync_input_sources_to_accountsservice.patch:
+    - Fix type mismatch between g-s-d and accountsservice (LP: #1225785)
+
+ -- William Hua <william.hua@canonical.com>  Tue, 10 Sep 2013 01:02:02 -0400
+
 gnome-settings-daemon (3.8.5-0ubuntu2) saucy; urgency=low
 
   * debian/patches/ubuntu-lid-close-suspend.patch:
