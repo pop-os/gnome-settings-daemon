@@ -1,3 +1,10 @@
+gnome-settings-daemon (3.8.5-0ubuntu4) UNRELEASED; urgency=low
+
+  * debian/patches/git_hardcode_deprecated_gtk_settings.patch: git patch
+    to make things work with gsettings schemas 3.10 (LP: #1227537)
+
+ -- Tim Lunn <tim@feathertop.org>  Thu, 19 Sep 2013 19:20:34 +1000
+
 gnome-settings-daemon (3.8.5-0ubuntu3) saucy; urgency=low
 
   * debian/patches/53_sync_input_sources_to_accountsservice.patch:
