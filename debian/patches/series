@@ -25,4 +25,4 @@ git_revert_remove_automount_helper.patch
 git_revert_hardcoded_input_methods.patch
 ubuntu-fix-desktop-file.patch
 ubuntu-lid-close-suspend.patch
-git_hardcode_deprecated_gtk_settings.patch
+
