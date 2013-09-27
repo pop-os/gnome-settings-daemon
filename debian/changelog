@@ -1,4 +1,4 @@
-gnome-settings-daemon (3.8.5-0ubuntu5) UNRELEASED; urgency=low
+gnome-settings-daemon (3.8.5-0ubuntu5) saucy; urgency=low
 
   * debian/patches/git_hardcode_deprecated_gtk_settings.patch:
     - revert previous change, it's buggy (lp: #1228886). GNOME/GTK upstream 
@@ -8,7 +8,7 @@ gnome-settings-daemon (3.8.5-0ubuntu5) UNRELEASED; urgency=low
       - the fix is to workaround issues with a ppa, which can be solved by
         simply adding those gsettings key to the schemas in the ppa version
 
- -- Sebastien Bacher <seb128@ubuntu.com>  Fri, 27 Sep 2013 16:40:50 +0200
+ -- Sebastien Bacher <seb128@ubuntu.com>  Fri, 27 Sep 2013 16:46:04 +0200
 
 gnome-settings-daemon (3.8.5-0ubuntu4) saucy; urgency=low
 
