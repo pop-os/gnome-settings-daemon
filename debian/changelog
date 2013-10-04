@@ -1,9 +1,9 @@
-gnome-settings-daemon (3.8.5-0ubuntu6) UNRELEASED; urgency=low
+gnome-settings-daemon (3.8.5-0ubuntu6) saucy; urgency=low
 
   * debian/patches/git_thumbnail_cleaning_use_less_ios.patch:
     - Optimise for "do nothing" when cleaning thumbnails (lp: #505085)
 
- -- Sebastien Bacher <seb128@ubuntu.com>  Fri, 04 Oct 2013 18:20:48 +0200
+ -- Sebastien Bacher <seb128@ubuntu.com>  Fri, 04 Oct 2013 18:21:45 +0200
 
 gnome-settings-daemon (3.8.5-0ubuntu5) saucy; urgency=low
 
