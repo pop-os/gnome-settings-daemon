@@ -1,3 +1,11 @@
+gnome-settings-daemon (3.8.5-0ubuntu7) UNRELEASED; urgency=low
+
+  * debian/patches/series: 
+    - removed git_revert_hardcoded_input_methods.patch.
+     - Hard coded input methods required for some language. (lp: #1230265)
+
+ -- Ikuya Awashiro <ikuya@fruitsbasket.info>  Sun, 06 Oct 2013 20:24:36 +0900
+
 gnome-settings-daemon (3.8.5-0ubuntu6) saucy; urgency=low
 
   * debian/patches/git_thumbnail_cleaning_use_less_ios.patch:
