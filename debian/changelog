@@ -1,8 +1,16 @@
-gnome-settings-daemon (3.8.5-0ubuntu7) saucy; urgency=low
+gnome-settings-daemon (3.8.5-0ubuntu7) UNRELEASED; urgency=low
 
+  [ Ikuya Awashiro ]
   * debian/patches/series: 
     - removed git_revert_hardcoded_input_methods.patch.
      - Hard coded input methods required for some language. (lp: #1230265)
+
+  [ Tim ]
+  * debian/patches/fix_media_keys_on_unity.patch: Revise patch to load
+    legacy keygrabber for all non-gnome-shell sessions (LP: #1235625)
+
+  [ Iain Lane ]
+  * Rename on_unity_appeared in the above patch. 
 
  -- Ikuya Awashiro <ikuya@fruitsbasket.info>  Sun, 06 Oct 2013 20:24:36 +0900
 
