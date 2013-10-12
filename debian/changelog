@@ -1,73 +1,152 @@
-gnome-settings-daemon (3.4.2+git20121218.7c1322-6) unstable; urgency=low
+gnome-settings-daemon (3.8.5-2) UNRELEASED; urgency=low
 
-  * gnome-settings-daemon.gsettings-override: stop installing security 
-    updates without a confirmation. This just leads to an obnoxious popup 
-    asking for the root password. Closes: #708548.
+  * debian/gnome-settings-daemon.examples: Install input-device-example.sh as
+    an example (Closes: #709526)
 
- -- Josselin Mouette <joss@debian.org>  Wed, 19 Jun 2013 23:28:42 +0200
+ -- Laurent Bigonville <bigon@debian.org>  Mon, 09 Sep 2013 20:57:17 +0200
 
-gnome-settings-daemon (3.4.2+git20121218.7c1322-5) unstable; urgency=low
+gnome-settings-daemon (3.8.5-1) experimental; urgency=low
 
-  [ Emilio Pozuelo Monfort ]
-  * debian/patches/10_smaller_syndaemon_timeout.patch:
-    + Update patch to not write out of the array bounds. Fixes a crash
-      when the "Disable touchpad while typing" option is activated.
-      Closes: #684998.
+  * New upstream release.
+  * debian/rules: Call dh-autoreconf with --as-needed to minimize the runtime
+    dependencies
+  * debian/gnome-settings-daemon.install: Install dbus service files, IBus
+    support is shipping org.freedesktop.IBus.service
 
-  [ Michael Biebl ]
-  * Cherry-pick patches from upstream Git to fix build failures with CUPS 1.6.
+ -- Laurent Bigonville <bigon@debian.org>  Mon, 09 Sep 2013 20:14:29 +0200
 
- -- Michael Biebl <biebl@debian.org>  Wed, 05 Jun 2013 01:23:05 +0200
+gnome-settings-daemon (3.8.4-2) experimental; urgency=low
 
-gnome-settings-daemon (3.4.2+git20121218.7c1322-4) unstable; urgency=low
+  * debian/control.in, debian/rules: Re-enable ibus support (Closes: #720489)
+  * debian/control.in: Bump Standards-Version to 3.9.4 (no further changes)
+  * debian/rules: Drop removed --enable-pulse configure flag
 
+ -- Laurent Bigonville <bigon@debian.org>  Sat, 24 Aug 2013 14:25:09 +0200
+
+gnome-settings-daemon (3.8.4-1) experimental; urgency=low
+
+  [ Thomas Bechtold ]
+  * New upstream release.
+  * Bump Standards-Version to 3.9.4.
+
+ -- Andreas Henriksson <andreas@fatal.se>  Fri, 16 Aug 2013 20:06:53 +0200
+
+gnome-settings-daemon (3.8.3-1) experimental; urgency=low
+
+  [ Deng Xiyue ]
   * Disable "-Wl,-z,defs" on mipsel in order to fix segfault.
     (Closes: #629351)
 
- -- Xiyue Deng <manphiz-guest@users.alioth.debian.org>  Mon, 03 Jun 2013 04:42:40 -0700
+  [ Emilio Pozuelo Monfort ]
+  * New upstream release.
 
-gnome-settings-daemon (3.4.2+git20121218.7c1322-3) unstable; urgency=low
+ -- Emilio Pozuelo Monfort <pochu@debian.org>  Sat, 08 Jun 2013 18:48:22 +0200
 
-  * 06_a11y_gdm_leak.patch: backported from git master. Reset keyboard
-    accessibility settings when shutting down the settings daemon. This 
-    avoids leaking them from the GDM session to the user’s.
-    Closes: #682581.
-    + 06_a11y_macro.patch: a bit of refactoring that the previous patch 
-      depends on.
+gnome-settings-daemon (3.8.2-2) experimental; urgency=low
 
- -- Josselin Mouette <joss@debian.org>  Tue, 05 Feb 2013 16:34:56 +0100
+  * debian/gnome-settings-daemon.maintscript:
+    + Properly set the version so that users who upgraded to a package
+      that had already stopped shipping the conffile also get it removed.
+      Really closes: #704184.
 
-gnome-settings-daemon (3.4.2+git20121218.7c1322-2) unstable; urgency=low
+ -- Emilio Pozuelo Monfort <pochu@debian.org>  Sun, 26 May 2013 19:49:26 +0200
 
-  * 05_sound_pkg-config.patch: backported from 3.6. Correctly link the 
-    sound plugin to libpulse.
+gnome-settings-daemon (3.8.2-1) experimental; urgency=low
 
- -- Josselin Mouette <joss@debian.org>  Fri, 04 Jan 2013 19:22:32 +0100
+  [ Emilio Pozuelo Monfort ]
+  * debian/gnome-settings-daemon.maintscript:
+    + Remove obsolete conffile. Closes: #704184.
 
-gnome-settings-daemon (3.4.2+git20121218.7c1322-1) unstable; urgency=low
+  [ Andreas Henriksson ]
+  * New upstream release.
+  * Drop patches merged upstream:
+    - 08-Fix-build-on-non-Linux-platforms.patch
+    - 12-cursor-set-an-error-if-we-can-t-create-a-monitor.patch
+    - 13-cursor-set-error-if-we-don-t-have-the-necessary-X-su.patch
+  * Drop 11-cursor-add-error-quark.patch, not needed.
 
-  * New upstream git snapshot from the 3.4 branch.
-    + Fix a pair of crashers.
-    + Better fix for the keyboard infinite loop bug.
-    + Cleanup in print notifications.
-    + Translation updates.
-  * 11_numlock_loop.patch: dropped accordingly.
+ -- Andreas Henriksson <andreas@fatal.se>  Sat, 25 May 2013 17:18:18 +0200
 
- -- Josselin Mouette <joss@debian.org>  Wed, 19 Dec 2012 23:23:04 +0100
+gnome-settings-daemon (3.8.0-2) experimental; urgency=low
 
-gnome-settings-daemon (3.4.2+git20120925.a4c817-2) unstable; urgency=low
+  * debian/control.in:
+    + Bump libgnome-desktop-3-dev build dependency to get a .symbols
+      file with Build-Depends-Package, to ensure a proper runtime
+      dependency.
 
-  * Pull upstream fixes for the print-notifications plugin:
-    + 01_print_proxy.patch: don’t create an unused GDBusProxy.
-    + 02_print_init.patch: delay CUPS initialization.
-    + 03_print_async.patch: test asynchronously whether the CUPS server 
-      actually works. Closes: #687978.
-  * 11_numlock_loop.patch: patch from Andrew Potter to fix infinite loop 
-    triggered by switching the numlock status.
-  * gnome-settings-daemon.gsettings-override: dropped, NumLock saving is 
-    back to work now.
+ -- Emilio Pozuelo Monfort <pochu@debian.org>  Thu, 28 Mar 2013 12:59:02 +0100
 
- -- Josselin Mouette <joss@debian.org>  Fri, 26 Oct 2012 19:04:37 +0200
+gnome-settings-daemon (3.8.0-1) experimental; urgency=low
+
+  * debian/patches/08-Fix-build-on-non-Linux-platforms.patch:
+    + Fix the build on kfreebsd and hurd by including stdlib.h
+      before using NULL.
+  * New upstream release.
+    + debian/control.in:
+      - Bump libgnome-desktop3-dev requirement for the cursor fix.
+    + debian/patches/05_disable_cursor_manager.patch:
+      - Dropped, fixed upstream in a different way.
+    + d/p/11-cursor-add-error-quark.patch
+      d/p/12-cursor-set-an-error-if-we-can-t-create-a-monitor.patch
+      d/p/13-cursor-set-error-if-we-don-t-have-the-necessary-X-su.patch:
+      - New patches. The upstream fix to disable the cursor with
+        Xorg < 1.14 was incomplete. With these patches we gracefully
+        fail with Xorg < 1.14 and the cursor plugin will be enabled with
+        Xorg >= 1.14.
+
+ -- Emilio Pozuelo Monfort <pochu@debian.org>  Wed, 27 Mar 2013 16:48:21 +0100
+
+gnome-settings-daemon (3.7.92-1) experimental; urgency=low
+
+  [ Andreas Henriksson ]
+  * New upstream release
+  * Bump the following build-dependencies according to configure.ac
+    - libglib2.0-dev, libgtk-3-dev, gsettings-desktop-schemas-dev,
+      libgnome-desktop-3-dev, libpulse-dev, libwacom-dev
+  * Add build-dependency on librsvg2-dev (>= 2.36.2)
+  * Add a runtime dependency on systemd (except on hurd and kfreebsd)
+    as needed by the power plugin.
+  * Drop debian/patches/power-check-null-devices.patch, fixed upstream.
+  * Drop debian/patches/power-ignore-bad-dbus-requests.patch, fixed upstream.
+  * Remaining patches refreshed to apply cleanly.
+
+  [ Sjoerd Simons ]
+  * debian/patches/revert_git_datetime_dropping.patch:
+    - Dropped. Control center uses datetime directly now
+  * debian/control.in: Break gnome-control-center (<< 3.7) as the DateTime
+    mechanism is now dropped.
+  * debian/control.in: Remove gstreamer build-depends, no longer needed
+  * New upstream release (3.7.92)
+  * debian/patches/05_disable_cursor_manager.patch
+    + Added. Disable the cursor manager, causes crashes with Xorg 1.12. Remove
+    once Xorg 1.14 is available or when bgo#696118 is fixed upstream
+
+ -- Sjoerd Simons <sjoerd@debian.org>  Sat, 23 Mar 2013 16:34:51 +0100
+
+gnome-settings-daemon (3.6.4-1) experimental; urgency=low
+
+  [ Frederic Peters ]
+  * debian/control.in: bump {build-,}dependency on gsettings-desktop-schemas.
+
+  [ Aron Xu ]
+  * debian/control.in debian/rules: disable ibus integration (Closes: #694301).
+
+  [ Sjoerd Simons ]
+  * New upstream release
+
+ -- Sjoerd Simons <sjoerd@debian.org>  Fri, 15 Feb 2013 22:12:34 +0100
+
+gnome-settings-daemon (3.6.1-1) experimental; urgency=low
+
+  * New upstream release
+  * debian/patches/10_smaller_syndaemon_timeout.patch:
+    + Dropped, fixed upstream
+  * debian/patches/22_backlight_optional.patch:
+    + Dropped, fixed upstream
+  * debian/control: Update build-depends
+  * debian/patches/*: refreshed
+
+ -- Sjoerd Simons <sjoerd@debian.org>  Sun, 14 Oct 2012 21:16:55 +0200
 
 gnome-settings-daemon (3.4.2+git20120925.a4c817-1) unstable; urgency=low
 

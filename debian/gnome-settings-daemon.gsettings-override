@@ -1,2 +1,2 @@
-[org.gnome.settings-daemon.plugins.updates]
-auto-update-type='none'
+[org.gnome.settings-daemon.peripherals.keyboard]
+remember-numlock-state=false
