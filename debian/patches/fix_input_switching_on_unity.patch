@@ -11,9 +11,11 @@ Patched to use the new g_settings keys for input source switching
  plugins/media-keys/shortcuts-list.h         |  6 +++
  2 files changed, 64 insertions(+), 1 deletion(-)
 
+Index: b/plugins/media-keys/gsd-media-keys-manager.c
+===================================================================
 --- a/plugins/media-keys/gsd-media-keys-manager.c
 +++ b/plugins/media-keys/gsd-media-keys-manager.c
-@@ -112,6 +112,10 @@
+@@ -114,6 +114,10 @@
  #define VOLUME_STEP 6           /* percents for one volume button press */
  #define MAX_VOLUME 65536.0
  
@@ -24,7 +26,7 @@ Patched to use the new g_settings keys for input source switching
  #define SYSTEMD_DBUS_NAME                       "org.freedesktop.login1"
  #define SYSTEMD_DBUS_PATH                       "/org/freedesktop/login1"
  #define SYSTEMD_DBUS_INTERFACE                  "org.freedesktop.login1.Manager"
-@@ -155,6 +159,7 @@
+@@ -157,6 +161,7 @@
  #endif /* HAVE_GUDEV */
  
          GSettings       *settings;
@@ -32,7 +34,7 @@ Patched to use the new g_settings keys for input source switching
          GHashTable      *custom_settings;
  
          GPtrArray       *keys;
-@@ -526,7 +531,9 @@
+@@ -530,7 +535,9 @@
  get_key_string (GsdMediaKeysManager *manager,
  		MediaKey            *key)
  {
@@ -43,7 +45,7 @@ Patched to use the new g_settings keys for input source switching
  		return g_settings_get_string (manager->priv->settings, key->settings_key);
  	else if (key->hard_coded != NULL)
  		return g_strdup (key->hard_coded);
-@@ -2107,6 +2114,44 @@
+@@ -2111,6 +2118,44 @@
                   * are not used in this context */
                  break;
          }
@@ -58,7 +60,7 @@ Patched to use the new g_settings keys for input source switching
 +        GVariant *sources;
 +        gint i, n;
 +
-+        if (!manager->priv->have_unity)
++        if (!manager->priv->have_legacy_keygrabber)
 +                return;
 +
 +        settings = g_settings_new (GNOME_DESKTOP_INPUT_SOURCES_DIR);
@@ -88,7 +90,7 @@ Patched to use the new g_settings keys for input source switching
  }
  
  static void
-@@ -2447,6 +2492,10 @@
+@@ -2451,6 +2496,10 @@
          case BATTERY_KEY:
                  do_battery_action (manager);
                  break;
@@ -99,7 +101,7 @@ Patched to use the new g_settings keys for input source switching
          /* Note, no default so compiler catches missing keys */
          case CUSTOM_KEY:
                  g_assert_not_reached ();
-@@ -2758,6 +2807,12 @@
+@@ -2773,6 +2822,12 @@
          g_signal_connect (G_OBJECT (manager->priv->settings), "changed::custom-keybindings",
                            G_CALLBACK (gsettings_custom_changed_cb), manager);
  
@@ -112,7 +114,7 @@ Patched to use the new g_settings keys for input source switching
          manager->priv->custom_settings =
            g_hash_table_new_full (g_str_hash, g_str_equal,
                                   g_free, g_object_unref);
-@@ -2881,6 +2936,7 @@
+@@ -2903,6 +2958,7 @@
  
          g_clear_object (&priv->logind_proxy);
          g_clear_object (&priv->settings);
@@ -120,6 +122,8 @@ Patched to use the new g_settings keys for input source switching
          g_clear_object (&priv->power_settings);
          g_clear_object (&priv->power_proxy);
          g_clear_object (&priv->power_screen_proxy);
+Index: b/plugins/media-keys/shortcuts-list.h
+===================================================================
 --- a/plugins/media-keys/shortcuts-list.h
 +++ b/plugins/media-keys/shortcuts-list.h
 @@ -25,6 +25,7 @@
