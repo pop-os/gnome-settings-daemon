@@ -1,3 +1,10 @@
+gnome-settings-daemon (3.8.5-0ubuntu9) UNRELEASED; urgency=low
+
+  * debian/patches/git_touchpad_scrolling.patch: let enable edge scrolling,
+    on touchpads that don't support 2 fingers scrolling (lp: #1221367)
+
+ -- Sebastien Bacher <seb128@ubuntu.com>  Wed, 16 Oct 2013 16:39:01 +0200
+
 gnome-settings-daemon (3.8.5-0ubuntu8) saucy; urgency=low
 
   * debian/patches/fix_media_keys_on_unity.patch: Don't rely on
