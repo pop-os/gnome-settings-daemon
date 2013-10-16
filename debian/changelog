@@ -1,11 +1,11 @@
-gnome-settings-daemon (3.8.5-0ubuntu8) UNRELEASED; urgency=low
+gnome-settings-daemon (3.8.5-0ubuntu8) saucy; urgency=low
 
   * debian/patches/fix_media_keys_on_unity.patch: Don't rely on
     org.gnome.ScreenSaver as this might not be available (it's only a
     recommends of ubuntu-desktop). Use the names owned by (critical components
     of) the DEs themselves instead. (LP: #1237564)
 
- -- Iain Lane <iain.lane@canonical.com>  Tue, 15 Oct 2013 10:25:10 +0100
+ -- Iain Lane <iain.lane@canonical.com>  Wed, 16 Oct 2013 09:39:12 +0100
 
 gnome-settings-daemon (3.8.5-0ubuntu7) saucy; urgency=low
 
