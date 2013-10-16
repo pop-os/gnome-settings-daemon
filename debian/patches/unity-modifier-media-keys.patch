@@ -1,0 +1,88 @@
+--- a/plugins/common/gsd-keygrab.c
++++ b/plugins/common/gsd-keygrab.c
+@@ -307,6 +307,44 @@
+ 	return state;
+ }
+ 
++static guint
++mask_with_key (guint mask,
++               guint key)
++{
++	switch (key) {
++	case GDK_KEY_Shift_L:
++	case GDK_KEY_Shift_R:
++		mask |= GDK_SHIFT_MASK;
++		break;
++	case GDK_KEY_Control_L:
++	case GDK_KEY_Control_R:
++		mask |= GDK_CONTROL_MASK;
++		break;
++	case GDK_KEY_Caps_Lock:
++	case GDK_KEY_Shift_Lock:
++		mask |= GDK_LOCK_MASK;
++		break;
++	case GDK_KEY_Meta_L:
++	case GDK_KEY_Meta_R:
++		mask |= GDK_META_MASK;
++		break;
++	case GDK_KEY_Alt_L:
++	case GDK_KEY_Alt_R:
++		mask |= GDK_MOD1_MASK;
++		break;
++	case GDK_KEY_Super_L:
++	case GDK_KEY_Super_R:
++		mask |= GDK_SUPER_MASK;
++		break;
++	case GDK_KEY_Hyper_L:
++	case GDK_KEY_Hyper_R:
++		mask |= GDK_HYPER_MASK;
++		break;
++	}
++
++	return mask;
++}
++
+ gboolean
+ match_xi2_key (Key *key, XIDeviceEvent *event)
+ {
+@@ -334,7 +372,7 @@
+ 						 state, group,
+ 						 &keyval, NULL, NULL, &consumed)) {
+ 		guint lower, upper;
+-		guint mask;
++		guint mask, full_mask;
+ 
+ 		/* HACK: we don't want to use SysRq as a keybinding, so we avoid
+ 		 * its translation from Alt+Print. */
+@@ -347,8 +385,11 @@
+ 		/* The Key structure contains virtual modifiers, whereas
+ 		 * the XEvent will be using the real modifier, so translate those */
+ 		mask = key->state;
++		full_mask = mask_with_key (mask, key->keysym);
+ 		gdk_keymap_map_virtual_modifiers (gdk_keymap_get_default (), &mask);
++		gdk_keymap_map_virtual_modifiers (gdk_keymap_get_default (), &full_mask);
+                 mask &= ~(GDK_META_MASK | GDK_SUPER_MASK | GDK_HYPER_MASK);
++                full_mask &= ~(GDK_META_MASK | GDK_SUPER_MASK | GDK_HYPER_MASK);
+ 
+ 		gdk_keyval_convert_case (keyval, &lower, &upper);
+ 
+@@ -358,13 +399,17 @@
+ 		if (lower == key->keysym)
+ 			consumed &= ~GDK_SHIFT_MASK;
+ 
++		state &= ~consumed & gsd_used_mods;
++
+ 		return ((lower == key->keysym || upper == key->keysym)
+-			&& (state & ~consumed & gsd_used_mods) == mask);
++			&& (state == mask || state == full_mask));
+ 	}
+ 
++	state &= gsd_used_mods;
++
+ 	/* The key we passed doesn't have a keysym, so try with just the keycode */
+         return (key != NULL
+-                && key->state == (state & gsd_used_mods)
++                && key->state == state
+                 && key_uses_keycode (key, keycode));
+ }
+ 
