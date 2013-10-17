@@ -1,64 +1,57 @@
 --- a/plugins/common/gsd-keygrab.c
 +++ b/plugins/common/gsd-keygrab.c
-@@ -307,6 +307,44 @@
+@@ -307,6 +307,32 @@
  	return state;
  }
  
 +static guint
-+mask_with_key (guint mask,
-+               guint key)
++get_mask_for_key (guint key)
 +{
 +	switch (key) {
 +	case GDK_KEY_Shift_L:
 +	case GDK_KEY_Shift_R:
-+		mask |= GDK_SHIFT_MASK;
-+		break;
++		return GDK_SHIFT_MASK;
 +	case GDK_KEY_Control_L:
 +	case GDK_KEY_Control_R:
-+		mask |= GDK_CONTROL_MASK;
-+		break;
++		return GDK_CONTROL_MASK;
 +	case GDK_KEY_Caps_Lock:
 +	case GDK_KEY_Shift_Lock:
-+		mask |= GDK_LOCK_MASK;
-+		break;
++		return GDK_LOCK_MASK;
 +	case GDK_KEY_Meta_L:
 +	case GDK_KEY_Meta_R:
-+		mask |= GDK_META_MASK;
-+		break;
 +	case GDK_KEY_Alt_L:
 +	case GDK_KEY_Alt_R:
-+		mask |= GDK_MOD1_MASK;
-+		break;
++		return GDK_MOD1_MASK;
 +	case GDK_KEY_Super_L:
 +	case GDK_KEY_Super_R:
-+		mask |= GDK_SUPER_MASK;
-+		break;
-+	case GDK_KEY_Hyper_L:
-+	case GDK_KEY_Hyper_R:
-+		mask |= GDK_HYPER_MASK;
-+		break;
++		return GDK_SUPER_MASK;
 +	}
 +
-+	return mask;
++	return 0;
 +}
 +
  gboolean
  match_xi2_key (Key *key, XIDeviceEvent *event)
  {
-@@ -334,7 +372,7 @@
+@@ -333,8 +359,9 @@
+ 	if (gdk_keymap_translate_keyboard_state (gdk_keymap_get_default (), keycode,
  						 state, group,
  						 &keyval, NULL, NULL, &consumed)) {
++		guint key_bit, event_bit;
  		guint lower, upper;
 -		guint mask;
 +		guint mask, full_mask;
  
  		/* HACK: we don't want to use SysRq as a keybinding, so we avoid
  		 * its translation from Alt+Print. */
-@@ -347,8 +385,11 @@
+@@ -346,9 +373,14 @@
+ 
  		/* The Key structure contains virtual modifiers, whereas
  		 * the XEvent will be using the real modifier, so translate those */
++		key_bit = get_mask_for_key (key->keysym);
++		event_bit = get_mask_for_key (keyval);
  		mask = key->state;
-+		full_mask = mask_with_key (mask, key->keysym);
++		full_mask = mask | key_bit;
  		gdk_keymap_map_virtual_modifiers (gdk_keymap_get_default (), &mask);
 +		gdk_keymap_map_virtual_modifiers (gdk_keymap_get_default (), &full_mask);
                  mask &= ~(GDK_META_MASK | GDK_SUPER_MASK | GDK_HYPER_MASK);
@@ -66,23 +59,31 @@
  
  		gdk_keyval_convert_case (keyval, &lower, &upper);
  
-@@ -358,13 +399,17 @@
+@@ -358,8 +390,12 @@
  		if (lower == key->keysym)
  			consumed &= ~GDK_SHIFT_MASK;
  
+-		return ((lower == key->keysym || upper == key->keysym)
+-			&& (state & ~consumed & gsd_used_mods) == mask);
 +		state &= ~consumed & gsd_used_mods;
 +
- 		return ((lower == key->keysym || upper == key->keysym)
--			&& (state & ~consumed & gsd_used_mods) == mask);
-+			&& (state == mask || state == full_mask));
++		if (key_bit != 0 && event_bit != 0)
++			return (state | event_bit) == full_mask;
++
++		return (lower == key->keysym || upper == key->keysym) && state == mask;
  	}
  
-+	state &= gsd_used_mods;
-+
  	/* The key we passed doesn't have a keysym, so try with just the keycode */
-         return (key != NULL
--                && key->state == (state & gsd_used_mods)
-+                && key->state == state
-                 && key_uses_keycode (key, keycode));
- }
+--- a/plugins/media-keys/gsd-media-keys-manager.c
++++ b/plugins/media-keys/gsd-media-keys-manager.c
+@@ -2582,6 +2582,10 @@
+ 
+     deviceid = xev->sourceid;
+ 
++    guint mods = xev->mods.base | xev->mods.latched | xev->mods.locked;
++    guint group = CLAMP(xev->group.base | xev->group.latched | xev->group.locked, 0, 3);
++    g_print ("%s: %u %x\n", xiev->evtype == XI_KeyPress ? "press" : "release", xev->detail, mods | (group << 13));
++
+         for (i = 0; i < manager->priv->keys->len; i++) {
+                 MediaKey *key;
  
