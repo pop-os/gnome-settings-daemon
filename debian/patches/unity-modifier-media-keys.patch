@@ -1,6 +1,14 @@
 --- a/plugins/common/gsd-keygrab.c
 +++ b/plugins/common/gsd-keygrab.c
-@@ -239,19 +239,191 @@
+@@ -170,6 +170,7 @@
+              key->keysym != GDK_KEY_Pause &&
+              key->keysym != GDK_KEY_Print &&
+              key->keysym != GDK_KEY_Scroll_Lock &&
++             key->keysym != GDK_KEY_Caps_Lock &&
+              key->keysym != GDK_KEY_Pause &&
+              key->keysym != GDK_KEY_Break &&
+              key->keysym != GDK_KEY_Menu) {
+@@ -239,19 +240,192 @@
          g_array_free (all_mods, TRUE);
  }
  
@@ -33,6 +41,7 @@
 +		*left = GDK_KEY_Caps_Lock;
 +		*right = GDK_KEY_Shift_Lock;
 +		break;
++	case GDK_META_MASK:
 +	case GDK_MOD1_MASK:
 +		*left = GDK_KEY_Alt_L;
 +		*right = GDK_KEY_Alt_R;
@@ -192,7 +201,7 @@
  }
  
  static gboolean
-@@ -333,8 +505,9 @@
+@@ -333,8 +507,9 @@
  	if (gdk_keymap_translate_keyboard_state (gdk_keymap_get_default (), keycode,
  						 state, group,
  						 &keyval, NULL, NULL, &consumed)) {
@@ -203,7 +212,7 @@
  
  		/* HACK: we don't want to use SysRq as a keybinding, so we avoid
  		 * its translation from Alt+Print. */
-@@ -346,9 +519,14 @@
+@@ -346,9 +521,14 @@
  
  		/* The Key structure contains virtual modifiers, whereas
  		 * the XEvent will be using the real modifier, so translate those */
@@ -218,7 +227,7 @@
  
  		gdk_keyval_convert_case (keyval, &lower, &upper);
  
-@@ -358,8 +536,12 @@
+@@ -358,8 +538,16 @@
  		if (lower == key->keysym)
  			consumed &= ~GDK_SHIFT_MASK;
  
@@ -226,8 +235,12 @@
 -			&& (state & ~consumed & gsd_used_mods) == mask);
 +		state &= ~consumed & gsd_used_mods;
 +
-+		if (key_bit != 0 && event_bit != 0)
-+			return (state | event_bit) == full_mask;
++		if (key_bit != 0 && event_bit != 0) {
++			state |= event_bit;
++			gdk_keymap_map_virtual_modifiers (gdk_keymap_get_default (), &state);
++			state &= ~(GDK_META_MASK | GDK_SUPER_MASK | GDK_HYPER_MASK);
++			return state == full_mask;
++		}
 +
 +		return (lower == key->keysym || upper == key->keysym) && state == mask;
  	}
