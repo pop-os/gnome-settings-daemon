@@ -1,9 +1,49 @@
 --- a/plugins/common/gsd-keygrab.c
 +++ b/plugins/common/gsd-keygrab.c
-@@ -307,6 +307,32 @@
- 	return state;
+@@ -239,19 +239,191 @@
+         g_array_free (all_mods, TRUE);
  }
  
++static void
++get_keys_for_bit (guint  bit,
++                  guint *left,
++                  guint *right)
++{
++	guint left_dummy;
++	guint right_dummy;
++
++	if (left == NULL)
++		left = &left_dummy;
++	if (right == NULL)
++		right = &right_dummy;
++
++	*left = 0;
++	*right = 0;
++
++	switch (1 << bit) {
++	case GDK_SHIFT_MASK:
++		*left = GDK_KEY_Shift_L;
++		*right = GDK_KEY_Shift_R;
++		break;
++	case GDK_CONTROL_MASK:
++		*left = GDK_KEY_Control_L;
++		*right = GDK_KEY_Control_R;
++		break;
++	case GDK_LOCK_MASK:
++		*left = GDK_KEY_Caps_Lock;
++		*right = GDK_KEY_Shift_Lock;
++		break;
++	case GDK_MOD1_MASK:
++		*left = GDK_KEY_Alt_L;
++		*right = GDK_KEY_Alt_R;
++		break;
++	case GDK_SUPER_MASK:
++		*left = GDK_KEY_Super_L;
++		*right = GDK_KEY_Super_R;
++		break;
++	}
++}
++
 +static guint
 +get_mask_for_key (guint key)
 +{
@@ -30,10 +70,129 @@
 +	return 0;
 +}
 +
- gboolean
- match_xi2_key (Key *key, XIDeviceEvent *event)
+ void
+ grab_key_unsafe (Key             *key,
+                  GsdKeygrabFlags  flags,
+                  GSList          *screens)
  {
-@@ -333,8 +359,9 @@
++        guint key_mask = get_mask_for_key (key->keysym);
++
+         grab_key_internal (key, TRUE, flags, screens);
++
++        if (key_mask != 0) {
++                Key copy;
++                guint i, j;
++
++                for (i = 0; i < 8 * sizeof (guint); i++) {
++                        guint left, right;
++                        gint left_keys_len, right_keys_len;
++                        GdkKeymapKey *left_keys, *right_keys;
++
++                        if (1 << i == key_mask || (key->state & 1 << i) == 0)
++                                continue;
++
++                        get_keys_for_bit (i, &left, &right);
++
++                        if (left == 0 && right == 0)
++                                continue;
++
++                        left_keys_len = 0;
++                        right_keys_len = 0;
++                        left_keys = NULL;
++                        right_keys = NULL;
++
++                        if (left != 0)
++                                gdk_keymap_get_entries_for_keyval (gdk_keymap_get_default (),
++                                                                   left,
++                                                                   &left_keys,
++                                                                   &left_keys_len);
++
++                        if (right != 0)
++                                gdk_keymap_get_entries_for_keyval (gdk_keymap_get_default (),
++                                                                   right,
++                                                                   &right_keys,
++                                                                   &right_keys_len);
++
++                        copy.keysym = left != 0 ? left : right;
++                        copy.state = (key->state | key_mask) & ~(1 << i);
++                        copy.keycodes = g_new0 (guint, left_keys_len + right_keys_len + 1);
++
++                        for (j = 0; j < left_keys_len; j++)
++                                copy.keycodes[j] = left_keys[j].keycode;
++                        for (j = 0; j < right_keys_len; j++)
++                                copy.keycodes[left_keys_len + j] = right_keys[j].keycode;
++
++                        grab_key_internal (&copy, TRUE, flags, screens);
++
++                        g_free (copy.keycodes);
++                        g_free (right_keys);
++                        g_free (left_keys);
++                }
++        }
+ }
+ 
+ void
+ ungrab_key_unsafe (Key    *key,
+                    GSList *screens)
+ {
++        guint key_mask = get_mask_for_key (key->keysym);
++
+         grab_key_internal (key, FALSE, 0, screens);
++
++        if (key_mask != 0) {
++                Key copy;
++                guint i, j;
++
++                for (i = 0; i < 8 * sizeof (guint); i++) {
++                        guint left, right;
++                        gint left_keys_len, right_keys_len;
++                        GdkKeymapKey *left_keys, *right_keys;
++
++                        if (1 << i == key_mask || (key->state & 1 << i) == 0)
++                                continue;
++
++                        get_keys_for_bit (i, &left, &right);
++
++                        if (left == 0 && right == 0)
++                                continue;
++
++                        left_keys_len = 0;
++                        right_keys_len = 0;
++                        left_keys = NULL;
++                        right_keys = NULL;
++
++                        if (left != 0)
++                                gdk_keymap_get_entries_for_keyval (gdk_keymap_get_default (),
++                                                                   left,
++                                                                   &left_keys,
++                                                                   &left_keys_len);
++
++                        if (right != 0)
++                                gdk_keymap_get_entries_for_keyval (gdk_keymap_get_default (),
++                                                                   right,
++                                                                   &right_keys,
++                                                                   &right_keys_len);
++
++                        copy.keysym = left != 0 ? left : right;
++                        copy.state = (key->state | key_mask) & ~(1 << i);
++                        copy.keycodes = g_new0 (guint, left_keys_len + right_keys_len + 1);
++
++                        for (j = 0; j < left_keys_len; j++)
++                                copy.keycodes[j] = left_keys[j].keycode;
++                        for (j = 0; j < right_keys_len; j++)
++                                copy.keycodes[left_keys_len + j] = right_keys[j].keycode;
++
++                        grab_key_internal (&copy, FALSE, 0, screens);
++
++                        g_free (copy.keycodes);
++                        g_free (right_keys);
++                        g_free (left_keys);
++                }
++        }
+ }
+ 
+ static gboolean
+@@ -333,8 +505,9 @@
  	if (gdk_keymap_translate_keyboard_state (gdk_keymap_get_default (), keycode,
  						 state, group,
  						 &keyval, NULL, NULL, &consumed)) {
@@ -44,7 +203,7 @@
  
  		/* HACK: we don't want to use SysRq as a keybinding, so we avoid
  		 * its translation from Alt+Print. */
-@@ -346,9 +373,14 @@
+@@ -346,9 +519,14 @@
  
  		/* The Key structure contains virtual modifiers, whereas
  		 * the XEvent will be using the real modifier, so translate those */
@@ -59,7 +218,7 @@
  
  		gdk_keyval_convert_case (keyval, &lower, &upper);
  
-@@ -358,8 +390,12 @@
+@@ -358,8 +536,12 @@
  		if (lower == key->keysym)
  			consumed &= ~GDK_SHIFT_MASK;
  
@@ -74,16 +233,3 @@
  	}
  
  	/* The key we passed doesn't have a keysym, so try with just the keycode */
---- a/plugins/media-keys/gsd-media-keys-manager.c
-+++ b/plugins/media-keys/gsd-media-keys-manager.c
-@@ -2582,6 +2582,10 @@
- 
-     deviceid = xev->sourceid;
- 
-+    guint mods = xev->mods.base | xev->mods.latched | xev->mods.locked;
-+    guint group = CLAMP(xev->group.base | xev->group.latched | xev->group.locked, 0, 3);
-+    g_print ("%s: %u %x\n", xiev->evtype == XI_KeyPress ? "press" : "release", xev->detail, mods | (group << 13));
-+
-         for (i = 0; i < manager->priv->keys->len; i++) {
-                 MediaKey *key;
- 
