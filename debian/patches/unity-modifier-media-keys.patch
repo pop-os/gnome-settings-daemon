@@ -212,7 +212,7 @@
  
  		/* HACK: we don't want to use SysRq as a keybinding, so we avoid
  		 * its translation from Alt+Print. */
-@@ -346,9 +521,14 @@
+@@ -346,20 +521,33 @@
  
  		/* The Key structure contains virtual modifiers, whereas
  		 * the XEvent will be using the real modifier, so translate those */
@@ -227,8 +227,11 @@
  
  		gdk_keyval_convert_case (keyval, &lower, &upper);
  
-@@ -358,8 +538,16 @@
- 		if (lower == key->keysym)
+ 		/* If we are checking against the lower version of the
+ 		 * keysym, we might need the Shift state for matching,
+ 		 * so remove it from the consumed modifiers */
+-		if (lower == key->keysym)
++		if (lower == key->keysym || event_bit != 0)
  			consumed &= ~GDK_SHIFT_MASK;
  
 -		return ((lower == key->keysym || upper == key->keysym)
