@@ -1,4 +1,4 @@
-gnome-settings-daemon (3.8.5-0ubuntu10) UNRELEASED; urgency=low
+gnome-settings-daemon (3.8.5-0ubuntu10) saucy; urgency=low
 
   * debian/patches/unity-modifier-media-keys.patch:
     - Support modifier-only keyboard shortcuts (lp: #1218322)
