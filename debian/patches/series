@@ -1,3 +1,4 @@
+git_keyboard-Don-t-set-the-XKB-group-switching-option.patch
 05_disable_corner_tapping.patch
 16_use_synchronous_notifications.patch
 43_disable_locale_settings.patch

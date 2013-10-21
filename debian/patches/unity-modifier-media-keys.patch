@@ -249,3 +249,14 @@
  	}
  
  	/* The key we passed doesn't have a keysym, so try with just the keycode */
+--- a/plugins/keyboard/gsd-keyboard-manager.c
++++ b/plugins/keyboard/gsd-keyboard-manager.c
+@@ -959,7 +959,7 @@
+          * and doesn't call us so we can't set the group switching XKB
+          * option in the first place otherwise the X server's switch
+          * will take effect and we get a broken configuration. */
+-        if (n_sources < 2)
++        if (n_sources < 2 || g_strcmp0 (g_getenv ("XDG_CURRENT_DESKTOP"), "Unity") == 0)
+                 strip_xkb_option (options, "grp:");
+ 
+         options_str = build_xkb_options_string (options);
