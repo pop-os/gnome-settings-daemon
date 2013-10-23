@@ -345,6 +345,15 @@
                  strip_xkb_option (options, "grp:");
  
          options_str = build_xkb_options_string (options);
+@@ -1006,6 +1006,8 @@
+ 
+         gnome_xkb_info_free_var_defs (xkb_var_defs);
+         g_free (rules_file_path);
++
++        XkbLockModifiers (GDK_DISPLAY_XDISPLAY (gdk_display_get_default ()), XkbUseCoreKbd, LockMask, 0);
+ }
+ 
+ static void
 --- a/plugins/media-keys/gsd-media-keys-manager.c
 +++ b/plugins/media-keys/gsd-media-keys-manager.c
 @@ -2559,6 +2559,8 @@
