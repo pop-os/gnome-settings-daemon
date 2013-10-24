@@ -8,7 +8,7 @@
               key->keysym != GDK_KEY_Pause &&
               key->keysym != GDK_KEY_Break &&
               key->keysym != GDK_KEY_Menu) {
-@@ -239,19 +240,192 @@
+@@ -239,19 +240,277 @@
          g_array_free (all_mods, TRUE);
  }
  
@@ -79,6 +79,39 @@
 +	return 0;
 +}
 +
++static guint
++get_mirrored_key (guint key)
++{
++	switch (key) {
++	case GDK_KEY_Shift_L:
++		return GDK_KEY_Shift_R;
++	case GDK_KEY_Shift_R:
++		return GDK_KEY_Shift_L;
++	case GDK_KEY_Control_L:
++		return GDK_KEY_Control_R;
++	case GDK_KEY_Control_R:
++		return GDK_KEY_Control_L;
++	case GDK_KEY_Meta_L:
++		return GDK_KEY_Meta_R;
++	case GDK_KEY_Meta_R:
++		return GDK_KEY_Meta_L;
++	case GDK_KEY_Alt_L:
++		return GDK_KEY_Alt_R;
++	case GDK_KEY_Alt_R:
++		return GDK_KEY_Alt_L;
++	case GDK_KEY_Super_L:
++		return GDK_KEY_Super_R;
++	case GDK_KEY_Super_R:
++		return GDK_KEY_Super_L;
++	case GDK_KEY_Hyper_L:
++		return GDK_KEY_Hyper_R;
++	case GDK_KEY_Hyper_R:
++		return GDK_KEY_Hyper_L;
++	}
++
++	return 0;
++}
++
  void
  grab_key_unsafe (Key             *key,
                   GsdKeygrabFlags  flags,
@@ -91,6 +124,32 @@
 +        if (key_mask != 0) {
 +                Key copy;
 +                guint i, j;
++
++                if ((key->state & key_mask) != 0) {
++                        guint mirror = get_mirrored_key (key->keysym);
++
++                        if (mirror != 0) {
++                                gint mirror_keys_len;
++                                GdkKeymapKey *mirror_keys;
++
++                                gdk_keymap_get_entries_for_keyval (gdk_keymap_get_default (),
++                                                                   mirror,
++                                                                   &mirror_keys,
++                                                                   &mirror_keys_len);
++
++                                copy.keysym = mirror;
++                                copy.state = key->state;
++                                copy.keycodes = g_new0 (guint, mirror_keys_len + 1);
++
++                                for (j = 0; j < mirror_keys_len; j++)
++                                        copy.keycodes[j] = mirror_keys[j].keycode;
++
++                                grab_key_internal (&copy, TRUE, flags, screens);
++
++                                g_free (copy.keycodes);
++                                g_free (mirror_keys);
++                        }
++                }
 +
 +                for (i = 0; i < 8 * sizeof (guint); i++) {
 +                        guint left, right;
@@ -152,6 +211,32 @@
 +                Key copy;
 +                guint i, j;
 +
++                if ((key->state & key_mask) != 0) {
++                        guint mirror = get_mirrored_key (key->keysym);
++
++                        if (mirror != 0) {
++                                gint mirror_keys_len;
++                                GdkKeymapKey *mirror_keys;
++
++                                gdk_keymap_get_entries_for_keyval (gdk_keymap_get_default (),
++                                                                   mirror,
++                                                                   &mirror_keys,
++                                                                   &mirror_keys_len);
++
++                                copy.keysym = mirror;
++                                copy.state = key->state;
++                                copy.keycodes = g_new0 (guint, mirror_keys_len + 1);
++
++                                for (j = 0; j < mirror_keys_len; j++)
++                                        copy.keycodes[j] = mirror_keys[j].keycode;
++
++                                grab_key_internal (&copy, FALSE, 0, screens);
++
++                                g_free (copy.keycodes);
++                                g_free (mirror_keys);
++                        }
++                }
++
 +                for (i = 0; i < 8 * sizeof (guint); i++) {
 +                        guint left, right;
 +                        gint left_keys_len, right_keys_len;
@@ -201,7 +286,7 @@
  }
  
  static gboolean
-@@ -333,8 +507,9 @@
+@@ -333,8 +592,9 @@
  	if (gdk_keymap_translate_keyboard_state (gdk_keymap_get_default (), keycode,
  						 state, group,
  						 &keyval, NULL, NULL, &consumed)) {
@@ -212,7 +297,7 @@
  
  		/* HACK: we don't want to use SysRq as a keybinding, so we avoid
  		 * its translation from Alt+Print. */
-@@ -346,20 +521,33 @@
+@@ -346,20 +606,33 @@
  
  		/* The Key structure contains virtual modifiers, whereas
  		 * the XEvent will be using the real modifier, so translate those */
@@ -249,3 +334,60 @@
  	}
  
  	/* The key we passed doesn't have a keysym, so try with just the keycode */
+--- a/plugins/keyboard/gsd-keyboard-manager.c
++++ b/plugins/keyboard/gsd-keyboard-manager.c
+@@ -959,7 +959,7 @@
+          * and doesn't call us so we can't set the group switching XKB
+          * option in the first place otherwise the X server's switch
+          * will take effect and we get a broken configuration. */
+-        if (n_sources < 2)
++        if (n_sources < 2 || g_strcmp0 (g_getenv ("XDG_CURRENT_DESKTOP"), "Unity") == 0)
+                 strip_xkb_option (options, "grp:");
+ 
+         options_str = build_xkb_options_string (options);
+@@ -1006,6 +1006,8 @@
+ 
+         gnome_xkb_info_free_var_defs (xkb_var_defs);
+         g_free (rules_file_path);
++
++        XkbLockModifiers (GDK_DISPLAY_XDISPLAY (gdk_display_get_default ()), XkbUseCoreKbd, LockMask, 0);
+ }
+ 
+ static void
+--- a/plugins/media-keys/gsd-media-keys-manager.c
++++ b/plugins/media-keys/gsd-media-keys-manager.c
+@@ -2559,6 +2559,8 @@
+                    GdkEvent            *event,
+                    GsdMediaKeysManager *manager)
+ {
++    static gboolean ok_to_switch = TRUE;
++
+     XIEvent             *xiev;
+     XIDeviceEvent       *xev;
+     XGenericEventCookie *cookie;
+@@ -2582,6 +2584,9 @@
+ 
+     deviceid = xev->sourceid;
+ 
++    if (xiev->evtype == XI_KeyPress)
++        ok_to_switch = TRUE;
++
+         for (i = 0; i < manager->priv->keys->len; i++) {
+                 MediaKey *key;
+ 
+@@ -2614,6 +2619,15 @@
+                                 return GDK_FILTER_REMOVE;
+                         }
+ 
++                        if (key->key_type == SWITCH_INPUT_SOURCE_KEY || key->key_type == SWITCH_INPUT_SOURCE_BACKWARD_KEY) {
++                                if (ok_to_switch) {
++                                        do_action (manager, deviceid, key->key_type, xev->time);
++                                        ok_to_switch = FALSE;
++                                }
++
++                                return GDK_FILTER_CONTINUE;
++                        }
++
+                         if (do_action (manager, deviceid, key->key_type, xev->time) == FALSE) {
+                                 return GDK_FILTER_REMOVE;
+                         } else {

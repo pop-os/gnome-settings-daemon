@@ -1,3 +1,14 @@
+gnome-settings-daemon (3.8.5-0ubuntu11.1) UNRELEASED; urgency=low
+
+  * debian/patches/git_keyboard-Don-t-set-the-XKB-group-switching-option.patch:
+    - If the user has the grp xkb option enabled, pressing the specified key
+      might result in a Next Group keysym instead of the normal one. g-s-d
+      doesn't use the option, and prevents it from being used with the patch.
+  * debian/patches/unity-modifier-media-keys.patch:
+    - Caps lock, next group, double modifier workarounds (lp: #1218322)
+
+ -- William Hua <william.hua@canonical.com>  Thu, 24 Oct 2013 10:46:19 -0400
+
 gnome-settings-daemon (3.8.5-0ubuntu11) saucy; urgency=low
 
   * debian/patches/ubuntu-lid-open-reset-ideletime.patch:
