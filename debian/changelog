@@ -1,4 +1,4 @@
-gnome-settings-daemon (3.8.5-0ubuntu11.1) UNRELEASED; urgency=low
+gnome-settings-daemon (3.8.5-0ubuntu11.1) saucy; urgency=low
 
   * debian/patches/git_keyboard-Don-t-set-the-XKB-group-switching-option.patch:
     - If the user has the grp xkb option enabled, pressing the specified key
