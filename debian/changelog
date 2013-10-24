@@ -1,4 +1,11 @@
-gnome-settings-daemon (3.8.5-0ubuntu10) UNRELEASED; urgency=low
+gnome-settings-daemon (3.8.5-0ubuntu11) saucy; urgency=low
+
+  * debian/patches/ubuntu-lid-open-reset-ideletime.patch:
+    change idle-timeout-reset key sequence from Alt to Shift (lp: #1227920)
+
+ -- Stephen M. Webb <stephen.webb@canonical.com>  Tue, 22 Oct 2013 21:46:42 -0400
+
+gnome-settings-daemon (3.8.5-0ubuntu10) saucy; urgency=low
 
   * debian/patches/unity-modifier-media-keys.patch:
     - Support modifier-only keyboard shortcuts (lp: #1218322)
