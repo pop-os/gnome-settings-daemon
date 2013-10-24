@@ -1,7 +1,12 @@
 gnome-settings-daemon (3.8.5-0ubuntu11) saucy; urgency=low
 
+  [ Stephen M. Webb ]
   * debian/patches/ubuntu-lid-open-reset-ideletime.patch:
     change idle-timeout-reset key sequence from Alt to Shift (lp: #1227920)
+
+  [ William Hua ]
+  * debian/patches/unity-modifier-media-keys.patch:
+    - Caps lock, next group, double modifier workarounds (lp: #1218322)
 
  -- Stephen M. Webb <stephen.webb@canonical.com>  Tue, 22 Oct 2013 21:46:42 -0400
 
