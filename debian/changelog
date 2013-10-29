@@ -1,3 +1,11 @@
+gnome-settings-daemon (3.8.5-0ubuntu12) UNRELEASED; urgency=low
+
+  * debian/patches/fix_media_keys_on_unity.patch: Another reworking. Try to
+    start the legacy keygrabber all the time. Only don't if we're running
+    shell. Should fix keygrabber in environments without panel or Unity. 
+
+ -- Iain Lane <iain.lane@canonical.com>  Tue, 29 Oct 2013 00:56:59 +0000
+
 gnome-settings-daemon (3.8.5-0ubuntu11.1) saucy; urgency=low
 
   * debian/patches/git_keyboard-Don-t-set-the-XKB-group-switching-option.patch:

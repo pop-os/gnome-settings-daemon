@@ -7,8 +7,6 @@ keygrabber when running unity.
       	9e032789283dd5aa7c13411c538af3e4032f3145
 Author: Tim Lunn <tim@feathertop.org>
 Last-Update: <2013-04-25>
-Index: b/plugins/media-keys/gsd-media-keys-manager.c
-===================================================================
 --- a/plugins/media-keys/gsd-media-keys-manager.c
 +++ b/plugins/media-keys/gsd-media-keys-manager.c
 @@ -78,6 +78,10 @@
@@ -44,20 +42,18 @@ Index: b/plugins/media-keys/gsd-media-keys-manager.c
          GList           *media_players;
  
          GDBusNodeInfo   *introspection_data;
-@@ -192,6 +204,12 @@
+@@ -192,6 +204,10 @@
          NotifyNotification *volume_notification;
          NotifyNotification *brightness_notification;
          NotifyNotification *kb_backlight_notification;
 +
 +        /* Legacy keygrabber stuff */
-+        guint           unity_name_owner_id;
-+        guint           panel_name_owner_id;
 +        guint           have_legacy_keygrabber;
 +
  };
  
  static void     gsd_media_keys_manager_class_init  (GsdMediaKeysManagerClass *klass);
-@@ -338,12 +356,34 @@
+@@ -338,12 +354,34 @@
  }
  
  static void
@@ -92,7 +88,7 @@ Index: b/plugins/media-keys/gsd-media-keys-manager.c
          g_free (key);
  }
  
-@@ -474,6 +514,18 @@
+@@ -474,6 +512,18 @@
          g_free (exec);
  }
  
@@ -111,7 +107,7 @@ Index: b/plugins/media-keys/gsd-media-keys-manager.c
  static char *
  get_key_string (GsdMediaKeysManager *manager,
  		MediaKey            *key)
-@@ -681,6 +733,39 @@
+@@ -681,6 +731,39 @@
  	g_free (tmp);
  }
  
@@ -151,7 +147,7 @@ Index: b/plugins/media-keys/gsd-media-keys-manager.c
  static void
  ungrab_accelerator_complete (GObject      *object,
                               GAsyncResult *result,
-@@ -712,15 +797,21 @@
+@@ -712,15 +795,21 @@
                        GsdMediaKeysManager *manager)
  {
          int      i;
@@ -174,7 +170,7 @@ Index: b/plugins/media-keys/gsd-media-keys-manager.c
          /* Find the key that was modified */
          for (i = 0; i < manager->priv->keys->len; i++) {
                  MediaKey *key;
-@@ -731,10 +822,21 @@
+@@ -731,10 +820,21 @@
                  if (key->settings_key == NULL)
                          continue;
                  if (strcmp (settings_key, key->settings_key) == 0) {
@@ -197,7 +193,7 @@ Index: b/plugins/media-keys/gsd-media-keys-manager.c
  }
  
  static MediaKey *
-@@ -855,7 +957,17 @@
+@@ -855,7 +955,17 @@
                  if (found)
                          continue;
  
@@ -216,7 +212,7 @@ Index: b/plugins/media-keys/gsd-media-keys-manager.c
                  g_hash_table_remove (manager->priv->custom_settings,
                                       key->custom_path);
                  g_ptr_array_remove_index_fast (manager->priv->keys, i);
-@@ -876,6 +988,9 @@
+@@ -876,6 +986,9 @@
  	key->modes = media_keys[i].modes;
  
  	g_ptr_array_add (manager->priv->keys, key);
@@ -226,7 +222,7 @@ Index: b/plugins/media-keys/gsd-media-keys-manager.c
  }
  
  static void
-@@ -886,6 +1001,9 @@
+@@ -886,6 +999,9 @@
  
          gnome_settings_profile_start (NULL);
  
@@ -236,7 +232,7 @@ Index: b/plugins/media-keys/gsd-media-keys-manager.c
          /* Media keys
           * Add hard-coded shortcuts first so that they can't be preempted */
          for (i = 0; i < G_N_ELEMENTS (media_keys); i++) {
-@@ -911,10 +1029,19 @@
+@@ -911,10 +1027,19 @@
                          continue;
                  }
                  g_ptr_array_add (manager->priv->keys, key);
@@ -257,7 +253,7 @@ Index: b/plugins/media-keys/gsd-media-keys-manager.c
  
          gnome_settings_profile_end (NULL);
  }
-@@ -2332,6 +2459,95 @@
+@@ -2332,6 +2457,95 @@
          return FALSE;
  }
  
@@ -353,7 +349,7 @@ Index: b/plugins/media-keys/gsd-media-keys-manager.c
  static void
  on_accelerator_activated (ShellKeyGrabber     *grabber,
                            guint                accel_id,
-@@ -2448,6 +2664,9 @@
+@@ -2448,6 +2662,9 @@
                     const char        *name_owner,
                     gpointer           user_data)
  {
@@ -363,27 +359,12 @@ Index: b/plugins/media-keys/gsd-media-keys-manager.c
          GsdMediaKeysManager *manager = user_data;
  
          shell_key_grabber_proxy_new_for_bus (G_BUS_TYPE_SESSION,
-@@ -2471,6 +2690,9 @@
-                    const char       *name,
-                    gpointer          user_data)
- {
-+        if (g_strcmp0 (g_getenv ("DESKTOP_SESSION"), "gnome") != 0)
-+                return;
-+
-         GsdMediaKeysManager *manager = user_data;
- 
-         g_ptr_array_set_size (manager->priv->keys, 0);
-@@ -2479,6 +2701,60 @@
-         g_clear_object (&manager->priv->shell_proxy);
+@@ -2467,10 +2684,57 @@
  }
  
-+static void
-+start_legacy_grabber (GDBusConnection   *connection,
-+                      const char        *name,
-+                      const char        *name_owner,
-+                      gpointer           user_data)
+ static void
++maybe_start_legacy_grabber (GsdMediaKeysManager *manager)
 +{
-+        GsdMediaKeysManager *manager = user_data;
 +        GSList *l;
 +
 +        if (g_strcmp0 (g_getenv ("DESKTOP_SESSION"), "gnome") == 0)
@@ -394,9 +375,6 @@ Index: b/plugins/media-keys/gsd-media-keys-manager.c
 +        g_debug ("start_legacy_grabber");
 +
 +        if (manager->priv->keys == NULL)
-+                return;
-+
-+        if (!name_owner)
 +                return;
 +
 +        init_screens (manager);
@@ -417,12 +395,8 @@ Index: b/plugins/media-keys/gsd-media-keys-manager.c
 +}
 +
 +static void
-+stop_legacy_grabber (GDBusConnection  *connection,
-+                     const char       *name,
-+                     gpointer          user_data)
++maybe_stop_legacy_grabber (GsdMediaKeysManager *manager)
 +{
-+        GsdMediaKeysManager *manager = user_data;
-+
 +        if (g_strcmp0 (g_getenv ("DESKTOP_SESSION"), "gnome") == 0)
 +                return;
 +
@@ -431,10 +405,19 @@ Index: b/plugins/media-keys/gsd-media-keys-manager.c
 +        g_ptr_array_set_size (manager->priv->keys, 0);
 +}
 +
- static gboolean
- start_media_keys_idle_cb (GsdMediaKeysManager *manager)
++
++static void
+ on_shell_vanished (GDBusConnection  *connection,
+                    const char       *name,
+                    gpointer          user_data)
  {
-@@ -2531,6 +2807,7 @@
++        if (g_strcmp0 (g_getenv ("DESKTOP_SESSION"), "gnome") != 0)
++                return;
++
+         GsdMediaKeysManager *manager = user_data;
+ 
+         g_ptr_array_set_size (manager->priv->keys, 0);
+@@ -2531,6 +2795,7 @@
  	}
  	manager->priv->icon_theme = g_settings_get_string (manager->priv->interface_settings, "icon-theme");
  
@@ -442,28 +425,16 @@ Index: b/plugins/media-keys/gsd-media-keys-manager.c
          ensure_cancellable (&manager->priv->grab_cancellable);
          ensure_cancellable (&manager->priv->shell_cancellable);
  
-@@ -2541,6 +2818,20 @@
+@@ -2541,6 +2806,8 @@
                                    on_shell_vanished,
                                    manager, NULL);
  
-+        manager->priv->unity_name_owner_id =
-+                g_bus_watch_name (G_BUS_TYPE_SESSION,
-+                                  UNITY_DBUS_NAME, 0,
-+                                  start_legacy_grabber,
-+                                  stop_legacy_grabber,
-+                                  manager, NULL);
-+
-+        manager->priv->panel_name_owner_id =
-+                g_bus_watch_name (G_BUS_TYPE_SESSION,
-+                                  PANEL_DBUS_NAME, 0,
-+                                  start_legacy_grabber,
-+                                  stop_legacy_grabber,
-+                                  manager, NULL);
++        maybe_start_legacy_grabber (manager);
 +
          gnome_settings_profile_end (NULL);
  
          manager->priv->start_idle_id = 0;
-@@ -2556,6 +2847,11 @@
+@@ -2556,6 +2823,11 @@
  
          gnome_settings_profile_start (NULL);
  
@@ -475,7 +446,7 @@ Index: b/plugins/media-keys/gsd-media-keys-manager.c
  #ifdef HAVE_GUDEV
          manager->priv->streams = g_hash_table_new (g_direct_hash, g_direct_equal);
          manager->priv->udev_client = g_udev_client_new (subsystems);
-@@ -2574,6 +2870,7 @@
+@@ -2574,6 +2846,7 @@
  gsd_media_keys_manager_stop (GsdMediaKeysManager *manager)
  {
          GsdMediaKeysManagerPrivate *priv = manager->priv;
@@ -483,39 +454,23 @@ Index: b/plugins/media-keys/gsd-media-keys-manager.c
          int i;
  
          g_debug ("Stopping media_keys manager");
-@@ -2584,6 +2881,14 @@
+@@ -2584,6 +2857,15 @@
                  priv->bus_cancellable = NULL;
          }
  
-+        if (manager->priv->have_legacy_keygrabber){
++        if (manager->priv->have_legacy_keygrabber) {
 +                for (ls = priv->screens; ls != NULL; ls = ls->next) {
 +                        gdk_window_remove_filter (gdk_screen_get_root_window (ls->data),
 +                                                 (GdkFilterFunc) filter_key_events,
 +                                                  manager);
 +                }
++                maybe_stop_legacy_grabber (manager);
 +        }
 +
          if (manager->priv->gtksettings != NULL) {
                  g_signal_handlers_disconnect_by_func (manager->priv->gtksettings, sound_theme_changed, manager);
                  manager->priv->gtksettings = NULL;
-@@ -2608,6 +2913,16 @@
-                 manager->priv->name_owner_id = 0;
-         }
- 
-+        if (manager->priv->unity_name_owner_id) {
-+                g_bus_unwatch_name (manager->priv->unity_name_owner_id);
-+                manager->priv->unity_name_owner_id = 0;
-+        }
-+
-+        if (manager->priv->panel_name_owner_id) {
-+                g_bus_unwatch_name (manager->priv->panel_name_owner_id);
-+                manager->priv->panel_name_owner_id = 0;
-+        }
-+
-         if (priv->cancellable != NULL) {
-                 g_cancellable_cancel (priv->cancellable);
-                 g_clear_object (&priv->cancellable);
-@@ -2635,16 +2950,26 @@
+@@ -2635,16 +2917,26 @@
          }
  
          if (priv->keys != NULL) {
@@ -543,7 +498,7 @@ Index: b/plugins/media-keys/gsd-media-keys-manager.c
          if (priv->grab_cancellable != NULL) {
                  g_cancellable_cancel (priv->grab_cancellable);
                  g_clear_object (&priv->grab_cancellable);
-@@ -2655,6 +2980,7 @@
+@@ -2655,6 +2947,7 @@
                  g_clear_object (&priv->shell_cancellable);
          }
  
@@ -551,8 +506,6 @@ Index: b/plugins/media-keys/gsd-media-keys-manager.c
          g_clear_object (&priv->sink);
          g_clear_object (&priv->source);
          g_clear_object (&priv->volume);
-Index: b/plugins/media-keys/shortcuts-list.h
-===================================================================
 --- a/plugins/media-keys/shortcuts-list.h
 +++ b/plugins/media-keys/shortcuts-list.h
 @@ -22,6 +22,7 @@
