@@ -1,7 +1,12 @@
 gnome-settings-daemon (3.10.1-1) UNRELEASED; urgency=low
 
+  [ Sjoerd Simons ]
   * New upstream release
   * Sync b-d with Ubuntu's gnome3 teams packaging
+
+  [ Emilio Pozuelo Monfort ]
+  * debian/patches/04_superP.patch:
+    + Add upstream bug / author info.
 
  -- Sjoerd Simons <sjoerd@debian.org>  Sun, 20 Oct 2013 20:47:01 +0100
 
