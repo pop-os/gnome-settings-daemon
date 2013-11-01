@@ -6,7 +6,7 @@ gnome-settings-daemon (3.10.1-1) UNRELEASED; urgency=low
 
   [ Emilio Pozuelo Monfort ]
   * debian/patches/04_superP.patch:
-    + Add upstream bug / author info.
+    + Add upstream bug info.
 
  -- Sjoerd Simons <sjoerd@debian.org>  Sun, 20 Oct 2013 20:47:01 +0100
 
