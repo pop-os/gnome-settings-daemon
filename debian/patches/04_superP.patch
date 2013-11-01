@@ -1,5 +1,6 @@
+Bug: https://bugzilla.gnome.org/show_bug.cgi?id=623223
+Bug: https://bugzilla.gnome.org/show_bug.cgi?id=651571
 Bug: https://bugzilla.gnome.org/show_bug.cgi?id=669423
-Author: Josselin Mouette <joss@debian.org>
 
 Index: gnome-settings-daemon-3.7.91/data/org.gnome.settings-daemon.plugins.media-keys.gschema.xml.in.in
 ===================================================================
