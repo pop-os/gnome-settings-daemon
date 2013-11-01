@@ -1,4 +1,4 @@
-gnome-settings-daemon (3.10.1-1) UNRELEASED; urgency=low
+gnome-settings-daemon (3.10.1-1) experimental; urgency=low
 
   [ Sjoerd Simons ]
   * New upstream release
@@ -8,7 +8,7 @@ gnome-settings-daemon (3.10.1-1) UNRELEASED; urgency=low
   * debian/patches/04_superP.patch:
     + Add upstream bug info.
 
- -- Sjoerd Simons <sjoerd@debian.org>  Sun, 20 Oct 2013 20:47:01 +0100
+ -- Sjoerd Simons <sjoerd@debian.org>  Fri, 01 Nov 2013 23:07:44 +0100
 
 gnome-settings-daemon (3.8.5-2) unstable; urgency=low
 
