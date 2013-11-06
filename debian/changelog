@@ -1,3 +1,12 @@
+gnome-settings-daemon (3.8.6.1-0ubuntu1) UNRELEASED; urgency=low
+
+  * New upstream version
+  * debian/patches/git_thumbnail_cleaning_use_less_ios.patch,
+    git_keyboard-Don-t-set-the-XKB-group-switching-option.patch:
+    - dropped, the changes are in the new version
+
+ -- Sebastien Bacher <seb128@ubuntu.com>  Wed, 06 Nov 2013 11:00:57 +0100
+
 gnome-settings-daemon (3.8.5-0ubuntu12) trusty; urgency=low
 
   * debian/patches/fix_media_keys_on_unity.patch: Another reworking. Try to
