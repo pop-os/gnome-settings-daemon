@@ -1,3 +1,10 @@
+gnome-settings-daemon (3.8.6.1-0ubuntu2) UNRELEASED; urgency=low
+
+  * debian/patches/git_xsettings_segfaults.patch:
+    - "unwatch dbus before destroying xsettings managers" (lp: #1232419)
+
+ -- Sebastien Bacher <seb128@ubuntu.com>  Tue, 12 Nov 2013 20:24:12 +0100
+
 gnome-settings-daemon (3.8.6.1-0ubuntu1) trusty; urgency=low
 
   * New upstream version
