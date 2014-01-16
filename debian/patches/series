@@ -28,3 +28,4 @@ git_touchpad_scrolling.patch
 unity-modifier-media-keys.patch
 ubuntu-lid-open-reset-ideletime.patch
 git_xsettings_segfaults.patch
+git_new_screencast_keybinding.patch
