@@ -1,11 +1,11 @@
-gnome-settings-daemon (3.8.6.1-0ubuntu3) UNRELEASED; urgency=medium
+gnome-settings-daemon (3.8.6.1-0ubuntu3) trusty; urgency=medium
 
   * debian/patches/git_hidpi_scalling.patch: 
     - backport upstream change to support hi-dpi screens/scaling. You can 
       change the scaling value by writting the "org.gnome.desktop.interface 
       scaling-factor" gsettings key
 
- -- Sebastien Bacher <seb128@ubuntu.com>  Mon, 03 Feb 2014 12:02:48 +0000
+ -- Sebastien Bacher <seb128@ubuntu.com>  Mon, 03 Feb 2014 16:17:44 +0000
 
 gnome-settings-daemon (3.8.6.1-0ubuntu2) trusty; urgency=low
 
