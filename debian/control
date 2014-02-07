@@ -7,7 +7,7 @@ Section: gnome
 Priority: optional
 Maintainer: Ubuntu Desktop Team <ubuntu-desktop@lists.ubuntu.com>
 XSBC-Original-Maintainer: Debian GNOME Maintainers <pkg-gnome-maintainers@lists.alioth.debian.org>
-Uploaders: Debian GNOME Maintainers <pkg-gnome-maintainers@lists.alioth.debian.org>, Jeremy Bicha <jbicha@ubuntu.com>
+Uploaders: Debian GNOME Maintainers <pkg-gnome-maintainers@lists.alioth.debian.org>
 Build-Depends: cdbs,
                debhelper (>= 9),
                gnome-pkg-tools,
@@ -55,7 +55,8 @@ Depends: ${shlibs:Depends},
          ${misc:Depends},
          accountsservice (>= 0.6.34),
          gsettings-desktop-schemas (>= 3.7.2.1),
-         nautilus-data (>= 2.91.3-1)
+         nautilus-data (>= 2.91.3-1),
+         gnome-settings-daemon-schemas
 Recommends: ibus (>= 1.5.0),
             pulseaudio,
             systemd-services
@@ -87,6 +88,11 @@ Description: daemon handling the GNOME session settings
  .
  It also sets various application settings through X resources and
  freedesktop.org XSETTINGS.
+
+Package: gnome-settings-daemon-schemas
+Architecture: any
+Description: gnome-settings-daemon schemas
+ This package contains the schemas used by gnome-settings-daemon
 
 Package: gnome-settings-daemon-dev
 Architecture: any
