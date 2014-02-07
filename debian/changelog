@@ -1,4 +1,4 @@
-gnome-settings-daemon (3.8.6.1-0ubuntu6) UNRELEASED; urgency=medium
+gnome-settings-daemon (3.8.6.1-0ubuntu6) trusty; urgency=medium
 
   [ Robert Ancell ]
   * debian/control:
@@ -7,7 +7,7 @@ gnome-settings-daemon (3.8.6.1-0ubuntu6) UNRELEASED; urgency=medium
   * debian/gnome-settings-daemon-schemas.gsettings-override:
     - Split out schemas so unity-settings-daemon can use them
 
- -- Dimitri John Ledkov <xnox@ubuntu.com>  Fri, 07 Feb 2014 15:45:18 +0000
+ -- Dimitri John Ledkov <xnox@ubuntu.com>  Fri, 07 Feb 2014 15:53:09 +0000
 
 gnome-settings-daemon (3.8.6.1-0ubuntu5) trusty; urgency=medium
 
