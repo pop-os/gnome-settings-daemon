@@ -1,9 +1,9 @@
-gnome-settings-daemon (3.8.6.1-0ubuntu5) UNRELEASED; urgency=medium
+gnome-settings-daemon (3.8.6.1-0ubuntu5) trusty; urgency=medium
 
   * Make gnome-settings-daemon start on all gnome-session instances, but
     ubuntu/unity.
 
- -- Dimitri John Ledkov <xnox@ubuntu.com>  Fri, 07 Feb 2014 14:39:34 +0000
+ -- Dimitri John Ledkov <xnox@ubuntu.com>  Fri, 07 Feb 2014 14:39:59 +0000
 
 gnome-settings-daemon (3.8.6.1-0ubuntu4) trusty; urgency=medium
 
