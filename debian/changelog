@@ -1,3 +1,19 @@
+gnome-settings-daemon (3.8.6.1-0ubuntu8) UNRELEASED; urgency=medium
+
+  * I hate control.in files.
+  * Apply ubuntu7 control changes to control.in.
+
+ -- Dimitri John Ledkov <xnox@ubuntu.com>  Fri, 07 Feb 2014 16:58:41 +0000
+
+gnome-settings-daemon (3.8.6.1-0ubuntu7) trusty; urgency=medium
+
+  * Mark gnome-settings-daemon-schemas as arch:all.
+  * Mark gnome-settings-daemon-schemas to replace gnome-settings-daemon.
+  * Make gnome-settings-daemon depend on strict matching version of the
+    schemas package.
+
+ -- Dimitri John Ledkov <xnox@ubuntu.com>  Fri, 07 Feb 2014 16:32:19 +0000
+
 gnome-settings-daemon (3.8.6.1-0ubuntu6) trusty; urgency=medium
 
   [ Robert Ancell ]

@@ -52,7 +52,7 @@ Depends: ${shlibs:Depends},
          accountsservice (>= 0.6.34),
          gsettings-desktop-schemas (>= 3.7.2.1),
          nautilus-data (>= 2.91.3-1),
-         gnome-settings-daemon-schemas
+         gnome-settings-daemon-schemas (= ${binary:Version})
 Recommends: ibus (>= 1.5.0),
             pulseaudio,
             systemd-services
@@ -61,7 +61,7 @@ Breaks: rhythmbox (<< 0.11.5),
         banshee (<< 0.13.2+dfsg-7),
         totem (<< 2.22.0),
         gnome-control-center (<< 1:3.6.3-0ubuntu35),
-        gnome-session (<< 2.24),
+        gnome-session (<< 3.9.90-0ubuntu6),
         gnome-screensaver (<< 2.28.0),
         gnome-color-manager (<< 3.0),
         unity-greeter (<< 0.2.1-0ubuntu1),
@@ -86,7 +86,9 @@ Description: daemon handling the GNOME session settings
  freedesktop.org XSETTINGS.
 
 Package: gnome-settings-daemon-schemas
-Architecture: any
+Architecture: all
+Replaces: gnome-settings-daemon (<< 3.8.6.1-0ubuntu8)
+Breaks: gnome-settings-daemon (<< 3.8.6.1-0ubuntu8)
 Description: gnome-settings-daemon schemas
  This package contains the schemas used by gnome-settings-daemon
 

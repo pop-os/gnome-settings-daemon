@@ -56,7 +56,7 @@ Depends: ${shlibs:Depends},
          accountsservice (>= 0.6.34),
          gsettings-desktop-schemas (>= 3.7.2.1),
          nautilus-data (>= 2.91.3-1),
-         gnome-settings-daemon-schemas
+         gnome-settings-daemon-schemas (= ${binary:Version})
 Recommends: ibus (>= 1.5.0),
             pulseaudio,
             systemd-services
@@ -90,7 +90,9 @@ Description: daemon handling the GNOME session settings
  freedesktop.org XSETTINGS.
 
 Package: gnome-settings-daemon-schemas
-Architecture: any
+Architecture: all
+Replaces: gnome-settings-daemon (<< 3.8.6.1-0ubuntu8)
+Breaks: gnome-settings-daemon (<< 3.8.6.1-0ubuntu8)
 Description: gnome-settings-daemon schemas
  This package contains the schemas used by gnome-settings-daemon
 
