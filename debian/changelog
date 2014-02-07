@@ -1,9 +1,9 @@
-gnome-settings-daemon (3.8.6.1-0ubuntu8) UNRELEASED; urgency=medium
+gnome-settings-daemon (3.8.6.1-0ubuntu8) trusty; urgency=medium
 
   * I hate control.in files.
   * Apply ubuntu7 control changes to control.in.
 
- -- Dimitri John Ledkov <xnox@ubuntu.com>  Fri, 07 Feb 2014 16:58:41 +0000
+ -- Dimitri John Ledkov <xnox@ubuntu.com>  Fri, 07 Feb 2014 17:02:23 +0000
 
 gnome-settings-daemon (3.8.6.1-0ubuntu7) trusty; urgency=medium
 
