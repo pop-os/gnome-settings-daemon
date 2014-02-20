@@ -1,4 +1,4 @@
-gnome-settings-daemon (3.8.6.1-0ubuntu9) UNRELEASED; urgency=medium
+gnome-settings-daemon (3.8.6.1-0ubuntu9) trusty; urgency=medium
 
   * debian/patches/git_enable_auto_hidpi.patch: enable hidpi on screen
     configurations where it makes sense
@@ -7,7 +7,7 @@ gnome-settings-daemon (3.8.6.1-0ubuntu9) UNRELEASED; urgency=medium
   *  debian/gnome-settings-daemon.maintscript:
     - clean corresponding xdg autostart on upgrade
 
- -- Sebastien Bacher <seb128@ubuntu.com>  Tue, 18 Feb 2014 19:00:15 +0100
+ -- Sebastien Bacher <seb128@ubuntu.com>  Thu, 20 Feb 2014 11:38:39 +0100
 
 gnome-settings-daemon (3.8.6.1-0ubuntu8) trusty; urgency=medium
 
