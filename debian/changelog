@@ -2,6 +2,10 @@ gnome-settings-daemon (3.8.6.1-0ubuntu9) UNRELEASED; urgency=medium
 
   * debian/patches/git_enable_auto_hidpi.patch: enable hidpi on screen
     configurations where it makes sense
+  * debian/patches/git_revert_remove_automount_helper.patch:
+    - drop that revert, gnome-shell does the mounting and unity uses u-s-d
+  *  debian/gnome-settings-daemon.maintscript:
+    - clean corresponding xdg autostart on upgrade
 
  -- Sebastien Bacher <seb128@ubuntu.com>  Tue, 18 Feb 2014 19:00:15 +0100
 
