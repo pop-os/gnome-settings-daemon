@@ -7,3 +7,5 @@ usr/share/gnome-settings-daemon
 usr/share/GConf
 usr/share/glib-2.0
 usr/share/polkit-1
+usr/lib/udev/rules.d/*
+usr/share/gnome-settings-daemon-*/*
