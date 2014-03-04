@@ -1,4 +1,4 @@
-gnome-settings-daemon (3.11.90-1) UNRELEASED; urgency=medium
+gnome-settings-daemon (3.11.91-1) experimental; urgency=medium
 
   * New upstream release.
   * Update build-dependencies according to configure.ac:
@@ -8,7 +8,7 @@ gnome-settings-daemon (3.11.90-1) UNRELEASED; urgency=medium
   * Ship input-devices-example.sh
   * Bump Standards-Version to 3.9.5
 
- -- Andreas Henriksson <andreas@fatal.se>  Tue, 04 Mar 2014 00:25:03 +0100
+ -- Andreas Henriksson <andreas@fatal.se>  Tue, 04 Mar 2014 21:10:41 +0100
 
 gnome-settings-daemon (3.10.1-1) experimental; urgency=low
 
