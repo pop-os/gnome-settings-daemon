@@ -1,3 +1,11 @@
+gnome-settings-daemon (3.8.6.1-0ubuntu10) UNRELEASED; urgency=medium
+
+  * gnome-settings-daemon.user-session.upstart: Use XDG_CURRENT_DESKTOP
+    as the instance specifier for gnome-session upstart jobs, since
+    other sessions apart from ubuntu will need to use u-s-d (LP: #1224217) 
+
+ -- Tim Lunn <tim@feathertop.org>  Wed, 12 Mar 2014 16:47:04 +1100
+
 gnome-settings-daemon (3.8.6.1-0ubuntu9) trusty; urgency=medium
 
   * debian/patches/git_enable_auto_hidpi.patch: enable hidpi on screen
