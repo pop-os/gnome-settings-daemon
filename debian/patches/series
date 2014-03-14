@@ -30,3 +30,4 @@ git_xsettings_segfaults.patch
 git_hidpi_scalling.patch
 git_new_screencast_keybinding.patch
 git_enable_auto_hidpi.patch
+git_micmute.patch

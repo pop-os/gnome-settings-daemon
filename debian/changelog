@@ -1,3 +1,9 @@
+gnome-settings-daemon (3.8.6.1-0ubuntu11) trusty; urgency=medium
+
+  * Add git_micmute.patch to add XF86AudioMicMute as a mic mute key
+
+ -- Jackson Doak <noskcaj@ubuntu.com>  Fri, 14 Mar 2014 17:20:18 +1100
+
 gnome-settings-daemon (3.8.6.1-0ubuntu10) trusty; urgency=medium
 
   * gnome-settings-daemon.user-session.upstart: Use XDG_CURRENT_DESKTOP
