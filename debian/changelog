@@ -1,4 +1,4 @@
-gnome-settings-daemon (3.8.6.1-0ubuntu10) UNRELEASED; urgency=medium
+gnome-settings-daemon (3.8.6.1-0ubuntu10) trusty; urgency=medium
 
   * gnome-settings-daemon.user-session.upstart: Use XDG_CURRENT_DESKTOP
     as the instance specifier for gnome-session upstart jobs, since
