@@ -102,7 +102,7 @@ Index: gnome-settings-daemon-3.6.3/plugins/xsettings/gsd-xsettings-manager.c
 +{
 +        notify_have_shell (manager);
 +        manager->priv->have_unity = TRUE;
-+        manager->priv->shell_name_watch_id = g_bus_watch_name (G_BUS_TYPE_SESSION,
++        manager->priv->unity_name_watch_id = g_bus_watch_name (G_BUS_TYPE_SESSION,
 +                                                               "com.canonical.AppMenu.Registrar",
 +                                                               0,
 +                                                               on_unity_appeared,

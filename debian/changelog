@@ -1,8 +1,13 @@
 gnome-settings-daemon (3.8.6.1-0ubuntu11) UNRELEASED; urgency=medium
 
+  [ Jackson Doak ]
   * Add git_micmute.patch to add XF86AudioMicMute as a mic mute key
 
- -- Jackson Doak <noskcaj@ubuntu.com>  Fri, 14 Mar 2014 17:20:18 +1100
+  [ Robert Ancell ]
+  * debian/patches/90_set_gmenus_xsettings.patch:
+    - Fix error in patch for watching Shell D-Bus names (LP: #1278467)
+
+ -- Robert Ancell <robert.ancell@canonical.com>  Wed, 09 Apr 2014 13:31:09 +1200
 
 gnome-settings-daemon (3.8.6.1-0ubuntu10) trusty; urgency=medium
 
