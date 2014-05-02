@@ -15,7 +15,7 @@ endif
 LDFLAGS += -Wl,-O1 -Wl,--warn-unresolved-symbols -Wl,--as-needed
 
 ifneq ($(DEB_HOST_ARCH_OS),linux)
-  DEB_CONFIGURE_EXTRA_ARGS += --disable-rfkill
+  DEB_CONFIGURE_EXTRA_FLAGS += --disable-rfkill
 endif
 
 DEB_DH_MAKESHLIBS_ARGS_ALL += --no-act
