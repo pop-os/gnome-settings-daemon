@@ -1,3 +1,9 @@
+gnome-settings-daemon (3.12.1-1) UNRELEASED; urgency=medium
+
+  * New upstream release.
+
+ -- Emilio Pozuelo Monfort <pochu@debian.org>  Fri, 02 May 2014 17:54:53 +0200
+
 gnome-settings-daemon (3.12.0-1) experimental; urgency=medium
 
   * New upstream release.
