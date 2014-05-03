@@ -16,6 +16,10 @@ LDFLAGS += -Wl,-O1 -Wl,--warn-unresolved-symbols -Wl,--as-needed
 
 ifneq ($(DEB_HOST_ARCH_OS),linux)
   DEB_CONFIGURE_EXTRA_FLAGS += --disable-rfkill
+else
+install/gnome-settings-daemon::
+	dh_install --autodest -pgnome-settings-daemon --ignore=debian/gnome-settings-daemon.install \
+		debian/tmp/usr/lib/udev/rules.d/
 endif
 
 DEB_DH_MAKESHLIBS_ARGS_ALL += --no-act
