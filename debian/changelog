@@ -1,4 +1,4 @@
-gnome-settings-daemon (3.8.6.1-0ubuntu11.1) UNRELEASED; urgency=medium
+gnome-settings-daemon (3.8.6.1-0ubuntu11.1) trusty; urgency=medium
 
   * debian/patches/ubuntu-force-lock-group.patch:
     - Lock the XKB group when ISO_Next_Group is pressed (lp: #1318673)
