@@ -5,8 +5,10 @@ Subject: media-keys: Add a binding to take a short screencast of the screen
 
 https://bugzilla.gnome.org/show_bug.cgi?id=704435
 ---
---- a/data/org.gnome.settings-daemon.plugins.media-keys.gschema.xml.in.in
-+++ b/data/org.gnome.settings-daemon.plugins.media-keys.gschema.xml.in.in
+Index: gnome-settings-daemon-3.8.6.1/data/org.gnome.settings-daemon.plugins.media-keys.gschema.xml.in.in
+===================================================================
+--- gnome-settings-daemon-3.8.6.1.orig/data/org.gnome.settings-daemon.plugins.media-keys.gschema.xml.in.in
++++ gnome-settings-daemon-3.8.6.1/data/org.gnome.settings-daemon.plugins.media-keys.gschema.xml.in.in
 @@ -135,6 +135,11 @@
        <_summary>Launch terminal</_summary>
        <_description>Binding to launch the terminal.</_description>
@@ -19,9 +21,11 @@ https://bugzilla.gnome.org/show_bug.cgi?id=704435
      <key name="www" type="s">
        <default>'XF86WWW'</default>
        <_summary>Launch web browser</_summary>
---- a/plugins/media-keys/gsd-media-keys-manager.c
-+++ b/plugins/media-keys/gsd-media-keys-manager.c
-@@ -86,6 +86,9 @@
+Index: gnome-settings-daemon-3.8.6.1/plugins/media-keys/gsd-media-keys-manager.c
+===================================================================
+--- gnome-settings-daemon-3.8.6.1.orig/plugins/media-keys/gsd-media-keys-manager.c
++++ gnome-settings-daemon-3.8.6.1/plugins/media-keys/gsd-media-keys-manager.c
+@@ -80,6 +80,9 @@
  
  #define SHELL_GRABBER_RETRY_INTERVAL 1
  
@@ -31,7 +35,7 @@ https://bugzilla.gnome.org/show_bug.cgi?id=704435
  static const gchar introspection_xml[] =
  "<node name='/org/gnome/SettingsDaemon/MediaKeys'>"
  "  <interface name='org.gnome.SettingsDaemon.MediaKeys'>"
-@@ -184,6 +187,11 @@
+@@ -172,6 +175,11 @@ struct GsdMediaKeysManagerPrivate
          GCancellable    *shell_cancellable;
          GCancellable    *grab_cancellable;
  
@@ -43,7 +47,7 @@ https://bugzilla.gnome.org/show_bug.cgi?id=704435
          /* systemd stuff */
          GDBusProxy      *logind_proxy;
          gint             inhibit_keys_fd;
-@@ -2368,6 +2376,61 @@
+@@ -1967,6 +1975,61 @@ do_battery_action (GsdMediaKeysManager *
  }
  
  static void
@@ -105,7 +109,7 @@ https://bugzilla.gnome.org/show_bug.cgi?id=704435
  do_custom_action (GsdMediaKeysManager *manager,
                    guint                deviceid,
                    MediaKey            *key,
-@@ -2445,6 +2508,9 @@
+@@ -2044,6 +2107,9 @@ do_action (GsdMediaKeysManager *manager,
          case TERMINAL_KEY:
                  do_terminal_action (manager);
                  break;
@@ -115,7 +119,7 @@ https://bugzilla.gnome.org/show_bug.cgi?id=704435
          case WWW_KEY:
                  do_url_action (manager, "http", timestamp);
                  break;
-@@ -2729,6 +2795,17 @@
+@@ -2221,6 +2287,17 @@ on_shell_proxy_ready (GObject      *sour
  }
  
  static void
@@ -133,7 +137,7 @@ https://bugzilla.gnome.org/show_bug.cgi?id=704435
  on_key_grabber_ready (GObject      *source,
                        GAsyncResult *result,
                        gpointer      data)
-@@ -2772,6 +2849,14 @@
+@@ -2261,6 +2338,14 @@ on_shell_appeared (GDBusConnection   *co
                                    SHELL_DBUS_NAME,
                                    manager->priv->shell_cancellable,
                                    on_shell_proxy_ready, manager);
@@ -148,7 +152,7 @@ https://bugzilla.gnome.org/show_bug.cgi?id=704435
  }
  
  static void
-@@ -2895,6 +2980,7 @@
+@@ -2330,6 +2415,7 @@ start_media_keys_idle_cb (GsdMediaKeysMa
  
          ensure_cancellable (&manager->priv->grab_cancellable);
          ensure_cancellable (&manager->priv->shell_cancellable);
@@ -156,7 +160,7 @@ https://bugzilla.gnome.org/show_bug.cgi?id=704435
  
          manager->priv->name_owner_id =
                  g_bus_watch_name (G_BUS_TYPE_SESSION,
-@@ -2982,6 +3068,7 @@
+@@ -2399,6 +2485,7 @@ gsd_media_keys_manager_stop (GsdMediaKey
          g_clear_object (&priv->power_proxy);
          g_clear_object (&priv->power_screen_proxy);
          g_clear_object (&priv->power_keyboard_proxy);
@@ -164,7 +168,7 @@ https://bugzilla.gnome.org/show_bug.cgi?id=704435
  
          if (manager->priv->name_owner_id) {
                  g_bus_unwatch_name (manager->priv->name_owner_id);
-@@ -3045,6 +3132,11 @@
+@@ -2434,6 +2521,11 @@ gsd_media_keys_manager_stop (GsdMediaKey
                  g_clear_object (&priv->shell_cancellable);
          }
  
@@ -173,12 +177,14 @@ https://bugzilla.gnome.org/show_bug.cgi?id=704435
 +                g_clear_object (&priv->screencast_cancellable);
 +        }
 +
-         g_clear_pointer (&priv->screens, g_slist_free);
          g_clear_object (&priv->sink);
          g_clear_object (&priv->source);
---- a/plugins/media-keys/shortcuts-list.h
-+++ b/plugins/media-keys/shortcuts-list.h
-@@ -53,6 +53,7 @@
+         g_clear_object (&priv->volume);
+Index: gnome-settings-daemon-3.8.6.1/plugins/media-keys/shortcuts-list.h
+===================================================================
+--- gnome-settings-daemon-3.8.6.1.orig/plugins/media-keys/shortcuts-list.h
++++ gnome-settings-daemon-3.8.6.1/plugins/media-keys/shortcuts-list.h
+@@ -51,6 +51,7 @@ typedef enum {
          SCREENSHOT_CLIP_KEY,
          WINDOW_SCREENSHOT_CLIP_KEY,
          AREA_SCREENSHOT_CLIP_KEY,
@@ -186,7 +192,7 @@ https://bugzilla.gnome.org/show_bug.cgi?id=704435
          TERMINAL_KEY,
          WWW_KEY,
          PLAY_KEY,
-@@ -127,6 +128,7 @@
+@@ -123,6 +124,7 @@ static struct {
          { SCREENSHOT_CLIP_KEY, "screenshot-clip", NULL, NULL, SHELL_KEYBINDING_MODE_ALL },
          { WINDOW_SCREENSHOT_CLIP_KEY, "window-screenshot-clip", NULL, NULL, SHELL_KEYBINDING_MODE_NORMAL },
          { AREA_SCREENSHOT_CLIP_KEY, "area-screenshot-clip", NULL, NULL, SHELL_KEYBINDING_MODE_ALL },

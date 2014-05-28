@@ -42,7 +42,7 @@ Build-Depends: cdbs,
                libxklavier-dev,
                libsystemd-login-dev (>= 183),
                libibus-1.0-dev (>= 1.5.0)
-Standards-Version: 3.9.3
+Standards-Version: 3.9.5
 Vcs-Bzr: https://code.launchpad.net/~ubuntu-desktop/gnome-settings-daemon/ubuntu
 
 Package: gnome-settings-daemon
@@ -52,7 +52,7 @@ Depends: ${shlibs:Depends},
          accountsservice (>= 0.6.34),
          gsettings-desktop-schemas (>= 3.7.2.1),
          nautilus-data (>= 2.91.3-1),
-         gnome-settings-daemon-schemas (= ${binary:Version})
+         gnome-settings-daemon-schemas (= ${source:Version}) 
 Recommends: ibus (>= 1.5.0),
             pulseaudio,
             systemd-services
@@ -87,6 +87,7 @@ Description: daemon handling the GNOME session settings
 
 Package: gnome-settings-daemon-schemas
 Architecture: all
+Depends: ${misc:Depends}
 Replaces: gnome-settings-daemon (<< 3.8.6.1-0ubuntu8)
 Breaks: gnome-settings-daemon (<< 3.8.6.1-0ubuntu8)
 Description: gnome-settings-daemon schemas

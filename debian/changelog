@@ -1,3 +1,17 @@
+gnome-settings-daemon (3.8.6.1-0ubuntu12) utopic; urgency=medium
+
+  * Drop all Unity patches and legacy features (LP: #1318539)
+    - Keep schemas for background plugin, since they are used by u-s-d
+  * debian/patches: Refreshed
+    - git_new_screencast_keybinding.patch
+    - git_xsettings_segfaults.patch
+  * debian/control.in: Fix lintian warnings
+    - gnome-settings-daemon-schemas add ${misc:Depends}
+    - gnome-settings-daemon fix binNMUable error for gnome-settings-daemon-schemas
+  * Bump standards to 3.9.5 (No changes)
+
+ -- Tim Lunn <tim@feathertop.org>  Mon, 12 May 2014 10:06:51 +1000
+
 gnome-settings-daemon (3.8.6.1-0ubuntu11.1) trusty; urgency=medium
 
   * debian/patches/ubuntu-force-lock-group.patch:
