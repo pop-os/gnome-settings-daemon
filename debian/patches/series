@@ -16,3 +16,4 @@ git_new_screencast_keybinding.patch
 git_enable_auto_hidpi.patch
 git_micmute.patch
 ubuntu-force-lock-group.patch
+revert_background_dropping.patch

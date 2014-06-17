@@ -1,3 +1,11 @@
+gnome-settings-daemon (3.8.6.1-0ubuntu13) UNRELEASED; urgency=medium
+
+  * debian/patches/revert_background_dropping was inadvertantly dropped from
+    series (it's needed for the keys in the schema even though the plugin
+    itself is gone). Add it back.
+
+ -- Iain Lane <iain@orangesquash.org.uk>  Tue, 17 Jun 2014 10:19:34 +0100
+
 gnome-settings-daemon (3.8.6.1-0ubuntu12) utopic; urgency=medium
 
   * Drop all Unity patches and legacy features (LP: #1318539)
