@@ -1,3 +1,10 @@
+gnome-settings-daemon (3.8.6.1-0ubuntu15) utopic; urgency=low
+
+  * debian/patches/git_lp1339244.patch:
+    - fix exit status check in gsd-input-helper.c (LP: #1339244)
+
+ -- Michael Vogt <michael.vogt@ubuntu.com>  Thu, 10 Jul 2014 11:05:00 +0200
+
 gnome-settings-daemon (3.8.6.1-0ubuntu14) utopic; urgency=medium
 
   * debian/patches/revert_background_dropping was inadvertantly dropped from

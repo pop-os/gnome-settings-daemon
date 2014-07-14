@@ -1,0 +1,52 @@
+From 2329da7dad28f61109cecd8ca8ce93580f62f349 Mon Sep 17 00:00:00 2001
+From: Bastien Nocera <hadess@hadess.net>
+Date: Fri, 25 Apr 2014 15:42:39 +0200
+Subject: common: Check the exit status of hotplug scripts correctly
+
+Instead of comparing the shell's exit code by hand, use
+g_spawn_check_exit_status() to get the script's exit code.
+
+https://bugzilla.gnome.org/show_bug.cgi?id=710791
+
+Index: gnome-settings-daemon-3.8.6.1/plugins/common/gsd-input-helper.c
+===================================================================
+--- gnome-settings-daemon-3.8.6.1.orig/plugins/common/gsd-input-helper.c
++++ gnome-settings-daemon-3.8.6.1/plugins/common/gsd-input-helper.c
+@@ -499,6 +499,7 @@ run_custom_command (GdkDevice
+                     CustomCommand           command)
+ {
+         GSettings *settings;
++        GError *error = NULL;
+         char *cmd;
+         char *argv[7];
+         int exit_status;
+@@ -526,15 +527,25 @@ run_custom_command (GdkDevice
+         argv[6] = NULL;
+ 
+         rc = g_spawn_sync (g_get_home_dir (), argv, NULL, G_SPAWN_SEARCH_PATH,
+-                           NULL, NULL, NULL, NULL, &exit_status, NULL);
++                           NULL, NULL, NULL, NULL, &exit_status, &error);
+ 
+-        if (rc == FALSE)
+-                g_warning ("Couldn't execute command '%s', verify that this is a valid command.", cmd);
++        if (rc == FALSE) {
++                g_warning ("Couldn't execute command '%s', verify that this is a valid command: %s", cmd, error->message);
++                g_clear_error (&error);
++        }
+ 
+         g_free (argv[0]);
+         g_free (argv[4]);
+ 
+-        return (exit_status == 1);
++        if (!g_spawn_check_exit_status (exit_status, &error)) {
++                if (g_error_matches (error, G_SPAWN_EXIT_ERROR, 1)) {
++                        g_clear_error (&error);
++                        return TRUE;
++                }
++                g_clear_error (&error);
++        }
++
++        return FALSE;
+ }
+ 
+ GList *

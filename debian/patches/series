@@ -17,3 +17,4 @@ git_enable_auto_hidpi.patch
 git_micmute.patch
 ubuntu-force-lock-group.patch
 revert_background_dropping.patch
+git_lp1339244.patch
