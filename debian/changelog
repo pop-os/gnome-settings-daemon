@@ -1,9 +1,14 @@
-gnome-settings-daemon (3.12.1-4) UNRELEASED; urgency=medium
+gnome-settings-daemon (3.12.2-1) unstable; urgency=medium
 
+  [ Laurent Bigonville ]
   * debian/rules: Install rfkill udev rules in /lib/udev/rules.d instead of
     /usr/lib/udev/rules.d
 
- -- Laurent Bigonville <bigon@debian.org>  Mon, 09 Jun 2014 13:08:53 +0200
+  [ Andreas Henriksson ]
+  * New upstream release.
+  * Upload to unstable.
+
+ -- Andreas Henriksson <andreas@fatal.se>  Tue, 15 Jul 2014 00:02:20 +0200
 
 gnome-settings-daemon (3.12.1-3) experimental; urgency=medium
 
