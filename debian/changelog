@@ -1,3 +1,11 @@
+gnome-settings-daemon (3.13.90-1) UNRELEASED; urgency=medium
+
+  * New upstream development release.
+  * Update build-dependencies according to configure.ac changes:
+    - Add libnm-glib-dev (>= 0.9.9.1)
+
+ -- Andreas Henriksson <andreas@fatal.se>  Mon, 25 Aug 2014 16:26:03 -0700
+
 gnome-settings-daemon (3.12.2-1) unstable; urgency=medium
 
   [ Laurent Bigonville ]
