@@ -1,3 +1,14 @@
+gnome-settings-daemon (3.14.0-1) unstable; urgency=medium
+
+  * New upstream release.
+  * debian/gnome-settings-daemon.install: stop installing
+    usr/share/dbus-1/services. See upstream commit
+    "keyboard: Remove input sources handling".
+  * Bump Breaks on gnome-shell to 3.13.92 because of the above.
+  * Upload to unstable.
+
+ -- Andreas Henriksson <andreas@fatal.se>  Mon, 22 Sep 2014 20:05:46 +0200
+
 gnome-settings-daemon (3.13.91-1) experimental; urgency=medium
 
   * New upstream development release.
