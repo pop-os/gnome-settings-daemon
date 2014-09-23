@@ -10,8 +10,10 @@ This reverts commit 58cb4eee64bbd8ca43111b1f80fdaacde8ad5f12.
  plugins/power/gsd-power-manager.c                  | 10 ++++++++++
  2 files changed, 32 insertions(+)
 
---- a/data/org.gnome.settings-daemon.plugins.power.gschema.xml.in.in
-+++ b/data/org.gnome.settings-daemon.plugins.power.gschema.xml.in.in
+Index: gnome-settings-daemon/data/org.gnome.settings-daemon.plugins.power.gschema.xml.in.in
+===================================================================
+--- gnome-settings-daemon.orig/data/org.gnome.settings-daemon.plugins.power.gschema.xml.in.in
++++ gnome-settings-daemon/data/org.gnome.settings-daemon.plugins.power.gschema.xml.in.in
 @@ -61,6 +61,28 @@
        <summary>Power button action</summary>
        <description>The action to take when the system power button is pressed.</description>
@@ -41,9 +43,11 @@ This reverts commit 58cb4eee64bbd8ca43111b1f80fdaacde8ad5f12.
      <key name="critical-battery-action" enum="org.gnome.settings-daemon.GsdPowerActionType">
        <default>'hibernate'</default>
        <summary>Battery critical low action</summary>
---- a/plugins/power/gsd-power-manager.c
-+++ b/plugins/power/gsd-power-manager.c
-@@ -207,6 +207,7 @@
+Index: gnome-settings-daemon/plugins/power/gsd-power-manager.c
+===================================================================
+--- gnome-settings-daemon.orig/plugins/power/gsd-power-manager.c
++++ gnome-settings-daemon/plugins/power/gsd-power-manager.c
+@@ -183,6 +183,7 @@ struct GsdPowerManagerPrivate
          GDBusProxy              *logind_proxy;
          gint                     inhibit_lid_switch_fd;
          gboolean                 inhibit_lid_switch_taken;
@@ -51,15 +55,15 @@ This reverts commit 58cb4eee64bbd8ca43111b1f80fdaacde8ad5f12.
          gint                     inhibit_suspend_fd;
          gboolean                 inhibit_suspend_taken;
          guint                    inhibit_lid_switch_timer_id;
-@@ -240,6 +241,7 @@
+@@ -215,6 +216,7 @@ static GIcon    *engine_get_icon (GsdPow
+ static gchar    *engine_get_summary (GsdPowerManager *manager);
  static gdouble   engine_get_percentage (GsdPowerManager *manager);
  static void      do_power_action_type (GsdPowerManager *manager, GsdPowerActionType action_type);
- static void      do_lid_closed_action (GsdPowerManager *manager);
 +static void      inhibit_lid_switch (GsdPowerManager *manager);
  static void      uninhibit_lid_switch (GsdPowerManager *manager);
+ static void      stop_inhibit_lid_switch_timer (GsdPowerManager *manager);
  static void      main_battery_or_ups_low_changed (GsdPowerManager *manager, gboolean is_low);
- static gboolean  idle_is_session_inhibited (GsdPowerManager *manager, guint mask, gboolean *is_inhibited);
-@@ -2141,6 +2143,9 @@
+@@ -2033,6 +2035,9 @@ suspend_on_lid_close (GsdPowerManager *m
  {
          GsdXrandrBootBehaviour val;
  
@@ -69,7 +73,7 @@ This reverts commit 58cb4eee64bbd8ca43111b1f80fdaacde8ad5f12.
          if (!external_monitor_is_connected (manager->priv->rr_screen))
                  return TRUE;
  
-@@ -2194,6 +2199,26 @@
+@@ -2092,6 +2097,26 @@ restart_inhibit_lid_switch_timer (GsdPow
  }
  
  static void
@@ -96,27 +100,16 @@ This reverts commit 58cb4eee64bbd8ca43111b1f80fdaacde8ad5f12.
  do_lid_open_action (GsdPowerManager *manager)
  {
          /* play a sound, using sounds from the naming spec */
-@@ -2259,6 +2284,10 @@
-                         lock_screensaver (manager);
-                 }
-         }
-+        else {
-+                if (manager->priv->inhibit_lid_switch_action)
-+                        lock_screensaver (manager);
-+        }
- }
- 
- static void
-@@ -2273,6 +2302,8 @@
-             main_battery_or_ups_low_changed (manager, FALSE);
-         }
+@@ -2172,6 +2197,8 @@ up_client_changed_cb (UpClient *client,
+         if (!manager->priv->lid_is_present)
+                 return;
  
 +        setup_lid_closed_action (manager);
 +
-         /* same state */
+         /* same lid state */
          tmp = up_client_get_lid_is_closed (manager->priv->up_client);
          if (manager->priv->lid_is_closed == tmp)
-@@ -3130,6 +3161,10 @@
+@@ -2962,6 +2989,10 @@ engine_settings_key_changed_cb (GSetting
                  idle_configure (manager);
                  return;
          }
@@ -127,15 +120,15 @@ This reverts commit 58cb4eee64bbd8ca43111b1f80fdaacde8ad5f12.
  }
  
  static void
-@@ -3539,6 +3574,7 @@
-         /* don't blank inside a VM */
-         manager->priv->is_virtual_machine = gsd_power_is_hardware_a_vm ();
+@@ -3348,6 +3379,7 @@ gsd_power_manager_start (GsdPowerManager
+         manager->priv->settings_bus = g_settings_new ("org.gnome.desktop.session");
+         manager->priv->settings_xrandr = g_settings_new (GSD_XRANDR_SETTINGS_SCHEMA);
  
 +        setup_lid_closed_action (manager);
          gnome_settings_profile_end (NULL);
          return TRUE;
  }
-@@ -3586,6 +3622,7 @@
+@@ -3385,6 +3417,7 @@ gsd_power_manager_stop (GsdPowerManager
                  close (manager->priv->inhibit_lid_switch_fd);
                  manager->priv->inhibit_lid_switch_fd = -1;
                  manager->priv->inhibit_lid_switch_taken = FALSE;
@@ -143,11 +136,11 @@ This reverts commit 58cb4eee64bbd8ca43111b1f80fdaacde8ad5f12.
          }
          if (manager->priv->inhibit_suspend_fd != -1) {
                  close (manager->priv->inhibit_suspend_fd);
-@@ -3622,6 +3659,7 @@
+@@ -3421,6 +3454,7 @@ gsd_power_manager_init (GsdPowerManager
          manager->priv = GSD_POWER_MANAGER_GET_PRIVATE (manager);
          manager->priv->inhibit_lid_switch_fd = -1;
          manager->priv->inhibit_suspend_fd = -1;
 +        manager->priv->inhibit_lid_switch_action = FALSE;
-         manager->priv->screensaver_cancellable = g_cancellable_new ();
          manager->priv->bus_cancellable = g_cancellable_new ();
  }
+ 

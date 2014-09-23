@@ -1,15 +1,15 @@
 --- a/plugins/keyboard/gsd-keyboard-manager.c
 +++ b/plugins/keyboard/gsd-keyboard-manager.c
-@@ -50,6 +50,8 @@
+@@ -47,6 +47,8 @@
  #include <ibus.h>
  #endif
  
 +#include <act/act.h>
 +
- #include "gnome-settings-session.h"
+ #include "gnome-settings-bus.h"
  #include "gnome-settings-profile.h"
  #include "gsd-keyboard-manager.h"
-@@ -969,6 +971,67 @@
+@@ -953,6 +955,67 @@
          g_free (rules_file_path);
  }
  
@@ -77,7 +77,7 @@
  static gboolean
  apply_input_sources_settings (GSettings          *settings,
                                gpointer            keys,
-@@ -984,11 +1047,20 @@
+@@ -968,11 +1031,20 @@
          gchar *layout = NULL;
          gchar *variant = NULL;
          gchar **options = NULL;
@@ -100,12 +100,12 @@
  
 --- a/configure.ac
 +++ b/configure.ac
-@@ -195,7 +195,7 @@
+@@ -200,7 +200,7 @@
  fi
  AM_CONDITIONAL(HAVE_IBUS, test "x$enable_ibus" == "xyes")
  
--PKG_CHECK_MODULES(KEYBOARD, xkbfile $IBUS_MODULE gnome-desktop-3.0 >= $GNOME_DESKTOP_REQUIRED_VERSION)
-+PKG_CHECK_MODULES(KEYBOARD, accountsservice xkbfile $IBUS_MODULE gnome-desktop-3.0 >= $GNOME_DESKTOP_REQUIRED_VERSION)
+-PKG_CHECK_MODULES(KEYBOARD, xkbfile xkeyboard-config $IBUS_MODULE gnome-desktop-3.0 >= $GNOME_DESKTOP_REQUIRED_VERSION)
++PKG_CHECK_MODULES(KEYBOARD, accountsservice xkbfile xkeyboard-config $IBUS_MODULE gnome-desktop-3.0 >= $GNOME_DESKTOP_REQUIRED_VERSION)
  
- dnl ---------------------------------------------------------------------------
- dnl - Housekeeping plugin stuff
+ XKB_BASE=$($PKG_CONFIG --variable xkb_base xkeyboard-config)
+ AC_SUBST(XKB_BASE)
