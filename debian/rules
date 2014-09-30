@@ -7,25 +7,28 @@ include /usr/share/cdbs/1/class/gnome.mk
 include /usr/share/gnome-pkg-tools/1/rules/uploaders.mk
 include /usr/share/gnome-pkg-tools/1/rules/gnome-get-source.mk
 
-LDFLAGS += -Wl,-O1 -Wl,-z,defs -Wl,--warn-unresolved-symbols -Wl,--as-needed
+DEB_DH_AUTORECONF_ARGS = --as-needed
 
-DEB_DH_MAKESHLIBS_ARGS_ALL += --no-act
-DEB_CONFIGURE_EXTRA_FLAGS = --enable-systemd --disable-packagekit --enable-ibus
+ifneq ($(DEB_HOST_ARCH_CPU),$(filter $(DEB_HOST_ARCH_CPU),ia64 mipsel))
+  LDFLAGS += -Wl,-z,defs
+endif
+LDFLAGS += -Wl,-O1 -Wl,--warn-unresolved-symbols -Wl,--as-needed
 
-build/gnome-settings-daemon::
-	gcc -o gnome-settings-daemon/gnome-update-wallpaper-cache debian/gnome-update-wallpaper-cache.c `pkg-config --cflags --libs glib-2.0 gdk-3.0 gdk-x11-3.0 gio-2.0 gnome-desktop-3.0`
-
+ifneq ($(DEB_HOST_ARCH_OS),linux)
+  DEB_CONFIGURE_EXTRA_FLAGS += --disable-rfkill
+else
 install/gnome-settings-daemon::
-	/usr/bin/install -c gnome-settings-daemon/gnome-update-wallpaper-cache 'debian/tmp/usr/lib/gnome-settings-daemon'
 	install -m 644 -D debian/gnome-settings-daemon.user-session.upstart debian/gnome-settings-daemon/usr/share/upstart/sessions/gnome-settings-daemon.conf
 	install -m 644 -D debian/gnome-settings-daemon.user-session.desktop debian/gnome-settings-daemon/usr/share/upstart/xdg/autostart/gnome-settings-daemon.desktop
+
+	dh_install -pgnome-settings-daemon --ignore=debian/gnome-settings-daemon.install \
+		debian/tmp/usr/lib/udev/rules.d/ lib/udev
+endif
+
+DEB_DH_MAKESHLIBS_ARGS_ALL += --no-act
 
 binary-install/gnome-settings-daemon::
 	find debian -name '*.a' -delete
 	find debian -name '*.la' -delete
 
 common-binary-post-install-arch:: list-missing
-
-clean::
-	rm -f gnome-settings-daemon/gnome-update-wallpaper-cache
-

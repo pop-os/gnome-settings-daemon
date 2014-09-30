@@ -1,3 +1,4 @@
+revert_power_310.patch
 05_disable_corner_tapping.patch
 43_disable_locale_settings.patch
 45_suppress-printer-may-not-be-connected-notification.patch
@@ -5,16 +6,9 @@
 64_restore_terminal_keyboard_shortcut_schema.patch
 correct_logout_action.patch
 migrate_metacity_keys.patch
-touchscreen_rotation.patch
 nexus-orientation.patch
-git_keybindings_add_screen_reader_toggle.patch
 ubuntu-lid-close-suspend.patch
-git_touchpad_scrolling.patch
-git_xsettings_segfaults.patch
-git_hidpi_scalling.patch
-git_new_screencast_keybinding.patch
-git_enable_auto_hidpi.patch
-git_micmute.patch
 ubuntu-force-lock-group.patch
 revert_background_dropping.patch
-git_lp1339244.patch
+revert-gsettings-removals.patch
+revert_media-keys_fix_battery_key.patch

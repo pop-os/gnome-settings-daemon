@@ -1,0 +1,112 @@
+From 2b112903b45497747bb196be80fa5eb49d18a562 Mon Sep 17 00:00:00 2001
+From: Tim Lunn <tim@feathertop.org>
+Date: Tue, 16 Sep 2014 12:18:59 +1000
+Subject: [PATCH] Revert "media-keys: Fix battery key handling"
+
+This reverts commit 79ce8533b0b7d406744fc5b1732fcc67ebc74b4f.
+---
+ configure.ac                                |  2 +-
+ plugins/media-keys/gsd-media-keys-manager.c | 34 ++++++++++-------------------
+ 2 files changed, 12 insertions(+), 24 deletions(-)
+
+diff --git a/configure.ac b/configure.ac
+index 501cb43..930e12f 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -208,7 +208,7 @@ dnl ---------------------------------------------------------------------------
+ dnl - media-keys plugin stuff
+ dnl ---------------------------------------------------------------------------
+ 
+-PKG_CHECK_MODULES(MEDIA_KEYS, [gio-unix-2.0 libpulse >= $PA_REQUIRED_VERSION $GUDEV_PKG libpulse-mainloop-glib >= $PA_REQUIRED_VERSION libcanberra-gtk3 upower-glib >= $UPOWER_REQUIRED_VERSION])
++PKG_CHECK_MODULES(MEDIA_KEYS, [gio-unix-2.0 libpulse >= $PA_REQUIRED_VERSION $GUDEV_PKG libpulse-mainloop-glib >= $PA_REQUIRED_VERSION libcanberra-gtk3])
+ PKG_CHECK_MODULES(GVC, [gobject-2.0 libpulse >= $PA_REQUIRED_VERSION libpulse-mainloop-glib >= $PA_REQUIRED_VERSION])
+ AM_CONDITIONAL(HAVE_INTROSPECTION, false)
+ 
+diff --git a/plugins/media-keys/gsd-media-keys-manager.c b/plugins/media-keys/gsd-media-keys-manager.c
+index 71eb16c..5e628f4 100644
+--- a/plugins/media-keys/gsd-media-keys-manager.c
++++ b/plugins/media-keys/gsd-media-keys-manager.c
+@@ -39,8 +39,6 @@
+ #include <gio/gdesktopappinfo.h>
+ #include <gio/gunixfdlist.h>
+ 
+-#include <libupower-glib/upower.h>
+-
+ #ifdef HAVE_GUDEV
+ #include <gudev/gudev.h>
+ #endif
+@@ -162,7 +160,6 @@ struct GsdMediaKeysManagerPrivate
+         GDBusProxy      *power_proxy;
+         GDBusProxy      *power_screen_proxy;
+         GDBusProxy      *power_keyboard_proxy;
+-        UpDevice        *composite_device;
+ 
+         /* Shell stuff */
+         GsdShell        *shell_proxy;
+@@ -1950,24 +1947,21 @@ do_brightness_action (GsdMediaKeysManager *manager,
+ static void
+ do_battery_action (GsdMediaKeysManager *manager)
+ {
+-        gdouble percentage;
+-        UpDeviceKind kind;
+-        gchar *icon_name;
++        GVariant *icon_var, *percentage;
++        char *label = NULL;
+ 
+-        g_return_if_fail (manager->priv->composite_device != NULL);
++        if (manager->priv->power_proxy == NULL)
++                return;
+ 
+-        g_object_get (manager->priv->composite_device,
+-                      "kind", &kind,
+-                      "icon-name", &icon_name,
+-                      "percentage", &percentage,
+-                      NULL);
++        icon_var = g_dbus_proxy_get_cached_property (manager->priv->power_proxy, "Icon");
++        percentage = g_dbus_proxy_get_cached_property (manager->priv->power_proxy, "Percentage");
+ 
+-        if (kind == UP_DEVICE_KIND_UPS || kind == UP_DEVICE_KIND_BATTERY) {
+-                g_debug ("showing battery level OSD");
+-                show_osd (manager, icon_name, NULL, percentage);
+-        }
++        if (g_variant_get_double (percentage) >= 0.0)
++                label = g_strdup_printf ("%d %%", (int) g_variant_get_double (percentage));
+ 
+-        g_free (icon_name);
++        show_osd (manager, g_variant_get_string (icon_var, NULL),
++                  label, g_variant_get_double (percentage));
++        g_free (label);
+ }
+ 
+ static void
+@@ -2488,7 +2482,6 @@ gsd_media_keys_manager_stop (GsdMediaKeysManager *manager)
+         g_clear_object (&priv->power_proxy);
+         g_clear_object (&priv->power_screen_proxy);
+         g_clear_object (&priv->power_keyboard_proxy);
+-        g_clear_object (&priv->composite_device);
+         g_clear_object (&priv->mpris_controller);
+         g_clear_object (&priv->screencast_proxy);
+ 
+@@ -2712,7 +2705,6 @@ on_bus_gotten (GObject             *source_object,
+ {
+         GDBusConnection *connection;
+         GError *error = NULL;
+-        UpClient *up_client;
+ 
+         if (manager->priv->bus_cancellable == NULL ||
+             g_cancellable_is_cancelled (manager->priv->bus_cancellable)) {
+@@ -2775,10 +2767,6 @@ on_bus_gotten (GObject             *source_object,
+                           NULL,
+                           (GAsyncReadyCallback) power_keyboard_ready_cb,
+                           manager);
+-
+-        up_client = up_client_new ();
+-        manager->priv->composite_device = up_client_get_display_device (up_client);
+-        g_object_unref (up_client);
+ }
+ 
+ static void
+-- 
+2.1.0
+
+
