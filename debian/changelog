@@ -1,3 +1,10 @@
+gnome-settings-daemon (3.12.2-1ubuntu2) utopic; urgency=medium
+
+  * debian/patches/geoclue-build-fixes.patch: disable build of new
+    datetime plugin since geoclue-2.0 is not currently in main.
+
+ -- Tim Lunn <tim@feathertop.org>  Wed, 01 Oct 2014 07:45:02 +1000
+
 gnome-settings-daemon (3.12.2-1ubuntu1) utopic; urgency=medium
 
   * New Upstream Release (LP: #1372346)

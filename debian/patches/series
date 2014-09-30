@@ -12,3 +12,4 @@ ubuntu-force-lock-group.patch
 revert_background_dropping.patch
 revert-gsettings-removals.patch
 revert_media-keys_fix_battery_key.patch
+geoclue-build-fixes.patch
