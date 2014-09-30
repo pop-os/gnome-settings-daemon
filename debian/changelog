@@ -1,4 +1,4 @@
-gnome-settings-daemon (3.12.2-1ubuntu1) UNRELEASED; urgency=medium
+gnome-settings-daemon (3.12.2-1ubuntu1) utopic; urgency=medium
 
   * New Upstream Release (LP: #1372346)
   * Merge with Debian, remaining changes:
@@ -31,7 +31,7 @@ gnome-settings-daemon (3.12.2-1ubuntu1) UNRELEASED; urgency=medium
     + debian/rules: install upstart scripts
   * Revert power plugin to 3.10 until we have new Upower
 
- -- Tim Lunn <tim@feathertop.org>  Sat, 13 Sep 2014 11:15:22 +1000
+ -- Tim Lunn <tim@feathertop.org>  Tue, 30 Sep 2014 14:36:27 +0200
 
 gnome-settings-daemon (3.12.2-1) unstable; urgency=medium
 
