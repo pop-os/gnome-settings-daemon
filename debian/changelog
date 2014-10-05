@@ -1,9 +1,12 @@
 gnome-settings-daemon (3.14.0-2) UNRELEASED; urgency=medium
 
   * Do not enable networkmanager support on !linux architectures
-  * debian/control.in: Add libnm-util-dev to the build-dependencies
+  * debian/control.in:
+    - Add libnm-util-dev to the build-dependencies
+    - Depends against libpam-systemd instead of plain systemd package, g-s-d
+      needs logind for several power related functionalities
 
- -- Laurent Bigonville <bigon@debian.org>  Sun, 05 Oct 2014 04:02:19 +0200
+ -- Laurent Bigonville <bigon@debian.org>  Sun, 05 Oct 2014 04:19:22 +0200
 
 gnome-settings-daemon (3.14.0-1) unstable; urgency=medium
 
