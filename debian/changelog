@@ -1,9 +1,9 @@
-gnome-settings-daemon (3.14.1-1) UNRELEASED; urgency=medium
+gnome-settings-daemon (3.14.1-1) unstable; urgency=medium
 
   * New upstream release.
   * debian/control.in: Bump Standards-Version to 3.9.6 (no further changes)
 
- -- Laurent Bigonville <bigon@debian.org>  Sat, 18 Oct 2014 09:37:09 +0200
+ -- Laurent Bigonville <bigon@debian.org>  Sat, 18 Oct 2014 09:47:37 +0200
 
 gnome-settings-daemon (3.14.0-2) unstable; urgency=medium
 
