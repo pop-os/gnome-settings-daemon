@@ -1,4 +1,3 @@
-revert_power_310.patch
 05_disable_corner_tapping.patch
 43_disable_locale_settings.patch
 45_suppress-printer-may-not-be-connected-notification.patch
