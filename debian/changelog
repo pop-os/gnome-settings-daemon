@@ -1,6 +1,7 @@
 gnome-settings-daemon (3.12.2-1ubuntu3) UNRELEASED; urgency=medium
 
   * Drop revert_power_310.patch and build against upower 0.99. (LP: #1330037)
+  * ubuntu-lid-close-suspend.patch: Unfuzz.
 
  -- Martin Pitt <martin.pitt@ubuntu.com>  Fri, 31 Oct 2014 11:06:47 +0100
 

@@ -47,7 +47,7 @@ Index: gnome-settings-daemon/plugins/power/gsd-power-manager.c
 ===================================================================
 --- gnome-settings-daemon.orig/plugins/power/gsd-power-manager.c
 +++ gnome-settings-daemon/plugins/power/gsd-power-manager.c
-@@ -183,6 +183,7 @@ struct GsdPowerManagerPrivate
+@@ -165,6 +165,7 @@ struct GsdPowerManagerPrivate
          GDBusProxy              *logind_proxy;
          gint                     inhibit_lid_switch_fd;
          gboolean                 inhibit_lid_switch_taken;
@@ -55,15 +55,15 @@ Index: gnome-settings-daemon/plugins/power/gsd-power-manager.c
          gint                     inhibit_suspend_fd;
          gboolean                 inhibit_suspend_taken;
          guint                    inhibit_lid_switch_timer_id;
-@@ -215,6 +216,7 @@ static GIcon    *engine_get_icon (GsdPow
- static gchar    *engine_get_summary (GsdPowerManager *manager);
- static gdouble   engine_get_percentage (GsdPowerManager *manager);
+@@ -193,6 +194,7 @@ static void     gsd_power_manager_init
+ 
+ static void      engine_device_warning_changed_cb (UpDevice *device, GParamSpec *pspec, GsdPowerManager *manager);
  static void      do_power_action_type (GsdPowerManager *manager, GsdPowerActionType action_type);
 +static void      inhibit_lid_switch (GsdPowerManager *manager);
  static void      uninhibit_lid_switch (GsdPowerManager *manager);
  static void      stop_inhibit_lid_switch_timer (GsdPowerManager *manager);
  static void      main_battery_or_ups_low_changed (GsdPowerManager *manager, gboolean is_low);
-@@ -2033,6 +2035,9 @@ suspend_on_lid_close (GsdPowerManager *m
+@@ -1085,6 +1087,9 @@ suspend_on_lid_close (GsdPowerManager *m
  {
          GsdXrandrBootBehaviour val;
  
@@ -73,7 +73,7 @@ Index: gnome-settings-daemon/plugins/power/gsd-power-manager.c
          if (!external_monitor_is_connected (manager->priv->rr_screen))
                  return TRUE;
  
-@@ -2092,6 +2097,26 @@ restart_inhibit_lid_switch_timer (GsdPow
+@@ -1144,6 +1149,26 @@ restart_inhibit_lid_switch_timer (GsdPow
  }
  
  static void
@@ -100,7 +100,7 @@ Index: gnome-settings-daemon/plugins/power/gsd-power-manager.c
  do_lid_open_action (GsdPowerManager *manager)
  {
          /* play a sound, using sounds from the naming spec */
-@@ -2172,6 +2197,8 @@ up_client_changed_cb (UpClient *client,
+@@ -1217,6 +1242,8 @@ lid_state_changed_cb (UpClient *client,
          if (!manager->priv->lid_is_present)
                  return;
  
@@ -109,7 +109,7 @@ Index: gnome-settings-daemon/plugins/power/gsd-power-manager.c
          /* same lid state */
          tmp = up_client_get_lid_is_closed (manager->priv->up_client);
          if (manager->priv->lid_is_closed == tmp)
-@@ -2962,6 +2989,10 @@ engine_settings_key_changed_cb (GSetting
+@@ -2022,6 +2049,10 @@ engine_settings_key_changed_cb (GSetting
                  idle_configure (manager);
                  return;
          }
@@ -120,7 +120,7 @@ Index: gnome-settings-daemon/plugins/power/gsd-power-manager.c
  }
  
  static void
-@@ -3348,6 +3379,7 @@ gsd_power_manager_start (GsdPowerManager
+@@ -2413,6 +2444,7 @@ gsd_power_manager_start (GsdPowerManager
          manager->priv->settings_bus = g_settings_new ("org.gnome.desktop.session");
          manager->priv->settings_xrandr = g_settings_new (GSD_XRANDR_SETTINGS_SCHEMA);
  
@@ -128,7 +128,7 @@ Index: gnome-settings-daemon/plugins/power/gsd-power-manager.c
          gnome_settings_profile_end (NULL);
          return TRUE;
  }
-@@ -3385,6 +3417,7 @@ gsd_power_manager_stop (GsdPowerManager
+@@ -2450,6 +2482,7 @@ gsd_power_manager_stop (GsdPowerManager
                  close (manager->priv->inhibit_lid_switch_fd);
                  manager->priv->inhibit_lid_switch_fd = -1;
                  manager->priv->inhibit_lid_switch_taken = FALSE;
@@ -136,7 +136,7 @@ Index: gnome-settings-daemon/plugins/power/gsd-power-manager.c
          }
          if (manager->priv->inhibit_suspend_fd != -1) {
                  close (manager->priv->inhibit_suspend_fd);
-@@ -3421,6 +3454,7 @@ gsd_power_manager_init (GsdPowerManager
+@@ -2483,6 +2516,7 @@ gsd_power_manager_init (GsdPowerManager
          manager->priv = GSD_POWER_MANAGER_GET_PRIVATE (manager);
          manager->priv->inhibit_lid_switch_fd = -1;
          manager->priv->inhibit_suspend_fd = -1;
