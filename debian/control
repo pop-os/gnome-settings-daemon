@@ -7,7 +7,7 @@ Section: gnome
 Priority: optional
 Maintainer: Ubuntu Desktop Team <ubuntu-desktop@lists.ubuntu.com>
 XSBC-Original-Maintainer: Debian GNOME Maintainers <pkg-gnome-maintainers@lists.alioth.debian.org>
-Uploaders: Andreas Henriksson <andreas@fatal.se>, Debian GNOME Maintainers <pkg-gnome-maintainers@lists.alioth.debian.org>, Emilio Pozuelo Monfort <pochu@debian.org>, Sjoerd Simons <sjoerd@debian.org>
+Uploaders: Andreas Henriksson <andreas@fatal.se>, Debian GNOME Maintainers <pkg-gnome-maintainers@lists.alioth.debian.org>, Emilio Pozuelo Monfort <pochu@debian.org>
 Build-Depends: cdbs,
                debhelper (>= 9),
                gnome-pkg-tools,
@@ -42,8 +42,8 @@ Build-Depends: cdbs,
                xserver-xorg-input-wacom [!hurd-any !kfreebsd-any !s390 !s390x],
                librsvg2-dev (>= 2.36.2),
                libgweather-3-dev (>= 3.9.5),
-               libgeocode-glib-dev (>= 3.10.0),
-               geoclue-2.0 (>= 2.1.2),
+#               libgeocode-glib-dev (>= 3.10.0),
+#               geoclue-2.0 (>= 2.1.2),
                xkb-data,
                libxkbfile-dev,
 Standards-Version: 3.9.5

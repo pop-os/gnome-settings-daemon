@@ -1,3 +1,10 @@
+gnome-settings-daemon (3.12.2-1ubuntu4) UNRELEASED; urgency=medium
+
+  * geoclue-2.0 build-deps were accidentally uncommented in the previous
+    upload - remove them again.
+
+ -- Iain Lane <iain@orangesquash.org.uk>  Sat, 01 Nov 2014 13:32:00 +0000
+
 gnome-settings-daemon (3.12.2-1ubuntu3) vivid; urgency=medium
 
   * Drop revert_power_310.patch and build against upower 0.99. (LP: #1330037)
