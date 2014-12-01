@@ -1,7 +1,7 @@
 Index: gnome-settings-daemon-3.14.2/configure.ac
 ===================================================================
---- gnome-settings-daemon-3.14.2.orig/configure.ac	2014-11-11 16:48:43.000000000 +0100
-+++ gnome-settings-daemon-3.14.2/configure.ac	2014-12-01 22:53:44.679039487 +0100
+--- gnome-settings-daemon-3.14.2.orig/configure.ac	2014-12-02 00:06:35.445485473 +0100
++++ gnome-settings-daemon-3.14.2/configure.ac	2014-12-02 00:06:35.437485592 +0100
 @@ -291,6 +291,33 @@ esac
  AM_CONDITIONAL(HAVE_WACOM, test x$have_wacom = xyes)
  
@@ -62,8 +62,8 @@ Index: gnome-settings-daemon-3.14.2/configure.ac
          Wacom support:            ${have_wacom}
 Index: gnome-settings-daemon-3.14.2/data/Makefile.am
 ===================================================================
---- gnome-settings-daemon-3.14.2.orig/data/Makefile.am	2014-09-22 18:02:18.000000000 +0200
-+++ gnome-settings-daemon-3.14.2/data/Makefile.am	2014-12-01 22:51:50.528739534 +0100
+--- gnome-settings-daemon-3.14.2.orig/data/Makefile.am	2014-12-02 00:06:35.445485473 +0100
++++ gnome-settings-daemon-3.14.2/data/Makefile.am	2014-12-02 00:06:35.437485592 +0100
 @@ -19,6 +19,7 @@ gsettings_SCHEMAS =							\
  	org.gnome.settings-daemon.plugins.housekeeping.gschema.xml	\
  	org.gnome.settings-daemon.plugins.print-notifications.gschema.xml	\
@@ -75,7 +75,7 @@ Index: gnome-settings-daemon-3.14.2/data/Makefile.am
 Index: gnome-settings-daemon-3.14.2/data/org.gnome.settings-daemon.plugins.updates.gschema.xml.in.in
 ===================================================================
 --- /dev/null	1970-01-01 00:00:00.000000000 +0000
-+++ gnome-settings-daemon-3.14.2/data/org.gnome.settings-daemon.plugins.updates.gschema.xml.in.in	2014-12-01 22:51:50.528739534 +0100
++++ gnome-settings-daemon-3.14.2/data/org.gnome.settings-daemon.plugins.updates.gschema.xml.in.in	2014-12-02 00:06:35.437485592 +0100
 @@ -0,0 +1,79 @@
 +<schemalist>
 +  <schema gettext-domain="@GETTEXT_PACKAGE@" id="org.gnome.settings-daemon.plugins.updates" path="/org/gnome/settings-daemon/plugins/updates/">
@@ -158,8 +158,8 @@ Index: gnome-settings-daemon-3.14.2/data/org.gnome.settings-daemon.plugins.updat
 +</schemalist>
 Index: gnome-settings-daemon-3.14.2/plugins/Makefile.am
 ===================================================================
---- gnome-settings-daemon-3.14.2.orig/plugins/Makefile.am	2014-09-22 18:02:18.000000000 +0200
-+++ gnome-settings-daemon-3.14.2/plugins/Makefile.am	2014-12-01 22:51:50.528739534 +0100
+--- gnome-settings-daemon-3.14.2.orig/plugins/Makefile.am	2014-12-02 00:06:35.445485473 +0100
++++ gnome-settings-daemon-3.14.2/plugins/Makefile.am	2014-12-02 00:06:35.437485592 +0100
 @@ -22,6 +22,12 @@ enabled_plugins =	\
  
  disabled_plugins = $(NULL)
@@ -176,7 +176,7 @@ Index: gnome-settings-daemon-3.14.2/plugins/Makefile.am
 Index: gnome-settings-daemon-3.14.2/plugins/updates/Makefile.am
 ===================================================================
 --- /dev/null	1970-01-01 00:00:00.000000000 +0000
-+++ gnome-settings-daemon-3.14.2/plugins/updates/Makefile.am	2014-12-01 22:51:50.528739534 +0100
++++ gnome-settings-daemon-3.14.2/plugins/updates/Makefile.am	2014-12-02 00:06:35.437485592 +0100
 @@ -0,0 +1,93 @@
 +plugin_name = updates
 +
@@ -274,7 +274,7 @@ Index: gnome-settings-daemon-3.14.2/plugins/updates/Makefile.am
 Index: gnome-settings-daemon-3.14.2/plugins/updates/gsd-updates-common.h
 ===================================================================
 --- /dev/null	1970-01-01 00:00:00.000000000 +0000
-+++ gnome-settings-daemon-3.14.2/plugins/updates/gsd-updates-common.h	2014-12-01 22:51:50.528739534 +0100
++++ gnome-settings-daemon-3.14.2/plugins/updates/gsd-updates-common.h	2014-12-02 00:06:35.437485592 +0100
 @@ -0,0 +1,44 @@
 +/* -*- Mode: C; tab-width: 8; indent-tabs-mode: nil; c-basic-offset: 8 -*-
 + *
@@ -323,7 +323,7 @@ Index: gnome-settings-daemon-3.14.2/plugins/updates/gsd-updates-common.h
 Index: gnome-settings-daemon-3.14.2/plugins/updates/gsd-updates-firmware.c
 ===================================================================
 --- /dev/null	1970-01-01 00:00:00.000000000 +0000
-+++ gnome-settings-daemon-3.14.2/plugins/updates/gsd-updates-firmware.c	2014-12-01 22:51:50.532739475 +0100
++++ gnome-settings-daemon-3.14.2/plugins/updates/gsd-updates-firmware.c	2014-12-02 00:06:35.437485592 +0100
 @@ -0,0 +1,1040 @@
 +/* -*- Mode: C; tab-width: 8; indent-tabs-mode: nil; c-basic-offset: 8 -*-
 + *
@@ -1368,7 +1368,7 @@ Index: gnome-settings-daemon-3.14.2/plugins/updates/gsd-updates-firmware.c
 Index: gnome-settings-daemon-3.14.2/plugins/updates/gsd-updates-firmware.h
 ===================================================================
 --- /dev/null	1970-01-01 00:00:00.000000000 +0000
-+++ gnome-settings-daemon-3.14.2/plugins/updates/gsd-updates-firmware.h	2014-12-01 22:51:50.532739475 +0100
++++ gnome-settings-daemon-3.14.2/plugins/updates/gsd-updates-firmware.h	2014-12-02 00:06:35.437485592 +0100
 @@ -0,0 +1,52 @@
 +/* -*- Mode: C; tab-width: 8; indent-tabs-mode: nil; c-basic-offset: 8 -*-
 + *
@@ -1425,7 +1425,7 @@ Index: gnome-settings-daemon-3.14.2/plugins/updates/gsd-updates-firmware.h
 Index: gnome-settings-daemon-3.14.2/plugins/updates/gsd-updates-manager.c
 ===================================================================
 --- /dev/null	1970-01-01 00:00:00.000000000 +0000
-+++ gnome-settings-daemon-3.14.2/plugins/updates/gsd-updates-manager.c	2014-12-01 22:51:50.532739475 +0100
++++ gnome-settings-daemon-3.14.2/plugins/updates/gsd-updates-manager.c	2014-12-02 00:06:35.441485533 +0100
 @@ -0,0 +1,1519 @@
 +/* -*- Mode: C; tab-width: 8; indent-tabs-mode: nil; c-basic-offset: 8 -*-
 + *
@@ -2949,7 +2949,7 @@ Index: gnome-settings-daemon-3.14.2/plugins/updates/gsd-updates-manager.c
 Index: gnome-settings-daemon-3.14.2/plugins/updates/gsd-updates-manager.h
 ===================================================================
 --- /dev/null	1970-01-01 00:00:00.000000000 +0000
-+++ gnome-settings-daemon-3.14.2/plugins/updates/gsd-updates-manager.h	2014-12-01 22:51:50.532739475 +0100
++++ gnome-settings-daemon-3.14.2/plugins/updates/gsd-updates-manager.h	2014-12-02 00:06:35.441485533 +0100
 @@ -0,0 +1,56 @@
 +/* -*- Mode: C; tab-width: 8; indent-tabs-mode: nil; c-basic-offset: 8 -*-
 + *
@@ -3010,7 +3010,7 @@ Index: gnome-settings-daemon-3.14.2/plugins/updates/gsd-updates-manager.h
 Index: gnome-settings-daemon-3.14.2/plugins/updates/gsd-updates-plugin.c
 ===================================================================
 --- /dev/null	1970-01-01 00:00:00.000000000 +0000
-+++ gnome-settings-daemon-3.14.2/plugins/updates/gsd-updates-plugin.c	2014-12-01 22:51:50.532739475 +0100
++++ gnome-settings-daemon-3.14.2/plugins/updates/gsd-updates-plugin.c	2014-12-02 00:06:35.441485533 +0100
 @@ -0,0 +1,28 @@
 +/* -*- Mode: C; tab-width: 8; indent-tabs-mode: nil; c-basic-offset: 8 -*-
 + *
@@ -3043,8 +3043,8 @@ Index: gnome-settings-daemon-3.14.2/plugins/updates/gsd-updates-plugin.c
 Index: gnome-settings-daemon-3.14.2/plugins/updates/gsd-updates-refresh.c
 ===================================================================
 --- /dev/null	1970-01-01 00:00:00.000000000 +0000
-+++ gnome-settings-daemon-3.14.2/plugins/updates/gsd-updates-refresh.c	2014-12-01 22:51:50.532739475 +0100
-@@ -0,0 +1,573 @@
++++ gnome-settings-daemon-3.14.2/plugins/updates/gsd-updates-refresh.c	2014-12-02 00:07:17.324863126 +0100
+@@ -0,0 +1,575 @@
 +/* -*- Mode: C; tab-width: 8; indent-tabs-mode: t; c-basic-offset: 8 -*-
 + *
 + * Copyright (C) 2007-2011 Richard Hughes <richard@hughsie.com>
@@ -3344,6 +3344,7 @@ Index: gnome-settings-daemon-3.14.2/plugins/updates/gsd-updates-refresh.c
 +        /* no point continuing if we have no network */
 +        if (!refresh->priv->network_active) {
 +                g_debug ("not when no network");
++                refresh->priv->timeout_id = 0;
 +                return FALSE;
 +        }
 +
@@ -3352,6 +3353,7 @@ Index: gnome-settings-daemon-3.14.2/plugins/updates/gsd-updates-refresh.c
 +                                      GSD_SETTINGS_UPDATE_BATTERY);
 +        if (!ret && refresh->priv->on_battery) {
 +                g_debug ("not when on battery");
++                refresh->priv->timeout_id = 0;
 +                return FALSE;
 +        }
 +
@@ -3621,7 +3623,7 @@ Index: gnome-settings-daemon-3.14.2/plugins/updates/gsd-updates-refresh.c
 Index: gnome-settings-daemon-3.14.2/plugins/updates/gsd-updates-refresh.h
 ===================================================================
 --- /dev/null	1970-01-01 00:00:00.000000000 +0000
-+++ gnome-settings-daemon-3.14.2/plugins/updates/gsd-updates-refresh.h	2014-12-01 22:51:50.532739475 +0100
++++ gnome-settings-daemon-3.14.2/plugins/updates/gsd-updates-refresh.h	2014-12-02 00:06:35.441485533 +0100
 @@ -0,0 +1,52 @@
 +/* -*- Mode: C; tab-width: 8; indent-tabs-mode: t; c-basic-offset: 8 -*-
 + *
@@ -3678,7 +3680,7 @@ Index: gnome-settings-daemon-3.14.2/plugins/updates/gsd-updates-refresh.h
 Index: gnome-settings-daemon-3.14.2/plugins/updates/test-updates.c
 ===================================================================
 --- /dev/null	1970-01-01 00:00:00.000000000 +0000
-+++ gnome-settings-daemon-3.14.2/plugins/updates/test-updates.c	2014-12-01 22:51:50.532739475 +0100
++++ gnome-settings-daemon-3.14.2/plugins/updates/test-updates.c	2014-12-02 00:06:35.441485533 +0100
 @@ -0,0 +1,7 @@
 +#define NEW gsd_updates_manager_new
 +#define START gsd_updates_manager_start
@@ -3690,7 +3692,7 @@ Index: gnome-settings-daemon-3.14.2/plugins/updates/test-updates.c
 Index: gnome-settings-daemon-3.14.2/plugins/updates/updates-design.svg
 ===================================================================
 --- /dev/null	1970-01-01 00:00:00.000000000 +0000
-+++ gnome-settings-daemon-3.14.2/plugins/updates/updates-design.svg	2014-12-01 22:51:50.532739475 +0100
++++ gnome-settings-daemon-3.14.2/plugins/updates/updates-design.svg	2014-12-02 00:06:35.441485533 +0100
 @@ -0,0 +1,765 @@
 +<?xml version="1.0" encoding="UTF-8" standalone="no"?>
 +<!-- Created with Inkscape (http://www.inkscape.org/) -->
@@ -4460,7 +4462,7 @@ Index: gnome-settings-daemon-3.14.2/plugins/updates/updates-design.svg
 Index: gnome-settings-daemon-3.14.2/plugins/updates/updates.gnome-settings-plugin.in
 ===================================================================
 --- /dev/null	1970-01-01 00:00:00.000000000 +0000
-+++ gnome-settings-daemon-3.14.2/plugins/updates/updates.gnome-settings-plugin.in	2014-12-01 22:51:50.532739475 +0100
++++ gnome-settings-daemon-3.14.2/plugins/updates/updates.gnome-settings-plugin.in	2014-12-02 00:06:35.441485533 +0100
 @@ -0,0 +1,9 @@
 +[GNOME Settings Plugin]
 +Module=updates
@@ -4473,8 +4475,8 @@ Index: gnome-settings-daemon-3.14.2/plugins/updates/updates.gnome-settings-plugi
 +Website=
 Index: gnome-settings-daemon-3.14.2/po/POTFILES.in
 ===================================================================
---- gnome-settings-daemon-3.14.2.orig/po/POTFILES.in	2014-09-22 18:02:20.000000000 +0200
-+++ gnome-settings-daemon-3.14.2/po/POTFILES.in	2014-12-01 22:56:28.592598330 +0100
+--- gnome-settings-daemon-3.14.2.orig/po/POTFILES.in	2014-12-02 00:06:35.445485473 +0100
++++ gnome-settings-daemon-3.14.2/po/POTFILES.in	2014-12-02 00:06:35.441485533 +0100
 @@ -13,6 +13,7 @@ data/org.gnome.settings-daemon.plugins.o
  data/org.gnome.settings-daemon.plugins.power.gschema.xml.in.in
  data/org.gnome.settings-daemon.plugins.print-notifications.gschema.xml.in.in
@@ -4495,8 +4497,8 @@ Index: gnome-settings-daemon-3.14.2/po/POTFILES.in
  plugins/wacom/gsd-wacom-key-shortcut-button.c
 Index: gnome-settings-daemon-3.14.2/po/POTFILES.skip
 ===================================================================
---- gnome-settings-daemon-3.14.2.orig/po/POTFILES.skip	2014-09-22 18:02:20.000000000 +0200
-+++ gnome-settings-daemon-3.14.2/po/POTFILES.skip	2014-12-01 22:56:47.692313881 +0100
+--- gnome-settings-daemon-3.14.2.orig/po/POTFILES.skip	2014-12-02 00:06:35.445485473 +0100
++++ gnome-settings-daemon-3.14.2/po/POTFILES.skip	2014-12-02 00:06:35.441485533 +0100
 @@ -19,6 +19,7 @@ data/org.gnome.settings-daemon.plugins.o
  data/org.gnome.settings-daemon.plugins.power.gschema.xml.in
  data/org.gnome.settings-daemon.plugins.print-notifications.gschema.xml.in
@@ -4507,8 +4509,8 @@ Index: gnome-settings-daemon-3.14.2/po/POTFILES.skip
  plugins/automount/gnome-fallback-mount-helper.desktop.in
 Index: gnome-settings-daemon-3.14.2/data/org.gnome.settings-daemon.plugins.gschema.xml.in.in
 ===================================================================
---- gnome-settings-daemon-3.14.2.orig/data/org.gnome.settings-daemon.plugins.gschema.xml.in.in	2014-12-01 22:58:10.203085061 +0100
-+++ gnome-settings-daemon-3.14.2/data/org.gnome.settings-daemon.plugins.gschema.xml.in.in	2014-12-01 22:58:01.223218797 +0100
+--- gnome-settings-daemon-3.14.2.orig/data/org.gnome.settings-daemon.plugins.gschema.xml.in.in	2014-12-02 00:06:35.445485473 +0100
++++ gnome-settings-daemon-3.14.2/data/org.gnome.settings-daemon.plugins.gschema.xml.in.in	2014-12-02 00:06:35.441485533 +0100
 @@ -27,6 +27,7 @@
      <child name="sharing" schema="org.gnome.settings-daemon.plugins.sharing"/>
      <child name="smartcard" schema="org.gnome.settings-daemon.plugins.smartcard"/>
