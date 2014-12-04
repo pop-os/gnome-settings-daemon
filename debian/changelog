@@ -1,4 +1,4 @@
-gnome-settings-daemon (3.14.2-2) UNRELEASED; urgency=medium
+gnome-settings-daemon (3.14.2-2) unstable; urgency=medium
 
   * 01_reinstate_updates_plugin.patch: reinstate the “updates” plugin, 
     since gnome-software is not in jessie and we need an update 
@@ -7,7 +7,7 @@ gnome-settings-daemon (3.14.2-2) UNRELEASED; urgency=medium
   * Reintroduce GNOME 3.12 translations.
   * Update packagekit-glib build-dependency.
 
- -- Josselin Mouette <joss@debian.org>  Mon, 01 Dec 2014 22:59:26 +0100
+ -- Josselin Mouette <joss@debian.org>  Thu, 04 Dec 2014 10:47:04 +0100
 
 gnome-settings-daemon (3.14.2-1) unstable; urgency=medium
 
