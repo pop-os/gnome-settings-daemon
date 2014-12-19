@@ -1,3 +1,6 @@
+01_reinstate_updates_plugin.patch
+04_superP.patch
+30_xrandr_dbus_init.patch
 05_disable_corner_tapping.patch
 43_disable_locale_settings.patch
 45_suppress-printer-may-not-be-connected-notification.patch
@@ -11,4 +14,3 @@ ubuntu-force-lock-group.patch
 revert_background_dropping.patch
 revert-gsettings-removals.patch
 revert_media-keys_fix_battery_key.patch
-geoclue-build-fixes.patch

@@ -1,3 +1,93 @@
+gnome-settings-daemon (3.14.2-2ubuntu1) vivid; urgency=low
+
+  * Merge with Debian, remaining changes: LP: #1399047
+    + Split out schemas into gnome-settings-daemon-schemas so 
+      unity-settings-daemon can use them 
+    + debian/patches:
+       - 05_disable_corner_tapping.patch:
+          Disable corner tapping when disabling tap to click
+       - 43_disable_locale_settings.patch:
+          Don't set locales after sourcing .profile
+       - 45_suppress-printer-may-not-be-connected-notification.patch
+       - 53_sync_input_sources_to_accountsservice.patch
+       - 64_restore_terminal_keyboard_shortcut_schema.patch
+       - correct_logout_action.patch
+          display the logout action on ctrl-alt-del (lp: #961501)
+       - migrate_metacity_keys.patch
+          Migrate screenshot/terminal keys from metacity gconf as well
+          (LP: #1058004)
+       - nexus-orientation.patch
+          Fix screen rotation on nexus7
+       - ubuntu-lid-close-suspend.patch
+          Reimplement support for setting lid close suspend actions
+       - ubuntu-force-lock-group.patch
+          Lock the XKB group when ISO_Next_Group is pressed (lp: #1318673)
+       - revert_background_dropping.patch
+          Keep gsettings keys background u-s-d needs them
+       - revert-gsettings-removals.patch
+          Revert gsettings keys that were dropped since 3.8, for u-s-d
+    + debian/gnome-settings-daemon.install: Install apport hook
+    + debian/rules: install upstart scripts
+  * We now have geoclue-2.0, so drop our revert
+  * Disable new sharing plugin this requires Network Manager 0.9.10
+
+ -- Jackson Doak <noskcaj@ubuntu.com>  Fri, 05 Dec 2014 04:09:34 +0000
+
+gnome-settings-daemon (3.14.2-2) unstable; urgency=medium
+
+  * 01_reinstate_updates_plugin.patch: reinstate the “updates” plugin, 
+    since gnome-software is not in jessie and we need an update 
+    mechanism.
+  * Use patch-translations.mk.
+  * Reintroduce GNOME 3.12 translations.
+  * Update packagekit-glib build-dependency.
+
+ -- Josselin Mouette <joss@debian.org>  Thu, 04 Dec 2014 10:47:04 +0100
+
+gnome-settings-daemon (3.14.2-1) unstable; urgency=medium
+
+  * New upstream translation and bugfix release.
+  * 30_xrandr_dbus_init.patch: patch from upstream git. Fixes a crash
+    due to a race condition in dbus initialization.
+
+ -- Josselin Mouette <joss@debian.org>  Sun, 30 Nov 2014 12:46:20 +0100
+
+gnome-settings-daemon (3.14.1-1) unstable; urgency=medium
+
+  * New upstream release.
+  * debian/control.in: Bump Standards-Version to 3.9.6 (no further changes)
+
+ -- Laurent Bigonville <bigon@debian.org>  Sat, 18 Oct 2014 09:47:37 +0200
+
+gnome-settings-daemon (3.14.0-2) unstable; urgency=medium
+
+  * Do not enable networkmanager support on !linux architectures
+  * debian/control.in:
+    - Add libnm-util-dev to the build-dependencies
+    - Depends against libpam-systemd instead of plain systemd package, g-s-d
+      needs logind for several power related functionalities
+
+ -- Laurent Bigonville <bigon@debian.org>  Sun, 05 Oct 2014 04:23:11 +0200
+
+gnome-settings-daemon (3.14.0-1) unstable; urgency=medium
+
+  * New upstream release.
+  * debian/gnome-settings-daemon.install: stop installing
+    usr/share/dbus-1/services. See upstream commit
+    "keyboard: Remove input sources handling".
+  * Bump Breaks on gnome-shell to 3.13.92 because of the above.
+  * Upload to unstable.
+
+ -- Andreas Henriksson <andreas@fatal.se>  Mon, 22 Sep 2014 20:05:46 +0200
+
+gnome-settings-daemon (3.13.91-1) experimental; urgency=medium
+
+  * New upstream development release.
+  * Update build-dependencies according to configure.ac changes:
+    - Add libnm-glib-dev (>= 0.9.9.1)
+
+ -- Andreas Henriksson <andreas@fatal.se>  Fri, 05 Sep 2014 15:00:51 -0700
+
 gnome-settings-daemon (3.12.2-1ubuntu4) vivid; urgency=medium
 
   * geoclue-2.0 build-deps were accidentally uncommented in the previous
@@ -572,6 +662,7 @@ gnome-settings-daemon (3.6.4-1) experimental; urgency=low
   * New upstream release
 
  -- Sjoerd Simons <sjoerd@debian.org>  Fri, 15 Feb 2013 22:12:34 +0100
+
 gnome-settings-daemon (3.6.4-0ubuntu19) saucy; urgency=low
 
   * Install the ibus dbus service (LP: #1194138)
@@ -1417,6 +1508,7 @@ gnome-settings-daemon (3.2.2-1) experimental; urgency=low
     otherwise the build will fail with unresolved symbol *errors*
 
  -- Sjoerd Simons <sjoerd@debian.org>  Sun, 13 Nov 2011 16:25:33 +0100
+
 gnome-settings-daemon (3.2.2-0ubuntu17) precise; urgency=low
 
   * debian/patches/disable_three_touch_tap.patch
@@ -1586,7 +1678,6 @@ gnome-settings-daemon (3.2.1-1) experimental; urgency=low
   * debian/control.in: Make the gsettings-desktop-schemas depend more precise
 
  -- Sjoerd Simons <sjoerd@debian.org>  Wed, 26 Oct 2011 14:01:21 +0200
-
 
 gnome-settings-daemon (3.2.1-0ubuntu3) oneiric-proposed; urgency=low
 
@@ -2069,34 +2160,15 @@ gnome-settings-daemon (3.0.2-1) experimental; urgency=low
   [ Guido Günther ]
   * Bump build-dependency on libgnome-desktop-3-dev (Closes: #622689)
 
-  [ Rodrigo Moya ]
-  * Rebase from Debian, remaining Ubuntu changes:
-  * debian/control:
-    - Build-depend on libnotify4-dev, not libnotify-dev
-    - Add Buil-depend on libappindicator3-dev
-    - Add Vcs-Bzr URL
-  * debian/gnome-settings-daemon.install:
-  * debian/gnome-settings-daemon.postinst:
-    - Keep autostart files in standard directories
-  * debian/gnome-update-wallpaper-cache.c:
-  * debian/rules:
-    - Add wallpaper cache updater program
-  * debian/patches/02_missing_libs.patch:
-    - Add missing X11 libraries to build dependencies
-  * debian/patches/05_disable_corner_tapping.patch:
-    - Disable corner tapping when disabling tap to click
-  * debian/patches/06_use_application_indicator.patch:
-    - Use application indicators
-  * debian/patches/16_use_synchronous_notifications.patch:
-    - Use synchronous notifications when they are supported
-  * debian/patches/17_react_when_streams_removed.patch:
-    - React to stream-removed signal from GvcMixerControl
-  * debian/patches/40_xres_lcddefault.patch:
-    - OpenOffice.org subpixel font rendering broken with new cairo
-  * debian/gnome-settings-daemon.gconf-defaults:
-    - Needs to be moved to GSettings
+  [ Josselin Mouette ]
+  * Break gdm3 < version with GSettings support.
+  * New upstream release.
+  * 01_numlock.patch: new patch. Work around the lack of support for 
+    per-host NumLock status by providing at least a global setting. It 
+    can turn wrong in multi-host environments, but it’s better than 
+    nothing in the general case.
 
- -- Rodrigo Moya <rodrigo.moya@canonical.com>  Wed, 04 May 2011 13:07:16 +0200
+ -- Josselin Mouette <joss@debian.org>  Sat, 04 Jun 2011 18:33:11 +0200
 
 gnome-settings-daemon (3.0.1-1ubuntu4) oneiric; urgency=low
 
@@ -2150,8 +2222,6 @@ gnome-settings-daemon (3.0.0.1-1ubuntu2) oneiric; urgency=low
     - Fix call to non existing API
 
  -- Rodrigo Moya <rodrigo.moya@canonical.com>  Mon, 09 May 2011 11:24:49 +0200
-
-gnome-settings-daemon (3.0.0.1-1ubuntu1) oneiric; urgency=low
 
 gnome-settings-daemon (3.0.0.1-1) experimental; urgency=low
 

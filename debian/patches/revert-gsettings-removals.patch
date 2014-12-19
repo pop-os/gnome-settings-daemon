@@ -10,10 +10,10 @@ Date: Sat, 13 Sep 2014 11:57:02 +1000
  plugins/power/gsd-power-manager.c                  | 32 +++++++++++++++++
  5 files changed, 94 insertions(+)
 
-diff --git a/data/org.gnome.settings-daemon.peripherals.wacom.gschema.xml.in.in b/data/org.gnome.settings-daemon.peripherals.wacom.gschema.xml.in.in
-index 5908fbc..d642c85 100644
---- a/data/org.gnome.settings-daemon.peripherals.wacom.gschema.xml.in.in
-+++ b/data/org.gnome.settings-daemon.peripherals.wacom.gschema.xml.in.in
+Index: gnome-settings-daemon/data/org.gnome.settings-daemon.peripherals.wacom.gschema.xml.in.in
+===================================================================
+--- gnome-settings-daemon.orig/data/org.gnome.settings-daemon.peripherals.wacom.gschema.xml.in.in
++++ gnome-settings-daemon/data/org.gnome.settings-daemon.peripherals.wacom.gschema.xml.in.in
 @@ -41,6 +41,11 @@
        <_summary>Wacom touch feature</_summary>
        <_description>Enable this to move the cursor when the user touches the tablet.</_description>
@@ -26,26 +26,22 @@ index 5908fbc..d642c85 100644
      <key name="last-calibrated-resolution" type="(ii)">
        <default>(-1, -1)</default>
        <_summary>Wacom last calibrated resolution</_summary>
-diff --git a/data/org.gnome.settings-daemon.plugins.gschema.xml.in.in b/data/org.gnome.settings-daemon.plugins.gschema.xml.in.in
-index 65682df..57a058d 100644
---- a/data/org.gnome.settings-daemon.plugins.gschema.xml.in.in
-+++ b/data/org.gnome.settings-daemon.plugins.gschema.xml.in.in
-@@ -23,6 +23,7 @@
+Index: gnome-settings-daemon/data/org.gnome.settings-daemon.plugins.gschema.xml.in.in
+===================================================================
+--- gnome-settings-daemon.orig/data/org.gnome.settings-daemon.plugins.gschema.xml.in.in
++++ gnome-settings-daemon/data/org.gnome.settings-daemon.plugins.gschema.xml.in.in
+@@ -24,6 +24,7 @@
      <child name="orientation" schema="org.gnome.settings-daemon.plugins.orientation"/>
      <child name="power" schema="org.gnome.settings-daemon.plugins.power"/>
      <child name="print-notifications" schema="org.gnome.settings-daemon.plugins.print-notifications"/>
 +    <child name="remote-display" schema="org.gnome.settings-daemon.plugins.remote-display"/>
      <child name="screensaver-proxy" schema="org.gnome.settings-daemon.plugins.screensaver-proxy"/>
+     <child name="sharing" schema="org.gnome.settings-daemon.plugins.sharing"/>
      <child name="smartcard" schema="org.gnome.settings-daemon.plugins.smartcard"/>
-     <child name="sound" schema="org.gnome.settings-daemon.plugins.sound"/>
-@@ -90,6 +91,18 @@
-       <_description>Priority to use for this plugin in gnome-settings-daemon startup queue</_description>
-     </key>
-   </schema>
-+  <schema gettext-domain="@GETTEXT_PACKAGE@" id="org.gnome.settings-daemon.plugins.remote-display" path="/org/gnome/settings-daemon/plugins/remote-display/">
-+    <key name="active" type="b">
-+      <default>true</default>
-+      <_summary>Activation of this plugin</_summary>
+@@ -95,6 +96,18 @@
+     <key name="active" type="b">
+       <default>true</default>
+       <_summary>Activation of this plugin</_summary>
 +      <_description>Whether this plugin would be activated by gnome-settings-daemon or not</_description>
 +    </key>
 +    <key name="priority" type="i">
@@ -54,14 +50,18 @@ index 65682df..57a058d 100644
 +      <_description>Priority to use for this plugin in gnome-settings-daemon startup queue</_description>
 +    </key>
 +  </schema>
-   <schema gettext-domain="@GETTEXT_PACKAGE@" id="org.gnome.settings-daemon.plugins.rfkill" path="/org/gnome/settings-daemon/plugins/rfkill/">
-     <key name="active" type="b">
-       <default>true</default>
-diff --git a/data/org.gnome.settings-daemon.plugins.power.gschema.xml.in.in b/data/org.gnome.settings-daemon.plugins.power.gschema.xml.in.in
-index 1fd60e7..8db3973 100644
---- a/data/org.gnome.settings-daemon.plugins.power.gschema.xml.in.in
-+++ b/data/org.gnome.settings-daemon.plugins.power.gschema.xml.in.in
-@@ -66,5 +66,45 @@
++  <schema gettext-domain="@GETTEXT_PACKAGE@" id="org.gnome.settings-daemon.plugins.remote-display" path="/org/gnome/settings-daemon/plugins/remote-display/">
++    <key name="active" type="b">
++      <default>true</default>
++      <_summary>Activation of this plugin</_summary>
+       <_description>Whether this plugin would be activated by gnome-settings-daemon or not</_description>
+     </key>
+     <key name="priority" type="i">
+Index: gnome-settings-daemon/data/org.gnome.settings-daemon.plugins.power.gschema.xml.in.in
+===================================================================
+--- gnome-settings-daemon.orig/data/org.gnome.settings-daemon.plugins.power.gschema.xml.in.in
++++ gnome-settings-daemon/data/org.gnome.settings-daemon.plugins.power.gschema.xml.in.in
+@@ -88,5 +88,45 @@
        <summary>Battery critical low action</summary>
        <description>The action to take when the battery is critically low.</description>
      </key>
@@ -107,7 +107,3 @@ index 1fd60e7..8db3973 100644
 +    </key>
    </schema>
  </schemalist>
--- 
-2.1.0
-
-

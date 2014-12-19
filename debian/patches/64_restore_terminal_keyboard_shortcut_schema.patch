@@ -1,6 +1,13 @@
+---
+ data/org.gnome.settings-daemon.plugins.media-keys.gschema.xml.in.in |    5 ++
+ plugins/media-keys/gsd-media-keys-manager.c                         |   19 ++++++++++
+ plugins/media-keys/media-keys.h                                     |    1 
+ plugins/media-keys/shortcuts-list.h                                 |    1 
+ 4 files changed, 26 insertions(+)
+
 --- a/data/org.gnome.settings-daemon.plugins.media-keys.gschema.xml.in.in
 +++ b/data/org.gnome.settings-daemon.plugins.media-keys.gschema.xml.in.in
-@@ -135,6 +135,11 @@
+@@ -145,6 +145,11 @@
        <_summary>Record a short video of the screen</_summary>
        <description>Binding to record a short video of the screen</description>
      </key>
@@ -14,7 +21,7 @@
        <_summary>Launch web browser</_summary>
 --- a/plugins/media-keys/gsd-media-keys-manager.c
 +++ b/plugins/media-keys/gsd-media-keys-manager.c
-@@ -979,6 +979,22 @@
+@@ -777,6 +777,22 @@ do_media_action (GsdMediaKeysManager *ma
  }
  
  static void
@@ -37,7 +44,7 @@
  gnome_session_shutdown (GsdMediaKeysManager *manager)
  {
  	GError *error = NULL;
-@@ -2319,6 +2335,9 @@
+@@ -2078,6 +2094,9 @@ do_action (GsdMediaKeysManager *manager,
          case SCREENCAST_KEY:
                  do_screencast_action (manager);
                  break;
@@ -49,7 +56,17 @@
                  break;
 --- a/plugins/media-keys/shortcuts-list.h
 +++ b/plugins/media-keys/shortcuts-list.h
-@@ -52,6 +52,7 @@
+@@ -70,6 +70,7 @@ static struct {
+         { WINDOW_SCREENSHOT_CLIP_KEY, "window-screenshot-clip", NULL, NULL, SHELL_KEYBINDING_MODE_NORMAL },
+         { AREA_SCREENSHOT_CLIP_KEY, "area-screenshot-clip", NULL, NULL, SHELL_KEYBINDING_MODE_ALL },
+         { SCREENCAST_KEY, "screencast", NULL, NULL, NO_LOCK_MODE },
++        { TERMINAL_KEY, "terminal", NULL, NULL, GSD_KEYBINDING_MODE_LAUNCHER },
+         { WWW_KEY, "www", NULL, NULL, GSD_KEYBINDING_MODE_LAUNCHER },
+         { PLAY_KEY, "play", NULL, NULL, SHELL_KEYBINDING_MODE_ALL },
+         { PAUSE_KEY, "pause", NULL, NULL, SHELL_KEYBINDING_MODE_ALL },
+--- a/plugins/media-keys/media-keys.h
++++ b/plugins/media-keys/media-keys.h
+@@ -47,6 +47,7 @@ typedef enum {
          WINDOW_SCREENSHOT_CLIP_KEY,
          AREA_SCREENSHOT_CLIP_KEY,
          SCREENCAST_KEY,
@@ -57,11 +74,3 @@
          WWW_KEY,
          PLAY_KEY,
          PAUSE_KEY,
-@@ -126,6 +127,7 @@
-         { WINDOW_SCREENSHOT_CLIP_KEY, "window-screenshot-clip", NULL, NULL, SHELL_KEYBINDING_MODE_NORMAL },
-         { AREA_SCREENSHOT_CLIP_KEY, "area-screenshot-clip", NULL, NULL, SHELL_KEYBINDING_MODE_ALL },
-         { SCREENCAST_KEY, "screencast", NULL, NULL, SHELL_KEYBINDING_MODE_ALL },
-+        { TERMINAL_KEY, "terminal", NULL, NULL, GSD_KEYBINDING_MODE_LAUNCHER },
-         { WWW_KEY, "www", NULL, NULL, GSD_KEYBINDING_MODE_LAUNCHER },
-         { PLAY_KEY, "play", NULL, NULL, SHELL_KEYBINDING_MODE_ALL },
-         { PAUSE_KEY, "pause", NULL, NULL, SHELL_KEYBINDING_MODE_ALL },
