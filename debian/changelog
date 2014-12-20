@@ -1,5 +1,6 @@
 gnome-settings-daemon (3.14.2-2ubuntu1) vivid; urgency=low
 
+  [ Jackson Doak ]
   * Merge with Debian, remaining changes: LP: #1399047
     + Split out schemas into gnome-settings-daemon-schemas so 
       unity-settings-daemon can use them 
@@ -30,6 +31,10 @@ gnome-settings-daemon (3.14.2-2ubuntu1) vivid; urgency=low
     + debian/rules: install upstart scripts
   * We now have geoclue-2.0, so drop our revert
   * Disable new sharing plugin this requires Network Manager 0.9.10
+
+  [ Tim Lunn ]
+  * Drop ubuntu-force-lock-group.patch, this completely breaks input switching  
+    and the bug that it fixes is no longer reproducible
 
  -- Jackson Doak <noskcaj@ubuntu.com>  Fri, 05 Dec 2014 04:09:34 +0000
 

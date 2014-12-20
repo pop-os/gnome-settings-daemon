@@ -10,7 +10,6 @@ correct_logout_action.patch
 migrate_metacity_keys.patch
 nexus-orientation.patch
 ubuntu-lid-close-suspend.patch
-ubuntu-force-lock-group.patch
 revert_background_dropping.patch
 revert-gsettings-removals.patch
 revert_media-keys_fix_battery_key.patch
