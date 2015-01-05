@@ -9,17 +9,18 @@ Author: Gunnar Hjalmarsson <ubuntu@gunnar.cc>
 * settings by editing ~/.profile.
 *
 
-Index: gnome-settings-daemon-3.12.2/gnome-settings-daemon/main.c
+Index: gnome-settings-daemon/gnome-settings-daemon/main.c
 ===================================================================
---- gnome-settings-daemon-3.12.2.orig/gnome-settings-daemon/main.c
-+++ gnome-settings-daemon-3.12.2/gnome-settings-daemon/main.c
-@@ -312,9 +312,6 @@ name_acquired_handler (GDBusConnection *
+--- gnome-settings-daemon.orig/gnome-settings-daemon/main.c
++++ gnome-settings-daemon/gnome-settings-daemon/main.c
+@@ -296,9 +296,7 @@ name_acquired_handler (GDBusConnection *
          GDBusProxy *proxy;
  
          proxy = G_DBUS_PROXY (gnome_settings_bus_get_session_proxy ());
 -        /* Always call this first, as Setenv can only be called before
 -           any client registers */
 -        set_locale (proxy);
- #ifdef HAVE_IBUS
++
          set_legacy_ibus_env_vars (proxy);
- #endif
+ 
+         start_settings_manager ();
