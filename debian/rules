@@ -9,7 +9,6 @@ include /usr/share/gnome-pkg-tools/1/rules/gnome-get-source.mk
 include /usr/share/gnome-pkg-tools/1/rules/patch-translations.mk
 
 DEB_DH_AUTORECONF_ARGS = --as-needed
-DEB_CONFIGURE_EXTRA_FLAGS += --disable-network-manager
 
 ifneq ($(DEB_HOST_ARCH_CPU),$(filter $(DEB_HOST_ARCH_CPU),ia64 mipsel))
   LDFLAGS += -Wl,-z,defs
