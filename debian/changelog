@@ -3,6 +3,9 @@ gnome-settings-daemon (3.16.2-1) UNRELEASED; urgency=medium
   * New upstream release.
   * debian/control.in:
     + Update (build-)dependencies.
+  * debian/patches/30_xrandr_dbus_init.patch,
+    debian/patches/power-make-sure-to-set-an-error-when-GDBus-set_prope.patch:
+    + Dropped, merged upstream.
 
  -- Emilio Pozuelo Monfort <pochu@debian.org>  Sat, 30 May 2015 22:31:54 +0200
 
