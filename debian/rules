@@ -6,6 +6,7 @@ include /usr/share/cdbs/1/rules/utils.mk
 include /usr/share/cdbs/1/class/gnome.mk
 include /usr/share/gnome-pkg-tools/1/rules/uploaders.mk
 include /usr/share/gnome-pkg-tools/1/rules/gnome-get-source.mk
+include /usr/share/gnome-pkg-tools/1/rules/patch-translations.mk
 
 DEB_DH_AUTORECONF_ARGS = --as-needed
 
@@ -15,7 +16,7 @@ endif
 LDFLAGS += -Wl,-O1 -Wl,--warn-unresolved-symbols -Wl,--as-needed
 
 ifneq ($(DEB_HOST_ARCH_OS),linux)
-  DEB_CONFIGURE_EXTRA_FLAGS += --disable-rfkill
+  DEB_CONFIGURE_EXTRA_FLAGS += --disable-rfkill --disable-network-manager
 else
 install/gnome-settings-daemon::
 	dh_install -pgnome-settings-daemon --ignore=debian/gnome-settings-daemon.install \
