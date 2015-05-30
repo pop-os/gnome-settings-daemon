@@ -6,6 +6,8 @@ gnome-settings-daemon (3.16.2-1) UNRELEASED; urgency=medium
   * debian/patches/30_xrandr_dbus_init.patch,
     debian/patches/power-make-sure-to-set-an-error-when-GDBus-set_prope.patch:
     + Dropped, merged upstream.
+  * debian/patches/04_superP.patch:
+    + Updated for the new version.
 
  -- Emilio Pozuelo Monfort <pochu@debian.org>  Sat, 30 May 2015 22:31:54 +0200
 
