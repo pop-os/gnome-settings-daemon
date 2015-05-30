@@ -1,4 +1,2 @@
 01_reinstate_updates_plugin.patch
-#04_superP.patch
-#30_xrandr_dbus_init.patch
-power-make-sure-to-set-an-error-when-GDBus-set_prope.patch
+04_superP.patch
