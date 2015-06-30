@@ -10,11 +10,11 @@ https://bugzilla.gnome.org/show_bug.cgi?id=686549
 
 Keep the schemas around since these are used by Unity-settings-daemon.
 ---
-Index: gnome-settings-daemon-3.7.90/data/gnome-settings-daemon.convert
+Index: gnome-settings-daemon-3.15.92/data/gnome-settings-daemon.convert
 ===================================================================
---- gnome-settings-daemon-3.7.90.orig/data/gnome-settings-daemon.convert	2013-02-23 13:52:19.012459246 -0500
-+++ gnome-settings-daemon-3.7.90/data/gnome-settings-daemon.convert	2013-02-23 13:52:19.000459246 -0500
-@@ -14,6 +14,10 @@
+--- gnome-settings-daemon-3.15.92.orig/data/gnome-settings-daemon.convert
++++ gnome-settings-daemon-3.15.92/data/gnome-settings-daemon.convert
+@@ -14,6 +14,10 @@ motion-threshold = /desktop/gnome/periph
  active = /apps/gnome_settings_daemon/plugins/a11y-keyboard/active
  priority = /apps/gnome_settings_daemon/plugins/a11y-keyboard/priority
  
@@ -25,10 +25,10 @@ Index: gnome-settings-daemon-3.7.90/data/gnome-settings-daemon.convert
  [org.gnome.settings-daemon.plugins.clipboard]
  active = /apps/gnome_settings_daemon/plugins/clipboard/active
  priority = /apps/gnome_settings_daemon/plugins/clipboard/priority
-Index: gnome-settings-daemon-3.7.90/data/org.gnome.settings-daemon.plugins.gschema.xml.in.in
+Index: gnome-settings-daemon-3.15.92/data/org.gnome.settings-daemon.plugins.gschema.xml.in.in
 ===================================================================
---- gnome-settings-daemon-3.7.90.orig/data/org.gnome.settings-daemon.plugins.gschema.xml.in.in	2013-02-23 13:52:19.012459246 -0500
-+++ gnome-settings-daemon-3.7.90/data/org.gnome.settings-daemon.plugins.gschema.xml.in.in	2013-02-23 13:52:19.000459246 -0500
+--- gnome-settings-daemon-3.15.92.orig/data/org.gnome.settings-daemon.plugins.gschema.xml.in.in
++++ gnome-settings-daemon-3.15.92/data/org.gnome.settings-daemon.plugins.gschema.xml.in.in
 @@ -11,6 +11,7 @@
      </key>
      <child name="a11y-keyboard" schema="org.gnome.settings-daemon.plugins.a11y-keyboard"/>
@@ -36,8 +36,8 @@ Index: gnome-settings-daemon-3.7.90/data/org.gnome.settings-daemon.plugins.gsche
 +    <child name="background" schema="org.gnome.settings-daemon.plugins.background"/>
      <child name="clipboard" schema="org.gnome.settings-daemon.plugins.clipboard"/>
      <child name="color" schema="org.gnome.settings-daemon.plugins.color"/>
-     <child name="cursor" schema="org.gnome.settings-daemon.plugins.cursor"/>
-@@ -54,6 +55,18 @@
+     <child name="datetime" schema="org.gnome.settings-daemon.plugins.datetime"/>
+@@ -53,6 +54,18 @@
        <_summary>Priority to use for this plugin</_summary>
        <_description>Priority to use for this plugin in gnome-settings-daemon startup queue</_description>
      </key>

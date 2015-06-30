@@ -1,3 +1,69 @@
+gnome-settings-daemon (3.16.2-3ubuntu1) wily; urgency=medium
+
+  * Merge with Debian, remaining changes (LP: #1468943):
+    + Split out schemas into gnome-settings-daemon-schemas so
+      unity-settings-daemon can use them
+    + debian/patches:
+       - 05_disable_corner_tapping.patch:
+          Disable corner tapping when disabling tap to click
+       - 43_disable_locale_settings.patch:
+          Don't set locales after sourcing .profile
+       - 45_suppress-printer-may-not-be-connected-notification.patch
+       - 53_sync_input_sources_to_accountsservice.patch
+       - 64_restore_terminal_keyboard_shortcut_schema.patch
+       - correct_logout_action.patch
+          display the logout action on ctrl-alt-del (lp: #961501)
+       - nexus-orientation.patch
+          Fix screen rotation on nexus7
+       - ubuntu-lid-close-suspend.patch
+          Reimplement support for setting lid close suspend actions
+       - revert_background_dropping.patch
+          Keep gsettings keys background u-s-d needs them
+       - revert-gsettings-removals.patch
+          Revert gsettings keys that were dropped since 3.8, for u-s-d
+    + debian/gnome-settings-daemon.install: Install apport hook
+    + debian/rules: install upstart scripts
+  * debian/rules: Dont link with "-Wl,-Bsymbolic-functions",
+    this was causing GType mismatches between plugins using
+    gsd-device-manager (LP: #1427877)
+  * debian/patches:
+    + migrate_metacity_keys.patch
+      - Dropped, these settings are long since obsolete
+    + revert_media-keys_fix_battery_key.patch
+      - not needed after upower 0.99
+
+  * debian/gnome-settings-daemon-schemas.gsettings-override: Dropped, these are
+    already the default settings
+
+ -- Tim Lunn <tim@feathertop.org>  Tue, 30 Jun 2015 09:32:56 +1000
+
+gnome-settings-daemon (3.16.2-3) wily; urgency=medium
+
+  * Upload to unstable.
+
+ -- Emilio Pozuelo Monfort <pochu@debian.org>  Sun, 14 Jun 2015 13:44:42 +0200
+
+gnome-settings-daemon (3.16.2-2) experimental; urgency=medium
+
+  * Bump Breaks: gnome-control-center to << 1:3.15.4 for the
+    peripherals related schema changes.
+
+ -- Andreas Henriksson <andreas@fatal.se>  Thu, 11 Jun 2015 16:00:15 +0200
+
+gnome-settings-daemon (3.16.2-1) experimental; urgency=medium
+
+  * New upstream release.
+  * debian/control.in:
+    + Update (build-)dependencies.
+  * debian/patches/30_xrandr_dbus_init.patch,
+    debian/patches/power-make-sure-to-set-an-error-when-GDBus-set_prope.patch:
+    + Dropped, merged upstream.
+  * debian/patches/04_superP.patch:
+    + Updated for the new version.
+  * Upload to experimental.
+
+ -- Emilio Pozuelo Monfort <pochu@debian.org>  Sun, 31 May 2015 00:06:31 +0200
+
 gnome-settings-daemon (3.14.2-3ubuntu1) vivid; urgency=low
 
   * Merge with Debian, remaining changes:

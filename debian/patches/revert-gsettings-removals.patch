@@ -10,10 +10,10 @@ Date: Sat, 13 Sep 2014 11:57:02 +1000
  plugins/power/gsd-power-manager.c                  | 32 +++++++++++++++++
  5 files changed, 94 insertions(+)
 
-Index: gnome-settings-daemon/data/org.gnome.settings-daemon.peripherals.wacom.gschema.xml.in.in
+Index: gnome-settings-daemon-3.16.2/data/org.gnome.settings-daemon.peripherals.wacom.gschema.xml.in.in
 ===================================================================
---- gnome-settings-daemon.orig/data/org.gnome.settings-daemon.peripherals.wacom.gschema.xml.in.in
-+++ gnome-settings-daemon/data/org.gnome.settings-daemon.peripherals.wacom.gschema.xml.in.in
+--- gnome-settings-daemon-3.16.2.orig/data/org.gnome.settings-daemon.peripherals.wacom.gschema.xml.in.in
++++ gnome-settings-daemon-3.16.2/data/org.gnome.settings-daemon.peripherals.wacom.gschema.xml.in.in
 @@ -41,6 +41,11 @@
        <_summary>Wacom touch feature</_summary>
        <_description>Enable this to move the cursor when the user touches the tablet.</_description>
@@ -23,14 +23,14 @@ Index: gnome-settings-daemon/data/org.gnome.settings-daemon.peripherals.wacom.gs
 +      <_summary>Wacom tablet PC feature</_summary>
 +      <_description>Enable this to only report stylus events when the tip is pressed.</_description>
 +    </key>
-     <key name="last-calibrated-resolution" type="(ii)">
-       <default>(-1, -1)</default>
-       <_summary>Wacom last calibrated resolution</_summary>
-Index: gnome-settings-daemon/data/org.gnome.settings-daemon.plugins.gschema.xml.in.in
+   </schema>
+   <schema gettext-domain="@GETTEXT_PACKAGE@" id="org.gnome.settings-daemon.peripherals.wacom.stylus">
+     <key name="pressurecurve" type="ai">
+Index: gnome-settings-daemon-3.16.2/data/org.gnome.settings-daemon.plugins.gschema.xml.in.in
 ===================================================================
---- gnome-settings-daemon.orig/data/org.gnome.settings-daemon.plugins.gschema.xml.in.in
-+++ gnome-settings-daemon/data/org.gnome.settings-daemon.plugins.gschema.xml.in.in
-@@ -24,6 +24,7 @@
+--- gnome-settings-daemon-3.16.2.orig/data/org.gnome.settings-daemon.plugins.gschema.xml.in.in
++++ gnome-settings-daemon-3.16.2/data/org.gnome.settings-daemon.plugins.gschema.xml.in.in
+@@ -23,6 +23,7 @@
      <child name="orientation" schema="org.gnome.settings-daemon.plugins.orientation"/>
      <child name="power" schema="org.gnome.settings-daemon.plugins.power"/>
      <child name="print-notifications" schema="org.gnome.settings-daemon.plugins.print-notifications"/>
@@ -57,10 +57,10 @@ Index: gnome-settings-daemon/data/org.gnome.settings-daemon.plugins.gschema.xml.
        <_description>Whether this plugin would be activated by gnome-settings-daemon or not</_description>
      </key>
      <key name="priority" type="i">
-Index: gnome-settings-daemon/data/org.gnome.settings-daemon.plugins.power.gschema.xml.in.in
+Index: gnome-settings-daemon-3.16.2/data/org.gnome.settings-daemon.plugins.power.gschema.xml.in.in
 ===================================================================
---- gnome-settings-daemon.orig/data/org.gnome.settings-daemon.plugins.power.gschema.xml.in.in
-+++ gnome-settings-daemon/data/org.gnome.settings-daemon.plugins.power.gschema.xml.in.in
+--- gnome-settings-daemon-3.16.2.orig/data/org.gnome.settings-daemon.plugins.power.gschema.xml.in.in
++++ gnome-settings-daemon-3.16.2/data/org.gnome.settings-daemon.plugins.power.gschema.xml.in.in
 @@ -88,5 +88,45 @@
        <summary>Battery critical low action</summary>
        <description>The action to take when the battery is critically low.</description>
