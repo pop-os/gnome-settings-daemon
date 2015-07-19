@@ -64,6 +64,12 @@ gnome-settings-daemon (3.16.2-1) experimental; urgency=medium
 
  -- Emilio Pozuelo Monfort <pochu@debian.org>  Sun, 31 May 2015 00:06:31 +0200
 
+gnome-settings-daemon (3.14.2-3ubuntu2) wily; urgency=medium
+
+  * debian/control.in: removed "Typing break" (LP: #991577).
+
+ -- Hans Chun <hanschun@gmail.com>  Fri, 03 Jul 2015 19:10:13 -0700
+
 gnome-settings-daemon (3.14.2-3ubuntu1) vivid; urgency=low
 
   * Merge with Debian, remaining changes:
