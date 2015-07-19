@@ -31,7 +31,7 @@ gnome-settings-daemon (3.16.2-3ubuntu1) wily; urgency=medium
       - Dropped, these settings are long since obsolete
     + revert_media-keys_fix_battery_key.patch
       - not needed after upower 0.99
-
+    + revert-gsettings-removals.patch: updated for keys removed in 3.16
   * debian/gnome-settings-daemon-schemas.gsettings-override: Dropped, these are
     already the default settings
 
