@@ -2,6 +2,13 @@ gnome-settings-daemon (3.16.3-1) UNRELEASED; urgency=medium
 
   * New upstream release.
   * Refresh patches.
+  * Remove Suggests on x11-xserver-utils. The xrdb plugin has been removed
+    upstream a long time ago.
+  * Remove Suggests on gnome-screensaver. Screen locking is nowadays done by
+    gnome-shell/gdm and gnome-settings-daemon no longer starts
+    gnome-screensaver directly.
+  * Remove Suggests on metacity | x-window-manager as gnome-settings-daemon no
+    longer starts a window manager directly.
 
  -- Michael Biebl <biebl@debian.org>  Wed, 22 Jul 2015 12:46:02 +0200
 
