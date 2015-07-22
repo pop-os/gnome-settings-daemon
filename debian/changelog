@@ -9,6 +9,7 @@ gnome-settings-daemon (3.16.3-1) UNRELEASED; urgency=medium
     gnome-screensaver directly.
   * Remove Suggests on metacity | x-window-manager as gnome-settings-daemon no
     longer starts a window manager directly.
+  * Remove obsolete Breaks from pre-wheezy.
 
  -- Michael Biebl <biebl@debian.org>  Wed, 22 Jul 2015 12:46:02 +0200
 
