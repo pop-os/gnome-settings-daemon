@@ -10,10 +10,10 @@ This reverts commit 58cb4eee64bbd8ca43111b1f80fdaacde8ad5f12.
  plugins/power/gsd-power-manager.c                  | 10 ++++++++++
  2 files changed, 32 insertions(+)
 
-Index: gnome-settings-daemon/data/org.gnome.settings-daemon.plugins.power.gschema.xml.in.in
+Index: gnome-settings-daemon-3.15.4/data/org.gnome.settings-daemon.plugins.power.gschema.xml.in.in
 ===================================================================
---- gnome-settings-daemon.orig/data/org.gnome.settings-daemon.plugins.power.gschema.xml.in.in
-+++ gnome-settings-daemon/data/org.gnome.settings-daemon.plugins.power.gschema.xml.in.in
+--- gnome-settings-daemon-3.15.4.orig/data/org.gnome.settings-daemon.plugins.power.gschema.xml.in.in
++++ gnome-settings-daemon-3.15.4/data/org.gnome.settings-daemon.plugins.power.gschema.xml.in.in
 @@ -61,6 +61,28 @@
        <summary>Power button action</summary>
        <description>The action to take when the system power button is pressed.</description>
@@ -43,11 +43,11 @@ Index: gnome-settings-daemon/data/org.gnome.settings-daemon.plugins.power.gschem
      <key name="critical-battery-action" enum="org.gnome.settings-daemon.GsdPowerActionType">
        <default>'hibernate'</default>
        <summary>Battery critical low action</summary>
-Index: gnome-settings-daemon/plugins/power/gsd-power-manager.c
+Index: gnome-settings-daemon-3.15.4/plugins/power/gsd-power-manager.c
 ===================================================================
---- gnome-settings-daemon.orig/plugins/power/gsd-power-manager.c
-+++ gnome-settings-daemon/plugins/power/gsd-power-manager.c
-@@ -160,6 +160,7 @@ struct GsdPowerManagerPrivate
+--- gnome-settings-daemon-3.15.4.orig/plugins/power/gsd-power-manager.c
++++ gnome-settings-daemon-3.15.4/plugins/power/gsd-power-manager.c
+@@ -164,6 +164,7 @@ struct GsdPowerManagerPrivate
          GDBusProxy              *logind_proxy;
          gint                     inhibit_lid_switch_fd;
          gboolean                 inhibit_lid_switch_taken;
@@ -55,7 +55,7 @@ Index: gnome-settings-daemon/plugins/power/gsd-power-manager.c
          gint                     inhibit_suspend_fd;
          gboolean                 inhibit_suspend_taken;
          guint                    inhibit_lid_switch_timer_id;
-@@ -188,6 +189,7 @@ static void     gsd_power_manager_init
+@@ -192,6 +193,7 @@ static void     gsd_power_manager_init
  
  static void      engine_device_warning_changed_cb (UpDevice *device, GParamSpec *pspec, GsdPowerManager *manager);
  static void      do_power_action_type (GsdPowerManager *manager, GsdPowerActionType action_type);
@@ -63,7 +63,7 @@ Index: gnome-settings-daemon/plugins/power/gsd-power-manager.c
  static void      uninhibit_lid_switch (GsdPowerManager *manager);
  static void      stop_inhibit_lid_switch_timer (GsdPowerManager *manager);
  static void      main_battery_or_ups_low_changed (GsdPowerManager *manager, gboolean is_low);
-@@ -1082,6 +1084,9 @@ suspend_on_lid_close (GsdPowerManager *m
+@@ -1146,6 +1148,9 @@ suspend_on_lid_close (GsdPowerManager *m
  {
          GsdXrandrBootBehaviour val;
  
@@ -73,7 +73,7 @@ Index: gnome-settings-daemon/plugins/power/gsd-power-manager.c
          if (!external_monitor_is_connected (manager->priv->rr_screen))
                  return TRUE;
  
-@@ -1141,6 +1146,26 @@ restart_inhibit_lid_switch_timer (GsdPow
+@@ -1205,6 +1210,26 @@ restart_inhibit_lid_switch_timer (GsdPow
  }
  
  static void
@@ -100,7 +100,7 @@ Index: gnome-settings-daemon/plugins/power/gsd-power-manager.c
  do_lid_open_action (GsdPowerManager *manager)
  {
          /* play a sound, using sounds from the naming spec */
-@@ -1214,6 +1239,8 @@ lid_state_changed_cb (UpClient *client,
+@@ -1278,6 +1303,8 @@ lid_state_changed_cb (UpClient *client,
          if (!manager->priv->lid_is_present)
                  return;
  
@@ -109,7 +109,7 @@ Index: gnome-settings-daemon/plugins/power/gsd-power-manager.c
          /* same lid state */
          tmp = up_client_get_lid_is_closed (manager->priv->up_client);
          if (manager->priv->lid_is_closed == tmp)
-@@ -2016,6 +2043,10 @@ engine_settings_key_changed_cb (GSetting
+@@ -2084,6 +2111,10 @@ engine_settings_key_changed_cb (GSetting
                  idle_configure (manager);
                  return;
          }
@@ -120,7 +120,7 @@ Index: gnome-settings-daemon/plugins/power/gsd-power-manager.c
  }
  
  static void
-@@ -2396,6 +2427,7 @@ gsd_power_manager_start (GsdPowerManager
+@@ -2464,6 +2495,7 @@ gsd_power_manager_start (GsdPowerManager
          manager->priv->settings_bus = g_settings_new ("org.gnome.desktop.session");
          manager->priv->settings_xrandr = g_settings_new (GSD_XRANDR_SETTINGS_SCHEMA);
  
@@ -128,7 +128,7 @@ Index: gnome-settings-daemon/plugins/power/gsd-power-manager.c
          gnome_settings_profile_end (NULL);
          return TRUE;
  }
-@@ -2433,6 +2465,7 @@ gsd_power_manager_stop (GsdPowerManager
+@@ -2504,6 +2536,7 @@ gsd_power_manager_stop (GsdPowerManager
                  close (manager->priv->inhibit_lid_switch_fd);
                  manager->priv->inhibit_lid_switch_fd = -1;
                  manager->priv->inhibit_lid_switch_taken = FALSE;
@@ -136,11 +136,11 @@ Index: gnome-settings-daemon/plugins/power/gsd-power-manager.c
          }
          if (manager->priv->inhibit_suspend_fd != -1) {
                  close (manager->priv->inhibit_suspend_fd);
-@@ -2467,6 +2500,7 @@ gsd_power_manager_init (GsdPowerManager
+@@ -2538,6 +2571,7 @@ gsd_power_manager_init (GsdPowerManager
          manager->priv = GSD_POWER_MANAGER_GET_PRIVATE (manager);
          manager->priv->inhibit_lid_switch_fd = -1;
          manager->priv->inhibit_suspend_fd = -1;
 +        manager->priv->inhibit_lid_switch_action = FALSE;
          manager->priv->bus_cancellable = g_cancellable_new ();
+         manager->priv->disabled_devices = g_hash_table_new (g_direct_hash, g_direct_equal);
  }
- 

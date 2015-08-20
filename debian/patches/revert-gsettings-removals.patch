@@ -10,11 +10,11 @@ Date: Sat, 13 Sep 2014 11:57:02 +1000
  plugins/power/gsd-power-manager.c                  | 32 +++++++++++++++++
  5 files changed, 94 insertions(+)
 
-Index: gnome-settings-daemon/data/org.gnome.settings-daemon.peripherals.wacom.gschema.xml.in.in
+Index: gnome-settings-daemon-3.16.2/data/org.gnome.settings-daemon.peripherals.wacom.gschema.xml.in.in
 ===================================================================
---- gnome-settings-daemon.orig/data/org.gnome.settings-daemon.peripherals.wacom.gschema.xml.in.in
-+++ gnome-settings-daemon/data/org.gnome.settings-daemon.peripherals.wacom.gschema.xml.in.in
-@@ -41,6 +41,11 @@
+--- gnome-settings-daemon-3.16.2.orig/data/org.gnome.settings-daemon.peripherals.wacom.gschema.xml.in.in
++++ gnome-settings-daemon-3.16.2/data/org.gnome.settings-daemon.peripherals.wacom.gschema.xml.in.in
+@@ -41,6 +41,16 @@
        <_summary>Wacom touch feature</_summary>
        <_description>Enable this to move the cursor when the user touches the tablet.</_description>
      </key>
@@ -23,14 +23,27 @@ Index: gnome-settings-daemon/data/org.gnome.settings-daemon.peripherals.wacom.gs
 +      <_summary>Wacom tablet PC feature</_summary>
 +      <_description>Enable this to only report stylus events when the tip is pressed.</_description>
 +    </key>
-     <key name="last-calibrated-resolution" type="(ii)">
-       <default>(-1, -1)</default>
-       <_summary>Wacom last calibrated resolution</_summary>
-Index: gnome-settings-daemon/data/org.gnome.settings-daemon.plugins.gschema.xml.in.in
++    <key name="display" type="as">
++      <default>["", "", ""]</default>
++      <_summary>Wacom display mapping</_summary>
++      <_description>EDID information of monitor to map tablet to. Must be in the format [vendor, product, serial]. ["","",""] disables mapping.</_description>
++    </key>
+   </schema>
+   <schema gettext-domain="@GETTEXT_PACKAGE@" id="org.gnome.settings-daemon.peripherals.wacom.stylus">
+     <key name="pressurecurve" type="ai">
+Index: gnome-settings-daemon-3.16.2/data/org.gnome.settings-daemon.plugins.gschema.xml.in.in
 ===================================================================
---- gnome-settings-daemon.orig/data/org.gnome.settings-daemon.plugins.gschema.xml.in.in
-+++ gnome-settings-daemon/data/org.gnome.settings-daemon.plugins.gschema.xml.in.in
-@@ -24,6 +24,7 @@
+--- gnome-settings-daemon-3.16.2.orig/data/org.gnome.settings-daemon.plugins.gschema.xml.in.in
++++ gnome-settings-daemon-3.16.2/data/org.gnome.settings-daemon.plugins.gschema.xml.in.in
+@@ -14,6 +14,7 @@
+     <child name="background" schema="org.gnome.settings-daemon.plugins.background"/>
+     <child name="clipboard" schema="org.gnome.settings-daemon.plugins.clipboard"/>
+     <child name="color" schema="org.gnome.settings-daemon.plugins.color"/>
++    <child name="cursor" schema="org.gnome.settings-daemon.plugins.cursor"/>
+     <child name="datetime" schema="org.gnome.settings-daemon.plugins.datetime"/>
+     <child name="gsdwacom" schema="org.gnome.settings-daemon.plugins.gsdwacom"/>
+     <child name="housekeeping" schema="org.gnome.settings-daemon.plugins.housekeeping"/>
+@@ -23,6 +24,7 @@
      <child name="orientation" schema="org.gnome.settings-daemon.plugins.orientation"/>
      <child name="power" schema="org.gnome.settings-daemon.plugins.power"/>
      <child name="print-notifications" schema="org.gnome.settings-daemon.plugins.print-notifications"/>
@@ -38,7 +51,26 @@ Index: gnome-settings-daemon/data/org.gnome.settings-daemon.plugins.gschema.xml.
      <child name="screensaver-proxy" schema="org.gnome.settings-daemon.plugins.screensaver-proxy"/>
      <child name="sharing" schema="org.gnome.settings-daemon.plugins.sharing"/>
      <child name="smartcard" schema="org.gnome.settings-daemon.plugins.smartcard"/>
-@@ -95,6 +96,18 @@
+@@ -79,6 +81,18 @@
+       <_description>Priority to use for this plugin in gnome-settings-daemon startup queue</_description>
+     </key>
+   </schema>
++  <schema gettext-domain="@GETTEXT_PACKAGE@" id="org.gnome.settings-daemon.plugins.cursor" path="/org/gnome/settings-daemon/plugins/cursor/">
++    <key name="active" type="b">
++      <default>true</default>
++      <_summary>Activation of this plugin</_summary>
++      <_description>Whether this plugin would be activated by gnome-settings-daemon or not</_description>
++    </key>
++    <key name="priority" type="i">
++      <default>0</default>
++      <_summary>Priority to use for this plugin</_summary>
++      <_description>Priority to use for this plugin in gnome-settings-daemon startup queue</_description>
++    </key>
++  </schema>
+   <schema gettext-domain="@GETTEXT_PACKAGE@" id="org.gnome.settings-daemon.plugins.mouse" path="/org/gnome/settings-daemon/plugins/mouse/">
+     <key name="active" type="b">
+       <default>true</default>
+@@ -95,6 +109,18 @@
      <key name="active" type="b">
        <default>true</default>
        <_summary>Activation of this plugin</_summary>
@@ -57,10 +89,10 @@ Index: gnome-settings-daemon/data/org.gnome.settings-daemon.plugins.gschema.xml.
        <_description>Whether this plugin would be activated by gnome-settings-daemon or not</_description>
      </key>
      <key name="priority" type="i">
-Index: gnome-settings-daemon/data/org.gnome.settings-daemon.plugins.power.gschema.xml.in.in
+Index: gnome-settings-daemon-3.16.2/data/org.gnome.settings-daemon.plugins.power.gschema.xml.in.in
 ===================================================================
---- gnome-settings-daemon.orig/data/org.gnome.settings-daemon.plugins.power.gschema.xml.in.in
-+++ gnome-settings-daemon/data/org.gnome.settings-daemon.plugins.power.gschema.xml.in.in
+--- gnome-settings-daemon-3.16.2.orig/data/org.gnome.settings-daemon.plugins.power.gschema.xml.in.in
++++ gnome-settings-daemon-3.16.2/data/org.gnome.settings-daemon.plugins.power.gschema.xml.in.in
 @@ -88,5 +88,45 @@
        <summary>Battery critical low action</summary>
        <description>The action to take when the battery is critically low.</description>

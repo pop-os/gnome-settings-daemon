@@ -10,6 +10,9 @@ include /usr/share/gnome-pkg-tools/1/rules/patch-translations.mk
 
 DEB_DH_AUTORECONF_ARGS = --as-needed
 
+export DEB_LDFLAGS_MAINT_STRIP=-Wl,-Bsymbolic-functions
+include /usr/share/dpkg/buildflags.mk
+
 ifneq ($(DEB_HOST_ARCH_CPU),$(filter $(DEB_HOST_ARCH_CPU),ia64 mipsel))
   LDFLAGS += -Wl,-z,defs
 endif
