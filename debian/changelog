@@ -1,3 +1,9 @@
+gnome-settings-daemon (3.17.90-1) UNRELEASED; urgency=medium
+
+  * New upstream beta release.
+
+ -- Andreas Henriksson <andreas@fatal.se>  Fri, 21 Aug 2015 20:25:22 +0200
+
 gnome-settings-daemon (3.16.3-1) unstable; urgency=medium
 
   * New upstream release.
