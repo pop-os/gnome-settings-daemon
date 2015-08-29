@@ -1,8 +1,10 @@
-gnome-settings-daemon (3.17.90-1) UNRELEASED; urgency=medium
+gnome-settings-daemon (3.17.90-1) experimental; urgency=medium
 
   * New upstream beta release.
+  * Add iio-sensor-proxy to recommends
+    - now used as source for ambient light and orientation information.
 
- -- Andreas Henriksson <andreas@fatal.se>  Fri, 21 Aug 2015 20:25:22 +0200
+ -- Andreas Henriksson <andreas@fatal.se>  Sat, 29 Aug 2015 12:03:48 +0200
 
 gnome-settings-daemon (3.16.3-1) unstable; urgency=medium
 
