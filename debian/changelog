@@ -1,3 +1,9 @@
+gnome-settings-daemon (3.17.92-1) experimental; urgency=medium
+
+  * New upstream release candidate.
+
+ -- Andreas Henriksson <andreas@fatal.se>  Thu, 17 Sep 2015 18:44:26 +0200
+
 gnome-settings-daemon (3.17.90-1) experimental; urgency=medium
 
   * New upstream beta release.
