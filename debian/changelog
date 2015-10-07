@@ -1,3 +1,9 @@
+gnome-settings-daemon (3.16.3-0ubuntu1) wily; urgency=medium
+
+  * New upstream stable release
+
+ -- Robert Ancell <robert.ancell@canonical.com>  Wed, 07 Oct 2015 14:59:26 +1300
+
 gnome-settings-daemon (3.16.2-3ubuntu1) wily; urgency=medium
 
   * Merge with Debian, remaining changes (LP: #1468943):
