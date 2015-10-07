@@ -47,7 +47,6 @@ Build-Depends: cdbs,
                libgeocode-glib-dev (>= 3.10.0),
                geoclue-2.0 (>= 2.1.2),
                xkb-data,
-#               libxkbfile-dev,
 Standards-Version: 3.9.6
 Vcs-Bzr: https://code.launchpad.net/~ubuntu-desktop/gnome-settings-daemon/ubuntu
 
@@ -82,7 +81,6 @@ Description: daemon handling the GNOME session settings
   * Cleanup of unused files
   * Mouse: cursors, speed, accessibility options
   * Startup of other daemons: screensaver, sound daemon
-  * Typing break
  .
  It also sets various application settings through X resources and
  freedesktop.org XSETTINGS.
@@ -100,7 +98,6 @@ Section: libdevel
 Architecture: any
 Depends: ${shlibs:Depends},
          ${misc:Depends},
-#         libdbus-glib-1-dev (>= 0.74),
          libglib2.0-dev (>= 2.35.3)
 Description: Headers for building applications communicating with gnome-settings-daemon
  This package contains header files required to build applications that
