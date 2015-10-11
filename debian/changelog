@@ -1,3 +1,9 @@
+gnome-settings-daemon (3.18.0-1) UNRELEASED; urgency=medium
+
+  * New upstream release.
+
+ -- Michael Biebl <biebl@debian.org>  Sun, 11 Oct 2015 20:01:21 +0200
+
 gnome-settings-daemon (3.17.92-1) experimental; urgency=medium
 
   * New upstream release candidate.
