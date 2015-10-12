@@ -1,6 +1,8 @@
 gnome-settings-daemon (3.18.0-1) UNRELEASED; urgency=medium
 
   * New upstream release.
+  * Drop debian/patches/01_reinstate_updates_plugin.patch, we have
+    gnome-software now which is responsible for the update notifications.
 
  -- Michael Biebl <biebl@debian.org>  Sun, 11 Oct 2015 20:01:21 +0200
 
