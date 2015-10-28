@@ -57,15 +57,9 @@ Depends: ${shlibs:Depends},
          gnome-settings-daemon-schemas (= ${source:Version}) 
 Recommends: ibus (>= 1.5.0),
             pulseaudio,
-Breaks: gnome-session (<< 2.24),
-        gnome-screensaver (<< 2.28.0),
-        gnome-color-manager (<< 3.0),
-        gnome-shell ( << 3.13.92),
-        gnome-control-center (<< 1:3.15.4),
-        gdm (<< 3.0)
-Suggests: x11-xserver-utils,
-          gnome-screensaver,
-          metacity | x-window-manager
+            iio-sensor-proxy
+Breaks: gnome-shell ( << 3.13.92),
+        gnome-control-center (<< 1:3.15.4)
 Description: daemon handling the GNOME session settings
  This package contains the daemon which is responsible for setting the
  various parameters of a GNOME session and the applications that run
@@ -94,7 +88,7 @@ Section: libdevel
 Architecture: any
 Depends: ${shlibs:Depends},
          ${misc:Depends},
-         libglib2.0-dev (>= 2.35.3)
+         libglib2.0-dev
 Description: Headers for building applications communicating with gnome-settings-daemon
  This package contains header files required to build applications that
  communicate with the GNOME settings daemon over D-Bus.

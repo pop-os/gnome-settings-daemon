@@ -1,3 +1,87 @@
+gnome-settings-daemon (3.18.1-1ubuntu1) xenial; urgency=medium
+
+  * Merge with Debian, remaining changes (LP: #1468943):
+    + Split out schemas into gnome-settings-daemon-schemas so
+      unity-settings-daemon can use them
+    + Provide upstart user-session
+    + debian/patches:
+       - 05_disable_corner_tapping.patch:
+          Disable corner tapping when disabling tap to click
+       - 43_disable_locale_settings.patch:
+          Don't set locales after sourcing .profile
+       - 45_suppress-printer-may-not-be-connected-notification.patch
+       - 53_sync_input_sources_to_accountsservice.patch
+       - 64_restore_terminal_keyboard_shortcut_schema.patch
+       - correct_logout_action.patch
+          display the logout action on ctrl-alt-del (lp: #961501)
+       - ubuntu-lid-close-suspend.patch
+          Reimplement support for setting lid close suspend actions
+       - revert_background_dropping.patch
+          Keep gsettings keys background u-s-d needs them
+       - revert-gsettings-removals.patch
+          Revert gsettings keys that were dropped since 3.8, for u-s-d
+       - 01_reinstate_updates_plugin.patch, keep this for now until we have
+         gnome-software now which is responsible for the update notifications.
+    + debian/gnome-settings-daemon.install: Install apport hook
+    + debian/rules: 
+      - install upstart scripts
+      - Dont link with "-Wl,-Bsymbolic-functions",
+        this was causing GType mismatches between plugins using
+        gsd-device-manager (LP: #1427877)
+  * debian/patches:
+    + revert-gsettings-removals.patch: updated for keys removed in 3.18
+    + nexus-orientation.patch: Dropped this will be handled by iio-sensor-proxy
+    + ubuntu-lid-close-suspend.patch: refreshed
+  * debian/gnome-settings-daemon-schemas.gsettings-override: Dropped, these are
+    already the default settings
+
+
+ -- Tim Lunn <tim@feathertop.org>  Wed, 28 Oct 2015 16:40:18 +1100
+
+gnome-settings-daemon (3.18.1-1) unstable; urgency=medium
+
+  * New upstream release.
+
+ -- Michael Biebl <biebl@debian.org>  Mon, 12 Oct 2015 17:51:38 +0200
+
+gnome-settings-daemon (3.18.0-1) unstable; urgency=medium
+
+  * New upstream release.
+  * Drop debian/patches/01_reinstate_updates_plugin.patch, we have
+    gnome-software now which is responsible for the update notifications.
+  * Upload to unstable.
+
+ -- Michael Biebl <biebl@debian.org>  Mon, 12 Oct 2015 11:54:56 +0200
+
+gnome-settings-daemon (3.17.92-1) experimental; urgency=medium
+
+  * New upstream release candidate.
+
+ -- Andreas Henriksson <andreas@fatal.se>  Thu, 17 Sep 2015 18:44:26 +0200
+
+gnome-settings-daemon (3.17.90-1) experimental; urgency=medium
+
+  * New upstream beta release.
+  * Add iio-sensor-proxy to recommends
+    - now used as source for ambient light and orientation information.
+
+ -- Andreas Henriksson <andreas@fatal.se>  Sat, 29 Aug 2015 12:03:48 +0200
+
+gnome-settings-daemon (3.16.3-1) unstable; urgency=medium
+
+  * New upstream release.
+  * Refresh patches.
+  * Remove Suggests on x11-xserver-utils. The xrdb plugin has been removed
+    upstream a long time ago.
+  * Remove Suggests on gnome-screensaver. Screen locking is nowadays done by
+    gnome-shell/gdm and gnome-settings-daemon no longer starts
+    gnome-screensaver directly.
+  * Remove Suggests on metacity | x-window-manager as gnome-settings-daemon no
+    longer starts a window manager directly.
+  * Remove obsolete Breaks from pre-wheezy.
+
+ -- Michael Biebl <biebl@debian.org>  Wed, 22 Jul 2015 14:04:05 +0200
+
 gnome-settings-daemon (3.16.3-0ubuntu1) wily; urgency=medium
 
   * New upstream stable release
@@ -43,7 +127,7 @@ gnome-settings-daemon (3.16.2-3ubuntu1) wily; urgency=medium
 
  -- Tim Lunn <tim@feathertop.org>  Tue, 30 Jun 2015 09:32:56 +1000
 
-gnome-settings-daemon (3.16.2-3) wily; urgency=medium
+gnome-settings-daemon (3.16.2-3) unstable; urgency=medium
 
   * Upload to unstable.
 
