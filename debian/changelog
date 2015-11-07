@@ -1,6 +1,6 @@
 gnome-settings-daemon (3.18.1-1ubuntu1) xenial; urgency=medium
 
-  * Merge with Debian, remaining changes (LP: #1468943):
+  * Merge with Debian, remaining changes (LP: #1512915):
     + Split out schemas into gnome-settings-daemon-schemas so
       unity-settings-daemon can use them
     + Provide upstart user-session
@@ -81,6 +81,12 @@ gnome-settings-daemon (3.16.3-1) unstable; urgency=medium
   * Remove obsolete Breaks from pre-wheezy.
 
  -- Michael Biebl <biebl@debian.org>  Wed, 22 Jul 2015 14:04:05 +0200
+
+gnome-settings-daemon (3.16.3-0ubuntu2) xenial; urgency=medium
+
+  * No-change rebuild against new gnome libraries
+
+ -- Iain Lane <iain@orangesquash.org.uk>  Mon, 02 Nov 2015 15:39:08 +0000
 
 gnome-settings-daemon (3.16.3-0ubuntu1) wily; urgency=medium
 
