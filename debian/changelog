@@ -1,3 +1,10 @@
+gnome-settings-daemon (3.18.2-0ubuntu1) xenial; urgency=medium
+
+  * New upstream release
+  * d/p/revert-gsettings-removals.patch: Refreshed
+
+ -- Tim Lunn <tim@feathertop.org>  Sat, 14 Nov 2015 10:39:26 +1100
+
 gnome-settings-daemon (3.18.1-1ubuntu1) xenial; urgency=medium
 
   * Merge with Debian, remaining changes (LP: #1512915):

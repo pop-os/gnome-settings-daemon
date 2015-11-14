@@ -10,10 +10,10 @@ Date: Sat, 13 Sep 2014 11:57:02 +1000
  plugins/power/gsd-power-manager.c                  | 32 +++++++++++++++++
  5 files changed, 94 insertions(+)
 
-Index: gnome-settings-daemon-3.17.92/data/org.gnome.settings-daemon.peripherals.wacom.gschema.xml.in.in
+Index: gnome-settings-daemon-3.18.2/data/org.gnome.settings-daemon.peripherals.wacom.gschema.xml.in.in
 ===================================================================
---- gnome-settings-daemon-3.17.92.orig/data/org.gnome.settings-daemon.peripherals.wacom.gschema.xml.in.in
-+++ gnome-settings-daemon-3.17.92/data/org.gnome.settings-daemon.peripherals.wacom.gschema.xml.in.in
+--- gnome-settings-daemon-3.18.2.orig/data/org.gnome.settings-daemon.peripherals.wacom.gschema.xml.in.in
++++ gnome-settings-daemon-3.18.2/data/org.gnome.settings-daemon.peripherals.wacom.gschema.xml.in.in
 @@ -41,6 +41,11 @@
        <_summary>Wacom touch feature</_summary>
        <_description>Enable this to move the cursor when the user touches the tablet.</_description>
@@ -26,10 +26,10 @@ Index: gnome-settings-daemon-3.17.92/data/org.gnome.settings-daemon.peripherals.
    </schema>
    <schema gettext-domain="@GETTEXT_PACKAGE@" id="org.gnome.settings-daemon.peripherals.wacom.stylus">
      <key name="pressurecurve" type="ai">
-Index: gnome-settings-daemon-3.17.92/data/org.gnome.settings-daemon.plugins.gschema.xml.in.in
+Index: gnome-settings-daemon-3.18.2/data/org.gnome.settings-daemon.plugins.gschema.xml.in.in
 ===================================================================
---- gnome-settings-daemon-3.17.92.orig/data/org.gnome.settings-daemon.plugins.gschema.xml.in.in
-+++ gnome-settings-daemon-3.17.92/data/org.gnome.settings-daemon.plugins.gschema.xml.in.in
+--- gnome-settings-daemon-3.18.2.orig/data/org.gnome.settings-daemon.plugins.gschema.xml.in.in
++++ gnome-settings-daemon-3.18.2/data/org.gnome.settings-daemon.plugins.gschema.xml.in.in
 @@ -23,6 +23,7 @@
      <child name="orientation" schema="org.gnome.settings-daemon.plugins.orientation"/>
      <child name="power" schema="org.gnome.settings-daemon.plugins.power"/>
@@ -57,14 +57,15 @@ Index: gnome-settings-daemon-3.17.92/data/org.gnome.settings-daemon.plugins.gsch
        <_description>Whether this plugin would be activated by gnome-settings-daemon or not</_description>
      </key>
      <key name="priority" type="i">
-Index: gnome-settings-daemon-3.17.92/data/org.gnome.settings-daemon.plugins.power.gschema.xml.in.in
+Index: gnome-settings-daemon-3.18.2/data/org.gnome.settings-daemon.plugins.power.gschema.xml.in.in
 ===================================================================
---- gnome-settings-daemon-3.17.92.orig/data/org.gnome.settings-daemon.plugins.power.gschema.xml.in.in
-+++ gnome-settings-daemon-3.17.92/data/org.gnome.settings-daemon.plugins.power.gschema.xml.in.in
-@@ -62,10 +62,76 @@
- 	key to False to keep the default behavior, or to True to suspend the laptop whenever the
- 	lid is closed and regardless of external monitors.</description>
+--- gnome-settings-daemon-3.18.2.orig/data/org.gnome.settings-daemon.plugins.power.gschema.xml.in.in
++++ gnome-settings-daemon-3.18.2/data/org.gnome.settings-daemon.plugins.power.gschema.xml.in.in
+@@ -72,5 +72,72 @@
+       <summary>Power button action</summary>
+       <description>The action to take when the system power button is pressed. This action is hard-coded (and the setting ignored) on virtual machines (power off) and tablets (suspend).</description>
      </key>
++    <!-- Obsolete keys still used by unity-settings-daemon -->
 +    <key name="button-suspend" enum="org.gnome.settings-daemon.GsdPowerActionType">
 +      <default>'suspend'</default>
 +      <summary>Suspend button action</summary>
@@ -91,11 +92,6 @@ Index: gnome-settings-daemon-3.17.92/data/org.gnome.settings-daemon.plugins.powe
 +      <summary>Battery critical low action</summary>
 +      <description>The action to take when the battery is critically low.</description>
 +    </key>
-     <key name="ambient-enabled" type="b">
-       <default>true</default>
-       <summary>Enable the ALS sensor</summary>
-       <description>If the ambient light sensor functionality is enabled.</description>
-     </key>
 +    <key name="percentage-low" type="i">
 +      <default>10</default>
 +      <_summary>Percentage considered low</_summary>
