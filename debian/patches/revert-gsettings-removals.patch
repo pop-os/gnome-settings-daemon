@@ -14,7 +14,7 @@ Index: gnome-settings-daemon-3.18.2/data/org.gnome.settings-daemon.peripherals.w
 ===================================================================
 --- gnome-settings-daemon-3.18.2.orig/data/org.gnome.settings-daemon.peripherals.wacom.gschema.xml.in.in
 +++ gnome-settings-daemon-3.18.2/data/org.gnome.settings-daemon.peripherals.wacom.gschema.xml.in.in
-@@ -41,6 +41,11 @@
+@@ -41,6 +41,16 @@
        <_summary>Wacom touch feature</_summary>
        <_description>Enable this to move the cursor when the user touches the tablet.</_description>
      </key>
@@ -22,6 +22,11 @@ Index: gnome-settings-daemon-3.18.2/data/org.gnome.settings-daemon.peripherals.w
 +      <default>false</default>
 +      <_summary>Wacom tablet PC feature</_summary>
 +      <_description>Enable this to only report stylus events when the tip is pressed.</_description>
++    </key>
++    <key name="display" type="as">
++      <default>["", "", ""]</default>
++      <_summary>Wacom display mapping</_summary>
++      <_description>EDID information of monitor to map tablet to. Must be in the format [vendor, product, serial]. ["","",""] disables mapping.</_description>
 +    </key>
    </schema>
    <schema gettext-domain="@GETTEXT_PACKAGE@" id="org.gnome.settings-daemon.peripherals.wacom.stylus">
