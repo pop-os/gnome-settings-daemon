@@ -1,10 +1,10 @@
-gnome-settings-daemon (3.18.2-0ubuntu3) UNRELEASED; urgency=medium
+gnome-settings-daemon (3.18.2-0ubuntu3) xenial; urgency=medium
 
   * debian/patches/revert-gsettings-removals.patch:
     - restore cursor plugin schemas as well, also dropped by error in 
       the 3.18 update it seems ... but still needed by u-s-d (lp: #1526181)
 
- -- Sebastien Bacher <seb128@ubuntu.com>  Tue, 15 Dec 2015 11:33:27 +0100
+ -- Sebastien Bacher <seb128@ubuntu.com>  Tue, 15 Dec 2015 11:34:02 +0100
 
 gnome-settings-daemon (3.18.2-0ubuntu2) xenial; urgency=medium
 
