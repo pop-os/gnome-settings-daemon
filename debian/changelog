@@ -1,3 +1,20 @@
+gnome-settings-daemon (3.19.92-1) experimental; urgency=medium
+
+  * New upstream release.
+  * Update build-dependencies according to configure.ac changes:
+    - Add libasound2-dev [linux-any] for alsa.pc check
+    - Replace libnm-glib-dev and libnm-util-dev with
+      libnm-dev (>= 1.0) [linux-any]
+    - Bump gsettings-desktop-schemas-dev (>= 3.19.3)
+    - Replace geoclue-2.0 with libgeoclue-2-dev (>= 2.3.1)
+  * Add --disable-alsa configure flag on non-linux.
+  * Bump Standards-Version to 3.9.7
+  * Stop ship input-devices-example.sh
+    (and usr/share/gnome-settings-daemon-* directory)
+    - upstream removed support for non-libinput mouse configurations
+
+ -- Andreas Henriksson <andreas@fatal.se>  Thu, 17 Mar 2016 12:24:55 +0100
+
 gnome-settings-daemon (3.18.2-1) unstable; urgency=medium
 
   * New upstream release.
