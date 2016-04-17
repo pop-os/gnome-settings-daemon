@@ -16,7 +16,8 @@ endif
 LDFLAGS += -Wl,-O1 -Wl,--warn-unresolved-symbols -Wl,--as-needed
 
 ifneq ($(DEB_HOST_ARCH_OS),linux)
-  DEB_CONFIGURE_EXTRA_FLAGS += --disable-rfkill --disable-network-manager
+  DEB_CONFIGURE_EXTRA_FLAGS += --disable-rfkill --disable-network-manager \
+				--disable-alsa
 else
 install/gnome-settings-daemon::
 	dh_install -pgnome-settings-daemon --ignore=debian/gnome-settings-daemon.install \

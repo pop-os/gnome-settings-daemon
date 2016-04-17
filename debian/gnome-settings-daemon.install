@@ -6,4 +6,3 @@ usr/share/gnome-settings-daemon
 usr/share/GConf
 usr/share/glib-2.0
 usr/share/polkit-1
-usr/share/gnome-settings-daemon-*/*
