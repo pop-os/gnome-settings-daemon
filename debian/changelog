@@ -1,4 +1,4 @@
-gnome-settings-daemon (3.20.1-2) UNRELEASED; urgency=medium
+gnome-settings-daemon (3.20.1-2) unstable; urgency=medium
 
   * debian/gnome-settings-daemon.install,
     debian/gnome-settings-daemon.maintscript: Move gnome-settings-daemon.desktop
@@ -7,7 +7,7 @@ gnome-settings-daemon (3.20.1-2) UNRELEASED; urgency=medium
   * debian/control.in: Bump gsettings-desktop-schemas (build-)dependency to
     3.20, gnome-settings-daemon needs the always-show-text-caret key
 
- -- Laurent Bigonville <bigon@debian.org>  Sat, 21 May 2016 20:31:44 +0200
+ -- Laurent Bigonville <bigon@debian.org>  Sat, 04 Jun 2016 23:09:35 +0200
 
 gnome-settings-daemon (3.20.1-1) unstable; urgency=medium
 
