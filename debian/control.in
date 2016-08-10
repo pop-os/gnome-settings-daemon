@@ -68,7 +68,6 @@ Description: daemon handling the GNOME session settings
   * Cleanup of unused files
   * Mouse: cursors, speed, accessibility options
   * Startup of other daemons: screensaver, sound daemon
-  * Typing break
  .
  It also sets various application settings through X resources and
  freedesktop.org XSETTINGS.
