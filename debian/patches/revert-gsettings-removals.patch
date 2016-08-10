@@ -10,10 +10,10 @@ Date: Sat, 13 Sep 2014 11:57:02 +1000
  plugins/power/gsd-power-manager.c                  | 32 +++++++++++++++++
  5 files changed, 94 insertions(+)
 
-Index: gnome-settings-daemon-3.18.2/data/org.gnome.settings-daemon.peripherals.wacom.gschema.xml.in.in
+Index: gnome-settings-daemon/data/org.gnome.settings-daemon.peripherals.wacom.gschema.xml.in.in
 ===================================================================
---- gnome-settings-daemon-3.18.2.orig/data/org.gnome.settings-daemon.peripherals.wacom.gschema.xml.in.in
-+++ gnome-settings-daemon-3.18.2/data/org.gnome.settings-daemon.peripherals.wacom.gschema.xml.in.in
+--- gnome-settings-daemon.orig/data/org.gnome.settings-daemon.peripherals.wacom.gschema.xml.in.in
++++ gnome-settings-daemon/data/org.gnome.settings-daemon.peripherals.wacom.gschema.xml.in.in
 @@ -41,6 +41,16 @@
        <_summary>Wacom touch feature</_summary>
        <_description>Enable this to move the cursor when the user touches the tablet.</_description>
@@ -31,10 +31,10 @@ Index: gnome-settings-daemon-3.18.2/data/org.gnome.settings-daemon.peripherals.w
    </schema>
    <schema gettext-domain="@GETTEXT_PACKAGE@" id="org.gnome.settings-daemon.peripherals.wacom.stylus">
      <key name="pressurecurve" type="ai">
-Index: gnome-settings-daemon-3.18.2/data/org.gnome.settings-daemon.plugins.gschema.xml.in.in
+Index: gnome-settings-daemon/data/org.gnome.settings-daemon.plugins.gschema.xml.in.in
 ===================================================================
---- gnome-settings-daemon-3.18.2.orig/data/org.gnome.settings-daemon.plugins.gschema.xml.in.in
-+++ gnome-settings-daemon-3.18.2/data/org.gnome.settings-daemon.plugins.gschema.xml.in.in
+--- gnome-settings-daemon.orig/data/org.gnome.settings-daemon.plugins.gschema.xml.in.in
++++ gnome-settings-daemon/data/org.gnome.settings-daemon.plugins.gschema.xml.in.in
 @@ -14,6 +14,7 @@
      <child name="background" schema="org.gnome.settings-daemon.plugins.background"/>
      <child name="clipboard" schema="org.gnome.settings-daemon.plugins.clipboard"/>
@@ -89,10 +89,10 @@ Index: gnome-settings-daemon-3.18.2/data/org.gnome.settings-daemon.plugins.gsche
        <_description>Whether this plugin would be activated by gnome-settings-daemon or not</_description>
      </key>
      <key name="priority" type="i">
-Index: gnome-settings-daemon-3.18.2/data/org.gnome.settings-daemon.plugins.power.gschema.xml.in.in
+Index: gnome-settings-daemon/data/org.gnome.settings-daemon.plugins.power.gschema.xml.in.in
 ===================================================================
---- gnome-settings-daemon-3.18.2.orig/data/org.gnome.settings-daemon.plugins.power.gschema.xml.in.in
-+++ gnome-settings-daemon-3.18.2/data/org.gnome.settings-daemon.plugins.power.gschema.xml.in.in
+--- gnome-settings-daemon.orig/data/org.gnome.settings-daemon.plugins.power.gschema.xml.in.in
++++ gnome-settings-daemon/data/org.gnome.settings-daemon.plugins.power.gschema.xml.in.in
 @@ -72,5 +72,72 @@
        <summary>Power button action</summary>
        <description>The action to take when the system power button is pressed. This action is hard-coded (and the setting ignored) on virtual machines (power off) and tablets (suspend).</description>
@@ -166,3 +166,29 @@ Index: gnome-settings-daemon-3.18.2/data/org.gnome.settings-daemon.plugins.power
 +    </key>
    </schema>
  </schemalist>
+Index: gnome-settings-daemon/data/org.gnome.settings-daemon.peripherals.gschema.xml.in.in
+===================================================================
+--- gnome-settings-daemon.orig/data/org.gnome.settings-daemon.peripherals.gschema.xml.in.in
++++ gnome-settings-daemon/data/org.gnome.settings-daemon.peripherals.gschema.xml.in.in
+@@ -4,6 +4,7 @@
+     <child name="keyboard" schema="org.gnome.settings-daemon.peripherals.keyboard"/>
+     <child name="mouse" schema="org.gnome.settings-daemon.peripherals.mouse"/>
+     <child name="touchscreen" schema="org.gnome.settings-daemon.peripherals.touchscreen"/>
++    <child name="input-devices" schema="org.gnome.settings-daemon.peripherals.input-devices"/>
+   </schema>
+   <schema gettext-domain="@GETTEXT_PACKAGE@" id="org.gnome.settings-daemon.peripherals.smartcard" path="/org/gnome/settings-daemon/peripherals/smartcard/">
+     <key name="removal-action" enum="org.gnome.settings-daemon.GsdSmartcardRemovalAction">
+@@ -67,6 +68,13 @@
+       <_summary>Whether the tablet's orientation is locked, or rotated automatically.</_summary>
+     </key>
+   </schema>
++  <schema gettext-domain="@GETTEXT_PACKAGE@" id="org.gnome.settings-daemon.peripherals.input-devices" path="/org/gnome/settings-daemon/peripherals/input-devices/">
++    <key name="hotplug-command" type="s">
++      <default>''</default>
++      <_summary>Device hotplug custom command</_summary>
++      <_description>Command to be run when a device is added or removed. An exit value of 1 means that the device will not be handled further by gnome-settings-daemon.</_description>
++    </key>
++  </schema>
+ 
+   <!-- Deprecated schemas/keys -->
+   <schema id="org.gnome.settings-daemon.peripherals.mouse.deprecated">
