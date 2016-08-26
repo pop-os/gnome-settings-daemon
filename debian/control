@@ -6,7 +6,7 @@ Source: gnome-settings-daemon
 Section: gnome
 Priority: optional
 Maintainer: Debian GNOME Maintainers <pkg-gnome-maintainers@lists.alioth.debian.org>
-Uploaders: Andreas Henriksson <andreas@fatal.se>, Emilio Pozuelo Monfort <pochu@debian.org>, Michael Biebl <biebl@debian.org>
+Uploaders: Andreas Henriksson <andreas@fatal.se>, Laurent Bigonville <bigon@debian.org>, Michael Biebl <biebl@debian.org>
 Build-Depends: cdbs,
                debhelper (>= 9),
                gnome-pkg-tools,
@@ -55,7 +55,7 @@ Pre-Depends: ${misc:Pre-Depends}
 Depends: ${shlibs:Depends},
          ${misc:Depends},
          libpam-systemd [!hurd-any !kfreebsd-any],
-         gsettings-desktop-schemas (>= 3.16),
+         gsettings-desktop-schemas (>= 3.19.3),
          nautilus-data (>= 2.91.3-1)
 Recommends: pulseaudio,
             iio-sensor-proxy
@@ -72,7 +72,6 @@ Description: daemon handling the GNOME session settings
   * Cleanup of unused files
   * Mouse: cursors, speed, accessibility options
   * Startup of other daemons: screensaver, sound daemon
-  * Typing break
  .
  It also sets various application settings through X resources and
  freedesktop.org XSETTINGS.
