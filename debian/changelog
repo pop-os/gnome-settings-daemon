@@ -1,3 +1,31 @@
+gnome-settings-daemon (3.20.1-3) UNRELEASED; urgency=medium
+
+  * Team upload.
+  * debian/control.in:
+    - Remove obsolete "typing break" from description
+
+ -- Jeremy Bicha <jbicha@ubuntu.com>  Tue, 09 Aug 2016 23:03:44 -0400
+
+gnome-settings-daemon (3.20.1-2) unstable; urgency=medium
+
+  * debian/gnome-settings-daemon.install,
+    debian/gnome-settings-daemon.maintscript: Move gnome-settings-daemon.desktop
+    back to etc/xdg/autostart. We are trying to remove the non-standard
+    /usr/share/gnome/autostart/ path.
+  * debian/control.in: Bump gsettings-desktop-schemas (build-)dependency to
+    3.20, gnome-settings-daemon needs the always-show-text-caret key
+
+ -- Laurent Bigonville <bigon@debian.org>  Sat, 04 Jun 2016 23:09:35 +0200
+
+gnome-settings-daemon (3.20.1-1) unstable; urgency=medium
+
+  * New upstream release.
+  * Bump Depends on gsettings-desktop-schemas to (>= 3.19.3) for the mouse
+    plugin changes.
+  * Upload to unstable.
+
+ -- Michael Biebl <biebl@debian.org>  Sun, 17 Apr 2016 23:20:38 +0200
+
 gnome-settings-daemon (3.20.0-1) experimental; urgency=medium
 
   * New upstream release.
