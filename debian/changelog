@@ -1,4 +1,4 @@
-gnome-settings-daemon (3.21.90-2) UNRELEASED; urgency=medium
+gnome-settings-daemon (3.21.90-2) unstable; urgency=medium
 
   * Drop translations for strings introduced by
     debian/patches/01_reinstate_updates_plugin.patch, this patch has been
@@ -9,8 +9,9 @@ gnome-settings-daemon (3.21.90-2) UNRELEASED; urgency=medium
   * Convert from cdbs to dh.
   * Use dh-exec to install architecture specific files and switch from
     --list-missing to --fail-missing, to avoid missing uninstalled files.
+  * Upload to unstable.
 
- -- Michael Biebl <biebl@debian.org>  Wed, 31 Aug 2016 23:48:57 +0200
+ -- Michael Biebl <biebl@debian.org>  Thu, 01 Sep 2016 01:03:20 +0200
 
 gnome-settings-daemon (3.21.90-1) experimental; urgency=medium
 
