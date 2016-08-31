@@ -5,6 +5,7 @@ gnome-settings-daemon (3.21.90-2) UNRELEASED; urgency=medium
     removed a while ago.
   * Install man page provided by upstream and remove the outdated one we
     shipped downstream.
+  * Drop conffile removal code from pre-wheezy.
 
  -- Michael Biebl <biebl@debian.org>  Wed, 31 Aug 2016 23:48:57 +0200
 
