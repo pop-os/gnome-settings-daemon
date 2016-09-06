@@ -8,11 +8,11 @@ Priority: optional
 Maintainer: Ubuntu Desktop Team <ubuntu-desktop@lists.ubuntu.com>
 XSBC-Original-Maintainer: Debian GNOME Maintainers <pkg-gnome-maintainers@lists.alioth.debian.org>
 Uploaders: Andreas Henriksson <andreas@fatal.se>, Laurent Bigonville <bigon@debian.org>, Michael Biebl <biebl@debian.org>
-Build-Depends: cdbs,
-               debhelper (>= 9),
+Build-Depends: debhelper (>= 9),
                gnome-pkg-tools,
                gtk-doc-tools,
                dh-autoreconf,
+               dh-exec,
                autotools-dev,
                intltool (>= 0.37.1),
                libaccountsservice-dev (>= 0.6.34),
@@ -28,7 +28,7 @@ Build-Depends: cdbs,
                libxext-dev,
                libx11-dev,
                libibus-1.0-dev (>= 1.5.2),
-               gsettings-desktop-schemas-dev (>= 3.19.3),
+               gsettings-desktop-schemas-dev (>= 3.20),
                libgnome-desktop-3-dev (>= 3.11.1),
                libpulse-dev (>= 2.0),
                libcanberra-gtk3-dev,
@@ -47,7 +47,7 @@ Build-Depends: cdbs,
                libgeocode-glib-dev (>= 3.10.0),
                libgeoclue-2-dev (>= 2.3.1),
                xkb-data
-Standards-Version: 3.9.7
+Standards-Version: 3.9.8
 Vcs-Bzr: https://code.launchpad.net/~ubuntu-desktop/gnome-settings-daemon/ubuntu
 
 Package: gnome-settings-daemon

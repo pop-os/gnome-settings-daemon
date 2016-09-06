@@ -1,13 +1,12 @@
-gnome-settings-daemon (3.20.1-2ubuntu1) yakkety; urgency=medium
+gnome-settings-daemon (3.21.90-2ubuntu1) yakkety; urgency=medium
 
-  [ Jeremy Bicha ]
   * Merge with Debian (LP: #1611194). Remaining changes:
     + Split out schemas into gnome-settings-daemon-schemas so
       unity-settings-daemon can use them
     + Provide upstart user-session
     + debian/control.in:
       - Build-depend on accountsservice
-      - Drop "typing break" from description
+      - Bump breaks/replaces for moving files to the -schemas pkg
     + debian/patches:
        - 05_disable_corner_tapping.patch:
           Disable corner tapping when disabling tap to click
@@ -24,33 +23,44 @@ gnome-settings-daemon (3.20.1-2ubuntu1) yakkety; urgency=medium
           Keep gsettings keys background u-s-d needs them
        - revert-gsettings-removals.patch
           Revert gsettings keys that were dropped since 3.8, for u-s-d
-    + debian/gnome-settings-daemon.install: Install apport hook
+    + debian/gnome-settings-daemon.install:
+      - Install apport hook and upstart scripts
+    + debian/gnome-settings-daemon-schemas.install:
+      - Install schemas, translations and the rfkill rule
+    + Don't install gnome-settings-daemon.gsettings-override
     + debian/rules: 
-      - install upstart scripts
       - Dont link with "-Wl,-Bsymbolic-functions",
         this was causing GType mismatches between plugins using
         gsd-device-manager (LP: #1427877)
-  * Dropped changes:
-    - 01_reinstate_updates_plugin.patch: no longer needed, might not have
-      been needed for Ubuntu any way
-    - debian/gnome-settings-daemon-schemas.gsettings-override
-      really drop this time
-  * debian/rules:
-    - Have gnome-settings-daemon-schemas install the rfkill rule
-  * Have gnome-settings-daemon-schemas install the translations
-  * debian/control.in:
-    - Bump breaks/replaces for above 2 moves
-
-  [ Tim Lunn ]
-  * debian/patches:
-    - 05_disable_corner_tapping.patch:
-      Dropped, input settings have been moved into mutter
-    - 45_suppress-printer-may-not-be-connected-notification.patch:
-      Refreshed
-    - revert-gsettings-removals.patch:
-      update with another removed key that is used by u-s-d
 
  -- Jeremy Bicha <jbicha@ubuntu.com>  Sat, 13 Aug 2016 11:52:26 -0400
+
+gnome-settings-daemon (3.21.90-2) unstable; urgency=medium
+
+  * Drop translations for strings introduced by
+    debian/patches/01_reinstate_updates_plugin.patch, this patch has been
+    removed a while ago.
+  * Install man page provided by upstream and remove the outdated one we
+    shipped downstream.
+  * Drop conffile removal code from pre-wheezy.
+  * Convert from cdbs to dh.
+  * Use dh-exec to install architecture specific files and switch from
+    --list-missing to --fail-missing, to avoid missing uninstalled files.
+  * Upload to unstable.
+
+ -- Michael Biebl <biebl@debian.org>  Thu, 01 Sep 2016 01:03:20 +0200
+
+gnome-settings-daemon (3.21.90-1) experimental; urgency=medium
+
+  [ Jeremy Bicha ]
+  * debian/control.in:
+    - Remove obsolete "typing break" from description
+
+  [ Andreas Henriksson ]
+  * New upstream beta release.
+  * Bump Standards-Version to 3.9.8
+
+ -- Andreas Henriksson <andreas@fatal.se>  Fri, 26 Aug 2016 11:07:08 +0200
 
 gnome-settings-daemon (3.20.1-2) unstable; urgency=medium
 
