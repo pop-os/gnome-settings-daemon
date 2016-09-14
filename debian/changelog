@@ -1,3 +1,9 @@
+gnome-settings-daemon (3.21.92.1-1) unstable; urgency=medium
+
+  * New upstream beta release.
+
+ -- Andreas Henriksson <andreas@fatal.se>  Tue, 13 Sep 2016 14:18:41 +0200
+
 gnome-settings-daemon (3.21.90-2) unstable; urgency=medium
 
   * Drop translations for strings introduced by
