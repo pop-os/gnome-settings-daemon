@@ -1,10 +1,10 @@
-gnome-settings-daemon (3.22.0-1) UNRELEASED; urgency=medium
+gnome-settings-daemon (3.22.0-1) unstable; urgency=medium
 
   * New upstream release.
   * Refresh debian/patches/04_superP.patch.
   * Bump debhelper compat level to 10.
 
- -- Michael Biebl <biebl@debian.org>  Tue, 20 Sep 2016 22:25:20 +0200
+ -- Michael Biebl <biebl@debian.org>  Wed, 21 Sep 2016 02:16:25 +0200
 
 gnome-settings-daemon (3.21.92.1-1) unstable; urgency=medium
 
