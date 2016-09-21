@@ -7,12 +7,10 @@ Section: gnome
 Priority: optional
 Maintainer: Debian GNOME Maintainers <pkg-gnome-maintainers@lists.alioth.debian.org>
 Uploaders: Andreas Henriksson <andreas@fatal.se>, Laurent Bigonville <bigon@debian.org>, Michael Biebl <biebl@debian.org>
-Build-Depends: debhelper (>= 9),
+Build-Depends: debhelper (>= 10),
                gnome-pkg-tools,
                gtk-doc-tools,
-               dh-autoreconf,
                dh-exec,
-               autotools-dev,
                intltool (>= 0.37.1),
                libasound2-dev [linux-any],
                libglib2.0-dev (>= 2.37.7),
