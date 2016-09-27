@@ -1,4 +1,4 @@
-gnome-settings-daemon (3.21.90-2ubuntu1) yakkety; urgency=medium
+gnome-settings-daemon (3.22.0-1ubuntu1) UNRELEASED; urgency=medium
 
   * Merge with Debian (LP: #1620177). Remaining changes:
     + Split out schemas into gnome-settings-daemon-schemas so
@@ -34,6 +34,20 @@ gnome-settings-daemon (3.21.90-2ubuntu1) yakkety; urgency=medium
         gsd-device-manager (LP: #1427877)
 
  -- Jeremy Bicha <jbicha@ubuntu.com>  Tue, 06 Sep 2016 12:24:24 -0400
+
+gnome-settings-daemon (3.22.0-1) unstable; urgency=medium
+
+  * New upstream release.
+  * Refresh debian/patches/04_superP.patch.
+  * Bump debhelper compat level to 10.
+
+ -- Michael Biebl <biebl@debian.org>  Wed, 21 Sep 2016 02:16:25 +0200
+
+gnome-settings-daemon (3.21.92.1-1) unstable; urgency=medium
+
+  * New upstream beta release.
+
+ -- Andreas Henriksson <andreas@fatal.se>  Tue, 13 Sep 2016 14:18:41 +0200
 
 gnome-settings-daemon (3.21.90-2) unstable; urgency=medium
 

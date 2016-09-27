@@ -4,12 +4,10 @@ Priority: optional
 Maintainer: Ubuntu Desktop Team <ubuntu-desktop@lists.ubuntu.com>
 XSBC-Original-Maintainer: Debian GNOME Maintainers <pkg-gnome-maintainers@lists.alioth.debian.org>
 Uploaders: @GNOME_TEAM@
-Build-Depends: debhelper (>= 9),
+Build-Depends: debhelper (>= 10),
                gnome-pkg-tools,
                gtk-doc-tools,
-               dh-autoreconf,
                dh-exec,
-               autotools-dev,
                intltool (>= 0.37.1),
                libaccountsservice-dev (>= 0.6.34),
                libasound2-dev [linux-any],
