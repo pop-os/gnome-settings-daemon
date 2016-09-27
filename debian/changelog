@@ -1,4 +1,4 @@
-gnome-settings-daemon (3.22.0-1ubuntu1) UNRELEASED; urgency=medium
+gnome-settings-daemon (3.22.0-1ubuntu1) yakkety; urgency=medium
 
   * Merge with Debian (LP: #1620177). Remaining changes:
     + Split out schemas into gnome-settings-daemon-schemas so
@@ -33,7 +33,7 @@ gnome-settings-daemon (3.22.0-1ubuntu1) UNRELEASED; urgency=medium
         this was causing GType mismatches between plugins using
         gsd-device-manager (LP: #1427877)
 
- -- Jeremy Bicha <jbicha@ubuntu.com>  Tue, 06 Sep 2016 12:24:24 -0400
+ -- Jeremy Bicha <jbicha@ubuntu.com>  Tue, 27 Sep 2016 02:01:59 -0400
 
 gnome-settings-daemon (3.22.0-1) unstable; urgency=medium
 
