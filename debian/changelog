@@ -1,3 +1,12 @@
+gnome-settings-daemon (3.22.1-0ubuntu1) yakkety; urgency=medium
+
+  * New upstream bugfix release (LP: #1632428)
+    - Fix crash when sharing plugin exits (LP: #1630853)
+    - Make sure screensaver blanking works when locked while screensaver
+      is inhibited
+
+ -- Jeremy Bicha <jbicha@ubuntu.com>  Tue, 11 Oct 2016 14:31:32 -0400
+
 gnome-settings-daemon (3.22.0-1ubuntu1) yakkety; urgency=medium
 
   * Merge with Debian (LP: #1620177). Remaining changes:
