@@ -1,8 +1,18 @@
 description "The Gnome Settings Daemon"
 author "Stéphane Graber <stgraber@ubuntu.com>"
 
-start on started dbus and starting gnome-session INSTANCE=GNOME
+start on started dbus and starting gnome-session
 stop on stopping gnome-session
+
+pre-start script
+    for DESKTOP in $(echo "$XDG_CURRENT_DESKTOP" | sed 's/:/ /g')
+    do
+      if [ "x$DESKTOP" = "xGNOME" ]; then
+        exit 0
+      fi
+    done
+    stop
+end script
 
 respawn
 exec /usr/lib/gnome-settings-daemon/gnome-settings-daemon
