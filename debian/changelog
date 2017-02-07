@@ -1,3 +1,24 @@
+gnome-settings-daemon (3.23.3-0ubuntu1) UNRELEASED; urgency=medium
+
+  * New upstream release (LP: #1662647)
+    - gnome-settings-daemon has been split into separate helper daemons
+  * debian/control.in:
+    - Bump minimum gsettings-desktop-schemas
+    - Break old versions of budgie-desktop and gnome-session
+  * debian/gnome-settings-daemon.install
+    - manpage was dropped since there is no g-s-d binary any more
+  * debian/gnome-settings-daemon.links:
+    - Drop because there is no g-s-d binary any more
+  * Drop 43_disable_locale_settings.patch since that code was dropped
+    in new release
+  * Update revert-gsettings-removals.patch:
+    - Restore "active" and "priority" keys still used by Unity
+    - Merge revert_background_dropping.patch into this patch
+    - Don't bother patching the obsolete gconf conversion file any more
+  * Refresh patches
+
+ -- Jeremy Bicha <jbicha@ubuntu.com>  Tue, 07 Feb 2017 06:35:07 -0500
+
 gnome-settings-daemon (3.22.1-0ubuntu2) zesty; urgency=medium
 
   * debian/gnome-settings-daemon.user-session.upstart:
