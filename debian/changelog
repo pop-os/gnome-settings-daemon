@@ -1,4 +1,4 @@
-gnome-settings-daemon (3.23.3-0ubuntu1) UNRELEASED; urgency=medium
+gnome-settings-daemon (3.23.3-0ubuntu1) zesty; urgency=medium
 
   * New upstream release (LP: #1662647)
     - gnome-settings-daemon has been split into separate helper daemons
@@ -17,7 +17,7 @@ gnome-settings-daemon (3.23.3-0ubuntu1) UNRELEASED; urgency=medium
     - Don't bother patching the obsolete gconf conversion file any more
   * Refresh patches
 
- -- Jeremy Bicha <jbicha@ubuntu.com>  Tue, 07 Feb 2017 06:35:07 -0500
+ -- Jeremy Bicha <jbicha@ubuntu.com>  Tue, 07 Feb 2017 18:20:50 -0500
 
 gnome-settings-daemon (3.22.1-0ubuntu2) zesty; urgency=medium
 
