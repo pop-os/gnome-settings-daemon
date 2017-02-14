@@ -8,6 +8,4 @@ usr/share/gnome-settings-daemon
 #usr/share/glib-2.0
 usr/share/polkit-1
 #[linux-any] usr/lib/udev/rules.d/ lib/udev
-debian/source_gnome-settings-daemon.py /usr/share/apport/package-hooks
-debian/gnome-settings-daemon.user-session.upstart => usr/share/upstart/sessions/gnome-settings-daemon.conf
-debian/gnome-settings-daemon.user-session.desktop => usr/share/upstart/xdg/autostart/gnome-settings-daemon.desktop
+debian/source_gnome-settings-daemon.py usr/share/apport/package-hooks

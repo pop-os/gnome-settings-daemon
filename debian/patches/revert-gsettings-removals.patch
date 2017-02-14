@@ -24,7 +24,7 @@ Date: Sat, 13 Sep 2014 11:57:02 +1000
 
 --- a/configure.ac
 +++ b/configure.ac
-@@ -543,7 +543,11 @@ data/org.gnome.settings-daemon.plugins.g
+@@ -541,7 +541,11 @@ data/org.gnome.settings-daemon.plugins.g
  data/org.gnome.settings-daemon.plugins.xsettings.gschema.xml.in
  data/org.gnome.settings-daemon.plugins.power.gschema.xml.in
  data/org.gnome.settings-daemon.plugins.color.gschema.xml.in
@@ -63,7 +63,7 @@ Date: Sat, 13 Sep 2014 11:57:02 +1000
 +    <key name="active" type="b">
 +      <default>true</default>
 +      <_summary>Activation of this plugin</_summary>
-+      <_description>Whether this plugin would be activated by gnome-settings-daemon or not</_description>
++      <_description>Whether this plugin would be activated by unity-settings-daemon or not</_description>
 +    </key>
      <child name="smartcard" schema="org.gnome.settings-daemon.peripherals.smartcard"/>
      <child name="keyboard" schema="org.gnome.settings-daemon.peripherals.keyboard"/>
@@ -74,7 +74,7 @@ Date: Sat, 13 Sep 2014 11:57:02 +1000
    <schema gettext-domain="@GETTEXT_PACKAGE@" id="org.gnome.settings-daemon.peripherals.smartcard" path="/org/gnome/settings-daemon/peripherals/smartcard/">
      <key name="removal-action" enum="org.gnome.settings-daemon.GsdSmartcardRemovalAction">
 @@ -67,6 +78,13 @@
-       <_summary>Whether the tablet's orientation is locked, or rotated automatically.</_summary>
+       <_summary>Whether the tablet’s orientation is locked, or rotated automatically.</_summary>
      </key>
    </schema>
 +  <schema gettext-domain="@GETTEXT_PACKAGE@" id="org.gnome.settings-daemon.peripherals.input-devices" path="/org/gnome/settings-daemon/peripherals/input-devices/">
@@ -100,7 +100,7 @@ Date: Sat, 13 Sep 2014 11:57:02 +1000
 +    <key name="active" type="b">
 +      <default>true</default>
 +      <_summary>Activation of this plugin</_summary>
-+      <_description>Whether this plugin would be activated by gnome-settings-daemon or not</_description>
++      <_description>Whether this plugin would be activated by unity-settings-daemon or not</_description>
 +    </key>
 +  </schema>
    <schema gettext-domain="@GETTEXT_PACKAGE@" id="org.gnome.settings-daemon.peripherals.wacom">
@@ -136,7 +136,7 @@ Date: Sat, 13 Sep 2014 11:57:02 +1000
 +    <key name="active" type="b">
 +      <default>true</default>
 +      <_summary>Activation of this plugin</_summary>
-+      <_description>Whether this plugin would be activated by gnome-settings-daemon or not</_description>
++      <_description>Whether this plugin would be activated by unity-settings-daemon or not</_description>
 +    </key>
      <key name="recalibrate-display-threshold" type="u">
        <default>0</default>
@@ -154,7 +154,7 @@ Date: Sat, 13 Sep 2014 11:57:02 +1000
 +    <key name="active" type="b">
 +      <default>true</default>
 +      <_summary>Activation of this plugin</_summary>
-+      <_description>Whether this plugin would be activated by gnome-settings-daemon or not</_description>
++      <_description>Whether this plugin would be activated by unity-settings-daemon or not</_description>
 +    </key>
 +  </schema>
 +</schemalist>
@@ -163,7 +163,7 @@ Date: Sat, 13 Sep 2014 11:57:02 +1000
 @@ -5,14 +5,165 @@
        <_summary>List of plugins that are allowed to be loaded</_summary>
        <_description>
-         A list of strings representing the plugins that are allowed to be loaded (default: 'all').
+         A list of strings representing the plugins that are allowed to be loaded (default: “all”).
 +        The plugins still need to be marked as active to get loaded by Unity (but not by GNOME).
          This is only evaluated on startup.
        </_description>
@@ -200,7 +200,7 @@ Date: Sat, 13 Sep 2014 11:57:02 +1000
 +    <key name="active" type="b">
 +      <default>true</default>
 +      <_summary>Activation of this plugin</_summary>
-+      <_description>Whether this plugin would be activated by gnome-settings-daemon or not</_description>
++      <_description>Whether this plugin would be activated by unity-settings-daemon or not</_description>
 +    </key>
 +  </schema>
 +  <schema gettext-domain="@GETTEXT_PACKAGE@" id="org.gnome.settings-daemon.plugins.a11y-settings" path="/org/gnome/settings-daemon/plugins/a11y-settings/">
@@ -212,7 +212,7 @@ Date: Sat, 13 Sep 2014 11:57:02 +1000
 +    <key name="active" type="b">
 +      <default>true</default>
 +      <_summary>Activation of this plugin</_summary>
-+      <_description>Whether this plugin would be activated by gnome-settings-daemon or not</_description>
++      <_description>Whether this plugin would be activated by unity-settings-daemon or not</_description>
 +    </key>
 +  </schema>
 +  <schema gettext-domain="@GETTEXT_PACKAGE@" id="org.gnome.settings-daemon.plugins.background" path="/org/gnome/settings-daemon/plugins/background/">
@@ -224,7 +224,7 @@ Date: Sat, 13 Sep 2014 11:57:02 +1000
 +    <key name="active" type="b">
 +      <default>true</default>
 +      <_summary>Activation of this plugin</_summary>
-+      <_description>Whether this plugin would be activated by gnome-settings-daemon or not</_description>
++      <_description>Whether this plugin would be activated by unity-settings-daemon or not</_description>
 +    </key>
 +   </schema>
 +  <schema gettext-domain="@GETTEXT_PACKAGE@" id="org.gnome.settings-daemon.plugins.clipboard" path="/org/gnome/settings-daemon/plugins/clipboard/">
@@ -236,7 +236,7 @@ Date: Sat, 13 Sep 2014 11:57:02 +1000
 +    <key name="active" type="b">
 +      <default>true</default>
 +      <_summary>Activation of this plugin</_summary>
-+      <_description>Whether this plugin would be activated by gnome-settings-daemon or not</_description>
++      <_description>Whether this plugin would be activated by unity-settings-daemon or not</_description>
 +    </key>
 +  </schema>
 +  <schema gettext-domain="@GETTEXT_PACKAGE@" id="org.gnome.settings-daemon.plugins.cursor" path="/org/gnome/settings-daemon/plugins/cursor/">
@@ -248,7 +248,7 @@ Date: Sat, 13 Sep 2014 11:57:02 +1000
 +    <key name="active" type="b">
 +      <default>true</default>
 +      <_summary>Activation of this plugin</_summary>
-+      <_description>Whether this plugin would be activated by gnome-settings-daemon or not</_description>
++      <_description>Whether this plugin would be activated by unity-settings-daemon or not</_description>
 +    </key>
 +  </schema>
 +  <schema gettext-domain="@GETTEXT_PACKAGE@" id="org.gnome.settings-daemon.plugins.mouse" path="/org/gnome/settings-daemon/plugins/mouse/">
@@ -260,7 +260,7 @@ Date: Sat, 13 Sep 2014 11:57:02 +1000
 +    <key name="active" type="b">
 +      <default>true</default>
 +      <_summary>Activation of this plugin</_summary>
-+      <_description>Whether this plugin would be activated by gnome-settings-daemon or not</_description>
++      <_description>Whether this plugin would be activated by unity-settings-daemon or not</_description>
 +    </key>
 +  </schema>
 +  <schema gettext-domain="@GETTEXT_PACKAGE@" id="org.gnome.settings-daemon.plugins.remote-display" path="/org/gnome/settings-daemon/plugins/remote-display/">
@@ -272,7 +272,7 @@ Date: Sat, 13 Sep 2014 11:57:02 +1000
 +    <key name="active" type="b">
 +      <default>true</default>
 +      <_summary>Activation of this plugin</_summary>
-+       <_description>Whether this plugin would be activated by gnome-settings-daemon or not</_description>
++       <_description>Whether this plugin would be activated by unity-settings-daemon or not</_description>
 +     </key>
 +  </schema>
 +  <schema gettext-domain="@GETTEXT_PACKAGE@" id="org.gnome.settings-daemon.plugins.rfkill" path="/org/gnome/settings-daemon/plugins/rfkill/">
@@ -284,7 +284,7 @@ Date: Sat, 13 Sep 2014 11:57:02 +1000
 +    <key name="active" type="b">
 +      <default>true</default>
 +      <_summary>Activation of this plugin</_summary>
-+      <_description>Whether this plugin would be activated by gnome-settings-daemon or not</_description>
++      <_description>Whether this plugin would be activated by unity-settings-daemon or not</_description>
 +    </key>
 +  </schema>
 +  <schema gettext-domain="@GETTEXT_PACKAGE@" id="org.gnome.settings-daemon.plugins.screensaver-proxy" path="/org/gnome/settings-daemon/plugins/screensaver-proxy/">
@@ -296,7 +296,7 @@ Date: Sat, 13 Sep 2014 11:57:02 +1000
 +    <key name="active" type="b">
 +      <default>true</default>
 +      <_summary>Activation of this plugin</_summary>
-+      <_description>Whether this plugin would be activated by gnome-settings-daemon or not</_description>
++      <_description>Whether this plugin would be activated by unity-settings-daemon or not</_description>
 +    </key>
 +  </schema>
 +  <schema gettext-domain="@GETTEXT_PACKAGE@" id="org.gnome.settings-daemon.plugins.smartcard" path="/org/gnome/settings-daemon/plugins/smartcard/">
@@ -308,7 +308,7 @@ Date: Sat, 13 Sep 2014 11:57:02 +1000
 +    <key name="active" type="b">
 +      <default>true</default>
 +      <_summary>Activation of this plugin</_summary>
-+      <_description>Whether this plugin would be activated by gnome-settings-daemon or not</_description>
++      <_description>Whether this plugin would be activated by unity-settings-daemon or not</_description>
 +    </key>
 +  </schema>
 +  <schema gettext-domain="@GETTEXT_PACKAGE@" id="org.gnome.settings-daemon.plugins.sound" path="/org/gnome/settings-daemon/plugins/sound/">
@@ -320,7 +320,7 @@ Date: Sat, 13 Sep 2014 11:57:02 +1000
 +    <key name="active" type="b">
 +      <default>true</default>
 +      <_summary>Activation of this plugin</_summary>
-+      <_description>Whether this plugin would be activated by gnome-settings-daemon or not</_description>
++      <_description>Whether this plugin would be activated by unity-settings-daemon or not</_description>
 +    </key>
 +  </schema>
  </schemalist>
@@ -339,7 +339,7 @@ Date: Sat, 13 Sep 2014 11:57:02 +1000
 +    <key name="active" type="b">
 +      <default>true</default>
 +      <_summary>Activation of this plugin</_summary>
-+      <_description>Whether this plugin would be activated by gnome-settings-daemon or not</_description>
++      <_description>Whether this plugin would be activated by unity-settings-daemon or not</_description>
 +    </key>
      <key name="ignore-paths" type="as">
        <default>[]</default>
@@ -357,7 +357,7 @@ Date: Sat, 13 Sep 2014 11:57:02 +1000
 +    <key name="active" type="b">
 +      <default>true</default>
 +      <_summary>Activation of this plugin</_summary>
-+      <_description>Whether this plugin would be activated by gnome-settings-daemon or not</_description>
++      <_description>Whether this plugin would be activated by unity-settings-daemon or not</_description>
 +    </key>
 +  </schema>
 +</schemalist>
@@ -374,7 +374,7 @@ Date: Sat, 13 Sep 2014 11:57:02 +1000
 +    <key name="active" type="b">
 +      <default>true</default>
 +      <_summary>Activation of this plugin</_summary>
-+      <_description>Whether this plugin would be activated by gnome-settings-daemon or not</_description>
++      <_description>Whether this plugin would be activated by unity-settings-daemon or not</_description>
 +    </key>
      <key name="custom-keybindings" type="as">
        <default>[]</default>
@@ -392,7 +392,7 @@ Date: Sat, 13 Sep 2014 11:57:02 +1000
 +    <key name="active" type="b">
 +      <default>true</default>
 +      <_summary>Activation of this plugin</_summary>
-+      <_description>Whether this plugin would be activated by gnome-settings-daemon or not</_description>
++      <_description>Whether this plugin would be activated by unity-settings-daemon or not</_description>
 +    </key>
 +  </schema>
 +</schemalist>
@@ -409,7 +409,7 @@ Date: Sat, 13 Sep 2014 11:57:02 +1000
 +    <key name="active" type="b">
 +      <default>true</default>
 +      <_summary>Activation of this plugin</_summary>
-+      <_description>Whether this plugin would be activated by gnome-settings-daemon or not</_description>
++      <_description>Whether this plugin would be activated by unity-settings-daemon or not</_description>
 +    </key>
      <key name="idle-brightness" type="i">
        <default>30</default>
@@ -500,7 +500,7 @@ Date: Sat, 13 Sep 2014 11:57:02 +1000
 +    <key name="active" type="b">
 +      <default>true</default>
 +      <_summary>Activation of this plugin</_summary>
-+      <_description>Whether this plugin would be activated by gnome-settings-daemon or not</_description>
++      <_description>Whether this plugin would be activated by unity-settings-daemon or not</_description>
 +    </key>
 +  </schema>
 +</schemalist>
@@ -517,7 +517,7 @@ Date: Sat, 13 Sep 2014 11:57:02 +1000
 +    <key name="active" type="b">
 +      <default>true</default>
 +      <_summary>Activation of this plugin</_summary>
-+      <_description>Whether this plugin would be activated by gnome-settings-daemon or not</_description>
++      <_description>Whether this plugin would be activated by unity-settings-daemon or not</_description>
 +    </key>
 +  </schema>
    <schema gettext-domain="@GETTEXT_PACKAGE@" id="org.gnome.settings-daemon.plugins.sharing.service">
@@ -536,7 +536,7 @@ Date: Sat, 13 Sep 2014 11:57:02 +1000
 +    <key name="active" type="b">
 +      <default>true</default>
 +      <_summary>Activation of this plugin</_summary>
-+      <_description>Whether this plugin would be activated by gnome-settings-daemon or not</_description>
++      <_description>Whether this plugin would be activated by unity-settings-daemon or not</_description>
 +    </key>
      <key name="default-configuration-file" type="s">
        <default>'/etc/gnome-settings-daemon/xrandr/monitors.xml'</default>
@@ -554,7 +554,7 @@ Date: Sat, 13 Sep 2014 11:57:02 +1000
 +    <key name="active" type="b">
 +      <default>true</default>
 +      <_summary>Activation of this plugin</_summary>
-+      <_description>Whether this plugin would be activated by gnome-settings-daemon or not</_description>
++      <_description>Whether this plugin would be activated by unity-settings-daemon or not</_description>
 +    </key>
      <key name="antialiasing" enum="org.gnome.settings-daemon.GsdFontAntialiasingMode">
        <default>'grayscale'</default>

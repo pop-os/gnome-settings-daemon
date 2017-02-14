@@ -7,8 +7,8 @@ Index: gnome-settings-daemon/plugins/print-notifications/gsd-print-notifications
                          break;
                  case 2:
                          /* Translators: The printer is in the process of connecting to a shared network output device (same as in system-config-printer) */
--                        status = g_strdup_printf (_("Printer '%s' may not be connected."), printer_name);
-+                        /* status = g_strdup_printf (_("Printer '%s' may not be connected."), printer_name); */
+-                        status = g_strdup_printf (_("Printer “%s” may not be connected."), printer_name);
++                        /* status = g_strdup_printf (_("Printer “%s” may not be connected."), printer_name); */
                          break;
                  case 3:
                          /* Translators: One or more covers on the printer are open (same as in system-config-printer) */
