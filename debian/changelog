@@ -1,4 +1,4 @@
-gnome-settings-daemon (3.23.90-0ubuntu1) UNRELEASED; urgency=medium
+gnome-settings-daemon (3.23.90-0ubuntu1) zesty; urgency=medium
 
   * New upstream release
   * debian/control.in:
@@ -9,7 +9,7 @@ gnome-settings-daemon (3.23.90-0ubuntu1) UNRELEASED; urgency=medium
     - Revert migrating wacom schemas to gsettings-desktop-schemas
       since the old schemas are still used by Unity.
 
- -- Jeremy Bicha <jbicha@ubuntu.com>  Tue, 14 Feb 2017 14:06:16 -0500
+ -- Jeremy Bicha <jbicha@ubuntu.com>  Tue, 14 Feb 2017 15:04:17 -0500
 
 gnome-settings-daemon (3.23.3-0ubuntu1) zesty; urgency=medium
 
