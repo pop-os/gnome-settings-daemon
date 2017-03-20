@@ -1,3 +1,11 @@
+gnome-settings-daemon (3.24.0-0ubuntu1) zesty; urgency=medium
+
+  * New upstream release.
+  * Drop git-workaround-startup-deadlock.patch:
+    - Applied in new release
+
+ -- Jeremy Bicha <jbicha@ubuntu.com>  Mon, 20 Mar 2017 11:01:05 -0400
+
 gnome-settings-daemon (3.23.92-0ubuntu2) zesty; urgency=medium
 
   * Add git-workaround-startup-deadlock.patch:

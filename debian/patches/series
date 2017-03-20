@@ -6,4 +6,3 @@ correct_logout_action.patch
 ubuntu-lid-close-suspend.patch
 revert-wacom-migration.patch
 revert-gsettings-removals.patch
-git-workaround-startup-deadlock.patch
