@@ -1,3 +1,10 @@
+gnome-settings-daemon (3.23.92-0ubuntu2) zesty; urgency=medium
+
+  * Add git-workaround-startup-deadlock.patch:
+    - Try to fix some some plugins failing to start
+
+ -- Jeremy Bicha <jbicha@ubuntu.com>  Thu, 16 Mar 2017 09:36:47 -0400
+
 gnome-settings-daemon (3.23.92-0ubuntu1) zesty; urgency=medium
 
   * New upstream release
