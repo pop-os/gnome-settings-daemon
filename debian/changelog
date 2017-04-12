@@ -1,3 +1,17 @@
+gnome-settings-daemon (3.24.1-0ubuntu1) zesty; urgency=medium
+
+  * New upstream release (LP: #1682132)
+  * Drop git_fix-calculator-key.patch, applied in new release
+
+ -- Jeremy Bicha <jbicha@ubuntu.com>  Wed, 12 Apr 2017 09:34:03 -0400
+
+gnome-settings-daemon (3.24.0-0ubuntu2) zesty; urgency=medium
+
+  * Add git_fix-calculator-key.patch:
+    - Fix Calculator keyboard key with gnome-calculator 3.24
+
+ -- Jeremy Bicha <jbicha@ubuntu.com>  Fri, 24 Mar 2017 19:55:10 -0400
+
 gnome-settings-daemon (3.24.0-0ubuntu1) zesty; urgency=medium
 
   * New upstream release.
