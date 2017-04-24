@@ -1,12 +1,13 @@
-gnome-settings-daemon (3.22.2-2) UNRELEASED; urgency=medium
+gnome-settings-daemon (3.22.2-2) unstable; urgency=medium
 
+  * Team upload
   * d/p/media-keys-Fix-mmkeys-D-Bus-API-to-match-API-docs.patch:
     Own the D-Bus name that the API documentation tells users of the
     multimedia keys API they should use (org.gnome.SettingsDaemon.MediaKeys),
     in addition to the D-Bus name that they actually use in practice
     (org.gnome.SettingsDaemon). (Closes: #861111)
 
- -- Simon McVittie <smcv@debian.org>  Mon, 24 Apr 2017 19:28:19 +0100
+ -- Simon McVittie <smcv@debian.org>  Mon, 24 Apr 2017 19:54:01 +0100
 
 gnome-settings-daemon (3.22.2-1) unstable; urgency=medium
 
