@@ -1,4 +1,4 @@
-gnome-settings-daemon (3.24.1-0ubuntu3) UNRELEASED; urgency=medium
+gnome-settings-daemon (3.24.1-0ubuntu3) artful; urgency=medium
 
   * Really add git_fix-gdm-plugins.patch
   * Add media-keys-Fix-mmkeys-D-Bus-API-to-match-API-docs.patch:
