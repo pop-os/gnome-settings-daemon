@@ -1,3 +1,22 @@
+gnome-settings-daemon (3.24.1-0ubuntu3) UNRELEASED; urgency=medium
+
+  * Really add git_fix-gdm-plugins.patch
+  * Add media-keys-Fix-mmkeys-D-Bus-API-to-match-API-docs.patch:
+    Own the D-Bus name that the API documentation tells users of the
+    multimedia keys API they should use (org.gnome.SettingsDaemon.MediaKeys),
+    in addition to the D-Bus name that they actually use in practice
+    (org.gnome.SettingsDaemon). (LP: #1686077)
+
+ -- Jeremy Bicha <jbicha@ubuntu.com>  Tue, 25 Apr 2017 07:55:13 -0400
+
+gnome-settings-daemon (3.24.1-0ubuntu2) artful; urgency=medium
+
+  * Add git_fix-gdm-plugins.patch:
+    - Fix gdm starting with no plugins which broke Hi-DPI support
+      on the login screen (LP: #1685035)
+
+ -- Jeremy Bicha <jbicha@ubuntu.com>  Sat, 22 Apr 2017 09:22:33 -0400
+
 gnome-settings-daemon (3.24.1-0ubuntu1) zesty; urgency=medium
 
   * New upstream release (LP: #1682132)
