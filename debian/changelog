@@ -1,4 +1,4 @@
-gnome-settings-daemon (3.24.1-0ubuntu4) UNRELEASED; urgency=medium
+gnome-settings-daemon (3.24.1-0ubuntu4) artful; urgency=medium
 
   * Add autopkgtest to run upstream tests
 
