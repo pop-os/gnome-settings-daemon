@@ -1,3 +1,9 @@
+gnome-settings-daemon (3.24.1-0ubuntu4) UNRELEASED; urgency=medium
+
+  * Add autopkgtest to run upstream tests
+
+ -- Jeremy Bicha <jbicha@ubuntu.com>  Thu, 04 May 2017 11:41:54 -0400
+
 gnome-settings-daemon (3.24.1-0ubuntu3) artful; urgency=medium
 
   * Really add git_fix-gdm-plugins.patch

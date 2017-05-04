@@ -1,0 +1,2 @@
+#!/bin/sh
+xvfb-run dh_auto_test

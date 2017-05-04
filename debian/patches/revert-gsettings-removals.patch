@@ -20,7 +20,9 @@ Date: Sat, 13 Sep 2014 11:57:02 +1000
  data/org.gnome.settings-daemon.plugins.sharing.gschema.xml.in.in             |   12 
  data/org.gnome.settings-daemon.plugins.xrandr.gschema.xml.in.in              |   10 
  data/org.gnome.settings-daemon.plugins.xsettings.gschema.xml.in.in           |   10 
- 16 files changed, 394 insertions(+)
+ po/POTFILES.in                                                               |    4 
+ po/POTFILES.skip                                                             |    4 
+ 18 files changed, 402 insertions(+)
 
 --- a/configure.ac
 +++ b/configure.ac
@@ -559,3 +561,37 @@ Date: Sat, 13 Sep 2014 11:57:02 +1000
      <key name="antialiasing" enum="org.gnome.settings-daemon.GsdFontAntialiasingMode">
        <default>'grayscale'</default>
        <_summary>Antialiasing</_summary>
+--- a/po/POTFILES.in
++++ b/po/POTFILES.in
+@@ -3,10 +3,14 @@
+ data/org.gnome.settings-daemon.peripherals.gschema.xml.in.in
+ data/org.gnome.settings-daemon.peripherals.wacom.gschema.xml.in.in
+ data/org.gnome.settings-daemon.plugins.color.gschema.xml.in.in
++data/org.gnome.settings-daemon.plugins.datetime.gschema.xml.in.in
+ data/org.gnome.settings-daemon.plugins.gschema.xml.in.in
+ data/org.gnome.settings-daemon.plugins.housekeeping.gschema.xml.in.in
++data/org.gnome.settings-daemon.plugins.keyboard.gschema.xml.in.in
+ data/org.gnome.settings-daemon.plugins.media-keys.gschema.xml.in.in
++data/org.gnome.settings-daemon.plugins.orientation.gschema.xml.in.in
+ data/org.gnome.settings-daemon.plugins.power.gschema.xml.in.in
++data/org.gnome.settings-daemon.plugins.print-notifications.gschema.xml.in.in
+ data/org.gnome.settings-daemon.plugins.sharing.gschema.xml.in.in
+ data/org.gnome.settings-daemon.plugins.xrandr.gschema.xml.in.in
+ data/org.gnome.settings-daemon.plugins.xsettings.gschema.xml.in.in
+--- a/po/POTFILES.skip
++++ b/po/POTFILES.skip
+@@ -4,10 +4,14 @@
+ data/org.gnome.settings-daemon.peripherals.gschema.xml.in
+ data/org.gnome.settings-daemon.peripherals.wacom.gschema.xml.in
+ data/org.gnome.settings-daemon.plugins.color.gschema.xml.in
++data/org.gnome.settings-daemon.plugins.datetime.gschema.xml.in
+ data/org.gnome.settings-daemon.plugins.gschema.xml.in
+ data/org.gnome.settings-daemon.plugins.housekeeping.gschema.xml.in
++data/org.gnome.settings-daemon.plugins.keyboard.gschema.xml.in
+ data/org.gnome.settings-daemon.plugins.media-keys.gschema.xml.in
++data/org.gnome.settings-daemon.plugins.orientation.gschema.xml.in
+ data/org.gnome.settings-daemon.plugins.power.gschema.xml.in
++data/org.gnome.settings-daemon.plugins.print-notifications.gschema.xml.in
+ data/org.gnome.settings-daemon.plugins.sharing.gschema.xml.in
+ data/org.gnome.settings-daemon.plugins.xrandr.gschema.xml.in
+ data/org.gnome.settings-daemon.plugins.xsettings.gschema.xml.in
