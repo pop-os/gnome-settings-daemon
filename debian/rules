@@ -27,5 +27,5 @@ override_dh_autoreconf:
 override_dh_install:
 	dh_install --fail-missing -X.la
 
-# test-suite currently fails, see https://bugzilla.gnome.org/show_bug.cgi?id=770684
+# We use autopkgtest instead
 override_dh_auto_test:

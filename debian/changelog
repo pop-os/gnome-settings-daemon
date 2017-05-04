@@ -1,3 +1,9 @@
+gnome-settings-daemon (3.22.2-3) UNRELEASED; urgency=medium
+
+  * Add autopkgtest to run upstream tests
+
+ -- Jeremy Bicha <jbicha@ubuntu.com>  Thu, 04 May 2017 12:06:22 -0400
+
 gnome-settings-daemon (3.22.2-2) unstable; urgency=medium
 
   * Team upload
