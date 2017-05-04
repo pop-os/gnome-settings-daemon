@@ -1,6 +1,8 @@
 gnome-settings-daemon (3.22.2-3) UNRELEASED; urgency=medium
 
-  * Add autopkgtest to run upstream tests
+  * debian/rules: Enable dh_auto_test
+  * debian/control.in:
+    - Build-depend on python-dbusmock, python-gi, xauth & xvfb for tests
 
  -- Jeremy Bicha <jbicha@ubuntu.com>  Thu, 04 May 2017 12:06:22 -0400
 

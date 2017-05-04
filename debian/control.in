@@ -38,6 +38,10 @@ Build-Depends: debhelper (>= 10),
                libgweather-3-dev (>= 3.9.5),
                libgeocode-glib-dev (>= 3.10.0),
                libgeoclue-2-dev (>= 2.3.1),
+               python-dbusmock <!nocheck>,
+               python-gi <!nocheck>,
+               xauth <!nocheck>,
+               xvfb <!nocheck>,
                xkb-data
 Standards-Version: 3.9.8
 Vcs-Browser: https://anonscm.debian.org/viewvc/pkg-gnome/desktop/unstable/gnome-settings-daemon/
