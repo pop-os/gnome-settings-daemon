@@ -6,7 +6,7 @@
 --- a/configure.ac
 +++ b/configure.ac
 @@ -180,6 +180,7 @@ PKG_CHECK_MODULES(HOUSEKEEPING,
- 		  libnotify >= LIBNOTIFY_REQUIRED_VERSION)
+ 		  libnotify >= $LIBNOTIFY_REQUIRED_VERSION)
  
  PKG_CHECK_MODULES(KEYBOARD,
 +		  accountsservice

@@ -1,3 +1,16 @@
+gnome-settings-daemon (3.24.2-0ubuntu1) UNRELEASED; urgency=medium
+
+  * New upstream release (LP: #1689610)
+    - Fix brightness control in some dual-GPU computers (LP: #1683445)
+    - Disable GNOME's rfkill handling which basically reverts this to
+      how it worked or didn't in 16.04 LTS. Hopefully, a more thorough
+      rework will be done in time for 3.26.
+  * Drop patches applied in new release:
+    - git_fix-gdm-plugins.patch
+    - media-keys-Fix-mmkeys-D-Bus-API-to-match-API-docs.patch
+
+ -- Jeremy Bicha <jbicha@ubuntu.com>  Tue, 09 May 2017 13:17:44 -0400
+
 gnome-settings-daemon (3.24.1-0ubuntu4) artful; urgency=medium
 
   * Add autopkgtest to run upstream tests
