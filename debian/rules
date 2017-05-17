@@ -28,5 +28,5 @@ override_dh_autoreconf:
 override_dh_install:
 	dh_install --fail-missing -X.la
 
-# We use autopkgtest instead
 override_dh_auto_test:
+	xvfb-run dh_auto_test

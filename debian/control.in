@@ -40,7 +40,11 @@ Build-Depends: debhelper (>= 10),
                libgweather-3-dev (>= 3.9.5),
                libgeocode-glib-dev (>= 3.10.0),
                libgeoclue-2-dev (>= 2.3.1),
-               xkb-data
+               xkb-data,
+               python-dbusmock <!nocheck>,
+               python-gi <!nocheck>,
+               xauth <!nocheck>,
+               xvfb <!nocheck>
 Standards-Version: 3.9.8
 Vcs-Bzr: https://code.launchpad.net/~ubuntu-desktop/gnome-settings-daemon/ubuntu
 

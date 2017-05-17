@@ -1,0 +1,19 @@
+Author: Jeremy Bicha
+Description: Disable the color build tests since they need to be fixed
+ to use their self-compiled gsettings schemas
+Bug: https://bugzilla.gnome.org/782170
+---
+ plugins/color/Makefile.am |    2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+--- a/plugins/color/Makefile.am
++++ b/plugins/color/Makefile.am
+@@ -28,7 +28,7 @@ gcm_self_test_LDADD =			\
+ 	$(SETTINGS_PLUGIN_LIBS)		\
+ 	$(LIBM)
+ 
+-TESTS = gcm-self-test
++##TESTS = gcm-self-test
+ 
+ libexec_PROGRAMS = gsd-color
+ gsd_color_SOURCES =			\
