@@ -1,4 +1,4 @@
-gnome-settings-daemon (3.24.2-0ubuntu2) UNRELEASED; urgency=medium
+gnome-settings-daemon (3.24.2-0ubuntu2) artful; urgency=medium
 
   * debian/control.in:
     - Build-Depend on python-dbusmock, python-gi, xauth & xfvb
