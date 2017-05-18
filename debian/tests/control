@@ -1,3 +1,0 @@
-Tests: upstream
-Restrictions: build-needed
-Depends: @, @builddeps@, debhelper, python-dbusmock, python-gi, xauth, xvfb
