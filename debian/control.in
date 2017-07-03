@@ -40,6 +40,7 @@ Build-Depends: debhelper (>= 10),
                libgeoclue-2-dev (>= 2.3.1),
                python-dbusmock <!nocheck>,
                python-gi <!nocheck>,
+               udev [linux-any] <!nocheck>,
                xauth <!nocheck>,
                xvfb <!nocheck>,
                xkb-data
