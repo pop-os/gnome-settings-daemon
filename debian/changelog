@@ -1,7 +1,7 @@
 gnome-settings-daemon (3.22.2-4) unstable; urgency=medium
 
   * debian/control.in: Add udev to the build-dependencies to fix the tests
-    failures on s390x.
+    failures on s390x. (Closes: #867108)
 
  -- Laurent Bigonville <bigon@debian.org>  Mon, 03 Jul 2017 22:32:27 +0200
 
