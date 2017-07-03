@@ -1,4 +1,4 @@
-gnome-settings-daemon (3.22.2-3) UNRELEASED; urgency=medium
+gnome-settings-daemon (3.22.2-3) unstable; urgency=medium
 
   [ Jeremy Bicha ]
   * debian/rules: Enable dh_auto_test
@@ -6,10 +6,10 @@ gnome-settings-daemon (3.22.2-3) UNRELEASED; urgency=medium
     - Build-depend on python-dbusmock, python-gi, xauth & xvfb for tests
 
   [ Laurent Bigonville ]
-  * Remove debian/gnome-settings-daemon.gsettings-override, remember the
+  * Remove debian/gnome-settings-daemon.gsettings-override to remember the
     NumLock state between sessions by default (Closes: #649587)
 
- -- Laurent Bigonville <bigon@debian.org>  Mon, 03 Jul 2017 20:41:13 +0200
+ -- Laurent Bigonville <bigon@debian.org>  Mon, 03 Jul 2017 20:46:56 +0200
 
 gnome-settings-daemon (3.22.2-2) unstable; urgency=medium
 
