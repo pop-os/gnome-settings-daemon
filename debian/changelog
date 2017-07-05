@@ -1,3 +1,18 @@
+gnome-settings-daemon (3.24.2-1) UNRELEASED; urgency=medium
+
+  * New upstream release.
+    - debian/control.in: Adjust the {build-}dependencies
+    - Drop d/p/media-keys-Fix-mmkeys-D-Bus-API-to-match-API-docs.patch:
+      applied upstream
+  * debian/control.in: Bump Standards-Version to 4.0.0 (no further changes)
+  * d/p/color-Make-the-testcase-able-to-run-uninstalled.patch: Fix the tests
+  * debian/gnome-settings-daemon.maintscript: Remove
+    /etc/xdg/autostart/gnome-settings-daemon.desktop during the upgrade
+  * debian/rules: Explicitly remove the .la files instead of ignoring them in
+    dh_install call
+
+ -- Laurent Bigonville <bigon@debian.org>  Wed, 05 Jul 2017 21:32:58 +0200
+
 gnome-settings-daemon (3.22.2-4) unstable; urgency=medium
 
   * debian/control.in: Add udev to the build-dependencies to fix the tests
