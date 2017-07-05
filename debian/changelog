@@ -1,3 +1,11 @@
+gnome-settings-daemon (3.24.2-2) UNRELEASED; urgency=medium
+
+  * debian/control.in: Add a Breaks gnome-session << 3.24, g-s-d doesn't
+    provides gnome-settings-daemon.desktop file which prevent the "gnome"
+    session to start
+
+ -- Laurent Bigonville <bigon@debian.org>  Thu, 06 Jul 2017 00:51:31 +0200
+
 gnome-settings-daemon (3.24.2-1) experimental; urgency=medium
 
   * New upstream release.
