@@ -1,4 +1,4 @@
-gnome-settings-daemon (3.24.2-2) UNRELEASED; urgency=medium
+gnome-settings-daemon (3.24.2-2) experimental; urgency=medium
 
   * debian/control.in: Add a Breaks gnome-session << 3.24, g-s-d doesn't
     provides gnome-settings-daemon.desktop file which prevent the "gnome"
@@ -6,7 +6,7 @@ gnome-settings-daemon (3.24.2-2) UNRELEASED; urgency=medium
   * Drop debian/gnome-settings-daemon.links, the gnome-settings-daemon
     executable is now gone, drop the symlink in /usr/bin as well
 
- -- Laurent Bigonville <bigon@debian.org>  Thu, 06 Jul 2017 01:14:35 +0200
+ -- Laurent Bigonville <bigon@debian.org>  Thu, 06 Jul 2017 01:18:12 +0200
 
 gnome-settings-daemon (3.24.2-1) experimental; urgency=medium
 
