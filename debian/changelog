@@ -1,3 +1,75 @@
+gnome-settings-daemon (3.22.2-4) unstable; urgency=medium
+
+  * debian/control.in: Add udev to the build-dependencies to fix the tests
+    failures on s390x. (Closes: #867108)
+
+ -- Laurent Bigonville <bigon@debian.org>  Mon, 03 Jul 2017 22:32:27 +0200
+
+gnome-settings-daemon (3.22.2-3) unstable; urgency=medium
+
+  [ Jeremy Bicha ]
+  * debian/rules: Enable dh_auto_test
+  * debian/control.in:
+    - Build-depend on python-dbusmock, python-gi, xauth & xvfb for tests
+
+  [ Laurent Bigonville ]
+  * Remove debian/gnome-settings-daemon.gsettings-override to remember the
+    NumLock state between sessions by default (Closes: #649587)
+
+ -- Laurent Bigonville <bigon@debian.org>  Mon, 03 Jul 2017 20:46:56 +0200
+
+gnome-settings-daemon (3.22.2-2) unstable; urgency=medium
+
+  * Team upload
+  * d/p/media-keys-Fix-mmkeys-D-Bus-API-to-match-API-docs.patch:
+    Own the D-Bus name that the API documentation tells users of the
+    multimedia keys API they should use (org.gnome.SettingsDaemon.MediaKeys),
+    in addition to the D-Bus name that they actually use in practice
+    (org.gnome.SettingsDaemon). (Closes: #861111)
+
+ -- Simon McVittie <smcv@debian.org>  Mon, 24 Apr 2017 19:54:01 +0100
+
+gnome-settings-daemon (3.22.2-1) unstable; urgency=medium
+
+  * New upstream release.
+
+ -- Michael Biebl <biebl@debian.org>  Tue, 14 Mar 2017 18:22:17 +0100
+
+gnome-settings-daemon (3.22.1-1) unstable; urgency=medium
+
+  * New upstream release.
+
+ -- Andreas Henriksson <andreas@fatal.se>  Tue, 11 Oct 2016 14:39:33 +0200
+
+gnome-settings-daemon (3.22.0-1) unstable; urgency=medium
+
+  * New upstream release.
+  * Refresh debian/patches/04_superP.patch.
+  * Bump debhelper compat level to 10.
+
+ -- Michael Biebl <biebl@debian.org>  Wed, 21 Sep 2016 02:16:25 +0200
+
+gnome-settings-daemon (3.21.92.1-1) unstable; urgency=medium
+
+  * New upstream beta release.
+
+ -- Andreas Henriksson <andreas@fatal.se>  Tue, 13 Sep 2016 14:18:41 +0200
+
+gnome-settings-daemon (3.21.90-2) unstable; urgency=medium
+
+  * Drop translations for strings introduced by
+    debian/patches/01_reinstate_updates_plugin.patch, this patch has been
+    removed a while ago.
+  * Install man page provided by upstream and remove the outdated one we
+    shipped downstream.
+  * Drop conffile removal code from pre-wheezy.
+  * Convert from cdbs to dh.
+  * Use dh-exec to install architecture specific files and switch from
+    --list-missing to --fail-missing, to avoid missing uninstalled files.
+  * Upload to unstable.
+
+ -- Michael Biebl <biebl@debian.org>  Thu, 01 Sep 2016 01:03:20 +0200
+
 gnome-settings-daemon (3.21.90-1) experimental; urgency=medium
 
   [ Jeremy Bicha ]
