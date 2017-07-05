@@ -1,33 +1,31 @@
 #!/usr/bin/make -f
 
-include /usr/share/cdbs/1/rules/autoreconf.mk
-include /usr/share/cdbs/1/rules/debhelper.mk
-include /usr/share/cdbs/1/rules/utils.mk
-include /usr/share/cdbs/1/class/gnome.mk
-include /usr/share/gnome-pkg-tools/1/rules/uploaders.mk
 include /usr/share/gnome-pkg-tools/1/rules/gnome-get-source.mk
-include /usr/share/gnome-pkg-tools/1/rules/patch-translations.mk
 
-DEB_DH_AUTORECONF_ARGS = --as-needed
+export DEB_LDFLAGS_MAINT_APPEND = -Wl,-z,defs -Wl,-O1 -Wl,--warn-unresolved-symbols -Wl,--as-needed
 
-ifneq ($(DEB_HOST_ARCH_CPU),$(filter $(DEB_HOST_ARCH_CPU),ia64 mipsel))
-  LDFLAGS += -Wl,-z,defs
-endif
-LDFLAGS += -Wl,-O1 -Wl,--warn-unresolved-symbols -Wl,--as-needed
+%:
+	dh $@ --with gnome
 
 ifneq ($(DEB_HOST_ARCH_OS),linux)
-  DEB_CONFIGURE_EXTRA_FLAGS += --disable-rfkill --disable-network-manager \
-				--disable-alsa
-else
-install/gnome-settings-daemon::
-	dh_install -pgnome-settings-daemon --ignore=debian/gnome-settings-daemon.install \
-		debian/tmp/usr/lib/udev/rules.d/ lib/udev
+CONFFLAGS = \
+	--disable-rfkill \
+	--disable-network-manager \
+	--disable-alsa
 endif
 
-DEB_DH_MAKESHLIBS_ARGS_ALL += --no-act
+override_dh_auto_configure:
+	dh_auto_configure -- \
+		--libdir=\$${prefix}/lib \
+		--libexecdir=\$${libdir}/gnome-settings-daemon \
+		--disable-static \
+		$(CONFFLAGS)
 
-binary-install/gnome-settings-daemon::
-	find debian -name '*.a' -delete
-	find debian -name '*.la' -delete
+override_dh_autoreconf:
+	dh_autoreconf --as-needed
 
-common-binary-post-install-arch:: list-missing
+override_dh_install:
+	dh_install --fail-missing -X.la
+
+override_dh_auto_test:
+	xvfb-run dh_auto_test

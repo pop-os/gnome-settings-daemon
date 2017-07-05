@@ -3,12 +3,10 @@ Section: gnome
 Priority: optional
 Maintainer: Debian GNOME Maintainers <pkg-gnome-maintainers@lists.alioth.debian.org>
 Uploaders: @GNOME_TEAM@
-Build-Depends: cdbs,
-               debhelper (>= 9),
+Build-Depends: debhelper (>= 10),
                gnome-pkg-tools,
                gtk-doc-tools,
-               dh-autoreconf,
-               autotools-dev,
+               dh-exec,
                intltool (>= 0.37.1),
                libasound2-dev [linux-any],
                libglib2.0-dev (>= 2.37.7),
@@ -40,6 +38,11 @@ Build-Depends: cdbs,
                libgweather-3-dev (>= 3.9.5),
                libgeocode-glib-dev (>= 3.10.0),
                libgeoclue-2-dev (>= 2.3.1),
+               python-dbusmock <!nocheck>,
+               python-gi <!nocheck>,
+               udev [linux-any] <!nocheck>,
+               xauth <!nocheck>,
+               xvfb <!nocheck>,
                xkb-data
 Standards-Version: 3.9.8
 Vcs-Browser: https://anonscm.debian.org/viewvc/pkg-gnome/desktop/unstable/gnome-settings-daemon/
