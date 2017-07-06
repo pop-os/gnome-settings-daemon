@@ -1,3 +1,13 @@
+gnome-settings-daemon (3.24.2-0ubuntu3) UNRELEASED; urgency=medium
+
+  * Add patches backported from gnome-3-24 git branch:
+    - fix-night-light-transition.patch:
+      + Do Night Light transition more gradually, as intended (LP: #1702722)
+    - disable-color-build-test.patch:
+      + Updated so that color tests can run uninstalled, thanks Laney!
+
+ -- Jeremy Bicha <jbicha@ubuntu.com>  Mon, 12 Jun 2017 11:58:22 -0400
+
 gnome-settings-daemon (3.24.2-0ubuntu2) artful; urgency=medium
 
   * debian/control.in:
