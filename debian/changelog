@@ -1,11 +1,11 @@
-gnome-settings-daemon (3.22.2-5) UNRELEASED; urgency=medium
+gnome-settings-daemon (3.22.2-5) unstable; urgency=medium
 
   * d/p/keyboard-Only-add-the-us-layout-if-the-system-config.patch:
     Do not add the "US" keyboard layout by default for new users, for some
     reasons, this keyboard was prefered over the system configured one on the
     first login. (Closes: #859268)
 
- -- Laurent Bigonville <bigon@debian.org>  Fri, 14 Jul 2017 14:18:40 +0200
+ -- Laurent Bigonville <bigon@debian.org>  Fri, 14 Jul 2017 14:26:41 +0200
 
 gnome-settings-daemon (3.22.2-4) unstable; urgency=medium
 
