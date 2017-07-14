@@ -1,2 +1,3 @@
 media-keys-Fix-mmkeys-D-Bus-API-to-match-API-docs.patch
 04_superP.patch
+keyboard-Only-add-the-us-layout-if-the-system-config.patch
