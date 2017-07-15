@@ -3,7 +3,7 @@ gnome-settings-daemon (3.24.2-3) UNRELEASED; urgency=medium
   * debian/rules: Make the tests non fatal on non-linux architectures
   * d/p/keyboard-Only-add-the-us-layout-if-the-system-config.patch:
     Do not add the "US" keyboard layout by default for new users, for some
-    reasons, this keyboard was prefered over the system configured one on the
+    reasons, this keyboard was preferred over the system configured one on the
     first login. (Closes: #859268)
 
  -- Laurent Bigonville <bigon@debian.org>  Sat, 15 Jul 2017 11:15:47 +0200
