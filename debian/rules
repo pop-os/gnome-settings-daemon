@@ -29,4 +29,8 @@ override_dh_install:
 	dh_install --fail-missing
 
 override_dh_auto_test:
+ifeq ($(DEB_HOST_ARCH_OS),linux)
 	xvfb-run dh_auto_test
+else
+	xvfb-run dh_auto_test || true
+endif
