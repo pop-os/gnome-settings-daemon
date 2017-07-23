@@ -29,4 +29,11 @@ override_dh_install:
 	dh_install --fail-missing -X.la
 
 override_dh_auto_test:
+ifeq (,$(findstring nocheck,$(DEB_BUILD_OPTIONS)))
+ifeq (,$(filter $(DEB_HOST_ARCH), s390x hurd-i386 kfreebsd-i386 kfreebsd-amd64))
 	xvfb-run dh_auto_test
+else
+	-xvfb-run dh_auto_test
+endif
+endif
+
