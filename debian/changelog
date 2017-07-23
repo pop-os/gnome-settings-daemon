@@ -1,10 +1,10 @@
-gnome-settings-daemon (3.24.2-3) UNRELEASED; urgency=medium
+gnome-settings-daemon (3.24.3-1) UNRELEASED; urgency=medium
 
+  * New upstream release
+    - Do not add the "US" keyboard layout by default for new users. For some
+      reason, this keyboard was preferred over the system configured one on
+      the first login. (Closes: #859268)
   * debian/rules: Make the tests non fatal on non-linux architectures
-  * d/p/keyboard-Only-add-the-us-layout-if-the-system-config.patch:
-    Do not add the "US" keyboard layout by default for new users, for some
-    reasons, this keyboard was preferred over the system configured one on the
-    first login. (Closes: #859268)
 
  -- Laurent Bigonville <bigon@debian.org>  Sat, 15 Jul 2017 11:15:47 +0200
 
