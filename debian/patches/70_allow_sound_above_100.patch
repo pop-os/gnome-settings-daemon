@@ -4,7 +4,7 @@ Description: Allow volume to bet set above 100%.
  Modified from original patch in ubuntu-settings-daemon from Lars Uebernickel.
 Origin: ubuntu
 Bug-Ubuntu: https://launchpad.net/bugs/1706524
-Forwarded: https://bugzilla.gnome.org/show_bug.cgi?id=710424
+Bug: https://bugzilla.gnome.org/show_bug.cgi?id=710424
 Index: gnome-settings-daemon-3.24.2/plugins/media-keys/gsd-media-keys-manager.c
 ===================================================================
 --- gnome-settings-daemon-3.24.2.orig/plugins/media-keys/gsd-media-keys-manager.c
