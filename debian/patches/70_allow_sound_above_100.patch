@@ -1,0 +1,101 @@
+Description: Allow volume to bet set above 100%.
+ Some systems have low maximum volume set (like x220), allow, from an option
+ in gnome-control-center to set it above that 100% limit.
+ Modified from original patch in ubuntu-settings-daemon from Lars Uebernickel.
+Origin: ubuntu
+Bug-Ubuntu: https://launchpad.net/bugs/1706524
+Forwarded: https://bugzilla.gnome.org/show_bug.cgi?id=710424
+Index: gnome-settings-daemon-3.24.2/plugins/media-keys/gsd-media-keys-manager.c
+===================================================================
+--- gnome-settings-daemon-3.24.2.orig/plugins/media-keys/gsd-media-keys-manager.c
++++ gnome-settings-daemon-3.24.2/plugins/media-keys/gsd-media-keys-manager.c
+@@ -109,7 +109,6 @@ static const gchar introspection_xml[] =
+ #define HIGH_CONTRAST "HighContrast"
+ 
+ #define VOLUME_STEP 6           /* percents for one volume button press */
+-#define MAX_VOLUME 65536.0
+ 
+ #define SYSTEMD_DBUS_NAME                       "org.freedesktop.login1"
+ #define SYSTEMD_DBUS_PATH                       "/org/freedesktop/login1"
+@@ -166,6 +165,7 @@ struct GsdMediaKeysManagerPrivate
+ 
+         GSettings       *settings;
+         GHashTable      *custom_settings;
++        GSettings       *sound_settings;
+ 
+         GPtrArray       *keys;
+ 
+@@ -1121,6 +1121,10 @@ ensure_canberra (GsdMediaKeysManager *ma
+ 	if (manager->priv->ca != NULL)
+ 		return;
+ 
++        if (strstr (g_getenv("XDG_SESSION_DESKTOP"), "ubuntu") != NULL) {
++                manager->priv->sound_settings = g_settings_new ("com.ubuntu.sound");
++        }
++
+         ca_context_create (&manager->priv->ca);
+         ca_context_set_driver (manager->priv->ca, "pulse");
+         ca_context_change_props (manager->priv->ca, 0,
+@@ -1141,6 +1145,7 @@ update_dialog (GsdMediaKeysManager *mana
+                guint                vol,
+                gboolean             muted,
+                gboolean             sound_changed,
++               pa_volume_t          max_volume,
+                gboolean             quiet)
+ {
+         GvcMixerUIDevice *device;
+@@ -1148,7 +1153,7 @@ update_dialog (GsdMediaKeysManager *mana
+         const char *icon;
+ 
+         if (!muted) {
+-                vol = (int) (100 * (double) vol / PA_VOLUME_NORM);
++                vol = (int) (100 * (double) vol / max_volume);
+                 vol = CLAMP (vol, 0, 100);
+         } else {
+                 vol = 0.0;
+@@ -1299,6 +1304,7 @@ do_sound_action (GsdMediaKeysManager *ma
+         gboolean old_muted, new_muted;
+         guint old_vol, new_vol, norm_vol_step;
+         gboolean sound_changed;
++        pa_volume_t max_volume;
+ 
+         /* Find the stream that corresponds to the device, if any */
+         stream = NULL;
+@@ -1316,6 +1322,11 @@ do_sound_action (GsdMediaKeysManager *ma
+         if (stream == NULL)
+                 return;
+ 
++        if ((manager->priv->sound_settings != NULL) && g_settings_get_boolean (manager->priv->sound_settings, "allow-amplified-volume"))
++                max_volume = PA_VOLUME_UI_MAX;
++        else
++                max_volume = PA_VOLUME_NORM;
++
+         norm_vol_step = PA_VOLUME_NORM * VOLUME_STEP / 100;
+ 
+         /* FIXME: this is racy */
+@@ -1339,7 +1350,7 @@ do_sound_action (GsdMediaKeysManager *ma
+                 new_muted = FALSE;
+                 /* When coming out of mute only increase the volume if it was 0 */
+                 if (!old_muted || old_vol == 0)
+-                        new_vol = MIN (old_vol + norm_vol_step, MAX_VOLUME);
++                        new_vol = MIN (old_vol + norm_vol_step, max_volume);
+                 break;
+         }
+ 
+@@ -1355,7 +1366,7 @@ do_sound_action (GsdMediaKeysManager *ma
+                 }
+         }
+ 
+-        update_dialog (manager, stream, new_vol, new_muted, sound_changed, quiet);
++        update_dialog (manager, stream, new_vol, new_muted, sound_changed, max_volume, quiet);
+ }
+ 
+ static void
+@@ -3001,6 +3012,7 @@ gsd_media_keys_manager_stop (GsdMediaKey
+         g_clear_object (&priv->power_proxy);
+         g_clear_object (&priv->power_screen_proxy);
+         g_clear_object (&priv->power_keyboard_proxy);
++        g_clear_object (&priv->sound_settings);
+         g_clear_object (&priv->composite_device);
+         g_clear_object (&priv->mpris_controller);
+         g_clear_object (&priv->screencast_proxy);
