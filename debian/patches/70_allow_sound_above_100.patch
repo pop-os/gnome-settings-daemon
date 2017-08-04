@@ -29,7 +29,7 @@ Index: gnome-settings-daemon-3.24.2/plugins/media-keys/gsd-media-keys-manager.c
  	if (manager->priv->ca != NULL)
  		return;
  
-+        if (strstr (g_getenv("XDG_SESSION_DESKTOP"), "ubuntu") != NULL) {
++        if (strstr (g_getenv("XDG_CURRENT_DESKTOP"), "ubuntu") != NULL) {
 +                manager->priv->sound_settings = g_settings_new ("com.ubuntu.sound");
 +        }
 +
