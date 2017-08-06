@@ -2,6 +2,9 @@ gnome-settings-daemon (3.24.3-1) UNRELEASED; urgency=medium
 
   [ Jeremy Bicha ]
   * Release to unstable
+  * The gnome-settings-daemon binary has been replaced by individual
+    binaries for each of the plugins. Add Breaks for packages shipping
+    gnome-session sessions that need to be updated for this change.
 
   [ Laurent Bigonville ]
   * New upstream release
