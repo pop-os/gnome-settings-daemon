@@ -5,6 +5,8 @@ gnome-settings-daemon (3.24.3-1) UNRELEASED; urgency=medium
   * The gnome-settings-daemon binary has been replaced by individual
     binaries for each of the plugins. Add Breaks for packages shipping
     gnome-session sessions that need to be updated for this change.
+  * Drop color-Make-the-testcase-able-to-run-uninstalled.patch:
+    - Applied in new release
 
   [ Laurent Bigonville ]
   * New upstream release
