@@ -1,4 +1,4 @@
-gnome-settings-daemon (3.24.3-1) UNRELEASED; urgency=medium
+gnome-settings-daemon (3.24.3-1) unstable; urgency=medium
 
   [ Jeremy Bicha ]
   * Release to unstable
@@ -16,7 +16,7 @@ gnome-settings-daemon (3.24.3-1) UNRELEASED; urgency=medium
   * debian/rules: Make the tests non fatal on s390x and non-linux
     architectures
 
- -- Laurent Bigonville <bigon@debian.org>  Sat, 15 Jul 2017 11:15:47 +0200
+ -- Jeremy Bicha <jbicha@ubuntu.com>  Sun, 06 Aug 2017 17:33:40 -0400
 
 gnome-settings-daemon (3.24.2-2) experimental; urgency=medium
 
