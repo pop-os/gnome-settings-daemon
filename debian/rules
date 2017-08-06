@@ -25,7 +25,12 @@ override_dh_autoreconf:
 	dh_autoreconf --as-needed
 
 override_dh_install:
-	dh_install --fail-missing -X.la
+	find debian/tmp -type f -name '*.la' -delete -print
+	dh_install --fail-missing
 
 override_dh_auto_test:
+ifeq (,$(filter $(DEB_HOST_ARCH), s390x hurd-i386 kfreebsd-i386 kfreebsd-amd64))
 	xvfb-run dh_auto_test
+else
+	xvfb-run dh_auto_test || true
+endif

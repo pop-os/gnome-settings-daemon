@@ -1,11 +1,38 @@
-gnome-settings-daemon (3.22.2-5) unstable; urgency=medium
+gnome-settings-daemon (3.24.3-1) UNRELEASED; urgency=medium
 
-  * d/p/keyboard-Only-add-the-us-layout-if-the-system-config.patch:
-    Do not add the "US" keyboard layout by default for new users, for some
-    reasons, this keyboard was prefered over the system configured one on the
-    first login. (Closes: #859268)
+  * New upstream release
+    - Do not add the "US" keyboard layout by default for new users. For some
+      reason, this keyboard was preferred over the system configured one on
+      the first login. (Closes: #859268)
+  * debian/rules: Make the tests non fatal on s390x and non-linux
+    architectures
 
- -- Laurent Bigonville <bigon@debian.org>  Fri, 14 Jul 2017 14:26:41 +0200
+ -- Laurent Bigonville <bigon@debian.org>  Sat, 15 Jul 2017 11:15:47 +0200
+
+gnome-settings-daemon (3.24.2-2) experimental; urgency=medium
+
+  * debian/control.in: Add a Breaks gnome-session << 3.24, g-s-d doesn't
+    provides gnome-settings-daemon.desktop file which prevent the "gnome"
+    session to start
+  * Drop debian/gnome-settings-daemon.links, the gnome-settings-daemon
+    executable is now gone, drop the symlink in /usr/bin as well
+
+ -- Laurent Bigonville <bigon@debian.org>  Thu, 06 Jul 2017 01:18:12 +0200
+
+gnome-settings-daemon (3.24.2-1) experimental; urgency=medium
+
+  * New upstream release.
+    - debian/control.in: Adjust the {build-}dependencies
+    - Drop d/p/media-keys-Fix-mmkeys-D-Bus-API-to-match-API-docs.patch:
+      applied upstream
+  * debian/control.in: Bump Standards-Version to 4.0.0 (no further changes)
+  * d/p/color-Make-the-testcase-able-to-run-uninstalled.patch: Fix the tests
+  * debian/gnome-settings-daemon.maintscript: Remove
+    /etc/xdg/autostart/gnome-settings-daemon.desktop during the upgrade
+  * debian/rules: Explicitly remove the .la files instead of ignoring them in
+    dh_install call
+
+ -- Laurent Bigonville <bigon@debian.org>  Wed, 05 Jul 2017 21:56:07 +0200
 
 gnome-settings-daemon (3.22.2-4) unstable; urgency=medium
 
