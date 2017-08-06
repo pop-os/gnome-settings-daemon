@@ -1,5 +1,9 @@
 gnome-settings-daemon (3.24.3-1) UNRELEASED; urgency=medium
 
+  [ Jeremy Bicha ]
+  * Release to unstable
+
+  [ Laurent Bigonville ]
   * New upstream release
     - Do not add the "US" keyboard layout by default for new users. For some
       reason, this keyboard was preferred over the system configured one on
