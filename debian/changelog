@@ -1,3 +1,11 @@
+gnome-settings-daemon (3.24.3-2) UNRELEASED; urgency=medium
+
+  * debian/rules: Make the test fatal on s390x again, the tests were failing
+    because hwdb files included in udev package were not installed, adding a
+    build-dependency against udev fixed the failure.
+
+ -- Laurent Bigonville <bigon@debian.org>  Mon, 07 Aug 2017 16:18:33 +0200
+
 gnome-settings-daemon (3.24.3-1) unstable; urgency=medium
 
   [ Jeremy Bicha ]
