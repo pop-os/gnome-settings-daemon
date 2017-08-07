@@ -29,6 +29,8 @@ override_dh_install:
 	dh_install --fail-missing
 
 override_dh_auto_test:
+# The tests are not fatal on non-linux architectures
+# See: https://bugzilla.gnome.org/show_bug.cgi?id=770684#c2
 ifeq (,$(filter $(DEB_HOST_ARCH), hurd-i386 kfreebsd-i386 kfreebsd-amd64))
 	xvfb-run dh_auto_test
 else
