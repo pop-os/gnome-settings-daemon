@@ -70,7 +70,7 @@ Breaks: afterstep (<< 2.2.12-10.1~),
         gnome-initial-setup (<< 3.24),
         gnome-session (<< 3.24),
         gnome-session-flashback (<< 3.24),
-        gnome-shell (<< 3.22.3-4~),
+        gnome-shell (<< 3.13.92),
         gnome-shell-extensions (<< 3.22.2-2~),
         openbox-gnome-session (<< 3.6.1-4.1~),
         xmonad (<< 0.13-5~)
