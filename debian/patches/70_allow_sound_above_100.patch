@@ -5,10 +5,10 @@ Description: Allow volume to bet set above 100%.
 Origin: ubuntu
 Bug-Ubuntu: https://launchpad.net/bugs/1706524
 Bug: https://bugzilla.gnome.org/show_bug.cgi?id=710424
-Index: gnome-settings-daemon-3.24.2/plugins/media-keys/gsd-media-keys-manager.c
+Index: gnome-settings-daemon-3.24.3/plugins/media-keys/gsd-media-keys-manager.c
 ===================================================================
---- gnome-settings-daemon-3.24.2.orig/plugins/media-keys/gsd-media-keys-manager.c
-+++ gnome-settings-daemon-3.24.2/plugins/media-keys/gsd-media-keys-manager.c
+--- gnome-settings-daemon-3.24.3.orig/plugins/media-keys/gsd-media-keys-manager.c
++++ gnome-settings-daemon-3.24.3/plugins/media-keys/gsd-media-keys-manager.c
 @@ -109,7 +109,6 @@ static const gchar introspection_xml[] =
  #define HIGH_CONTRAST "HighContrast"
  
@@ -25,18 +25,26 @@ Index: gnome-settings-daemon-3.24.2/plugins/media-keys/gsd-media-keys-manager.c
  
          GPtrArray       *keys;
  
-@@ -1121,6 +1121,10 @@ ensure_canberra (GsdMediaKeysManager *ma
+@@ -1152,6 +1152,18 @@ ensure_canberra (GsdMediaKeysManager *ma
  	if (manager->priv->ca != NULL)
  		return;
  
 +        if (strstr (g_getenv("XDG_CURRENT_DESKTOP"), "ubuntu") != NULL) {
-+                manager->priv->sound_settings = g_settings_new ("com.ubuntu.sound");
++                GSettingsSchema *schema;
++                schema = g_settings_schema_source_lookup(g_settings_schema_source_get_default(),
++                                                         "com.ubuntu.sound", TRUE);
++
++                if (schema != NULL)
++                {
++                        manager->priv->sound_settings = g_settings_new_full(schema, NULL, NULL);
++                        g_settings_schema_unref(schema);
++                }
 +        }
 +
          ca_context_create (&manager->priv->ca);
          ca_context_set_driver (manager->priv->ca, "pulse");
          ca_context_change_props (manager->priv->ca, 0,
-@@ -1141,6 +1145,7 @@ update_dialog (GsdMediaKeysManager *mana
+@@ -1172,6 +1184,7 @@ update_dialog (GsdMediaKeysManager *mana
                 guint                vol,
                 gboolean             muted,
                 gboolean             sound_changed,
@@ -44,7 +52,7 @@ Index: gnome-settings-daemon-3.24.2/plugins/media-keys/gsd-media-keys-manager.c
                 gboolean             quiet)
  {
          GvcMixerUIDevice *device;
-@@ -1148,7 +1153,7 @@ update_dialog (GsdMediaKeysManager *mana
+@@ -1179,7 +1192,7 @@ update_dialog (GsdMediaKeysManager *mana
          const char *icon;
  
          if (!muted) {
@@ -53,7 +61,7 @@ Index: gnome-settings-daemon-3.24.2/plugins/media-keys/gsd-media-keys-manager.c
                  vol = CLAMP (vol, 0, 100);
          } else {
                  vol = 0.0;
-@@ -1299,6 +1304,7 @@ do_sound_action (GsdMediaKeysManager *ma
+@@ -1330,6 +1343,7 @@ do_sound_action (GsdMediaKeysManager *ma
          gboolean old_muted, new_muted;
          guint old_vol, new_vol, norm_vol_step;
          gboolean sound_changed;
@@ -61,7 +69,7 @@ Index: gnome-settings-daemon-3.24.2/plugins/media-keys/gsd-media-keys-manager.c
  
          /* Find the stream that corresponds to the device, if any */
          stream = NULL;
-@@ -1316,6 +1322,11 @@ do_sound_action (GsdMediaKeysManager *ma
+@@ -1347,6 +1361,11 @@ do_sound_action (GsdMediaKeysManager *ma
          if (stream == NULL)
                  return;
  
@@ -73,7 +81,7 @@ Index: gnome-settings-daemon-3.24.2/plugins/media-keys/gsd-media-keys-manager.c
          norm_vol_step = PA_VOLUME_NORM * VOLUME_STEP / 100;
  
          /* FIXME: this is racy */
-@@ -1339,7 +1350,7 @@ do_sound_action (GsdMediaKeysManager *ma
+@@ -1370,7 +1389,7 @@ do_sound_action (GsdMediaKeysManager *ma
                  new_muted = FALSE;
                  /* When coming out of mute only increase the volume if it was 0 */
                  if (!old_muted || old_vol == 0)
@@ -82,7 +90,7 @@ Index: gnome-settings-daemon-3.24.2/plugins/media-keys/gsd-media-keys-manager.c
                  break;
          }
  
-@@ -1355,7 +1366,7 @@ do_sound_action (GsdMediaKeysManager *ma
+@@ -1386,7 +1405,7 @@ do_sound_action (GsdMediaKeysManager *ma
                  }
          }
  
@@ -91,7 +99,7 @@ Index: gnome-settings-daemon-3.24.2/plugins/media-keys/gsd-media-keys-manager.c
  }
  
  static void
-@@ -3001,6 +3012,7 @@ gsd_media_keys_manager_stop (GsdMediaKey
+@@ -3032,6 +3051,7 @@ gsd_media_keys_manager_stop (GsdMediaKey
          g_clear_object (&priv->power_proxy);
          g_clear_object (&priv->power_screen_proxy);
          g_clear_object (&priv->power_keyboard_proxy);
