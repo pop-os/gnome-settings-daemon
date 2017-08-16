@@ -1,10 +1,10 @@
-gnome-settings-daemon (3.24.3-0ubuntu3) UNRELEASED; urgency=medium
+gnome-settings-daemon (3.24.3-0ubuntu3) artful; urgency=medium
 
   * Add patch to allow setting volume above 100%:
     - debian/patches/70_allow_sound_above_100.patch, adapt the patch from
       ubuntu-settings-daemon to latest g-s-d. (LP: #1706524)
 
- -- Didier Roche <didrocks@ubuntu.com>  Wed, 26 Jul 2017 09:06:35 +0200
+ -- Didier Roche <didrocks@ubuntu.com>  Wed, 16 Aug 2017 08:29:43 +0200
 
 gnome-settings-daemon (3.24.3-0ubuntu2) artful; urgency=medium
 
