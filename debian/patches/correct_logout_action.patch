@@ -1,11 +1,13 @@
 # Description: let the logout key do what it's supposed to do
 # Ubuntu: https://launchpad.net/bugs/961501
 # Upstream: https://bugzilla.gnome.org/show_bug.cgi?id=671979
-Index: gnome-settings-daemon-3.7.4/plugins/media-keys/gsd-media-keys-manager.c
-===================================================================
---- gnome-settings-daemon-3.7.4.orig/plugins/media-keys/gsd-media-keys-manager.c	2013-01-15 09:33:28.214989030 -0500
-+++ gnome-settings-daemon-3.7.4/plugins/media-keys/gsd-media-keys-manager.c	2013-01-15 09:33:28.206985030 -0500
-@@ -801,6 +801,12 @@
+---
+# plugins/media-keys/gsd-media-keys-manager.c |    8 +++++++-
+# 1 file changed, 7 insertions(+), 1 deletion(-)
+#
+--- a/plugins/media-keys/gsd-media-keys-manager.c
++++ b/plugins/media-keys/gsd-media-keys-manager.c
+@@ -940,6 +940,12 @@ gnome_session_shutdown (GsdMediaKeysMana
  }
  
  static void
@@ -18,8 +20,8 @@ Index: gnome-settings-daemon-3.7.4/plugins/media-keys/gsd-media-keys-manager.c
  do_eject_action_cb (GDrive              *drive,
                      GAsyncResult        *res,
                      GsdMediaKeysManager *manager)
-@@ -1945,7 +1951,7 @@
-                 do_sound_action (manager, deviceid, VOLUME_UP_KEY, TRUE, TRUE);
+@@ -2335,7 +2341,7 @@ do_action (GsdMediaKeysManager *manager,
+                                  SOUND_ACTION_FLAG_IS_OUTPUT | SOUND_ACTION_FLAG_IS_PRECISE);
                  break;
          case LOGOUT_KEY:
 -                gnome_session_shutdown (manager);

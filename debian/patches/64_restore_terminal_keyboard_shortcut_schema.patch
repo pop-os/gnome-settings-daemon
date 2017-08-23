@@ -7,9 +7,9 @@
 
 --- a/data/org.gnome.settings-daemon.plugins.media-keys.gschema.xml.in.in
 +++ b/data/org.gnome.settings-daemon.plugins.media-keys.gschema.xml.in.in
-@@ -135,6 +135,11 @@
+@@ -130,6 +130,11 @@
        <_summary>Record a short video of the screen</_summary>
-       <description>Binding to record a short video of the screen</description>
+       <_description>Binding to record a short video of the screen</_description>
      </key>
 +    <key name="terminal" type="s">
 +      <default>'&lt;Primary&gt;&lt;Alt&gt;t'</default>
@@ -21,7 +21,7 @@
        <_summary>Launch web browser</_summary>
 --- a/plugins/media-keys/gsd-media-keys-manager.c
 +++ b/plugins/media-keys/gsd-media-keys-manager.c
-@@ -834,6 +834,22 @@ gnome_session_shutdown_cb (GObject *sour
+@@ -905,6 +905,22 @@ gnome_session_shutdown_cb (GObject *sour
  }
  
  static void
@@ -44,7 +44,7 @@
  gnome_session_shutdown (GsdMediaKeysManager *manager)
  {
          GDBusProxy *proxy;
-@@ -2334,6 +2350,9 @@ do_action (GsdMediaKeysManager *manager,
+@@ -2350,6 +2366,9 @@ do_action (GsdMediaKeysManager *manager,
          case SCREENCAST_KEY:
                  do_screencast_action (manager);
                  break;
@@ -56,7 +56,7 @@
                  break;
 --- a/plugins/media-keys/media-keys.h
 +++ b/plugins/media-keys/media-keys.h
-@@ -47,6 +47,7 @@ typedef enum {
+@@ -49,6 +49,7 @@ typedef enum {
          WINDOW_SCREENSHOT_CLIP_KEY,
          AREA_SCREENSHOT_CLIP_KEY,
          SCREENCAST_KEY,
@@ -66,7 +66,7 @@
          PAUSE_KEY,
 --- a/plugins/media-keys/shortcuts-list.h
 +++ b/plugins/media-keys/shortcuts-list.h
-@@ -72,6 +72,7 @@ static struct {
+@@ -74,6 +74,7 @@ static struct {
          { WINDOW_SCREENSHOT_CLIP_KEY, "window-screenshot-clip", NULL, NULL, SHELL_ACTION_MODE_NORMAL },
          { AREA_SCREENSHOT_CLIP_KEY, "area-screenshot-clip", NULL, NULL, SHELL_ACTION_MODE_ALL },
          { SCREENCAST_KEY, "screencast", NULL, NULL, NO_LOCK_MODE },

@@ -1,7 +1,6 @@
 #!/usr/bin/dh-exec
 etc/xdg/autostart
 usr/lib/gnome-settings-daemon*
-usr/share/icons
 #usr/share/locale
 usr/share/gnome-settings-daemon
 #usr/share/GConf
