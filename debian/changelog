@@ -1,9 +1,9 @@
-gnome-settings-daemon (3.25.91-0ubuntu2) UNRELEASED; urgency=medium
+gnome-settings-daemon (3.25.91-0ubuntu2) artful; urgency=medium
 
   * debian/gnome-settings-daemon.maintscript:
     - Remove obsolete autostart files for Orientation and XRANDR plugins.
 
- -- Jeremy Bicha <jbicha@ubuntu.com>  Wed, 23 Aug 2017 09:00:13 -0400
+ -- Jeremy Bicha <jbicha@ubuntu.com>  Wed, 23 Aug 2017 09:01:04 -0400
 
 gnome-settings-daemon (3.25.91-0ubuntu1) artful; urgency=medium
 
