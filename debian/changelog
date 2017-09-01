@@ -1,9 +1,9 @@
-gnome-settings-daemon (3.25.92-0ubuntu1) UNRELEASED; urgency=medium
+gnome-settings-daemon (3.25.92-0ubuntu1) artful; urgency=medium
 
   * New upstream release
     - Fix translation of notifications, thanks Sebastien Bacher
 
- -- Jeremy Bicha <jbicha@ubuntu.com>  Fri, 01 Sep 2017 08:46:08 -0400
+ -- Jeremy Bicha <jbicha@ubuntu.com>  Fri, 01 Sep 2017 08:59:29 -0400
 
 gnome-settings-daemon (3.25.91-0ubuntu2) artful; urgency=medium
 
