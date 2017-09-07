@@ -1,5 +1,6 @@
-gnome-settings-daemon (3.25.92-1) UNRELEASED; urgency=medium
+gnome-settings-daemon (3.25.92-1) experimental; urgency=medium
 
+  * Team upload
   * New upstream release
 
   [ Laurent Bigonville ]
@@ -22,7 +23,7 @@ gnome-settings-daemon (3.25.92-1) UNRELEASED; urgency=medium
     lockstep upgrade, since functionality has moved around
   * d/p/04_superP.patch: Drop, this functionality is no longer in g-s-d
 
- -- Laurent Bigonville <bigon@debian.org>  Mon, 07 Aug 2017 16:18:33 +0200
+ -- Simon McVittie <smcv@debian.org>  Thu, 07 Sep 2017 11:59:05 +0100
 
 gnome-settings-daemon (3.24.3-1) unstable; urgency=medium
 
