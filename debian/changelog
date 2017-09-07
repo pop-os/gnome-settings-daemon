@@ -1,5 +1,22 @@
-gnome-settings-daemon (3.24.3-1) UNRELEASED; urgency=medium
+gnome-settings-daemon (3.24.3-2) UNRELEASED; urgency=medium
 
+  * debian/rules: Make tests failures fatal on s390x again, the tests were
+    failing because hwdb files included in udev package were not installed,
+    adding a build-dependency against udev fixed the failure.
+
+ -- Laurent Bigonville <bigon@debian.org>  Mon, 07 Aug 2017 16:18:33 +0200
+
+gnome-settings-daemon (3.24.3-1) unstable; urgency=medium
+
+  [ Jeremy Bicha ]
+  * Release to unstable
+  * The gnome-settings-daemon binary has been replaced by individual
+    binaries for each of the plugins. Add Breaks for packages shipping
+    gnome-session sessions that need to be updated for this change.
+  * Drop color-Make-the-testcase-able-to-run-uninstalled.patch:
+    - Applied in new release
+
+  [ Laurent Bigonville ]
   * New upstream release
     - Do not add the "US" keyboard layout by default for new users. For some
       reason, this keyboard was preferred over the system configured one on
@@ -7,7 +24,7 @@ gnome-settings-daemon (3.24.3-1) UNRELEASED; urgency=medium
   * debian/rules: Make the tests non fatal on s390x and non-linux
     architectures
 
- -- Laurent Bigonville <bigon@debian.org>  Sat, 15 Jul 2017 11:15:47 +0200
+ -- Jeremy Bicha <jbicha@ubuntu.com>  Sun, 06 Aug 2017 17:33:40 -0400
 
 gnome-settings-daemon (3.24.2-2) experimental; urgency=medium
 
