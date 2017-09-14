@@ -1,3 +1,9 @@
+gnome-settings-daemon (3.26.0-0ubuntu1) UNRELEASED; urgency=medium
+
+  * New upstream translations release
+
+ -- Jeremy Bicha <jbicha@ubuntu.com>  Wed, 13 Sep 2017 22:05:57 -0400
+
 gnome-settings-daemon (3.25.92-0ubuntu1) artful; urgency=medium
 
   * New upstream release
