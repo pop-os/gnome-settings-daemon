@@ -1,10 +1,10 @@
-gnome-settings-daemon (3.26.1-1) UNRELEASED; urgency=medium
+gnome-settings-daemon (3.26.1-1) experimental; urgency=medium
 
   * New upstream release
     - Fix a regression in HiDPI support for Xorg session (LP: #1720150)
   * Bump Standards-Version to 4.1.1
 
- -- Jeremy Bicha <jbicha@debian.org>  Tue, 03 Oct 2017 10:11:28 -0400
+ -- Jeremy Bicha <jbicha@debian.org>  Tue, 03 Oct 2017 10:18:58 -0400
 
 gnome-settings-daemon (3.26.0-1) experimental; urgency=medium
 
