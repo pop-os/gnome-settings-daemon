@@ -1,3 +1,11 @@
+gnome-settings-daemon (3.26.1-0ubuntu2) UNRELEASED; urgency=medium
+
+  * debian/patches/ubuntu_ibus_configs.patch: restore the code that 
+    configure the input method according to the locale, upstream removed it 
+    because they use gnome-intial-setup but we don't
+
+ -- Sebastien Bacher <seb128@ubuntu.com>  Mon, 09 Oct 2017 11:10:31 +0200
+
 gnome-settings-daemon (3.26.1-0ubuntu1) artful; urgency=medium
 
   * New upstream release
