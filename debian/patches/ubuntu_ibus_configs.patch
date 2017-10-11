@@ -6,11 +6,11 @@ Forwarded: not-needed
  plugins/keyboard/gsd-keyboard-manager.c | 53 +++++++++++++++++++++++++++++++++
  1 file changed, 53 insertions(+)
 
-diff --git a/plugins/keyboard/gsd-keyboard-manager.c b/plugins/keyboard/gsd-keyboard-manager.c
-index ea67dda1..24c77164 100644
---- a/plugins/keyboard/gsd-keyboard-manager.c
-+++ b/plugins/keyboard/gsd-keyboard-manager.c
-@@ -159,6 +159,58 @@ check_xkb_extension (GsdKeyboardManager *manager)
+Index: gnome-settings-daemon-3.26.1/plugins/keyboard/gsd-keyboard-manager.c
+===================================================================
+--- gnome-settings-daemon-3.26.1.orig/plugins/keyboard/gsd-keyboard-manager.c
++++ gnome-settings-daemon-3.26.1/plugins/keyboard/gsd-keyboard-manager.c
+@@ -161,6 +161,58 @@ check_xkb_extension (GsdKeyboardManager
          return have_xkb;
  }
  
@@ -23,7 +23,7 @@ index ea67dda1..24c77164 100644
 +                { "bn_IN", "m17n:bn:inscript" },
 +                { "gu_IN", "m17n:gu:inscript" },
 +                { "hi_IN", "m17n:hi:inscript" },
-+                { "ja_JP", "anthy" },
++                { "ja_JP", "mozc-jp" },
 +                { "kn_IN", "m17n:kn:kgp" },
 +                { "ko_KR", "hangul" },
 +                { "mai_IN", "m17n:mai:inscript" },
@@ -69,7 +69,7 @@ index ea67dda1..24c77164 100644
  static void
  xkb_init (GsdKeyboardManager *manager)
  {
-@@ -641,6 +693,7 @@ maybe_create_initial_settings (GsdKeyboardManager *manager)
+@@ -713,6 +765,7 @@ maybe_create_initial_settings (GsdKeyboa
          sources = g_settings_get_value (settings, KEY_INPUT_SOURCES);
          if (g_variant_n_children (sources) < 1)
                  get_sources_from_xkb_config (manager);
@@ -77,6 +77,3 @@ index ea67dda1..24c77164 100644
          g_variant_unref (sources);
  
          options = g_settings_get_strv (settings, KEY_KEYBOARD_OPTIONS);
--- 
-2.14.1
-

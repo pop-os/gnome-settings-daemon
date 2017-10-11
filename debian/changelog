@@ -1,3 +1,11 @@
+gnome-settings-daemon (3.26.1-0ubuntu3) UNRELEASED; urgency=medium
+
+  * debian/patches/ubuntu_ibus_configs.patch: use mozc-jp instead of anthy
+    for Japanese. ibus-anthy is not installed by default anymore.
+    (lp: #1722681)
+
+ -- Ikuya Awashiro <ikuya@fruitsbasket.info>  Wed, 11 Oct 2017 08:13:10 +0900
+
 gnome-settings-daemon (3.26.1-0ubuntu2) artful; urgency=medium
 
   * debian/patches/ubuntu_ibus_configs.patch: restore the code that 
