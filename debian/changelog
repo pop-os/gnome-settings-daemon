@@ -1,10 +1,16 @@
 gnome-settings-daemon (3.26.1-0ubuntu3) UNRELEASED; urgency=medium
 
+  * debian/patches/ubuntu-lid-close-suspend.patch:
+    - comment that old Ubuntu patch, it's buggy and creating issues like
+      laptops suspending when logging in while docked with the lid closed
+      (lp: #1716160)
+
+  [ Ikuya Awashiro ]
   * debian/patches/ubuntu_ibus_configs.patch: use mozc-jp instead of anthy
     for Japanese. ibus-anthy is not installed by default anymore.
     (lp: #1722681)
 
- -- Ikuya Awashiro <ikuya@fruitsbasket.info>  Wed, 11 Oct 2017 08:13:10 +0900
+ -- Sebastien Bacher <seb128@ubuntu.com>  Wed, 11 Oct 2017 12:35:08 +0200
 
 gnome-settings-daemon (3.26.1-0ubuntu2) artful; urgency=medium
 
