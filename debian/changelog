@@ -1,4 +1,4 @@
-gnome-settings-daemon (3.26.1-0ubuntu3) UNRELEASED; urgency=medium
+gnome-settings-daemon (3.26.1-0ubuntu3) artful; urgency=medium
 
   * debian/patches/ubuntu-lid-close-suspend.patch:
     - comment that old Ubuntu patch, it's buggy and creating issues like
@@ -10,7 +10,7 @@ gnome-settings-daemon (3.26.1-0ubuntu3) UNRELEASED; urgency=medium
     for Japanese. ibus-anthy is not installed by default anymore.
     (lp: #1722681)
 
- -- Sebastien Bacher <seb128@ubuntu.com>  Wed, 11 Oct 2017 12:35:08 +0200
+ -- Sebastien Bacher <seb128@ubuntu.com>  Wed, 11 Oct 2017 12:39:32 +0200
 
 gnome-settings-daemon (3.26.1-0ubuntu2) artful; urgency=medium
 
