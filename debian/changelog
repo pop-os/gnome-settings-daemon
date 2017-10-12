@@ -1,3 +1,11 @@
+gnome-settings-daemon (3.26.1-0ubuntu4) UNRELEASED; urgency=medium
+
+  * debian/patches/ubuntu-lid-close-suspend.patch:
+    - restore the patch for the schemas part (and delete the code), 
+      those keys are used by unity-settings-daemon (lp: #1722920)
+
+ -- Sebastien Bacher <seb128@ubuntu.com>  Thu, 12 Oct 2017 16:45:31 +0200
+
 gnome-settings-daemon (3.26.1-0ubuntu3) artful; urgency=medium
 
   * debian/patches/ubuntu-lid-close-suspend.patch:
