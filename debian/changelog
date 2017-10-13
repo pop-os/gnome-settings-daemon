@@ -1,4 +1,4 @@
-gnome-settings-daemon (3.26.1-0ubuntu4) UNRELEASED; urgency=medium
+gnome-settings-daemon (3.26.1-0ubuntu4) artful; urgency=medium
 
   * debian/patches/ubuntu-lid-close-suspend.patch:
     - restore the patch for the schemas part (and delete the code), 
@@ -12,13 +12,16 @@ gnome-settings-daemon (3.26.1-0ubuntu3) artful; urgency=medium
     - comment that old Ubuntu patch, it's buggy and creating issues like
       laptops suspending when logging in while docked with the lid closed
       (lp: #1716160)
+  * debian/patches/ubuntu_ibus_configs.patch:
+    - use sunpinyin instead of pinyin for zh_CN since that's the ibus
+      component which is preinstall nowadays
 
   [ Ikuya Awashiro ]
   * debian/patches/ubuntu_ibus_configs.patch: use mozc-jp instead of anthy
     for Japanese. ibus-anthy is not installed by default anymore.
     (lp: #1722681)
 
- -- Sebastien Bacher <seb128@ubuntu.com>  Wed, 11 Oct 2017 12:39:32 +0200
+ -- Sebastien Bacher <seb128@ubuntu.com>  Wed, 11 Oct 2017 13:57:31 +0200
 
 gnome-settings-daemon (3.26.1-0ubuntu2) artful; urgency=medium
 

@@ -7,7 +7,7 @@ Section: gnome
 Priority: optional
 Maintainer: Ubuntu Desktop Team <ubuntu-desktop@lists.ubuntu.com>
 XSBC-Original-Maintainer: Debian GNOME Maintainers <pkg-gnome-maintainers@lists.alioth.debian.org>
-Uploaders: Andreas Henriksson <andreas@fatal.se>, Jeremy Bicha <jbicha@ubuntu.com>, Laurent Bigonville <bigon@debian.org>, Michael Biebl <biebl@debian.org>
+Uploaders: Emilio Pozuelo Monfort <pochu@debian.org>, Laurent Bigonville <bigon@debian.org>, Michael Biebl <biebl@debian.org>
 Build-Depends: debhelper (>= 10),
                gnome-pkg-tools,
                gtk-doc-tools,
@@ -47,6 +47,7 @@ Build-Depends: debhelper (>= 10),
                xkb-data,
                python-dbusmock <!nocheck>,
                python-gi <!nocheck>,
+               udev [linux-any] <!nocheck>,
                xauth <!nocheck>,
                xvfb <!nocheck>
 Standards-Version: 3.9.8

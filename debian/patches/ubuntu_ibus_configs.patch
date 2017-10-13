@@ -34,7 +34,7 @@ Index: gnome-settings-daemon-3.26.1/plugins/keyboard/gsd-keyboard-manager.c
 +                { "sd_IN", "m17n:sd:inscript" },
 +                { "ta_IN", "m17n:ta:tamil99" },
 +                { "te_IN", "m17n:te:inscript" },
-+                { "zh_CN", "pinyin" },
++                { "zh_CN", "sunpinyin" },
 +                { "zh_HK", "cangjie3" },
 +                { "zh_TW", "chewing" },
 +        };
