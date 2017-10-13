@@ -69,11 +69,15 @@ Index: gnome-settings-daemon-3.26.1/plugins/keyboard/gsd-keyboard-manager.c
  static void
  xkb_init (GsdKeyboardManager *manager)
  {
-@@ -713,6 +765,7 @@ maybe_create_initial_settings (GsdKeyboa
+@@ -711,8 +763,10 @@ maybe_create_initial_settings (GsdKeyboa
+ 
+         /* if we still don't have anything do some educated guesses */
          sources = g_settings_get_value (settings, KEY_INPUT_SOURCES);
-         if (g_variant_n_children (sources) < 1)
+-        if (g_variant_n_children (sources) < 1)
++        if (g_variant_n_children (sources) < 1) {
                  get_sources_from_xkb_config (manager);
 +                add_ibus_sources_from_locale (settings);
++        }
          g_variant_unref (sources);
  
          options = g_settings_get_strv (settings, KEY_KEYBOARD_OPTIONS);

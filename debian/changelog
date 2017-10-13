@@ -1,3 +1,13 @@
+gnome-settings-daemon (3.26.1-0ubuntu5) artful; urgency=medium
+
+  * debian/patches/ubuntu_ibus_configs.patch:
+     - configure sources only when there is none, that code is meant to be
+       used on first login only, the issue was due to a merge error in the 
+       recent changes, thanks Mitsuya Shibata for pointing the error
+       (lp: #1723358)
+
+ -- Sebastien Bacher <seb128@ubuntu.com>  Fri, 13 Oct 2017 13:07:31 +0200
+
 gnome-settings-daemon (3.26.1-0ubuntu4) artful; urgency=medium
 
   * debian/patches/ubuntu-lid-close-suspend.patch:
