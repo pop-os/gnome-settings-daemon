@@ -1,6 +1,7 @@
 gnome-settings-daemon (3.26.2-1) UNRELEASED; urgency=medium
 
   * New upstream release
+  * Switch to dh_missing
 
  -- Michael Biebl <biebl@debian.org>  Thu, 02 Nov 2017 18:24:15 +0100
 
