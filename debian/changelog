@@ -1,4 +1,4 @@
-gnome-settings-daemon (3.26.2-1) UNRELEASED; urgency=medium
+gnome-settings-daemon (3.26.2-1) unstable; urgency=medium
 
   [ Michael Biebl ]
   * New upstream release
@@ -7,7 +7,7 @@ gnome-settings-daemon (3.26.2-1) UNRELEASED; urgency=medium
   [ Helmut Grohne ]
   * Honour DEB_BUILD_OPTIONS=nocheck (Closes: #880486)
 
- -- Michael Biebl <biebl@debian.org>  Thu, 02 Nov 2017 18:24:15 +0100
+ -- Michael Biebl <biebl@debian.org>  Thu, 02 Nov 2017 18:45:01 +0100
 
 gnome-settings-daemon (3.26.1-2) unstable; urgency=medium
 
