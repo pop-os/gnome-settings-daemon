@@ -1,7 +1,11 @@
 gnome-settings-daemon (3.26.2-1) UNRELEASED; urgency=medium
 
+  [ Michael Biebl ]
   * New upstream release
   * Switch to dh_missing
+
+  [ Helmut Grohne ]
+  * Honour DEB_BUILD_OPTIONS=nocheck (Closes: #880486)
 
  -- Michael Biebl <biebl@debian.org>  Thu, 02 Nov 2017 18:24:15 +0100
 
