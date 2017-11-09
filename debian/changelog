@@ -1,9 +1,9 @@
-gnome-settings-daemon (3.26.2-0ubuntu1) UNRELEASED; urgency=medium
+gnome-settings-daemon (3.26.2-0ubuntu1) bionic; urgency=medium
 
   * New upstream release (LP: #1731099)
     - Fix Empty Trash button in Setting > Privacy (LP: #1721927)
 
- -- Jeremy Bicha <jbicha@ubuntu.com>  Wed, 08 Nov 2017 16:59:01 -0500
+ -- Jeremy Bicha <jbicha@ubuntu.com>  Wed, 08 Nov 2017 21:16:10 -0500
 
 gnome-settings-daemon (3.26.1-0ubuntu5) artful; urgency=medium
 
