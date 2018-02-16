@@ -1,3 +1,15 @@
+gnome-settings-daemon (3.26.2-0ubuntu3) bionic; urgency=medium
+
+  * No-change rebuild against latest gnome-desktop3
+
+ -- Jeremy Bicha <jbicha@ubuntu.com>  Fri, 16 Feb 2018 06:54:07 -0500
+
+gnome-settings-daemon (3.26.2-0ubuntu2) bionic; urgency=medium
+
+  * No-change rebuild against latest libgweather
+
+ -- Jeremy Bicha <jbicha@ubuntu.com>  Thu, 15 Feb 2018 06:58:03 -0500
+
 gnome-settings-daemon (3.26.2-0ubuntu1) bionic; urgency=medium
 
   * New upstream release (LP: #1731099)
