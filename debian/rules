@@ -26,13 +26,18 @@ override_dh_autoreconf:
 
 override_dh_install:
 	find debian/tmp -type f -name '*.la' -delete -print
-	dh_install --fail-missing
+	dh_install
+
+override_dh_missing:
+	dh_missing --fail-missing
 
 override_dh_auto_test:
+ifeq (,$(filter nocheck, $(DEB_BUILD_OPTIONS)))
 # The tests are not fatal on non-linux architectures
 # See: https://bugzilla.gnome.org/show_bug.cgi?id=770684#c2
 ifeq (,$(filter $(DEB_HOST_ARCH), hurd-i386 kfreebsd-i386 kfreebsd-amd64))
 	xvfb-run dh_auto_test
 else
 	xvfb-run dh_auto_test || true
+endif
 endif
