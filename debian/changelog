@@ -2,6 +2,8 @@ gnome-settings-daemon (3.27.91-1) UNRELEASED; urgency=medium
 
   * New upstream development release
   * Build with meson
+  * Make build tests non-fatal since the tests need to be updated
+    after the meson conversion. See upstream issue 7
   * A11yKeyboard plugin has been dropped, update some of the Breaks
     for this
 

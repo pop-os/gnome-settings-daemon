@@ -24,6 +24,9 @@ override_dh_auto_configure:
 override_dh_missing:
 	dh_missing --fail-missing
 
+# Require installed gsettings schemas
+# https://gitlab.gnome.org/GNOME/gnome-settings-daemon/issues/7
+# Also the tests will require a Build-Dependency on mutter >> 3.27.90
 override_dh_auto_test:
 ifeq (,$(filter nocheck, $(DEB_BUILD_OPTIONS)))
 # The tests are not fatal on non-linux architectures
