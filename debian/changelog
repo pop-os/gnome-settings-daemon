@@ -1,6 +1,7 @@
 gnome-settings-daemon (3.27.91-1) UNRELEASED; urgency=medium
 
   * New upstream development release
+  * Build with meson
 
  -- Jeremy Bicha <jbicha@debian.org>  Mon, 19 Feb 2018 14:06:36 -0500
 

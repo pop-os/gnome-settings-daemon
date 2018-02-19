@@ -7,7 +7,7 @@ Section: gnome
 Priority: optional
 Maintainer: Debian GNOME Maintainers <pkg-gnome-maintainers@lists.alioth.debian.org>
 Uploaders: Jeremy Bicha <jbicha@debian.org>, Laurent Bigonville <bigon@debian.org>, Michael Biebl <biebl@debian.org>
-Build-Depends: debhelper (>= 10.3),
+Build-Depends: debhelper (>= 11.1.3),
                gnome-pkg-tools,
                gtk-doc-tools,
                dh-exec,
@@ -42,6 +42,8 @@ Build-Depends: debhelper (>= 10.3),
                libgweather-3-dev (>= 3.9.5),
                libgeocode-glib-dev (>= 3.10.0),
                libgeoclue-2-dev (>= 2.3.1),
+               meson (>= 0.44.0),
+               policykit-1,
                python-dbusmock <!nocheck>,
                python-gi <!nocheck>,
                udev [linux-any] <!nocheck>,
