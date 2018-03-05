@@ -1,3 +1,23 @@
+gnome-settings-daemon (3.27.91-0ubuntu1) UNRELEASED; urgency=medium
+
+  [ Jeremy Bicha ]
+  * New upstream development release
+  * Update Breaks for dropped plugin in new release
+  * Build with meson
+  * Bump minimum libglib2.0-dev to 2.53.0
+  * Build-Depend on policykit-1 for its files
+  * maintscript: rm obsolete org.gnome.SettingsDaemon.A11yKeyboard autostart
+    file
+  * Refresh patches
+  * Disable build tests since they require installed gsettings schemas
+
+  [ Tim Lunn]
+  * d/p/upststream-power-fix-divide-by-0.patch:
+    Add upstream proposed patch which should fix the gsd-power crash for systems
+    with no backlit keyboard.
+
+ -- Tim Lunn <tim@feathertop.org>  Wed, 28 Feb 2018 19:19:43 +1100
+
 gnome-settings-daemon (3.26.2-0ubuntu3) bionic; urgency=medium
 
   * No-change rebuild against latest gnome-desktop3

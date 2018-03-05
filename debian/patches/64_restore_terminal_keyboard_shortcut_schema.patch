@@ -1,27 +1,27 @@
 ---
- data/org.gnome.settings-daemon.plugins.media-keys.gschema.xml.in.in |    5 ++
- plugins/media-keys/gsd-media-keys-manager.c                         |   19 ++++++++++
- plugins/media-keys/media-keys.h                                     |    1 
- plugins/media-keys/shortcuts-list.h                                 |    1 
+ data/org.gnome.settings-daemon.plugins.media-keys.gschema.xml.in |    5 ++
+ plugins/media-keys/gsd-media-keys-manager.c                      |   19 ++++++++++
+ plugins/media-keys/media-keys.h                                  |    1 
+ plugins/media-keys/shortcuts-list.h                              |    1 
  4 files changed, 26 insertions(+)
 
---- a/data/org.gnome.settings-daemon.plugins.media-keys.gschema.xml.in.in
-+++ b/data/org.gnome.settings-daemon.plugins.media-keys.gschema.xml.in.in
-@@ -130,6 +130,11 @@
-       <_summary>Record a short video of the screen</_summary>
-       <_description>Binding to record a short video of the screen</_description>
+--- a/data/org.gnome.settings-daemon.plugins.media-keys.gschema.xml.in
++++ b/data/org.gnome.settings-daemon.plugins.media-keys.gschema.xml.in
+@@ -131,6 +131,11 @@
+       <summary>Record a short video of the screen</summary>
+       <description>Binding to record a short video of the screen</description>
      </key>
 +    <key name="terminal" type="s">
 +      <default>'&lt;Primary&gt;&lt;Alt&gt;t'</default>
-+      <_summary>Launch terminal</_summary>
-+      <_description>Binding to launch the terminal.</_description>
++      <summary>Launch terminal</summary>
++      <description>Binding to launch the terminal.</description>
 +    </key>
      <key name="www" type="s">
        <default>'XF86WWW'</default>
-       <_summary>Launch web browser</_summary>
+       <summary>Launch web browser</summary>
 --- a/plugins/media-keys/gsd-media-keys-manager.c
 +++ b/plugins/media-keys/gsd-media-keys-manager.c
-@@ -905,6 +905,22 @@ gnome_session_shutdown_cb (GObject *sour
+@@ -936,6 +936,22 @@ gnome_session_shutdown_cb (GObject *sour
  }
  
  static void
@@ -44,7 +44,7 @@
  gnome_session_shutdown (GsdMediaKeysManager *manager)
  {
          GDBusProxy *proxy;
-@@ -2350,6 +2366,9 @@ do_action (GsdMediaKeysManager *manager,
+@@ -2391,6 +2407,9 @@ do_action (GsdMediaKeysManager *manager,
          case SCREENCAST_KEY:
                  do_screencast_action (manager);
                  break;

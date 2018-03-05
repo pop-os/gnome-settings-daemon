@@ -1,0 +1,31 @@
+From 052877fe1ef2c56825f8aaaa7296f87e248e7625 Mon Sep 17 00:00:00 2001
+From: Yanko Kaneti <yaneti@declera.com>
+Date: Fri, 9 Feb 2018 23:17:37 +0200
+Subject: [PATCH] power: Fix divide by zero on keyboard Brightness property
+ request
+
+Fail the get Brightness property request instead of crashing in
+gsd_power_backlight_abs_to_percentage when there is no UPower
+managed keyboard
+---
+ plugins/power/gsd-power-manager.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/plugins/power/gsd-power-manager.c b/plugins/power/gsd-power-manager.c
+index 11a7aa84..e60f5f98 100644
+--- a/plugins/power/gsd-power-manager.c
++++ b/plugins/power/gsd-power-manager.c
+@@ -2920,7 +2920,8 @@ handle_get_property_other (GsdPowerManager *manager,
+         if (g_strcmp0 (interface_name, GSD_POWER_DBUS_INTERFACE_SCREEN) == 0) {
+                 value = backlight_get_percentage (manager->priv->rr_screen, NULL);
+                 retval = g_variant_new_int32 (value);
+-        } else if (g_strcmp0 (interface_name, GSD_POWER_DBUS_INTERFACE_KEYBOARD) == 0) {
++        } else if (manager->priv->upower_kbd_proxy &&
++                   g_strcmp0 (interface_name, GSD_POWER_DBUS_INTERFACE_KEYBOARD) == 0) {
+                 value = ABS_TO_PERCENTAGE (0,
+                                            manager->priv->kbd_brightness_max,
+                                            manager->priv->kbd_brightness_now);
+-- 
+2.16.1
+
+

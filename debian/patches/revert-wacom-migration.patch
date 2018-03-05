@@ -12,13 +12,14 @@ Reverted in Ubuntu because all this commit does is migrate user settings
 from the gnome-settings-daemon schemas to the gsettings-desktop-schemas
 but the old settings are still used by Unity.
 ---
- data/org.gnome.settings-daemon.peripherals.wacom.gschema.xml.in.in |   12 -
- plugins/wacom/gsd-wacom-manager.c                                  |   77 ----------
+ data/org.gnome.settings-daemon.peripherals.wacom.gschema.xml.in |   12 -
+ plugins/wacom/gsd-wacom-manager.c                               |   77 ----------
  2 files changed, 6 insertions(+), 83 deletions(-)
 
---- a/data/org.gnome.settings-daemon.peripherals.wacom.gschema.xml.in.in
-+++ b/data/org.gnome.settings-daemon.peripherals.wacom.gschema.xml.in.in
-@@ -1,7 +1,7 @@
+--- a/data/org.gnome.settings-daemon.peripherals.wacom.gschema.xml.in
++++ b/data/org.gnome.settings-daemon.peripherals.wacom.gschema.xml.in
+@@ -1,8 +1,8 @@
+ <?xml version="1.0" encoding="UTF-8"?>
  <schemalist>
 -  <schema id="org.gnome.settings-daemon.peripherals.wacom.deprecated">
 -    <child name="stylus" schema="org.gnome.settings-daemon.peripherals.wacom.stylus.deprecated"/>
@@ -29,33 +30,33 @@ but the old settings are still used by Unity.
  
      <!-- is-absolute applies to all tools but PAD, CURSOR is hard-coded -->
      <key name="is-absolute" type="b">
-@@ -30,7 +30,7 @@
-       <_description>Enable this to move the cursor when the user touches the tablet.</_description>
+@@ -31,7 +31,7 @@
+       <description>Enable this to move the cursor when the user touches the tablet.</description>
      </key>
    </schema>
 -  <schema id="org.gnome.settings-daemon.peripherals.wacom.stylus.deprecated">
 +  <schema gettext-domain="@GETTEXT_PACKAGE@" id="org.gnome.settings-daemon.peripherals.wacom.stylus">
      <key name="pressurecurve" type="ai">
        <default>[0, 0, 100, 100]</default>
-       <_summary>Wacom stylus pressure curve</_summary>
-@@ -47,7 +47,7 @@
-       <_description>Set this to the pressure value at which a stylus click event is generated.</_description>
+       <summary>Wacom stylus pressure curve</summary>
+@@ -48,7 +48,7 @@
+       <description>Set this to the pressure value at which a stylus click event is generated.</description>
      </key>
    </schema>
 -  <schema id="org.gnome.settings-daemon.peripherals.wacom.eraser.deprecated">
 +  <schema gettext-domain="@GETTEXT_PACKAGE@" id="org.gnome.settings-daemon.peripherals.wacom.eraser">
      <key name="pressurecurve" type="ai">
        <default>[0, 0, 100, 100]</default>
-       <_summary>Wacom eraser pressure curve</_summary>
-@@ -64,7 +64,7 @@
-       <_description>Set this to the pressure value at which an eraser click event is generated.</_description>
+       <summary>Wacom eraser pressure curve</summary>
+@@ -65,7 +65,7 @@
+       <description>Set this to the pressure value at which an eraser click event is generated.</description>
      </key>
    </schema>
 -  <schema id="org.gnome.settings-daemon.peripherals.wacom.tablet-button.deprecated">
 +  <schema gettext-domain="@GETTEXT_PACKAGE@" id="org.gnome.settings-daemon.peripherals.wacom.tablet-button">
      <key name="action-type" enum="org.gnome.settings-daemon.GsdWacomActionType">
        <default>'none'</default>
-       <_summary>Wacom button action type</_summary>
+       <summary>Wacom button action type</summary>
 --- a/plugins/wacom/gsd-wacom-manager.c
 +++ b/plugins/wacom/gsd-wacom-manager.c
 @@ -41,8 +41,6 @@
@@ -138,7 +139,7 @@ but the old settings are still used by Unity.
  	if ((device_type & GSD_DEVICE_TYPE_TABLET) != 0 &&
              (device_type & GSD_DEVICE_TYPE_TOUCHPAD) == 0) {
  		gsd_device_mapper_add_input (manager->priv->device_mapper,
-@@ -400,27 +348,6 @@ register_manager (GsdWacomManager *manag
+@@ -411,27 +359,6 @@ register_manager (GsdWacomManager *manag
                     manager);
  }
  
@@ -166,7 +167,7 @@ but the old settings are still used by Unity.
  gboolean
  gsd_wacom_manager_start (GsdWacomManager *manager,
                           GError         **error)
-@@ -429,8 +356,6 @@ gsd_wacom_manager_start (GsdWacomManager
+@@ -440,8 +367,6 @@ gsd_wacom_manager_start (GsdWacomManager
  
          register_manager (manager_object);
  
@@ -175,7 +176,7 @@ but the old settings are still used by Unity.
          manager->priv->start_idle_id = g_idle_add ((GSourceFunc) gsd_wacom_manager_idle_cb, manager);
          g_source_set_name_by_id (manager->priv->start_idle_id, "[gnome-settings-daemon] gsd_wacom_manager_idle_cb");
  
-@@ -446,8 +371,6 @@ gsd_wacom_manager_stop (GsdWacomManager
+@@ -457,8 +382,6 @@ gsd_wacom_manager_stop (GsdWacomManager
  
          g_debug ("Stopping wacom manager");
  
