@@ -1,6 +1,7 @@
 gnome-settings-daemon (3.27.92-0ubuntu1) UNRELEASED; urgency=medium
 
   * New upstream release candidate
+  * Drop git-power-fix-divide-by-0.patch: Applied in new release
 
  -- Jeremy Bicha <jbicha@debian.org>  Mon, 05 Mar 2018 11:30:33 -0500
 
