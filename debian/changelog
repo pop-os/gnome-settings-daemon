@@ -1,3 +1,9 @@
+gnome-settings-daemon (3.27.92-0ubuntu1) UNRELEASED; urgency=medium
+
+  * New upstream release candidate
+
+ -- Jeremy Bicha <jbicha@debian.org>  Mon, 05 Mar 2018 11:30:33 -0500
+
 gnome-settings-daemon (3.27.91-0ubuntu1) bionic; urgency=medium
 
   [ Jeremy Bicha ]
