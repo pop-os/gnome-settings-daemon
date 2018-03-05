@@ -12,11 +12,11 @@ gnome-settings-daemon (3.27.91-0ubuntu1) UNRELEASED; urgency=medium
   * Disable build tests since they require installed gsettings schemas
 
   [ Tim Lunn]
-  * d/p/upststream-power-fix-divide-by-0.patch:
-    Add upstream proposed patch which should fix the gsd-power crash for systems
-    with no backlit keyboard.
+  * d/p/git-power-fix-divide-by-0.patch:
+    Cherry-pick patch which should fix the gsd-power crash for systems
+    with no backlit keyboard. (LP: #1751956)
 
- -- Tim Lunn <tim@feathertop.org>  Wed, 28 Feb 2018 19:19:43 +1100
+ -- Tim Lunn <tim@feathertop.org>  Mon, 05 Mar 2018 23:19:43 +1100
 
 gnome-settings-daemon (3.26.2-0ubuntu3) bionic; urgency=medium
 
