@@ -15,6 +15,11 @@
       <_summary>Launch calculator</_summary>
       <_description>Binding to launch the calculator.</_description>
     </key>
+    <key name="control-center" type="s">
+      <default>'XF86Tools'</default>
+      <_summary>Launch settings</_summary>
+      <_description>Binding to launch GNOME settings.</_description>
+    </key>
     <key name="email" type="s">
       <default>'XF86Mail'</default>
       <_summary>Launch email client</_summary>
@@ -66,12 +71,12 @@
       <_description>Binding to skip to previous track.</_description>
     </key>
     <key name="priority" type="i">
-      <default>98</default>
+      <default>0</default>
       <_summary>Priority to use for this plugin</_summary>
       <_description>Priority to use for this plugin in gnome-settings-daemon startup queue</_description>
     </key>
     <key name="screensaver" type="s">
-      <default>'&lt;Control&gt;&lt;Alt&gt;l'</default>
+      <default>'&lt;Super&gt;l'</default>
       <_summary>Lock screen</_summary>
       <_description>Binding to lock the screen.</_description>
     </key>
@@ -130,18 +135,23 @@
       <_summary>Copy a screenshot of an area to clipboard</_summary>
       <_description>Binding to copy a screenshot of an area to clipboard.</_description>
     </key>
+    <key name="screencast" type="s">
+      <default>'&lt;Ctrl&gt;&lt;Shift&gt;&lt;Alt&gt;R'</default>
+      <_summary>Record a short video of the screen</_summary>
+      <description>Binding to record a short video of the screen</description>
+    </key>
     <key name="www" type="s">
       <default>'XF86WWW'</default>
       <_summary>Launch web browser</_summary>
       <_description>Binding to launch the web browser.</_description>
     </key>
     <key name="magnifier" type="s">
-      <default>''</default>
+      <default>'&lt;Alt&gt;&lt;Super&gt;8'</default>
       <_summary>Toggle magnifier</_summary>
       <_description>Binding to show the screen magnifier</_description>
     </key>
     <key name="screenreader" type="s">
-      <default>''</default>
+      <default>'&lt;Alt&gt;&lt;Super&gt;s'</default>
       <_summary>Toggle screen reader</_summary>
       <_description>Binding to start the screen reader</_description>
     </key>
@@ -166,14 +176,19 @@
       <_description>Binding to toggle the interface contrast</_description>
     </key>
     <key name="magnifier-zoom-in" type="s">
-      <default>''</default>
+      <default>'&lt;Alt&gt;&lt;Super&gt;equal'</default>
       <_summary>Magnifier zoom in</_summary>
       <_description>Binding for the magnifier to zoom in</_description>
     </key>
     <key name="magnifier-zoom-out" type="s">
-      <default>''</default>
+      <default>'&lt;Alt&gt;&lt;Super&gt;minus'</default>
       <_summary>Magnifier zoom out</_summary>
       <_description>Binding for the magnifier to zoom out</_description>
+    </key>
+    <key name="max-screencast-length" type="u">
+      <default>30</default>
+      <summary>Maximum length of screen recordings</summary>
+      <description>The maximum length of single screen cast recordings in seconds or 0 for unlimited</description>
     </key>
   </schema>
 

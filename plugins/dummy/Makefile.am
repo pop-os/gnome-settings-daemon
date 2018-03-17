@@ -6,11 +6,11 @@ plugin_LTLIBRARIES = \
 libdummy_la_SOURCES = 		\
 	gsd-dummy-manager.c	\
 	gsd-dummy-manager.h	\
-	gsd-dummy-plugin.c	\
-	gsd-dummy-plugin.h
+	gsd-dummy-plugin.c
 
 libdummy_la_CPPFLAGS = \
 	-I$(top_srcdir)/gnome-settings-daemon		\
+	-I$(top_builddir)/gnome-settings-daemon		\
 	-DGNOME_SETTINGS_LOCALEDIR=\""$(datadir)/locale"\" \
 	$(AM_CPPFLAGS)
 

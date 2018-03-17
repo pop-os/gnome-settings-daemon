@@ -4,19 +4,21 @@ plugin_LTLIBRARIES = \
 	libcolor.la
 
 libcolor_la_SOURCES = 			\
-	gcm-profile-store.c		\
-	gcm-profile-store.h		\
-	gcm-dmi.c			\
-	gcm-dmi.h			\
 	gcm-edid.c			\
 	gcm-edid.h			\
+	gsd-color-calibrate.c		\
+	gsd-color-calibrate.h		\
 	gsd-color-manager.c		\
 	gsd-color-manager.h		\
-	gsd-color-plugin.c		\
-	gsd-color-plugin.h
+	gsd-color-profiles.c		\
+	gsd-color-profiles.h		\
+	gsd-color-state.c		\
+	gsd-color-state.h		\
+	gsd-color-plugin.c
 
 libcolor_la_CPPFLAGS = \
 	-I$(top_srcdir)/gnome-settings-daemon		\
+	-I$(top_builddir)/gnome-settings-daemon		\
 	-DGNOME_SETTINGS_LOCALEDIR=\""$(datadir)/locale"\" \
 	-DBINDIR=\"$(bindir)\"				\
 	$(AM_CPPFLAGS)
@@ -53,8 +55,6 @@ gcm_self_test_CFLAGS =			\
 	$(AM_CFLAGS)
 
 gcm_self_test_SOURCES =			\
-	gcm-dmi.c			\
-	gcm-dmi.h			\
 	gcm-edid.c			\
 	gcm-edid.h			\
 	gcm-self-test.c

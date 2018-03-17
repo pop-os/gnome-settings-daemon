@@ -16,8 +16,7 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
+ * along with this program; if not, see <http://www.gnu.org/licenses/>.
  *
  */
 
@@ -28,11 +27,33 @@
 
 G_BEGIN_DECLS
 
+typedef struct {
+        gint ref_count;
+        GFile           *file;
+        GCancellable    *cancellable;
+        GDateTime       *old;
+        gboolean         dry_run;
+        gboolean         trash;
+        gchar           *name;
+        gint             depth;
+} DeleteData;
+
+void delete_data_unref (DeleteData *data);
+DeleteData *delete_data_new (GFile        *file,
+                             GCancellable *cancellable,
+                             GDateTime    *old,
+                             gboolean      dry_run,
+                             gboolean      trash,
+                             gint          depth);
+void delete_recursively_by_age (DeleteData *data);
+
 void gsd_ldsm_setup (gboolean check_now);
 void gsd_ldsm_clean (void);
 
 /* for the test */
 void gsd_ldsm_show_empty_trash (void);
+void gsd_ldsm_purge_trash      (GDateTime *old);
+void gsd_ldsm_purge_temp_files (GDateTime *old);
 
 G_END_DECLS
 

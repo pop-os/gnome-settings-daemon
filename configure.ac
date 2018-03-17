@@ -1,12 +1,12 @@
 AC_PREREQ([2.60])
 
 AC_INIT([gnome-settings-daemon],
-        [3.4.2],
+        [3.14.2],
         [http://bugzilla.gnome.org/enter_bug.cgi?product=gnome-settings-daemon])
 
 AC_CONFIG_SRCDIR([gnome-settings-daemon/gnome-settings-manager.c])
 
-AM_INIT_AUTOMAKE([1.9 tar-ustar dist-xz no-dist-gzip])
+AM_INIT_AUTOMAKE([1.9 tar-ustar dist-xz no-dist-gzip check-news])
 AM_MAINTAINER_MODE([enable])
 
 m4_ifdef([AM_SILENT_RULES],[AM_SILENT_RULES([yes])])
@@ -43,32 +43,39 @@ dnl ---------------------------------------------------------------------------
 dnl - Dependencies
 dnl ---------------------------------------------------------------------------
 
-GLIB_REQUIRED_VERSION=2.31.0
-GTK_REQUIRED_VERSION=3.3.18
+GLIB_REQUIRED_VERSION=2.37.7
+GIO_REQUIRED_VERSION=${GLIB_REQUIRED_VERSION}
+GTK_REQUIRED_VERSION=3.7.8
 GCONF_REQUIRED_VERSION=2.6.1
-GIO_REQUIRED_VERSION=2.26.0
-GNOME_DESKTOP_REQUIRED_VERSION=3.3.92
+GNOME_DESKTOP_REQUIRED_VERSION=3.11.1
+LIBGWEATHER_REQUIRED_VERSION=3.9.5
 LIBNOTIFY_REQUIRED_VERSION=0.7.3
-UPOWER_GLIB_REQUIRED_VERSION=0.9.1
-PA_REQUIRED_VERSION=0.9.16
-LIBWACOM_REQUIRED_VERSION=0.6
-UPOWER_REQUIRED_VERSION=0.9.11
+PA_REQUIRED_VERSION=2.0
+LIBWACOM_REQUIRED_VERSION=0.7
+LIBRSVG_REQUIRED_VERSION=2.36.2
+PANGO_REQUIRED_VERSION=1.20.0
+POLKIT_REQUIRED_VERSION=0.103
+UPOWER_REQUIRED_VERSION=0.99.0
+GSETTINGS_DESKTOP_SCHEMAS_REQUIRED_VERSION=3.9.91
+GEOCODE_GLIB_REQUIRED_VERSION=3.10.0
+GEOCLUE_REQUIRED_VERSION=2.1.2
+NM_REQUIRED_VERSION=0.9.9.1
 
 EXTRA_COMPILE_WARNINGS(yes)
 
 PKG_CHECK_MODULES(SETTINGS_DAEMON,
-        glib-2.0 >= $GLIB_REQUIRED_VERSION
         gtk+-3.0 >= $GTK_REQUIRED_VERSION
         gio-2.0 >= $GIO_REQUIRED_VERSION
         gmodule-2.0
         gthread-2.0
-	gsettings-desktop-schemas >= 3.3.0
+	gsettings-desktop-schemas >= $GSETTINGS_DESKTOP_SCHEMAS_REQUIRED_VERSION
 )
 
 PKG_CHECK_MODULES(SETTINGS_PLUGIN,
         gtk+-3.0 >= $GTK_REQUIRED_VERSION
         gio-2.0 >= $GIO_REQUIRED_VERSION
-        gsettings-desktop-schemas
+        libnotify >= $LIBNOTIFY_REQUIRED_VERSION
+	gsettings-desktop-schemas >= $GSETTINGS_DESKTOP_SCHEMAS_REQUIRED_VERSION
         x11
 )
 
@@ -81,6 +88,7 @@ esac
 AC_SUBST([GSD_PLUGIN_LDFLAGS])
 
 AC_PATH_PROG(GLIB_GENMARSHAL, glib-genmarshal)
+AC_PATH_PROG([GLIB_MKENUMS],[glib-mkenums])
 
 dnl ================================================================
 dnl GSettings stuff
@@ -119,10 +127,10 @@ dnl ---------------------------------------------------------------------------
 dnl - GUdev integration (default enabled)
 dnl ---------------------------------------------------------------------------
 GUDEV_PKG=""
-AC_ARG_ENABLE(gudev, AS_HELP_STRING([--disable-gudev],[Disable GUdev support]), enable_gudev=$enableval)
+AC_ARG_ENABLE(gudev, AS_HELP_STRING([--disable-gudev],[Disable GUdev support (not optional on Linux platforms)]), enable_gudev=$enableval)
 if test x$enable_gudev != xno; then
-	PKG_CHECK_MODULES(GUDEV, gudev-1.0, HAVE_GUDEV="yes", HAVE_GUDEV="no")
-	if test "x$HAVE_GUDEV" = "xyes"; then
+	PKG_CHECK_MODULES(GUDEV, gudev-1.0, have_gudev="yes", have_gudev="no")
+	if test "x$have_gudev" = "xyes"; then
 		AC_DEFINE(HAVE_GUDEV, 1, [define if GUdev is available])
 		GUDEV_PKG="gudev-1.0"
 	else
@@ -131,9 +139,26 @@ if test x$enable_gudev != xno; then
 		fi
 	fi
 else
-	HAVE_GUDEV=no
+	have_gudev=no
 fi
-AM_CONDITIONAL(HAVE_GUDEV, test x$HAVE_GUDEV = xyes)
+AM_CONDITIONAL(HAVE_GUDEV, test x$have_gudev = xyes)
+
+dnl ---------------------------------------------------------------------------
+dnl - Check for libwayland-client
+dnl ---------------------------------------------------------------------------
+AC_ARG_ENABLE(wayland,
+        AC_HELP_STRING([--disable-wayland], [Disable wayland support (default: auto)]),
+        enable_wayland=$enableval, enable_wayland=auto)
+if test x$enable_wayland != xno; then
+        PKG_CHECK_MODULES(WAYLAND, wayland-client, have_wayland=yes, have_wayland=no)
+        if test x$have_wayland = xyes; then
+                AC_DEFINE(HAVE_WAYLAND, 1, [Define if libwayland-client is available])
+        else
+                if test x$enable_wayland = xyes; then
+                        AC_MSG_ERROR([Wayland enabled but not found])
+                fi
+        fi
+fi
 
 dnl ---------------------------------------------------------------------------
 dnl - common
@@ -142,16 +167,12 @@ dnl ---------------------------------------------------------------------------
 PKG_CHECK_MODULES(COMMON, x11 kbproto xi)
 
 dnl ---------------------------------------------------------------------------
-dnl - automount
+dnl - XTest
 dnl ---------------------------------------------------------------------------
 
-PKG_CHECK_MODULES(AUTOMOUNT, x11 kbproto)
-
-dnl ---------------------------------------------------------------------------
-dnl - background
-dnl ---------------------------------------------------------------------------
-
-PKG_CHECK_MODULES(BACKGROUND, x11 gnome-desktop-3.0 >= $GNOME_DESKTOP_REQUIRED_VERSION)
+PKG_CHECK_MODULES(XTEST, x11 xtst)
+AC_SUBST(XTEST_CFLAGS)
+AC_SUBST(XTEST_LIBS)
 
 dnl ---------------------------------------------------------------------------
 dnl - mouse
@@ -163,20 +184,13 @@ dnl ---------------------------------------------------------------------------
 dnl - cursor
 dnl ---------------------------------------------------------------------------
 
-PKG_CHECK_MODULES(CURSOR, xfixes)
+PKG_CHECK_MODULES(CURSOR, xfixes gnome-desktop-3.0 >= $GNOME_DESKTOP_REQUIRED_VERSION)
 
 dnl ---------------------------------------------------------------------------
-dnl - Fontconfig
+dnl - xsettings
 dnl ---------------------------------------------------------------------------
 
-PKG_CHECK_MODULES(FONTCONFIG, fontconfig)
-
-dnl ---------------------------------------------------------------------------
-dnl - Keyboard plugin stuff
-dnl ---------------------------------------------------------------------------
-
-LIBGNOMEKBD_REQUIRED=2.91.1
-PKG_CHECK_MODULES(KEYBOARD, [libgnomekbdui >= $LIBGNOMEKBD_REQUIRED libgnomekbd >= $LIBGNOMEKBD_REQUIRED libxklavier >= 5.0 kbproto])
+PKG_CHECK_MODULES(XSETTINGS, fontconfig gnome-desktop-3.0 >= $GNOME_DESKTOP_REQUIRED_VERSION)
 
 dnl ---------------------------------------------------------------------------
 dnl - Housekeeping plugin stuff
@@ -188,13 +202,67 @@ dnl ---------------------------------------------------------------------------
 dnl - media-keys plugin stuff
 dnl ---------------------------------------------------------------------------
 
-PKG_CHECK_MODULES(MEDIA_KEYS, [gio-unix-2.0 libpulse >= $PA_REQUIRED_VERSION $GUDEV_PKG libpulse-mainloop-glib >= $PA_REQUIRED_VERSION libcanberra])
+PKG_CHECK_MODULES(MEDIA_KEYS, [gio-unix-2.0 libpulse >= $PA_REQUIRED_VERSION $GUDEV_PKG libpulse-mainloop-glib >= $PA_REQUIRED_VERSION libcanberra-gtk3 upower-glib >= $UPOWER_REQUIRED_VERSION])
+PKG_CHECK_MODULES(GVC, [gobject-2.0 libpulse >= $PA_REQUIRED_VERSION libpulse-mainloop-glib >= $PA_REQUIRED_VERSION])
+AM_CONDITIONAL(HAVE_INTROSPECTION, false)
+
+dnl ---------------------------------------------------------------------------
+dnl - xrandr plugin stuff
+dnl ---------------------------------------------------------------------------
+
+PKG_CHECK_MODULES(XRANDR, [gnome-desktop-3.0 >= $GNOME_DESKTOP_REQUIRED_VERSION upower-glib >= $UPOWER_REQUIRED_VERSION])
+
+dnl ---------------------------------------------------------------------------
+dnl - orientation plugin stuff
+dnl ---------------------------------------------------------------------------
+
+if test x$have_gudev != xno; then
+	PKG_CHECK_MODULES(ORIENTATION, [gnome-desktop-3.0 >= $GNOME_DESKTOP_REQUIRED_VERSION gudev-1.0])
+fi
+
+dnl ---------------------------------------------------------------------------
+dnl - sound plugin stuff
+dnl ---------------------------------------------------------------------------
+
+PKG_CHECK_MODULES(SOUND, [libpulse >= $PA_REQUIRED_VERSION $GUDEV_PKG libpulse-mainloop-glib >= $PA_REQUIRED_VERSION])
+
+# ---------------------------------------------------------------------------
+# Power
+# ---------------------------------------------------------------------------
+PKG_CHECK_MODULES(POWER, upower-glib >= $UPOWER_REQUIRED_VERSION gnome-desktop-3.0 >= $GNOME_DESKTOP_REQUIRED_VERSION $GUDEV_PKG libcanberra-gtk3 libnotify x11 xext xtst)
+
+if test x$have_gudev != xno; then
+	PKG_CHECK_MODULES(BACKLIGHT_HELPER,
+		glib-2.0 >= $GLIB_REQUIRED_VERSION
+		gudev-1.0
+	)
+fi
 
 dnl ---------------------------------------------------------------------------
 dnl - color
 dnl ---------------------------------------------------------------------------
 
-PKG_CHECK_MODULES(COLOR, [colord >= 0.1.9 gnome-desktop-3.0 >= $GNOME_DESKTOP_REQUIRED_VERSION libcanberra-gtk3])
+PKG_CHECK_MODULES(COLOR, [colord >= 1.0.2 gnome-desktop-3.0 >= $GNOME_DESKTOP_REQUIRED_VERSION libcanberra-gtk3])
+
+dnl ---------------------------------------------------------------------------
+dnl - datetime
+dnl ---------------------------------------------------------------------------
+
+AC_CHECK_LIBM
+AC_SUBST(LIBM)
+
+PKG_CHECK_MODULES(DATETIME,
+        geoclue-2.0 >= $GEOCLUE_REQUIRED_VERSION
+	geocode-glib-1.0 >= $GEOCODE_GLIB_REQUIRED_VERSION
+	gweather-3.0 >= $LIBGWEATHER_REQUIRED_VERSION
+	polkit-gobject-1 >= $POLKIT_REQUIRED_VERSION
+)
+
+GEOCLUE_DBUS_INTERFACE_XML=`pkg-config --variable=dbus_interface geoclue-2.0`
+if test "x$GEOCLUE_DBUS_INTERFACE_XML" = "x"; then
+	AC_MSG_ERROR([Cannot find dbus_interface variable in geoclue-2.0.pc])
+fi
+AC_SUBST(GEOCLUE_DBUS_INTERFACE_XML)
 
 dnl ---------------------------------------------------------------------------
 dnl - wacom (disabled for s390/s390x and non Linux platforms)
@@ -205,7 +273,14 @@ case $host_os in
     if test "$host_cpu" = s390 -o "$host_cpu" = s390x; then
       have_wacom=no
     else
-      PKG_CHECK_MODULES(WACOM, [libwacom >= $LIBWACOM_REQUIRED_VERSION x11 xi xtst $GUDEV_PKG gnome-desktop-3.0 >= $GNOME_DESKTOP_REQUIRED_VERSION xorg-wacom])
+      if test x$enable_gudev != xno; then
+        PKG_CHECK_MODULES(LIBWACOM, [libwacom >= $LIBWACOM_REQUIRED_VERSION])
+        PKG_CHECK_MODULES(WACOM, [libwacom >= $LIBWACOM_REQUIRED_VERSION x11 xi xtst gudev-1.0 gnome-desktop-3.0 >= $GNOME_DESKTOP_REQUIRED_VERSION xorg-wacom librsvg-2.0 >= $LIBRSVG_REQUIRED_VERSION libnotify >= $LIBNOTIFY_REQUIRED_VERSION pango >= $PANGO_REQUIRED_VERSION])
+        PKG_CHECK_MODULES(WACOM_OLED, [gudev-1.0])
+      else
+        AC_MSG_ERROR([GUdev is necessary to compile Wacom support])
+      fi
+      AC_DEFINE_UNQUOTED(HAVE_WACOM, 1, [Define to 1 if wacom support is available])
       have_wacom=yes
     fi
     ;;
@@ -214,33 +289,6 @@ case $host_os in
     ;;
 esac
 AM_CONDITIONAL(HAVE_WACOM, test x$have_wacom = xyes)
-
-dnl ==============================================
-dnl PackageKit section
-dnl ==============================================
-
-have_packagekit=false
-AC_ARG_ENABLE(packagekit,
-  AC_HELP_STRING([--disable-packagekit],
-                 [turn off PackageKit support]),
-       [case "${enableval}" in
-               yes) WANT_PACKAGEKIT=yes ;;
-               no)  WANT_PACKAGEKIT=no ;;
-               *) AC_MSG_ERROR(bad value ${enableval} for --disable-packagekit) ;;
-       esac],
-       [WANT_PACKAGEKIT=yes]) dnl Default value
-
-if test x$WANT_PACKAGEKIT = xyes ; then
-       PK_REQUIRED_VERSION=0.6.12
-       PKG_CHECK_MODULES(PACKAGEKIT, glib-2.0 packagekit-glib2 >= $PK_REQUIRED_VERSION upower-glib >= $UPOWER_REQUIRED_VERSION gudev-1.0 libnotify >= $LIBNOTIFY_REQUIRED_VERSION,
-             [have_packagekit=true
-              AC_DEFINE(HAVE_PACKAGEKIT, 1, [Define if PackageKit should be used])],
-             [have_packagekit=false])
-fi
-AM_CONDITIONAL(HAVE_PACKAGEKIT, test "x$have_packagekit" = "xtrue")
-
-AC_SUBST(PACKAGEKIT_CFLAGS)
-AC_SUBST(PACKAGEKIT_LIBS)
 
 dnl ==============================================
 dnl smartcard section
@@ -288,43 +336,6 @@ fi
 AC_SUBST(NSS_DATABASE)
 
 
-dnl ==============================================
-dnl power section
-dnl ==============================================
-
-# ---------------------------------------------------------------------------
-# UPower
-# ---------------------------------------------------------------------------
-PKG_CHECK_MODULES(UPOWER, upower-glib >= $UPOWER_REQUIRED_VERSION libcanberra-gtk3)
-if test x$enable_gudev != xno; then
-	PKG_CHECK_MODULES(BACKLIGHT_HELPER,
-		glib-2.0 >= $GLIB_REQUIRED_VERSION
-		gudev-1.0
-	)
-fi
-
-# ---------------------------------------------------------------------------
-# systemd
-# ---------------------------------------------------------------------------
-
-AC_ARG_ENABLE([systemd],
-              AS_HELP_STRING([--enable-systemd], [Use systemd for session tracking]),
-              [with_systemd=$enableval],
-              [with_systemd=no])
-if test "$with_systemd" = "yes" ; then
-  PKG_CHECK_MODULES(SYSTEMD, [libsystemd-login])
-  AC_DEFINE(HAVE_SYSTEMD, 1, [Define if systemd is used for session tracking])
-  SESSION_TRACKING=systemd
-else
-  SESSION_TRACKING=ConsoleKit
-fi
-
-AC_SUBST(SYSTEMD_CFLAGS)
-AC_SUBST(SYSTEMD_LIBS)
-
-AM_CONDITIONAL(WITH_SYSTEMD, [test "$with_systemd" = "yes"], [Using systemd])
-
-
 # ---------------------------------------------------------------------------
 # CUPS
 # ---------------------------------------------------------------------------
@@ -336,8 +347,11 @@ AC_ARG_ENABLE(cups,
 if test x"$enable_cups" != x"no" ; then
    AC_PROG_SED
 
-   AC_PATH_PROG(CUPS_CONFIG, cups-config,
-                AC_MSG_ERROR([cups-config not found but CUPS support requested]))
+   AC_PATH_PROG(CUPS_CONFIG, cups-config)
+
+   if test x$CUPS_CONFIG = x; then
+     AC_MSG_ERROR([cups-config not found but CUPS support requested])
+   fi
 
   CUPS_API_VERSION=`$CUPS_CONFIG --api-version`
   CUPS_API_MAJOR=`echo $ECHO_N $CUPS_API_VERSION | cut -d . -f 1`
@@ -351,13 +365,55 @@ if test x"$enable_cups" != x"no" ; then
       AC_MSG_ERROR([CUPS 1.4 or newer not found, but CUPS support requested])
    fi
 
+   # https://bugzilla.gnome.org/show_bug.cgi?id=696571
+   CUPS_CPPFLAGS=""
+   if test $CUPS_API_MAJOR -gt 1 -o \
+           $CUPS_API_MAJOR -eq 1 -a $CUPS_API_MINOR -ge 6 ; then
+      CUPS_CPPFLAGS=-D_PPD_DEPRECATED=""
+   fi
+
    CUPS_CFLAGS=`$CUPS_CONFIG --cflags | $SED -e 's/-O\w*//g' -e 's/-m\w*//g'`
    CUPS_LIBS=`$CUPS_CONFIG --libs`
+   AC_SUBST(CUPS_CPPFLAGS)
    AC_SUBST(CUPS_CFLAGS)
    AC_SUBST(CUPS_LIBS)
 fi
 
 AM_CONDITIONAL(BUILD_PRINT_NOTIFICATIONS, [test x"$enable_cups" = x"yes"])
+
+# ---------------------------------------------------------------------------
+# Rfkill
+# ---------------------------------------------------------------------------
+
+AC_ARG_ENABLE(rfkill,
+              AS_HELP_STRING([--disable-rfkill], [disable rfkill support (default: enabled)]),,
+              enable_rfkill=yes, enabled_rfkill=no)
+
+if test x"$enable_rfkill" != x"no" ; then
+  AC_CHECK_HEADERS([linux/rfkill.h],,
+                   AC_MSG_ERROR([RFKill headers not found but rfkill support requested]))
+fi
+
+AM_CONDITIONAL(BUILD_RFKILL, [test x"$enable_rfkill" = x"yes"])
+
+dnl ---------------------------------------------------------------------------
+dnl Sharing plugin
+dnl ---------------------------------------------------------------------------
+
+AC_ARG_ENABLE(network-manager,
+        AS_HELP_STRING([--disable-network-manager],
+                       [Disable NetworkManager support]),
+        enable_network_manager=$enableval,
+        enable_network_manager=yes)
+
+if test "x$enable_network_manager" = "xyes" ; then
+        NM_MODULE="libnm-glib >= $NM_REQUIRED_VERSION libnm-util >= $NM_REQUIRED_VERSION"
+        AC_DEFINE(HAVE_NETWORK_MANAGER, 1, [Defined if NetworkManager support is enabled])
+else
+        NM_MODULE=
+fi
+
+PKG_CHECK_MODULES(SHARING, gio-2.0 $NM_MODULE)
 
 # ---------------------------------------------------------------------------
 # Enable Profiling
@@ -370,7 +426,6 @@ if test "x$enable_profiling" = "xyes"; then
     AC_DEFINE(ENABLE_PROFILING,1,[enable profiling])
 fi
 
-
 # ---------------------------------------------------------------------------
 # Plugins
 # ---------------------------------------------------------------------------
@@ -378,8 +433,20 @@ fi
 plugindir='$(libdir)/gnome-settings-daemon-gsd_api_version'
 AC_SUBST([plugindir])
 
-PLUGIN_CFLAGS="-DG_LOG_DOMAIN=\"\\\"\$(plugin_name)-plugin\\\"\""
+PLUGIN_CFLAGS="-DG_LOG_DOMAIN=\"\\\"\$(plugin_name)-plugin\\\"\" -DPLUGIN_NAME=\"\\\"\$(plugin_name)\\\"\" "
 AC_SUBST(PLUGIN_CFLAGS)
+
+AC_ARG_ENABLE(man,
+              [AS_HELP_STRING([--enable-man],
+                              [generate man pages [default=yes]])],,
+              enable_man=yes)
+if test "$enable_man" != no; then
+  AC_PATH_PROG([XSLTPROC], [xsltproc])
+  if test -z "$XSLTPROC"; then
+    AC_MSG_ERROR([xsltproc is required for --enable-man])
+  fi
+fi
+AM_CONDITIONAL(ENABLE_MAN, test "$enable_man" != no)
 
 dnl ---------------------------------------------------------------------------
 dnl - Finish
@@ -451,24 +518,25 @@ gnome-settings-daemon/Makefile
 plugins/Makefile
 plugins/a11y-keyboard/Makefile
 plugins/a11y-settings/Makefile
-plugins/automount/Makefile
-plugins/background/Makefile
 plugins/clipboard/Makefile
 plugins/color/Makefile
 plugins/common/Makefile
 plugins/cursor/Makefile
+plugins/datetime/Makefile
 plugins/dummy/Makefile
 plugins/power/Makefile
 plugins/housekeeping/Makefile
 plugins/keyboard/Makefile
 plugins/media-keys/Makefile
-plugins/media-keys/cut-n-paste/Makefile
+plugins/media-keys/gvc/Makefile
 plugins/mouse/Makefile
 plugins/orientation/Makefile
 plugins/print-notifications/Makefile
+plugins/rfkill/Makefile
+plugins/screensaver-proxy/Makefile
+plugins/sharing/Makefile
 plugins/smartcard/Makefile
 plugins/sound/Makefile
-plugins/updates/Makefile
 plugins/wacom/Makefile
 plugins/xrandr/Makefile
 plugins/xsettings/Makefile
@@ -480,15 +548,18 @@ data/org.gnome.settings-daemon.plugins.xsettings.gschema.xml.in
 data/org.gnome.settings-daemon.plugins.keyboard.gschema.xml.in
 data/org.gnome.settings-daemon.plugins.power.gschema.xml.in
 data/org.gnome.settings-daemon.plugins.color.gschema.xml.in
+data/org.gnome.settings-daemon.plugins.datetime.gschema.xml.in
 data/org.gnome.settings-daemon.plugins.media-keys.gschema.xml.in
 data/org.gnome.settings-daemon.peripherals.gschema.xml.in
 data/org.gnome.settings-daemon.plugins.housekeeping.gschema.xml.in
 data/org.gnome.settings-daemon.plugins.orientation.gschema.xml.in
-data/org.gnome.settings-daemon.plugins.updates.gschema.xml.in
+data/org.gnome.settings-daemon.plugins.sharing.gschema.xml.in
 data/org.gnome.settings-daemon.plugins.xrandr.gschema.xml.in
 data/org.gnome.settings-daemon.peripherals.wacom.gschema.xml.in
 data/org.gnome.settings-daemon.plugins.print-notifications.gschema.xml.in
 po/Makefile.in
+man/Makefile
+tests/Makefile
 ])
 
 dnl ---------------------------------------------------------------------------
@@ -514,14 +585,13 @@ echo "
         cflags:                   ${CFLAGS}
         Maintainer mode:          ${USE_MAINTAINER_MODE}
 
-        Session tracking:         ${SESSION_TRACKING}
         LCMS DICT support:        ${have_new_lcms}
-
+        NetworkManager support:   ${enable_network_manager}
         Libnotify support:        ${have_libnotify}
-        PackageKit support:       ${have_packagekit}
         Smartcard support:        ${have_smartcard_support}
         Cups support:             ${enable_cups}
         Wacom support:            ${have_wacom}
+        RFKill support:           ${enable_rfkill}
 ${NSS_DATABASE:+\
         System nssdb:             ${NSS_DATABASE}
 }\

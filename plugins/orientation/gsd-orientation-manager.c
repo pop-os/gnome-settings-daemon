@@ -16,8 +16,7 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
+ * along with this program; if not, see <http://www.gnu.org/licenses/>.
  *
  */
 
@@ -33,6 +32,7 @@
 #include <libgnome-desktop/gnome-rr.h>
 
 #include "gsd-input-helper.h"
+#include "gnome-settings-plugin.h"
 #include "gnome-settings-profile.h"
 #include "gsd-orientation-manager.h"
 
@@ -49,6 +49,7 @@ typedef enum {
 struct GsdOrientationManagerPrivate
 {
         guint start_idle_id;
+        guint name_id;
 
         /* Accelerometer */
         char *sysfs_path;
@@ -69,7 +70,7 @@ struct GsdOrientationManagerPrivate
 #define CONF_SCHEMA "org.gnome.settings-daemon.peripherals.touchscreen"
 #define ORIENTATION_LOCK_KEY "orientation-lock"
 
-#define GSD_DBUS_PATH "/org/gnome/SettingsDaemon"
+#define GSD_ORIENTATION_DBUS_NAME GSD_DBUS_NAME ".Orientation"
 #define GSD_ORIENTATION_DBUS_PATH GSD_DBUS_PATH "/Orientation"
 
 static const gchar introspection_xml[] =
@@ -82,38 +83,17 @@ static const gchar introspection_xml[] =
 static void     gsd_orientation_manager_class_init  (GsdOrientationManagerClass *klass);
 static void     gsd_orientation_manager_init        (GsdOrientationManager      *orientation_manager);
 static void     gsd_orientation_manager_finalize    (GObject                    *object);
+static void     update_accelerometer                (GsdOrientationManager      *manager);
 
 G_DEFINE_TYPE (GsdOrientationManager, gsd_orientation_manager, G_TYPE_OBJECT)
 
 static gpointer manager_object = NULL;
-
-static GObject *
-gsd_orientation_manager_constructor (GType                     type,
-                               guint                      n_construct_properties,
-                               GObjectConstructParam     *construct_properties)
-{
-        GsdOrientationManager      *orientation_manager;
-
-        orientation_manager = GSD_ORIENTATION_MANAGER (G_OBJECT_CLASS (gsd_orientation_manager_parent_class)->constructor (type,
-                                                                                                         n_construct_properties,
-                                                                                                         construct_properties));
-
-        return G_OBJECT (orientation_manager);
-}
-
-static void
-gsd_orientation_manager_dispose (GObject *object)
-{
-        G_OBJECT_CLASS (gsd_orientation_manager_parent_class)->dispose (object);
-}
 
 static void
 gsd_orientation_manager_class_init (GsdOrientationManagerClass *klass)
 {
         GObjectClass   *object_class = G_OBJECT_CLASS (klass);
 
-        object_class->constructor = gsd_orientation_manager_constructor;
-        object_class->dispose = gsd_orientation_manager_dispose;
         object_class->finalize = gsd_orientation_manager_finalize;
 
         g_type_class_add_private (klass, sizeof (GsdOrientationManagerPrivate));
@@ -204,10 +184,9 @@ on_xrandr_action_call_finished (GObject               *source_object,
 
         variant = g_dbus_proxy_call_finish (G_DBUS_PROXY (source_object), res, &error);
 
-        g_object_unref (manager->priv->cancellable);
-        manager->priv->cancellable = NULL;
+        g_clear_object (&manager->priv->cancellable);
 
-        if (error != NULL) {
+        if (variant == NULL) {
                 g_warning ("Unable to call 'RotateTo': %s", error->message);
                 g_error_free (error);
         } else {
@@ -282,8 +261,11 @@ client_uevent_cb (GUdevClient           *client,
         if (manager->priv->orientation_lock)
                 return;
 
-        if (g_str_equal (action, "change") == FALSE)
+        if (g_str_equal (action, "change") == FALSE) {
+                /* "add", "remove", or "move" */
+                update_accelerometer (manager);
                 return;
+        }
 
         if (g_strcmp0 (manager->priv->sysfs_path, sysfs_path) != 0)
                 return;
@@ -361,12 +343,23 @@ on_bus_gotten (GObject               *source_object,
         g_dbus_proxy_new (manager->priv->connection,
                           G_DBUS_PROXY_FLAGS_NONE,
                           NULL,
-                          "org.gnome.SettingsDaemon",
-                          "/org/gnome/SettingsDaemon/XRANDR",
-                          "org.gnome.SettingsDaemon.XRANDR_2",
+                          GSD_DBUS_NAME ".XRANDR",
+                          GSD_DBUS_PATH "/XRANDR",
+                          GSD_DBUS_BASE_INTERFACE ".XRANDR_2",
                           NULL,
                           (GAsyncReadyCallback) xrandr_ready_cb,
                           manager);
+
+	/* If we got the accelerometer before D-Bus was ready */
+        if (manager->priv->sysfs_path != NULL) {
+                manager->priv->name_id = g_bus_own_name_on_connection (manager->priv->connection,
+                                                                       GSD_ORIENTATION_DBUS_NAME,
+                                                                       G_BUS_NAME_OWNER_FLAGS_NONE,
+                                                                       NULL,
+                                                                       NULL,
+                                                                       NULL,
+                                                                       NULL);
+        }
 }
 
 static GUdevDevice *
@@ -408,33 +401,54 @@ get_accelerometer (GUdevClient *client)
         return ret;
 }
 
+static void
+update_accelerometer (GsdOrientationManager *manager)
+{
+        GUdevDevice *dev;
+
+        g_clear_pointer (&manager->priv->sysfs_path, g_free);
+        manager->priv->prev_orientation = ORIENTATION_UNDEFINED;
+
+        dev = get_accelerometer (manager->priv->client);
+        if (dev == NULL) {
+                if (manager->priv->name_id != 0)
+                        g_bus_unown_name (manager->priv->name_id);
+        } else {
+                if (manager->priv->connection) {
+                        manager->priv->name_id = g_bus_own_name_on_connection (manager->priv->connection,
+                                                                               GSD_ORIENTATION_DBUS_NAME,
+                                                                               G_BUS_NAME_OWNER_FLAGS_NONE,
+                                                                               NULL,
+                                                                               NULL,
+                                                                               NULL,
+                                                                               NULL);
+                }
+
+                manager->priv->sysfs_path = g_strdup (g_udev_device_get_sysfs_path (dev));
+                g_debug ("Found accelerometer at sysfs path '%s'", manager->priv->sysfs_path);
+
+                manager->priv->prev_orientation = get_orientation_from_device (dev);
+                g_object_unref (dev);
+        }
+}
+
 static gboolean
 gsd_orientation_manager_idle_cb (GsdOrientationManager *manager)
 {
         const char * const subsystems[] = { "input", NULL };
-        GUdevDevice *dev;
 
         gnome_settings_profile_start (NULL);
 
+        manager->priv->start_idle_id = 0;
         manager->priv->settings = g_settings_new (CONF_SCHEMA);
         manager->priv->orientation_lock = g_settings_get_boolean (manager->priv->settings, ORIENTATION_LOCK_KEY);
         g_signal_connect (G_OBJECT (manager->priv->settings), "changed::orientation-lock",
                           G_CALLBACK (orientation_lock_changed_cb), manager);
 
         manager->priv->client = g_udev_client_new (subsystems);
-        dev = get_accelerometer (manager->priv->client);
-        if (dev == NULL) {
-                g_debug ("Did not find an accelerometer");
-                gnome_settings_profile_end (NULL);
-                return FALSE;
-        }
-        manager->priv->sysfs_path = g_strdup (g_udev_device_get_sysfs_path (dev));
-        g_debug ("Found accelerometer at sysfs path '%s'", manager->priv->sysfs_path);
+        update_accelerometer (manager);
 
-        manager->priv->prev_orientation = get_orientation_from_device (dev);
-        g_object_unref (dev);
-
-        /* Start process of owning a D-Bus name */
+        /* D-Bus setup */
         g_bus_get (G_BUS_TYPE_SESSION,
                    NULL,
                    (GAsyncReadyCallback) on_bus_gotten,
@@ -445,7 +459,7 @@ gsd_orientation_manager_idle_cb (GsdOrientationManager *manager)
 
         gnome_settings_profile_end (NULL);
 
-        return FALSE;
+        return G_SOURCE_REMOVE;
 }
 
 gboolean
@@ -455,6 +469,7 @@ gsd_orientation_manager_start (GsdOrientationManager *manager,
         gnome_settings_profile_start (NULL);
 
         manager->priv->start_idle_id = g_idle_add ((GSourceFunc) gsd_orientation_manager_idle_cb, manager);
+        g_source_set_name_by_id (manager->priv->start_idle_id, "[gnome-settings-daemon] gsd_orientation_manager_idle_cb");
 
         manager->priv->introspection_data = g_dbus_node_info_new_for_xml (introspection_xml, NULL);
         g_assert (manager->priv->introspection_data != NULL);
@@ -471,25 +486,13 @@ gsd_orientation_manager_stop (GsdOrientationManager *manager)
 
         g_debug ("Stopping orientation manager");
 
-        if (p->settings) {
-                g_object_unref (p->settings);
-                p->settings = NULL;
-        }
+        if (manager->priv->name_id != 0)
+                g_bus_unown_name (manager->priv->name_id);
 
-        if (p->sysfs_path) {
-                g_free (p->sysfs_path);
-                p->sysfs_path = NULL;
-        }
-
-        if (p->introspection_data) {
-                g_dbus_node_info_unref (p->introspection_data);
-                p->introspection_data = NULL;
-        }
-
-        if (p->client) {
-                g_object_unref (p->client);
-                p->client = NULL;
-        }
+        g_clear_object (&p->settings);
+        g_clear_pointer (&p->sysfs_path, g_free);
+        g_clear_pointer (&p->introspection_data, g_dbus_node_info_unref);
+        g_clear_object (&p->client);
 }
 
 static void
@@ -503,6 +506,8 @@ gsd_orientation_manager_finalize (GObject *object)
         orientation_manager = GSD_ORIENTATION_MANAGER (object);
 
         g_return_if_fail (orientation_manager->priv != NULL);
+
+        gsd_orientation_manager_stop (orientation_manager);
 
         if (orientation_manager->priv->start_idle_id != 0)
                 g_source_remove (orientation_manager->priv->start_idle_id);

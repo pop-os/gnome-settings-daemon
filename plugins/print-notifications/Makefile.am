@@ -6,14 +6,15 @@ plugin_LTLIBRARIES = \
 libprint_notifications_la_SOURCES = 		\
 	gsd-print-notifications-manager.c	\
 	gsd-print-notifications-manager.h	\
-	gsd-print-notifications-plugin.c	\
-	gsd-print-notifications-plugin.h
+	gsd-print-notifications-plugin.c
 
 libprint_notifications_la_CPPFLAGS = \
 	-I$(top_srcdir)/gnome-settings-daemon		\
+	-I$(top_builddir)/gnome-settings-daemon		\
 	-DGNOME_SETTINGS_LOCALEDIR=\""$(datadir)/locale"\" \
 	-DLIBEXECDIR=\""$(libexecdir)"\" \
-	$(AM_CPPFLAGS)
+	$(AM_CPPFLAGS)			\
+	$(CUPS_CPPFLAGS)
 
 libprint_notifications_la_CFLAGS = \
 	$(PLUGIN_CFLAGS)		\
@@ -48,26 +49,28 @@ gsd_printer_LDADD  = 		\
 	$(CUPS_LIBS)		\
 	$(LIBNOTIFY_LIBS)
 
-noinst_PROGRAMS = \
-	test-print-notifications
+libexec_PROGRAMS += gsd-test-print-notifications
 
-test_print_notifications_SOURCES =		\
+gsd_test_print_notifications_SOURCES =		\
 	gsd-print-notifications-manager.c	\
 	gsd-print-notifications-manager.h	\
 	test-print-notifications.c
 
-test_print_notifications_CPPFLAGS =				\
+gsd_test_print_notifications_CPPFLAGS =				\
 	-I$(top_srcdir)/gnome-settings-daemon			\
-	-DGNOME_SETTINGS_LOCALEDIR=\""$(datadir)/locale"\" 	\
+	-I$(top_builddir)/gnome-settings-daemon			\
+	-I$(top_srcdir)/plugins/common				\
+	-DGNOME_SETTINGS_LOCALEDIR=\""$(datadir)/locale"\"	\
 	-DLIBEXECDIR=\""$(libexecdir)"\"			\
-	$(AM_CPPFLAGS)
+	$(AM_CPPFLAGS)						\
+	$(CUPS_CPPFLAGS)
 
-test_print_notifications_CFLAGS =	\
+gsd_test_print_notifications_CFLAGS =	\
 	$(PLUGIN_CFLAGS)		\
 	$(SETTINGS_PLUGIN_CFLAGS)	\
 	$(AM_CFLAGS)
 
-test_print_notifications_LDADD =				\
+gsd_test_print_notifications_LDADD =				\
 	$(top_builddir)/gnome-settings-daemon/libgsd.la		\
 	$(SETTINGS_DAEMON_LIBS)					\
 	$(SETTINGS_PLUGIN_LIBS)					\

@@ -3,29 +3,24 @@ NULL =
 enabled_plugins =	\
 	a11y-keyboard	\
 	a11y-settings	\
-	automount	\
-	background	\
 	clipboard	\
 	color		\
 	cursor		\
+	datetime	\
 	dummy		\
 	power		\
 	housekeeping    \
 	keyboard	\
 	media-keys	\
 	mouse		\
+	screensaver-proxy \
+	sharing		\
 	sound		\
 	xrandr		\
 	xsettings	\
 	$(NULL)
 
 disabled_plugins = $(NULL)
-
-if HAVE_PACKAGEKIT
-enabled_plugins += updates
-else
-disabled_plugins += updates
-endif
 
 if SMARTCARD_SUPPORT
 enabled_plugins += smartcard
@@ -49,6 +44,12 @@ if BUILD_PRINT_NOTIFICATIONS
 enabled_plugins += print-notifications
 else
 disabled_plugins += print-notifications
+endif
+
+if BUILD_RFKILL
+enabled_plugins += rfkill
+else
+disabled_plugins += rfkill
 endif
 
 SUBDIRS = common $(enabled_plugins)

@@ -14,8 +14,7 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
+ * along with this program; if not, see <http://www.gnu.org/licenses/>.
  *
  */
 
@@ -36,28 +35,27 @@
 #include <glib/gi18n.h>
 #include <gio/gio.h>
 #include <gdk/gdk.h>
-#include <gdk/gdkx.h>
 #include <gtk/gtk.h>
 #include <libupower-glib/upower.h>
-#include <X11/Xatom.h>
 
 #define GNOME_DESKTOP_USE_UNSTABLE_API
 
 #include <libgnome-desktop/gnome-rr-config.h>
 #include <libgnome-desktop/gnome-rr.h>
-#include <libgnome-desktop/gnome-rr-labeler.h>
+#include <libgnome-desktop/gnome-pnp-ids.h>
 
 #include "gsd-enums.h"
 #include "gsd-input-helper.h"
+#include "gnome-settings-plugin.h"
 #include "gnome-settings-profile.h"
-#include "gnome-settings-session.h"
+#include "gnome-settings-bus.h"
+#include "gsd-device-mapper.h"
 #include "gsd-xrandr-manager.h"
 
 #define GSD_XRANDR_MANAGER_GET_PRIVATE(o) (G_TYPE_INSTANCE_GET_PRIVATE ((o), GSD_TYPE_XRANDR_MANAGER, GsdXrandrManagerPrivate))
 
 #define CONF_SCHEMA "org.gnome.settings-daemon.plugins.xrandr"
 #define CONF_KEY_DEFAULT_MONITORS_SETUP   "default-monitors-setup"
-#define CONF_KEY_DEFAULT_CONFIGURATION_FILE   "default-configuration-file"
 
 /* Number of seconds that the confirmation dialog will last before it resets the
  * RANDR configuration to its old state.
@@ -67,22 +65,13 @@
 /* name of the icon files (gsd-xrandr.svg, etc.) */
 #define GSD_XRANDR_ICON_NAME "gsd-xrandr"
 
-#define GSD_DBUS_PATH "/org/gnome/SettingsDaemon"
+#define GSD_XRANDR_DBUS_NAME GSD_DBUS_NAME ".XRANDR"
 #define GSD_XRANDR_DBUS_PATH GSD_DBUS_PATH "/XRANDR"
 
 static const gchar introspection_xml[] =
-"<node>"
+"<node name='/org/gnome/SettingsDaemon/XRANDR'>"
 "  <interface name='org.gnome.SettingsDaemon.XRANDR_2'>"
 "    <annotation name='org.freedesktop.DBus.GLib.CSymbol' value='gsd_xrandr_manager_2'/>"
-"    <method name='ApplyConfiguration'>"
-"      <!-- transient-parent window for the confirmation dialog; use 0"
-"      for no parent -->"
-"      <arg name='parent_window_id' type='x' direction='in'/>"
-""
-"      <!-- Timestamp used to present the confirmation dialog and (in"
-"      the future) for the RANDR calls themselves -->"
-"      <arg name='timestamp' type='x' direction='in'/>"
-"    </method>"
 "    <method name='VideoModeSwitch'>"
 "       <!-- Timestamp for the RANDR call itself -->"
 "       <arg name='timestamp' type='x' direction='in'/>"
@@ -99,25 +88,26 @@ static const gchar introspection_xml[] =
 "  </interface>"
 "</node>";
 
-struct GsdXrandrManagerPrivate
-{
+struct GsdXrandrManagerPrivate {
         GnomeRRScreen *rw_screen;
         gboolean running;
 
         UpClient *upower_client;
-        gboolean laptop_lid_is_closed;
 
         GSettings       *settings;
         GDBusNodeInfo   *introspection_data;
+        guint            name_id;
         GDBusConnection *connection;
         GCancellable    *bus_cancellable;
+
+        GsdDeviceMapper  *device_mapper;
+        GdkDeviceManager *device_manager;
+        guint             device_added_id;
+        guint             device_removed_id;
 
         /* fn-F7 status */
         int             current_fn_f7_config;             /* -1 if no configs */
         GnomeRRConfig **fn_f7_configs;  /* NULL terminated, NULL if there are no configs */
-
-        /* Last time at which we got a "screen got reconfigured" event; see on_randr_event() */
-        guint32 last_config_timestamp;
 };
 
 static const GnomeRRRotation possible_rotations[] = {
@@ -132,15 +122,13 @@ static void     gsd_xrandr_manager_class_init  (GsdXrandrManagerClass *klass);
 static void     gsd_xrandr_manager_init        (GsdXrandrManager      *xrandr_manager);
 static void     gsd_xrandr_manager_finalize    (GObject             *object);
 
-static void error_message (GsdXrandrManager *mgr, const char *primary_text, GError *error_to_display, const char *secondary_text);
-
 static void get_allowed_rotations_for_output (GnomeRRConfig *config,
                                               GnomeRRScreen *rr_screen,
                                               GnomeRROutputInfo *output,
                                               int *out_num_rotations,
                                               GnomeRRRotation *out_rotations);
-static void handle_fn_f7 (GsdXrandrManager *mgr, guint32 timestamp);
-static void handle_rotate_windows (GsdXrandrManager *mgr, GnomeRRRotation rotation, guint32 timestamp);
+static void handle_fn_f7 (GsdXrandrManager *mgr, gint64 timestamp);
+static void handle_rotate_windows (GsdXrandrManager *mgr, GnomeRRRotation rotation, gint64 timestamp);
 
 G_DEFINE_TYPE (GsdXrandrManager, gsd_xrandr_manager, G_TYPE_OBJECT)
 
@@ -242,23 +230,11 @@ log_configuration (GnomeRRConfig *config)
                 log_msg ("        no outputs!\n");
 }
 
-static char
-timestamp_relationship (guint32 a, guint32 b)
-{
-        if (a < b)
-                return '<';
-        else if (a > b)
-                return '>';
-        else
-                return '=';
-}
-
 static void
 log_screen (GnomeRRScreen *screen)
 {
         GnomeRRConfig *config;
         int min_w, min_h, max_w, max_h;
-        guint32 change_timestamp, config_timestamp;
 
         if (!log_file)
                 return;
@@ -266,14 +242,10 @@ log_screen (GnomeRRScreen *screen)
         config = gnome_rr_config_new_current (screen, NULL);
 
         gnome_rr_screen_get_ranges (screen, &min_w, &max_w, &min_h, &max_h);
-        gnome_rr_screen_get_timestamps (screen, &change_timestamp, &config_timestamp);
 
-        log_msg ("        Screen min(%d, %d), max(%d, %d), change=%u %c config=%u\n",
+        log_msg ("        Screen min(%d, %d), max(%d, %d)\n",
                  min_w, min_h,
-                 max_w, max_h,
-                 change_timestamp,
-                 timestamp_relationship (change_timestamp, config_timestamp),
-                 config_timestamp);
+                 max_w, max_h);
 
         log_configuration (config);
         g_object_unref (config);
@@ -296,47 +268,19 @@ log_configurations (GnomeRRConfig **configs)
 }
 
 static void
-show_timestamps_dialog (GsdXrandrManager *manager, const char *msg)
-{
-#if 1
-        return;
-#else
-        struct GsdXrandrManagerPrivate *priv = manager->priv;
-        GtkWidget *dialog;
-        guint32 change_timestamp, config_timestamp;
-        static int serial;
-
-        gnome_rr_screen_get_timestamps (priv->rw_screen, &change_timestamp, &config_timestamp);
-
-        dialog = gtk_message_dialog_new (NULL,
-                                         0,
-                                         GTK_MESSAGE_INFO,
-                                         GTK_BUTTONS_CLOSE,
-                                         "RANDR timestamps (%d):\n%s\nchange: %u\nconfig: %u",
-                                         serial++,
-                                         msg,
-                                         change_timestamp,
-                                         config_timestamp);
-        g_signal_connect (dialog, "response",
-                          G_CALLBACK (gtk_widget_destroy), NULL);
-        gtk_widget_show (dialog);
-#endif
-}
-
-static void
 print_output (GnomeRROutputInfo *info)
 {
         int x, y, width, height;
 
-        g_print ("  Output: %s attached to %s\n", gnome_rr_output_info_get_display_name (info), gnome_rr_output_info_get_name (info));
-        g_print ("     status: %s\n", gnome_rr_output_info_is_active (info) ? "on" : "off");
+        g_debug ("  Output: %s attached to %s", gnome_rr_output_info_get_display_name (info), gnome_rr_output_info_get_name (info));
+        g_debug ("     status: %s", gnome_rr_output_info_is_active (info) ? "on" : "off");
 
         gnome_rr_output_info_get_geometry (info, &x, &y, &width, &height);
-        g_print ("     width: %d\n", width);
-        g_print ("     height: %d\n", height);
-        g_print ("     rate: %d\n", gnome_rr_output_info_get_refresh_rate (info));
-        g_print ("     primary: %s\n", gnome_rr_output_info_get_primary (info) ? "true" : "false");
-        g_print ("     position: %d %d\n", x, y);
+        g_debug ("     width: %d", width);
+        g_debug ("     height: %d", height);
+        g_debug ("     rate: %d", gnome_rr_output_info_get_refresh_rate (info));
+        g_debug ("     primary: %s", gnome_rr_output_info_get_primary (info) ? "true" : "false");
+        g_debug ("     position: %d %d", x, y);
 }
 
 static void
@@ -345,13 +289,13 @@ print_configuration (GnomeRRConfig *config, const char *header)
         int i;
         GnomeRROutputInfo **outputs;
 
-        g_print ("=== %s Configuration ===\n", header);
+        g_debug ("=== %s Configuration ===", header);
         if (!config) {
-                g_print ("  none\n");
+                g_debug ("  none");
                 return;
         }
 
-        g_print ("  Clone: %s\n", gnome_rr_config_get_clone (config) ? "true" : "false");
+        g_debug ("  Clone: %s", gnome_rr_config_get_clone (config) ? "true" : "false");
 
         outputs = gnome_rr_config_get_outputs (config);
         for (i = 0; outputs[i] != NULL; ++i)
@@ -365,7 +309,7 @@ is_laptop (GnomeRRScreen *screen, GnomeRROutputInfo *output)
 
         rr_output = gnome_rr_screen_get_output_by_name (screen, gnome_rr_output_info_get_name (output));
 
-        return gnome_rr_output_is_laptop (rr_output);
+        return gnome_rr_output_is_builtin_display (rr_output);
 }
 
 static GnomeRROutputInfo *
@@ -382,103 +326,13 @@ get_laptop_output_info (GnomeRRScreen *screen, GnomeRRConfig *config)
         return NULL;
 }
 
-static gboolean
-non_laptop_outputs_are_active (GnomeRRConfig *config, GnomeRROutputInfo *laptop_info)
-{
-        GnomeRROutputInfo **outputs;
-        int i;
-
-        outputs = gnome_rr_config_get_outputs (config);
-        for (i = 0; outputs[i] != NULL; i++) {
-                if (outputs[i] == laptop_info)
-                        continue;
-
-                if (gnome_rr_output_info_is_active (outputs[i]))
-                        return TRUE;
-        }
-
-        return FALSE;
-}
-
-static void
-turn_off_laptop_display_in_configuration (GnomeRRScreen *screen, GnomeRRConfig *config)
-{
-        GnomeRROutputInfo *laptop_info;
-
-        laptop_info = get_laptop_output_info (screen, config);
-        if (laptop_info) {
-                /* Turn off the laptop's screen only if other displays are on.  This is to avoid an all-black-screens scenario. */
-                if (non_laptop_outputs_are_active (config, laptop_info))
-                        gnome_rr_output_info_set_active (laptop_info, FALSE);
-        }
-
-        /* Adjust the offsets of outputs so they start at (0, 0) */
-        gnome_rr_config_sanitize (config);
-}
-
-/* This function effectively centralizes the use of gnome_rr_config_apply_from_filename_with_time().
- *
- * Optionally filters out GNOME_RR_ERROR_NO_MATCHING_CONFIG from the matching
- * process(), since that is not usually an error.
- */
-static gboolean
-apply_configuration_from_filename (GsdXrandrManager *manager,
-                                   const char       *filename,
-                                   gboolean          no_matching_config_is_an_error,
-                                   guint32           timestamp,
-                                   GError          **error)
-{
-        struct GsdXrandrManagerPrivate *priv = manager->priv;
-        GnomeRRConfig *config;
-        GError *my_error;
-        gboolean success;
-        char *str;
-
-        str = g_strdup_printf ("Applying %s with timestamp %d", filename, timestamp);
-        show_timestamps_dialog (manager, str);
-        g_free (str);
-
-        my_error = NULL;
-
-        config = g_object_new (GNOME_TYPE_RR_CONFIG, "screen", priv->rw_screen, NULL);
-        if (!gnome_rr_config_load_filename (config, filename, &my_error)) {
-                g_object_unref (config);
-
-                if (g_error_matches (my_error, GNOME_RR_ERROR, GNOME_RR_ERROR_NO_MATCHING_CONFIG)) {
-                        if (no_matching_config_is_an_error) {
-                                g_propagate_error (error, my_error);
-                                return FALSE;
-                        } else {
-                                /* This is not an error; the user probably changed his monitors
-                                 * and so they don't match any of the stored configurations.
-                                 */
-                                g_error_free (my_error);
-                                return TRUE;
-                        }
-                } else {
-                        g_propagate_error (error, my_error);
-                        return FALSE;
-                }
-        }
-
-        if (up_client_get_lid_is_closed (priv->upower_client))
-                turn_off_laptop_display_in_configuration (priv->rw_screen, config);
-
-        gnome_rr_config_ensure_primary (config);
-	success = gnome_rr_config_apply_with_time (config, priv->rw_screen, timestamp, error);
-
-        g_object_unref (config);
-
-        return success;
-}
-
 /* This function centralizes the use of gnome_rr_config_apply_with_time().
  *
  * Applies a configuration and displays an error message if an error happens.
  * We just return whether setting the configuration succeeded.
  */
 static gboolean
-apply_configuration (GsdXrandrManager *manager, GnomeRRConfig *config, guint32 timestamp, gboolean show_error, gboolean save_configuration)
+apply_configuration (GsdXrandrManager *manager, GnomeRRConfig *config, gint64 timestamp)
 {
         GsdXrandrManagerPrivate *priv = manager->priv;
         GError *error;
@@ -489,269 +343,21 @@ apply_configuration (GsdXrandrManager *manager, GnomeRRConfig *config, guint32 t
         print_configuration (config, "Applying Configuration");
 
         error = NULL;
-        success = gnome_rr_config_apply_with_time (config, priv->rw_screen, timestamp, &error);
-        if (success) {
-                if (save_configuration)
-                        gnome_rr_config_save (config, NULL); /* NULL-GError - there's not much we can do if this fails */
-        } else {
-                log_msg ("Could not switch to the following configuration (timestamp %u): %s\n", timestamp, error->message);
+        success = gnome_rr_config_apply (config, priv->rw_screen, &error);
+
+        if (!success) {
+                log_msg ("Could not switch to the following configuration (timestamp %" G_GINT64_FORMAT "): %s\n", timestamp, error->message);
                 log_configuration (config);
-                if (show_error)
-                        error_message (manager, _("Could not switch the monitor configuration"), error, NULL);
                 g_error_free (error);
         }
 
         return success;
 }
 
-static void
-restore_backup_configuration_without_messages (const char *backup_filename, const char *intended_filename)
-{
-        backup_filename = gnome_rr_config_get_backup_filename ();
-        rename (backup_filename, intended_filename);
-}
-
-static void
-restore_backup_configuration (GsdXrandrManager *manager, const char *backup_filename, const char *intended_filename, guint32 timestamp)
-{
-        int saved_errno;
-
-        if (rename (backup_filename, intended_filename) == 0) {
-                GError *error;
-
-                error = NULL;
-                if (!apply_configuration_from_filename (manager, intended_filename, FALSE, timestamp, &error)) {
-                        error_message (manager, _("Could not restore the display's configuration"), error, NULL);
-
-                        if (error)
-                                g_error_free (error);
-                }
-
-                return;
-        }
-
-        saved_errno = errno;
-
-        /* ENOENT means the original file didn't exist.  That is *not* an error;
-         * the backup was not created because there wasn't even an original
-         * monitors.xml (such as on a first-time login).  Note that *here* there
-         * is a "didn't work" monitors.xml, so we must delete that one.
-         */
-        if (saved_errno == ENOENT)
-                unlink (intended_filename);
-        else {
-                char *msg;
-
-                msg = g_strdup_printf ("Could not rename %s to %s: %s",
-                                       backup_filename, intended_filename,
-                                       g_strerror (saved_errno));
-                error_message (manager,
-                               _("Could not restore the display's configuration from a backup"),
-                               NULL,
-                               msg);
-                g_free (msg);
-        }
-
-        unlink (backup_filename);
-}
-
-typedef struct {
-        GsdXrandrManager *manager;
-        GtkWidget *dialog;
-
-        int countdown;
-        int response_id;
-} TimeoutDialog;
-
-static void
-print_countdown_text (TimeoutDialog *timeout)
-{
-        gtk_message_dialog_format_secondary_text (GTK_MESSAGE_DIALOG (timeout->dialog),
-                                                  ngettext ("The display will be reset to its previous configuration in %d second",
-                                                            "The display will be reset to its previous configuration in %d seconds",
-                                                            timeout->countdown),
-                                                  timeout->countdown);
-}
-
-static gboolean
-timeout_cb (gpointer data)
-{
-        TimeoutDialog *timeout = data;
-
-        timeout->countdown--;
-
-        if (timeout->countdown == 0) {
-                timeout->response_id = GTK_RESPONSE_CANCEL;
-                gtk_main_quit ();
-        } else {
-                print_countdown_text (timeout);
-        }
-
-        return TRUE;
-}
-
-static void
-timeout_response_cb (GtkDialog *dialog, int response_id, gpointer data)
-{
-        TimeoutDialog *timeout = data;
-
-        if (response_id == GTK_RESPONSE_DELETE_EVENT) {
-                /* The user closed the dialog or pressed ESC, revert */
-                timeout->response_id = GTK_RESPONSE_CANCEL;
-        } else
-                timeout->response_id = response_id;
-
-        gtk_main_quit ();
-}
-
-static gboolean
-user_says_things_are_ok (GsdXrandrManager *manager, GdkWindow *parent_window)
-{
-        TimeoutDialog timeout;
-        guint timeout_id;
-
-        timeout.manager = manager;
-
-        timeout.dialog = gtk_message_dialog_new (NULL,
-                                                 GTK_DIALOG_MODAL,
-                                                 GTK_MESSAGE_QUESTION,
-                                                 GTK_BUTTONS_NONE,
-                                                 _("Does the display look OK?"));
-
-        timeout.countdown = CONFIRMATION_DIALOG_SECONDS;
-
-        print_countdown_text (&timeout);
-
-        gtk_window_set_icon_name (GTK_WINDOW (timeout.dialog), "preferences-desktop-display");
-        gtk_dialog_add_button (GTK_DIALOG (timeout.dialog), _("_Restore Previous Configuration"), GTK_RESPONSE_CANCEL);
-        gtk_dialog_add_button (GTK_DIALOG (timeout.dialog), _("_Keep This Configuration"), GTK_RESPONSE_ACCEPT);
-        gtk_dialog_set_default_response (GTK_DIALOG (timeout.dialog), GTK_RESPONSE_ACCEPT); /* ah, the optimism */
-
-        g_signal_connect (timeout.dialog, "response",
-                          G_CALLBACK (timeout_response_cb),
-                          &timeout);
-
-        gtk_widget_realize (timeout.dialog);
-
-        if (parent_window)
-                gdk_window_set_transient_for (gtk_widget_get_window (timeout.dialog), parent_window);
-
-        gtk_widget_show_all (timeout.dialog);
-        /* We don't use g_timeout_add_seconds() since we actually care that the user sees "real" second ticks in the dialog */
-        timeout_id = g_timeout_add (1000,
-                                    timeout_cb,
-                                    &timeout);
-        gtk_main ();
-
-        gtk_widget_destroy (timeout.dialog);
-        g_source_remove (timeout_id);
-
-        if (timeout.response_id == GTK_RESPONSE_ACCEPT)
-                return TRUE;
-        else
-                return FALSE;
-}
-
-struct confirmation {
-        GsdXrandrManager *manager;
-        GdkWindow *parent_window;
-        guint32 timestamp;
-};
-
-static gboolean
-confirm_with_user_idle_cb (gpointer data)
-{
-        struct confirmation *confirmation = data;
-        char *backup_filename;
-        char *intended_filename;
-
-        backup_filename = gnome_rr_config_get_backup_filename ();
-        intended_filename = gnome_rr_config_get_intended_filename ();
-
-        if (user_says_things_are_ok (confirmation->manager, confirmation->parent_window))
-                unlink (backup_filename);
-        else
-                restore_backup_configuration (confirmation->manager, backup_filename, intended_filename, confirmation->timestamp);
-
-        g_free (confirmation);
-
-        return FALSE;
-}
-
-static void
-queue_confirmation_by_user (GsdXrandrManager *manager, GdkWindow *parent_window, guint32 timestamp)
-{
-        struct confirmation *confirmation;
-
-        confirmation = g_new (struct confirmation, 1);
-        confirmation->manager = manager;
-        confirmation->parent_window = parent_window;
-        confirmation->timestamp = timestamp;
-
-        g_idle_add (confirm_with_user_idle_cb, confirmation);
-}
-
-static gboolean
-try_to_apply_intended_configuration (GsdXrandrManager *manager, GdkWindow *parent_window, guint32 timestamp, GError **error)
-{
-        char *backup_filename;
-        char *intended_filename;
-        gboolean result;
-
-        /* Try to apply the intended configuration */
-
-        backup_filename = gnome_rr_config_get_backup_filename ();
-        intended_filename = gnome_rr_config_get_intended_filename ();
-
-        result = apply_configuration_from_filename (manager, intended_filename, FALSE, timestamp, error);
-        if (!result) {
-                error_message (manager, _("The selected configuration for displays could not be applied"), error ? *error : NULL, NULL);
-                restore_backup_configuration_without_messages (backup_filename, intended_filename);
-                goto out;
-        } else {
-                /* We need to return as quickly as possible, so instead of
-                 * confirming with the user right here, we do it in an idle
-                 * handler.  The caller only expects a status for "could you
-                 * change the RANDR configuration?", not "is the user OK with it
-                 * as well?".
-                 */
-                queue_confirmation_by_user (manager, parent_window, timestamp);
-        }
-
-out:
-        g_free (backup_filename);
-        g_free (intended_filename);
-
-        return result;
-}
-
-/* DBus method for org.gnome.SettingsDaemon.XRANDR_2 ApplyConfiguration; see gsd-xrandr-manager.xml for the interface definition */
-static gboolean
-gsd_xrandr_manager_2_apply_configuration (GsdXrandrManager *manager,
-                                          gint64            parent_window_id,
-                                          gint64            timestamp,
-                                          GError          **error)
-{
-        GdkWindow *parent_window;
-        gboolean result;
-
-        if (parent_window_id != 0)
-                parent_window = gdk_x11_window_foreign_new_for_display (gdk_display_get_default (), (Window) parent_window_id);
-        else
-                parent_window = NULL;
-
-        result = try_to_apply_intended_configuration (manager, parent_window, (guint32) timestamp, error);
-
-        if (parent_window)
-                g_object_unref (parent_window);
-
-        return result;
-}
-
 /* DBus method for org.gnome.SettingsDaemon.XRANDR_2 VideoModeSwitch; see gsd-xrandr-manager.xml for the interface definition */
 static gboolean
 gsd_xrandr_manager_2_video_mode_switch (GsdXrandrManager *manager,
-                                        guint32           timestamp,
+                                        gint64            timestamp,
                                         GError          **error)
 {
         handle_fn_f7 (manager, timestamp);
@@ -761,7 +367,7 @@ gsd_xrandr_manager_2_video_mode_switch (GsdXrandrManager *manager,
 /* DBus method for org.gnome.SettingsDaemon.XRANDR_2 Rotate; see gsd-xrandr-manager.xml for the interface definition */
 static gboolean
 gsd_xrandr_manager_2_rotate (GsdXrandrManager *manager,
-                             guint32           timestamp,
+                             gint64            timestamp,
                              GError          **error)
 {
         handle_rotate_windows (manager, GNOME_RR_ROTATION_NEXT, timestamp);
@@ -772,7 +378,7 @@ gsd_xrandr_manager_2_rotate (GsdXrandrManager *manager,
 static gboolean
 gsd_xrandr_manager_2_rotate_to (GsdXrandrManager *manager,
                                 GnomeRRRotation   rotation,
-                                guint32           timestamp,
+                                gint64            timestamp,
                                 GError          **error)
 {
         guint i;
@@ -871,6 +477,8 @@ make_clone_setup (GsdXrandrManager *manager, GnomeRRScreen *screen)
                 return NULL;
 
         result = gnome_rr_config_new_current (screen, NULL);
+        gnome_rr_config_set_clone (result, TRUE);
+
         outputs = gnome_rr_config_get_outputs (result);
 
         for (i = 0; outputs[i] != NULL; ++i) {
@@ -911,8 +519,6 @@ make_clone_setup (GsdXrandrManager *manager, GnomeRRScreen *screen)
                 g_object_unref (G_OBJECT (result));
                 result = NULL;
         }
-
-        gnome_rr_config_set_clone (result, TRUE);
 
         print_configuration (result, "clone setup");
 
@@ -995,6 +601,8 @@ make_laptop_setup (GsdXrandrManager *manager, GnomeRRScreen *screen)
         GnomeRROutputInfo **outputs = gnome_rr_config_get_outputs (result);
         int i;
 
+        gnome_rr_config_set_clone (result, FALSE);
+
         for (i = 0; outputs[i] != NULL; ++i) {
                 GnomeRROutputInfo *info = outputs[i];
 
@@ -1010,12 +618,11 @@ make_laptop_setup (GsdXrandrManager *manager, GnomeRRScreen *screen)
                 }
         }
 
+
         if (config_is_all_off (result)) {
                 g_object_unref (G_OBJECT (result));
                 result = NULL;
         }
-
-        gnome_rr_config_set_clone (result, FALSE);
 
         print_configuration (result, "Laptop setup");
 
@@ -1038,16 +645,16 @@ turn_on_and_get_rightmost_offset (GnomeRRScreen *screen, GnomeRROutputInfo *info
         return x;
 }
 
-/* Used from qsort(); compares outputs based on their X position */
+/* Used from g_ptr_array_sort(); compares outputs based on their X position */
 static int
-compare_output_positions (const void *a, const void *b)
+compare_output_positions (gconstpointer a, gconstpointer b)
 {
-        GnomeRROutputInfo *oa = (GnomeRROutputInfo *) a;
-        GnomeRROutputInfo *ob = (GnomeRROutputInfo *) b;
+        GnomeRROutputInfo **oa = (GnomeRROutputInfo **) a;
+        GnomeRROutputInfo **ob = (GnomeRROutputInfo **) b;
         int xa, xb;
 
-        gnome_rr_output_info_get_geometry (oa, &xa, NULL, NULL, NULL);
-        gnome_rr_output_info_get_geometry (ob, &xb, NULL, NULL, NULL);
+        gnome_rr_output_info_get_geometry (*oa, &xa, NULL, NULL, NULL);
+        gnome_rr_output_info_get_geometry (*ob, &xb, NULL, NULL, NULL);
 
         return xb - xa;
 }
@@ -1061,39 +668,30 @@ static gboolean
 trim_rightmost_outputs_that_dont_fit_in_framebuffer (GnomeRRScreen *rr_screen, GnomeRRConfig *config)
 {
         GnomeRROutputInfo **outputs;
-        GnomeRROutputInfo **sorted_outputs;
-        int num_on_outputs;
-        int i, j;
+        int i;
         gboolean applicable;
+        GPtrArray *sorted_outputs;
 
         outputs = gnome_rr_config_get_outputs (config);
+        g_return_val_if_fail (outputs != NULL, FALSE);
 
         /* How many are on? */
 
-        num_on_outputs = 0;
+        sorted_outputs = g_ptr_array_new ();
         for (i = 0; outputs[i] != NULL; i++) {
                 if (gnome_rr_output_info_is_active (outputs[i]))
-                        num_on_outputs++;
+                        g_ptr_array_add (sorted_outputs, outputs[i]);
         }
 
         /* Lay them out from left to right */
 
-        sorted_outputs = g_new (GnomeRROutputInfo *, num_on_outputs);
-        j = 0;
-        for (i = 0; outputs[i] != NULL; i++) {
-                if (gnome_rr_output_info_is_active (outputs[i])) {
-                        sorted_outputs[j] = outputs[i];
-                        j++;
-                }
-        }
-
-        qsort (sorted_outputs, num_on_outputs, sizeof (sorted_outputs[0]), compare_output_positions);
+        g_ptr_array_sort (sorted_outputs, compare_output_positions);
 
         /* Trim! */
 
         applicable = FALSE;
 
-        for (i = num_on_outputs - 1; i >= 0; i--) {
+        for (i = sorted_outputs->len - 1; i >= 0; i--) {
                 GError *error = NULL;
                 gboolean is_bounds_error;
 
@@ -1107,15 +705,23 @@ trim_rightmost_outputs_that_dont_fit_in_framebuffer (GnomeRRScreen *rr_screen, G
                 if (!is_bounds_error)
                         break;
 
-                gnome_rr_output_info_set_active (sorted_outputs[i], FALSE);
+                gnome_rr_output_info_set_active (sorted_outputs->pdata[i], FALSE);
         }
 
         if (config_is_all_off (config))
                 applicable = FALSE;
 
-        g_free (sorted_outputs);
+        g_ptr_array_free (sorted_outputs, FALSE);
 
         return applicable;
+}
+
+static gboolean
+follow_laptop_lid(GsdXrandrManager *manager)
+{
+        GsdXrandrBootBehaviour val;
+        val = g_settings_get_enum (manager->priv->settings, CONF_KEY_DEFAULT_MONITORS_SETUP);
+        return val == GSD_XRANDR_BOOT_BEHAVIOUR_FOLLOW_LID || val == GSD_XRANDR_BOOT_BEHAVIOUR_CLONE;
 }
 
 static GnomeRRConfig *
@@ -1129,12 +735,14 @@ make_xinerama_setup (GsdXrandrManager *manager, GnomeRRScreen *screen)
         int i;
         int x;
 
+        gnome_rr_config_set_clone (result, FALSE);
+
         x = 0;
         for (i = 0; outputs[i] != NULL; ++i) {
                 GnomeRROutputInfo *info = outputs[i];
 
                 if (is_laptop (screen, info)) {
-                        if (laptop_lid_is_closed (manager))
+                        if (laptop_lid_is_closed (manager) && follow_laptop_lid (manager))
                                 gnome_rr_output_info_set_active (info, FALSE);
                         else {
                                 gnome_rr_output_info_set_primary (info, TRUE);
@@ -1157,8 +765,6 @@ make_xinerama_setup (GsdXrandrManager *manager, GnomeRRScreen *screen)
                 result = NULL;
         }
 
-        gnome_rr_config_set_clone (result, FALSE);
-
         print_configuration (result, "xinerama setup");
 
         return result;
@@ -1174,6 +780,8 @@ make_other_setup (GnomeRRScreen *screen)
         GnomeRRConfig *result = gnome_rr_config_new_current (screen, NULL);
         GnomeRROutputInfo **outputs = gnome_rr_config_get_outputs (result);
         int i;
+
+        gnome_rr_config_set_clone (result, FALSE);
 
         for (i = 0; outputs[i] != NULL; ++i) {
                 GnomeRROutputInfo *info = outputs[i];
@@ -1191,8 +799,6 @@ make_other_setup (GnomeRRScreen *screen)
                 g_object_unref (G_OBJECT (result));
                 result = NULL;
         }
-
-        gnome_rr_config_set_clone (result, FALSE);
 
         print_configuration (result, "other setup");
 
@@ -1321,21 +927,7 @@ generate_fn_f7_configs (GsdXrandrManager *mgr)
 }
 
 static void
-error_message (GsdXrandrManager *mgr, const char *primary_text, GError *error_to_display, const char *secondary_text)
-{
-        GtkWidget *dialog;
-
-        dialog = gtk_message_dialog_new (NULL, GTK_DIALOG_MODAL, GTK_MESSAGE_ERROR, GTK_BUTTONS_CLOSE,
-                                         "%s", primary_text);
-        gtk_message_dialog_format_secondary_text (GTK_MESSAGE_DIALOG (dialog), "%s",
-                                                  error_to_display ? error_to_display->message : secondary_text);
-
-        gtk_dialog_run (GTK_DIALOG (dialog));
-        gtk_widget_destroy (dialog);
-}
-
-static void
-handle_fn_f7 (GsdXrandrManager *mgr, guint32 timestamp)
+handle_fn_f7 (GsdXrandrManager *mgr, gint64 timestamp)
 {
         GsdXrandrManagerPrivate *priv = mgr->priv;
         GnomeRRScreen *screen = priv->rw_screen;
@@ -1357,7 +949,7 @@ handle_fn_f7 (GsdXrandrManager *mgr, guint32 timestamp)
         g_debug ("Handling fn-f7");
 
         log_open ();
-        log_msg ("Handling XF86Display hotkey - timestamp %u\n", timestamp);
+        log_msg ("Handling XF86Display hotkey - timestamp %" G_GINT64_FORMAT "\n", timestamp);
 
         error = NULL;
         if (!gnome_rr_screen_refresh (screen, &error) && error) {
@@ -1367,7 +959,6 @@ handle_fn_f7 (GsdXrandrManager *mgr, guint32 timestamp)
                 g_error_free (error);
 
                 log_msg ("%s\n", str);
-                error_message (mgr, str, NULL, _("Trying to switch the monitor configuration anyway."));
                 g_free (str);
         }
 
@@ -1393,7 +984,6 @@ handle_fn_f7 (GsdXrandrManager *mgr, guint32 timestamp)
         g_object_unref (current);
 
         if (priv->fn_f7_configs) {
-                guint32 server_timestamp;
                 gboolean success;
 
                 mgr->priv->current_fn_f7_config++;
@@ -1407,26 +997,10 @@ handle_fn_f7 (GsdXrandrManager *mgr, guint32 timestamp)
 
                 g_debug ("applying");
 
-                /* See https://bugzilla.gnome.org/show_bug.cgi?id=610482
-                 *
-                 * Sometimes we'll get two rapid XF86Display keypress events,
-                 * but their timestamps will be out of order with respect to the
-                 * RANDR timestamps.  This *may* be due to stupid BIOSes sending
-                 * out display-switch keystrokes "to make Windows work".
-                 *
-                 * The X server will error out if the timestamp provided is
-                 * older than a previous change configuration timestamp. We
-                 * assume here that we do want this event to go through still,
-                 * since kernel timestamps may be skewed wrt the X server.
-                 */
-                gnome_rr_screen_get_timestamps (screen, NULL, &server_timestamp);
-                if (timestamp < server_timestamp)
-                        timestamp = server_timestamp;
-
-                success = apply_configuration (mgr, priv->fn_f7_configs[mgr->priv->current_fn_f7_config], timestamp, TRUE, TRUE);
+                success = apply_configuration (mgr, priv->fn_f7_configs[mgr->priv->current_fn_f7_config], timestamp);
 
                 if (success) {
-                        log_msg ("Successfully switched to configuration (timestamp %u):\n", timestamp);
+                        log_msg ("Successfully switched to configuration (timestamp %" G_GINT64_FORMAT "):\n", timestamp);
                         log_configuration (priv->fn_f7_configs[mgr->priv->current_fn_f7_config]);
                 }
         }
@@ -1482,97 +1056,6 @@ get_next_rotation (GnomeRRRotation allowed_rotations, GnomeRRRotation current_ro
         }
 }
 
-struct {
-        GnomeRRRotation rotation;
-        /* evdev */
-        gboolean x_axis_inversion;
-        gboolean y_axis_inversion;
-        gboolean axes_swap;
-} evdev_rotations[] = {
-        { GNOME_RR_ROTATION_0, 0, 0, 0 },
-        { GNOME_RR_ROTATION_90, 1, 0, 1 },
-        { GNOME_RR_ROTATION_180, 1, 1, 0 },
-        { GNOME_RR_ROTATION_270, 0, 1, 1 }
-};
-
-static guint
-get_rotation_index (GnomeRRRotation rotation)
-{
-        guint i;
-
-        for (i = 0; i < G_N_ELEMENTS (evdev_rotations); i++) {
-                if (evdev_rotations[i].rotation == rotation)
-                        return i;
-        }
-        g_assert_not_reached ();
-}
-
-static void
-rotate_touchscreens (GsdXrandrManager *mgr,
-                     GnomeRRRotation   rotation)
-{
-        XDeviceInfo *device_info;
-        gint n_devices;
-        guint i, rot_idx;
-
-        if (!supports_xinput_devices ())
-                return;
-
-        g_debug ("Rotating touchscreen devices");
-
-        device_info = XListInputDevices (GDK_DISPLAY_XDISPLAY (gdk_display_get_default ()), &n_devices);
-        if (device_info == NULL)
-                return;
-
-        rot_idx = get_rotation_index (rotation);
-
-        for (i = 0; i < n_devices; i++) {
-                if (device_info_is_touchscreen (&device_info[i])) {
-                        XDevice *device;
-                        char c = evdev_rotations[rot_idx].axes_swap;
-                        PropertyHelper axes_swap = {
-                                .name = "Evdev Axes Swap",
-                                .nitems = 1,
-                                .format = 8,
-                                .type   = XA_INTEGER,
-                                .data.c = &c,
-                        };
-
-                        g_debug ("About to rotate '%s'", device_info[i].name);
-
-                        gdk_error_trap_push ();
-                        device = XOpenDevice (GDK_DISPLAY_XDISPLAY (gdk_display_get_default ()), device_info[i].id);
-                        if (gdk_error_trap_pop () || (device == NULL))
-                                continue;
-
-                        if (device_set_property (device, device_info[i].name, &axes_swap) != FALSE) {
-                                char axis[] = {
-                                        evdev_rotations[rot_idx].x_axis_inversion,
-                                        evdev_rotations[rot_idx].y_axis_inversion
-                                };
-                                PropertyHelper axis_invert = {
-                                        .name = "Evdev Axis Inversion",
-                                        .nitems = 2,
-                                        .format = 8,
-                                        .type   = XA_INTEGER,
-                                        .data.c = axis,
-                                };
-
-                                device_set_property (device, device_info[i].name, &axis_invert);
-
-                                g_debug ("Rotated '%s' to configuration '%d, %d, %d'",
-                                         device_info[i].name,
-                                         evdev_rotations[rot_idx].x_axis_inversion,
-                                         evdev_rotations[rot_idx].y_axis_inversion,
-                                         evdev_rotations[rot_idx].axes_swap);
-                        }
-
-                        XCloseDevice (GDK_DISPLAY_XDISPLAY (gdk_display_get_default ()), device);
-                }
-        }
-        XFreeDeviceList (device_info);
-}
-
 /* We use this when the XF86RotateWindows key is pressed, or the
  * orientation of a tablet changes. The key is present
  * on some tablet PCs; they use it so that the user can rotate the tablet
@@ -1581,7 +1064,7 @@ rotate_touchscreens (GsdXrandrManager *mgr,
 static void
 handle_rotate_windows (GsdXrandrManager *mgr,
                        GnomeRRRotation rotation,
-                       guint32 timestamp)
+                       gint64 timestamp)
 {
         GsdXrandrManagerPrivate *priv = mgr->priv;
         GnomeRRScreen *screen = priv->rw_screen;
@@ -1590,9 +1073,8 @@ handle_rotate_windows (GsdXrandrManager *mgr,
         int num_allowed_rotations;
         GnomeRRRotation allowed_rotations;
         GnomeRRRotation next_rotation;
-        gboolean success, show_error;
 
-        g_debug ("Handling XF86RotateWindows");
+        g_debug ("Handling XF86RotateWindows with rotation %d", rotation);
 
         /* Which output? */
 
@@ -1604,7 +1086,7 @@ handle_rotate_windows (GsdXrandrManager *mgr,
                 goto out;
         }
 
-        if (rotation < 0) {
+        if (rotation <= GNOME_RR_ROTATION_NEXT) {
                 /* Which rotation? */
 
                 get_allowed_rotations_for_output (current, priv->rw_screen, rotatable_output_info, &num_allowed_rotations, &allowed_rotations);
@@ -1614,137 +1096,18 @@ handle_rotate_windows (GsdXrandrManager *mgr,
                         g_debug ("No rotations are supported other than the current one; XF86RotateWindows key will do nothing");
                         goto out;
                 }
-                show_error = TRUE;
         } else {
                 next_rotation = rotation;
-                show_error = FALSE;
         }
 
         /* Rotate */
 
         gnome_rr_output_info_set_rotation (rotatable_output_info, next_rotation);
 
-        success = apply_configuration (mgr, current, timestamp, show_error, TRUE);
-        if (success)
-                rotate_touchscreens (mgr, next_rotation);
+        apply_configuration (mgr, current, timestamp);
 
 out:
         g_object_unref (current);
-}
-
-static void
-auto_configure_outputs (GsdXrandrManager *manager, guint32 timestamp)
-{
-        GsdXrandrManagerPrivate *priv = manager->priv;
-        GnomeRRConfig *config;
-
-        config = make_xinerama_setup (manager, priv->rw_screen);
-        if (config) {
-                print_configuration (config, "auto-configure - xinerama mode");
-                apply_configuration (manager, config, timestamp, TRUE, FALSE);
-                g_object_unref (config);
-        } else {
-                g_debug ("No applicable configuration found during auto-configure");
-        }
-}
-
-static void
-use_stored_configuration_or_auto_configure_outputs (GsdXrandrManager *manager, guint32 timestamp)
-{
-        GsdXrandrManagerPrivate *priv = manager->priv;
-        char *intended_filename;
-        GError *error;
-        gboolean success;
-
-        intended_filename = gnome_rr_config_get_intended_filename ();
-
-        error = NULL;
-        success = apply_configuration_from_filename (manager, intended_filename, TRUE, timestamp, &error);
-        g_free (intended_filename);
-
-        if (!success) {
-                /* We don't bother checking the error type.
-                 *
-                 * Both G_FILE_ERROR_NOENT and
-                 * GNOME_RR_ERROR_NO_MATCHING_CONFIG would mean, "there
-                 * was no configuration to apply, or none that matched
-                 * the current outputs", and in that case we need to run
-                 * our fallback.
-                 *
-                 * Any other error means "we couldn't do the smart thing
-                 * of using a previously- saved configuration, anyway,
-                 * for some other reason.  In that case, we also need to
-                 * run our fallback to avoid leaving the user with a
-                 * bogus configuration.
-                 */
-
-                if (error)
-                        g_error_free (error);
-
-                if (timestamp != priv->last_config_timestamp || timestamp == GDK_CURRENT_TIME) {
-                        priv->last_config_timestamp = timestamp;
-                        auto_configure_outputs (manager, timestamp);
-                        log_msg ("  Automatically configured outputs\n");
-                } else
-                        log_msg ("  Ignored autoconfiguration as old and new config timestamps are the same\n");
-        } else
-                log_msg ("Applied stored configuration\n");
-}
-
-static void
-on_randr_event (GnomeRRScreen *screen, gpointer data)
-{
-        GsdXrandrManager *manager = GSD_XRANDR_MANAGER (data);
-        GsdXrandrManagerPrivate *priv = manager->priv;
-        guint32 change_timestamp, config_timestamp;
-
-        if (!priv->running)
-                return;
-
-        gnome_rr_screen_get_timestamps (screen, &change_timestamp, &config_timestamp);
-
-        log_open ();
-        log_msg ("Got RANDR event with timestamps change=%u %c config=%u\n",
-                 change_timestamp,
-                 timestamp_relationship (change_timestamp, config_timestamp),
-                 config_timestamp);
-
-        if (change_timestamp >= config_timestamp) {
-                GnomeRRConfig *rr_config;
-
-                /* The event is due to an explicit configuration change.
-                 *
-                 * If the change was performed by us, then we need to do nothing.
-                 *
-                 * If the change was done by some other X client, we don't need
-                 * to do anything, either; the screen is already configured.
-                 */
-
-                /* Check if we need to update the primary */
-                rr_config = gnome_rr_config_new_current (priv->rw_screen, NULL);
-                if (gnome_rr_config_ensure_primary (rr_config)) {
-                        if (gnome_rr_config_applicable (rr_config, priv->rw_screen, NULL)) {
-                                print_configuration (rr_config, "Updating for primary");
-                                priv->last_config_timestamp = config_timestamp;
-                                gnome_rr_config_apply_with_time (rr_config, priv->rw_screen, config_timestamp, NULL);
-                        }
-                }
-                g_object_unref (rr_config);
-
-                show_timestamps_dialog (manager, "ignoring since change > config");
-                log_msg ("  Ignoring event since change >= config\n");
-        } else {
-                /* Here, config_timestamp > change_timestamp.  This means that
-                 * the screen got reconfigured because of hotplug/unplug; the X
-                 * server is just notifying us, and we need to configure the
-                 * outputs in a sane way.
-                 */
-
-                show_timestamps_dialog (manager, "need to deal with reconfiguration, as config > change");
-                use_stored_configuration_or_auto_configure_outputs (manager, config_timestamp);
-        }
-
-        log_close ();
 }
 
 static void
@@ -1786,180 +1149,85 @@ get_allowed_rotations_for_output (GnomeRRConfig *config,
         }
 }
 
-static gboolean
-apply_intended_configuration (GsdXrandrManager *manager, const char *intended_filename, guint32 timestamp)
-{
-        GError *my_error;
-        gboolean result;
-
-        my_error = NULL;
-        result = apply_configuration_from_filename (manager, intended_filename, TRUE, timestamp, &my_error);
-        if (!result) {
-                if (my_error) {
-                        if (!g_error_matches (my_error, G_FILE_ERROR, G_FILE_ERROR_NOENT) &&
-                            !g_error_matches (my_error, GNOME_RR_ERROR, GNOME_RR_ERROR_NO_MATCHING_CONFIG))
-                                error_message (manager, _("Could not apply the stored configuration for monitors"), my_error, NULL);
-
-                        g_error_free (my_error);
-                }
-        }
-
-        return result;
-}
-
 static void
-apply_default_boot_configuration (GsdXrandrManager *mgr, guint32 timestamp)
+manager_device_added (GsdXrandrManager *manager,
+                      GdkDevice        *device)
 {
-        GsdXrandrManagerPrivate *priv = mgr->priv;
-        GnomeRRScreen *screen = priv->rw_screen;
-        GnomeRRConfig *config;
-        GsdXrandrBootBehaviour boot;
-
-        boot = g_settings_get_enum (priv->settings, CONF_KEY_DEFAULT_MONITORS_SETUP);
-
-        switch (boot) {
-        case GSD_XRANDR_BOOT_BEHAVIOUR_DO_NOTHING:
+        if (gdk_device_get_device_type (device) == GDK_DEVICE_TYPE_MASTER ||
+            gdk_device_get_source (device) != GDK_SOURCE_TOUCHSCREEN)
                 return;
-        case GSD_XRANDR_BOOT_BEHAVIOUR_CLONE:
-                config = make_clone_setup (mgr, screen);
-                break;
-        case GSD_XRANDR_BOOT_BEHAVIOUR_DOCK:
-                config = make_other_setup (screen);
-                break;
-        default:
-                g_assert_not_reached ();
-        }
 
-        if (config) {
-                /* We don't save the configuration (the "false" parameter to the following function) because we don't want to
-                 * install a user-side setting when *here* we are using a system-default setting.
-                 */
-                apply_configuration (mgr, config, timestamp, TRUE, FALSE);
-                g_object_unref (config);
-        }
-}
-
-static gboolean
-apply_stored_configuration_at_startup (GsdXrandrManager *manager, guint32 timestamp)
-{
-        GError *my_error;
-        gboolean success;
-        char *backup_filename;
-        char *intended_filename;
-
-        backup_filename = gnome_rr_config_get_backup_filename ();
-        intended_filename = gnome_rr_config_get_intended_filename ();
-
-        /* 1. See if there was a "saved" configuration.  If there is one, it means
-         * that the user had selected to change the display configuration, but the
-         * machine crashed.  In that case, we'll apply *that* configuration and save it on top of the
-         * "intended" one.
-         */
-
-        my_error = NULL;
-
-        success = apply_configuration_from_filename (manager, backup_filename, FALSE, timestamp, &my_error);
-        if (success) {
-                /* The backup configuration existed, and could be applied
-                 * successfully, so we must restore it on top of the
-                 * failed/intended one.
-                 */
-                restore_backup_configuration (manager, backup_filename, intended_filename, timestamp);
-                goto out;
-        }
-
-        if (!g_error_matches (my_error, G_FILE_ERROR, G_FILE_ERROR_NOENT)) {
-                /* Epic fail:  there (probably) was a backup configuration, but
-                 * we could not apply it.  The only thing we can do is delete
-                 * the backup configuration.  Let's hope that the user doesn't
-                 * get left with an unusable display...
-                 */
-
-                unlink (backup_filename);
-                goto out;
-        }
-
-        /* 2. There was no backup configuration!  This means we are
-         * good.  Apply the intended configuration instead.
-         */
-
-        success = apply_intended_configuration (manager, intended_filename, timestamp);
-
-out:
-
-        if (my_error)
-                g_error_free (my_error);
-
-        g_free (backup_filename);
-        g_free (intended_filename);
-
-        return success;
-}
-
-static gboolean
-apply_default_configuration_from_file (GsdXrandrManager *manager, guint32 timestamp)
-{
-        GsdXrandrManagerPrivate *priv = manager->priv;
-        char *default_config_filename;
-        gboolean result;
-
-        default_config_filename = g_settings_get_string (priv->settings, CONF_KEY_DEFAULT_CONFIGURATION_FILE);
-        if (!default_config_filename)
-                return FALSE;
-
-        result = apply_configuration_from_filename (manager, default_config_filename, TRUE, timestamp, NULL);
-
-        g_free (default_config_filename);
-        return result;
+        gsd_device_mapper_add_input (manager->priv->device_mapper, device, NULL);
 }
 
 static void
-turn_off_laptop_display (GsdXrandrManager *manager, guint32 timestamp)
+manager_device_removed (GsdXrandrManager *manager,
+                        GdkDevice        *device)
 {
-        GsdXrandrManagerPrivate *priv = manager->priv;
-        GnomeRRConfig *config;
-        
-        config = gnome_rr_config_new_current (priv->rw_screen, NULL);
+        if (gdk_device_get_device_type (device) == GDK_DEVICE_TYPE_MASTER ||
+            gdk_device_get_source (device) != GDK_SOURCE_TOUCHSCREEN)
+                return;
 
-        turn_off_laptop_display_in_configuration (priv->rw_screen, config);
-
-        /* We don't turn the laptop's display off if it is the only display present. */
-        if (!config_is_all_off (config)) {
-                /* We don't save the configuration (the "false" parameter to the following function) because we
-                 * wouldn't want to restore a configuration with the laptop's display turned off, if at some
-                 * point later the user booted his laptop with the lid open.
-                 */
-                apply_configuration (manager, config, timestamp, FALSE, FALSE);
-        }
-
-        g_object_unref (config);
+        gsd_device_mapper_remove_input (manager->priv->device_mapper, device);
 }
 
 static void
-power_client_changed_cb (UpClient *client, gpointer data)
+manager_init_devices (GsdXrandrManager *manager)
 {
-        GsdXrandrManager *manager = data;
-        GsdXrandrManagerPrivate *priv = manager->priv;
-        gboolean is_closed;
+        GdkDisplay *display;
+        GList *devices, *d;
+        GdkScreen *screen;
 
-        is_closed = up_client_get_lid_is_closed (priv->upower_client);
+        screen = gdk_screen_get_default ();
+        display = gdk_screen_get_display (screen);
 
-        if (is_closed != priv->laptop_lid_is_closed) {
-                priv->laptop_lid_is_closed = is_closed;
+        manager->priv->device_mapper = gsd_device_mapper_get ();
+        manager->priv->device_manager = gdk_display_get_device_manager (display);
+        manager->priv->device_added_id =
+                g_signal_connect_swapped (manager->priv->device_manager, "device-added",
+                                          G_CALLBACK (manager_device_added), manager);
+        manager->priv->device_removed_id =
+                g_signal_connect_swapped (manager->priv->device_manager, "device-removed",
+                                  G_CALLBACK (manager_device_removed), manager);
 
-                /* Refresh the RANDR state.  The lid just got opened/closed, so we can afford to
-                 * probe the outputs right now.  It will also help the case where we can't detect
-                 * hotplug/unplug, but the fact that the lid's state changed lets us know that the
-                 * user probably did something interesting.
-                 */
+        devices = gdk_device_manager_list_devices (manager->priv->device_manager,
+                                                   GDK_DEVICE_TYPE_SLAVE);
 
-                gnome_rr_screen_refresh (priv->rw_screen, NULL); /* NULL-GError */
+        for (d = devices; d; d = d->next)
+                manager_device_added (manager, d->data);
 
-                if (is_closed)
-                        turn_off_laptop_display (manager, GDK_CURRENT_TIME); /* sucks not to have a timestamp for the notification */
-                else
-                        use_stored_configuration_or_auto_configure_outputs (manager, GDK_CURRENT_TIME);
+        g_list_free (devices);
+}
+
+static void
+on_rr_screen_acquired (GObject      *object,
+                       GAsyncResult *result,
+                       gpointer      user_data)
+{
+        GsdXrandrManager *manager = user_data;
+        GError *error = NULL;
+
+        manager->priv->rw_screen = gnome_rr_screen_new_finish (result, &error);
+
+        if (manager->priv->rw_screen == NULL) {
+                log_msg ("Could not initialize the RANDR plugin: %s\n",
+                         error->message);
+                g_error_free (error);
+                log_close ();
+                return;
         }
+
+        manager->priv->upower_client = up_client_new ();
+
+        log_msg ("State of screen at startup:\n");
+        log_screen (manager->priv->rw_screen);
+
+        manager->priv->running = TRUE;
+        manager->priv->settings = g_settings_new (CONF_SCHEMA);
+
+        manager_init_devices (manager);
+
+        log_close ();
 }
 
 gboolean
@@ -1972,38 +1240,8 @@ gsd_xrandr_manager_start (GsdXrandrManager *manager,
         log_open ();
         log_msg ("------------------------------------------------------------\nSTARTING XRANDR PLUGIN\n");
 
-        manager->priv->rw_screen = gnome_rr_screen_new (gdk_screen_get_default (), error);
-
-        if (manager->priv->rw_screen == NULL) {
-                log_msg ("Could not initialize the RANDR plugin%s%s\n",
-                         (error && *error) ? ": " : "",
-                         (error && *error) ? (*error)->message : "");
-                log_close ();
-                return FALSE;
-        }
-
-        g_signal_connect (manager->priv->rw_screen, "changed", G_CALLBACK (on_randr_event), manager);
-
-        manager->priv->upower_client = up_client_new ();
-        manager->priv->laptop_lid_is_closed = up_client_get_lid_is_closed (manager->priv->upower_client);
-        g_signal_connect (manager->priv->upower_client, "changed",
-                          G_CALLBACK (power_client_changed_cb), manager);
-
-        log_msg ("State of screen at startup:\n");
-        log_screen (manager->priv->rw_screen);
-
-        manager->priv->running = TRUE;
-        manager->priv->settings = g_settings_new (CONF_SCHEMA);
-
-        show_timestamps_dialog (manager, "Startup");
-        if (!apply_stored_configuration_at_startup (manager, GDK_CURRENT_TIME)) /* we don't have a real timestamp at startup anyway */
-                if (!apply_default_configuration_from_file (manager, GDK_CURRENT_TIME))
-                        apply_default_boot_configuration (manager, GDK_CURRENT_TIME);
-
-        log_msg ("State of screen after initial configuration:\n");
-        log_screen (manager->priv->rw_screen);
-
-        log_close ();
+        gnome_rr_screen_new_async (gdk_screen_get_default (),
+                                   on_rr_screen_acquired, manager);
 
         gnome_settings_profile_end (NULL);
 
@@ -2049,23 +1287,17 @@ gsd_xrandr_manager_stop (GsdXrandrManager *manager)
                 manager->priv->connection = NULL;
         }
 
+        if (manager->priv->device_manager != NULL) {
+                g_signal_handler_disconnect (manager->priv->device_manager,
+                                             manager->priv->device_added_id);
+                g_signal_handler_disconnect (manager->priv->device_manager,
+                                             manager->priv->device_removed_id);
+                manager->priv->device_manager = NULL;
+        }
+
         log_open ();
         log_msg ("STOPPING XRANDR PLUGIN\n------------------------------------------------------------\n");
         log_close ();
-}
-
-static GObject *
-gsd_xrandr_manager_constructor (GType                  type,
-                              guint                  n_construct_properties,
-                              GObjectConstructParam *construct_properties)
-{
-        GsdXrandrManager      *xrandr_manager;
-
-        xrandr_manager = GSD_XRANDR_MANAGER (G_OBJECT_CLASS (gsd_xrandr_manager_parent_class)->constructor (type,
-                                                                                                      n_construct_properties,
-                                                                                                      construct_properties));
-
-        return G_OBJECT (xrandr_manager);
 }
 
 static void
@@ -2073,7 +1305,6 @@ gsd_xrandr_manager_class_init (GsdXrandrManagerClass *klass)
 {
         GObjectClass *object_class = G_OBJECT_CLASS (klass);
 
-        object_class->constructor = gsd_xrandr_manager_constructor;
         object_class->finalize = gsd_xrandr_manager_finalize;
 
         g_type_class_add_private (klass, sizeof (GsdXrandrManagerPrivate));
@@ -2091,14 +1322,19 @@ gsd_xrandr_manager_init (GsdXrandrManager *manager)
 static void
 gsd_xrandr_manager_finalize (GObject *object)
 {
-        GsdXrandrManager *xrandr_manager;
+        GsdXrandrManager *manager;
 
         g_return_if_fail (object != NULL);
         g_return_if_fail (GSD_IS_XRANDR_MANAGER (object));
 
-        xrandr_manager = GSD_XRANDR_MANAGER (object);
+        manager = GSD_XRANDR_MANAGER (object);
 
-        g_return_if_fail (xrandr_manager->priv != NULL);
+        g_return_if_fail (manager->priv != NULL);
+
+        gsd_xrandr_manager_stop (manager);
+
+        if (manager->priv->name_id != 0)
+                g_bus_unown_name (manager->priv->name_id);
 
         G_OBJECT_CLASS (gsd_xrandr_manager_parent_class)->finalize (object);
 }
@@ -2110,21 +1346,10 @@ handle_method_call_xrandr_2 (GsdXrandrManager *manager,
                              GDBusMethodInvocation *invocation)
 {
         gint64 timestamp;
-        GError *error = NULL;
 
         g_debug ("Calling method '%s' for org.gnome.SettingsDaemon.XRANDR_2", method_name);
 
-        if (g_strcmp0 (method_name, "ApplyConfiguration") == 0) {
-                gint64 parent_window_id;
-
-                g_variant_get (parameters, "(xx)", &parent_window_id, &timestamp);
-                if (gsd_xrandr_manager_2_apply_configuration (manager, parent_window_id,
-                                                              timestamp, &error) == FALSE) {
-                        g_dbus_method_invocation_return_gerror (invocation, error);
-                } else {
-                        g_dbus_method_invocation_return_value (invocation, NULL);
-                }
-        } else if (g_strcmp0 (method_name, "VideoModeSwitch") == 0) {
+        if (g_strcmp0 (method_name, "VideoModeSwitch") == 0) {
                 g_variant_get (parameters, "(x)", &timestamp);
                 gsd_xrandr_manager_2_video_mode_switch (manager, timestamp, NULL);
                 g_dbus_method_invocation_return_value (invocation, NULL);
@@ -2178,15 +1403,10 @@ on_bus_gotten (GObject             *source_object,
         GDBusInterfaceInfo **infos;
         int i;
 
-        if (manager->priv->bus_cancellable == NULL ||
-            g_cancellable_is_cancelled (manager->priv->bus_cancellable)) {
-                g_warning ("Operation has been cancelled, so not retrieving session bus");
-                return;
-        }
-
         connection = g_bus_get_finish (res, &error);
         if (connection == NULL) {
-                g_warning ("Could not get session bus: %s", error->message);
+                if (!g_error_matches (error, G_IO_ERROR, G_IO_ERROR_CANCELLED))
+                        g_warning ("Could not get session bus: %s", error->message);
                 g_error_free (error);
                 return;
         }
@@ -2202,6 +1422,14 @@ on_bus_gotten (GObject             *source_object,
                                                    NULL,
                                                    NULL);
         }
+
+        manager->priv->name_id = g_bus_own_name_on_connection (connection,
+                                                               GSD_XRANDR_DBUS_NAME,
+                                                               G_BUS_NAME_OWNER_FLAGS_NONE,
+                                                               NULL,
+                                                               NULL,
+                                                               NULL,
+                                                               NULL);
 }
 
 static void

@@ -6,7 +6,7 @@
       <_description>Whether this plugin would be activated by gnome-settings-daemon or not</_description>
     </key>
     <key name="priority" type="i">
-      <default>6</default>
+      <default>0</default>
       <_summary>Priority to use for this plugin</_summary>
       <_description>Priority to use for this plugin in gnome-settings-daemon startup queue</_description>
     </key>
@@ -26,6 +26,11 @@
       <_summary>Wacom tablet area</_summary>
       <_description>Set this to x1, y1 and x2, y2 of the area usable by the tools.</_description>
     </key>
+    <key name="keep-aspect" type="b">
+      <default>false</default>
+      <_summary>Wacom tablet aspect ratio</_summary>
+      <_description>Enable this to restrict the Wacom tablet area to match the aspect ratio of the output.</_description>
+    </key>
     <key name="rotation" enum="org.gnome.settings-daemon.GsdWacomRotation">
       <default>'none'</default>
       <_summary>Wacom tablet rotation</_summary>
@@ -36,10 +41,10 @@
       <_summary>Wacom touch feature</_summary>
       <_description>Enable this to move the cursor when the user touches the tablet.</_description>
     </key>
-    <key name="tablet-pc-button" type="b">
-      <default>false</default>
-      <_summary>Wacom tablet PC feature</_summary>
-      <_description>Enable this to only report stylus events when the tip is pressed.</_description>
+    <key name="last-calibrated-resolution" type="(ii)">
+      <default>(-1, -1)</default>
+      <_summary>Wacom last calibrated resolution</_summary>
+      <_description>Holds the last calibrated resolution to help check if calibration is needed.</_description>
     </key>
     <key name="display" type="as">
       <default>["", "", ""]</default>
@@ -94,8 +99,15 @@
     </key>
     <key name="custom-elevator-action" type="as">
       <default>['', '']</default>
-      <_summary>Key combinations for an elevator custom action</_summary>
+      <_summary>Key combinations for a touchring or touchstrip custom action</_summary>
       <_description>The keyboard shortcuts generated when a touchring or touchstrip is used for custom actions (up followed by down).</_description>
+    </key>
+    <key name="oled-label" type="s">
+      <default>''</default>
+      <!-- Translators: This is the OLED display on an Intuos4 tablet:
+           http://eu.shop.wacom.eu/images/articles/d9abd9f2d4d88aa0649cda97a8077e2b_8.jpg -->
+      <_summary>Button label for OLED display.</_summary>
+      <_description>Label will be rendered to OLED display belonging to the button</_description>
     </key>
   </schema>
 </schemalist>

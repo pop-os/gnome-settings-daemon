@@ -13,8 +13,7 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
+ * along with this program; if not, see <http://www.gnu.org/licenses/>.
  */
 
 #ifndef __GSD_COMMON_KEYGRAB_H
@@ -26,29 +25,9 @@ G_BEGIN_DECLS
 #include <X11/keysym.h>
 #include <X11/extensions/XInput2.h>
 
-typedef struct {
-        guint keysym;
-        guint state;
-        guint *keycodes;
-} Key;
-
-
-void	        grab_key_unsafe	(Key     *key,
-				 gboolean grab,
-			         GSList  *screens);
-
-gboolean        match_xi2_key   (Key           *key,
-                                 XIDeviceEvent *event);
-
-gboolean        key_uses_keycode (const Key *key,
-                                  guint keycode);
-
-Key *           parse_key        (const char    *str);
-void            free_key         (Key           *key);
-
-void            grab_button      (int      deviceid,
-                                  gboolean grab,
-                                  GSList  *screens);
+void            grab_button      (int        deviceid,
+                                  gboolean   grab,
+                                  GdkScreen *screen);
 
 G_END_DECLS
 

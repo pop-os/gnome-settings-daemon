@@ -12,8 +12,7 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
+ * along with this program; if not, see <http://www.gnu.org/licenses/>.
  *
  * Author: Bastien Nocera <hadess@hadess.net>
  *
@@ -38,9 +37,9 @@ get_loc (GSettings *settings)
 
 	g_object_get (G_OBJECT (settings),
 		      "path", &path,
-		      "schema", &schema,
+		      "schema-id", &schema,
 		      NULL);
-	ret = g_strdup_printf ("schema: %s (path: %s)", schema, path);
+	ret = g_strdup_printf ("schema-id: %s (path: %s)", schema, path);
 	g_free (schema);
 	g_free (path);
 
@@ -79,8 +78,10 @@ button_type_to_string (GsdWacomTabletButtonType type)
 	switch (type) {
 	case WACOM_TABLET_BUTTON_TYPE_NORMAL:
 		return "normal";
-	case WACOM_TABLET_BUTTON_TYPE_ELEVATOR:
-		return "elevator";
+	case WACOM_TABLET_BUTTON_TYPE_STRIP:
+		return "touch-strip";
+	case WACOM_TABLET_BUTTON_TYPE_RING:
+		return "touch-ring";
 	case WACOM_TABLET_BUTTON_TYPE_HARDCODED:
 		return "hard-coded";
 	default:
@@ -140,6 +141,7 @@ print_buttons (GsdWacomDevice *device)
 
 	for (l = buttons; l != NULL; l = l->next) {
 		GsdWacomTabletButton *button = l->data;
+		gboolean has_led;
 
 		g_print ("\tButton: %s (%s)\n", button->name, button->id);
 		g_print ("\t\tType: %s\n", button_type_to_string (button->type));
@@ -150,6 +152,9 @@ print_buttons (GsdWacomDevice *device)
 			else
 				g_print ("\n");
 		}
+		has_led = (button->type == WACOM_TABLET_BUTTON_TYPE_HARDCODED && button->status_led != GSD_WACOM_NO_LED);
+		if (has_led || button->has_oled)
+			g_print ("\t\tHas LED: %s Has OLED: %s\n", BOOL_AS_STR(has_led), BOOL_AS_STR(button->has_oled));
 		if (button->settings) {
 			char *loc;
 			loc = get_loc (button->settings);
@@ -183,7 +188,8 @@ list_devices (GList *devices)
 	for (l = devices; l ; l = l->next) {
 		GsdWacomDevice *device;
 		GsdWacomDeviceType type;
-		char *loc;
+		GSettings *settings;
+		char *loc, **edid;
 
 		device = l->data;
 
@@ -195,10 +201,24 @@ list_devices (GList *devices)
 			 gsd_wacom_device_type_to_string (gsd_wacom_device_get_device_type (device)));
 		g_print ("\tReversible: %s\n", BOOL_AS_STR (gsd_wacom_device_reversible (device)));
 		g_print ("\tScreen Tablet: %s\n", BOOL_AS_STR (gsd_wacom_device_is_screen_tablet (device)));
+		g_print ("\tIntegrated Device: %s\n", BOOL_AS_STR (gsd_wacom_device_is_isd (device)));
+		g_print ("\tUnknown (fallback) device: %s\n", BOOL_AS_STR(gsd_wacom_device_is_fallback (device)));
 
-		loc = get_loc (gsd_wacom_device_get_settings (device));
+		settings = gsd_wacom_device_get_settings (device);
+		loc = get_loc (settings);
 		g_print ("\tGeneric settings: %s\n", loc);
 		g_free (loc);
+
+		edid = g_settings_get_strv (settings, "display");
+		if (!edid || g_strv_length (edid) != 3)
+			g_warning ("Invalid display EDID set for device");
+		else {
+			if (*edid[0] == '\0' && *edid[1] == '\0' && *edid[2] == '\0')
+				g_print ("\tDisplay EDID: unset\n");
+			else
+				g_print ("\tDisplay EDID: '%s', '%s', '%s'\n", edid[0], edid[1], edid[2]);
+		}
+		g_clear_pointer (&edid, g_strfreev);
 
 		type = gsd_wacom_device_get_device_type (device);
 		if (type == WACOM_TYPE_STYLUS ||

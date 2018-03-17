@@ -1,34 +1,1148 @@
-=============
-Version 3.4.2
-=============
-
-Media-keys:
-- Fix applications launching through keyboard shortcuts
-  not using  the session's ssh agent, or keyrings
-
-Mouse:
-- Fix arguments passed to the custom command
-
-And a number of memory leak fixes and translation updates.
-
-=============
-Version 3.4.1
-=============
-
-Mouse:
-- Fix applying settings to touchpads
-
-Updates:
-- Fix possible crashes when exiting
-
-Wacom:
-- Don't put touchscreens in relative mode, just touch tablets
-  (such as the Bamboo Touch)
-
-Printers:
-- Use PrinterAddOption method to set media size
+==============
+Version 3.14.2
+==============
 
 - Updated translations
+
+Media-keys:
+- Fixed a few minor leaks
+
+Power:
+- Disable touchscreens when turning off its screen
+
+Smartcard:
+- Fixed a locking issue
+
+Wacom:
+- Fix possible crash in GsdDeviceMapper
+- Make sure that display-less tablets can be set back to mapping to
+  the full desktop extent
+- Make sure that the output is looked up again from settings when the
+  connected outputs change
+
+XSettings:
+- Don't check for hi-dpi on monitors with broken EDID
+
+==============
+Version 3.14.1
+==============
+
+Cursor:
+- Disable if running under a wayland session
+
+Keyboard:
+- Add back the gtk+ IM module handling
+
+Media-keys:
+- Disallow screenshots when locked
+
+XSettings:
+- Translate titlebar action settings (for CSD gtk+ windows)
+- Misc cleanups
+
+==============
+Version 3.14.0
+==============
+
+- Updated translations
+
+XSettings:
+- Fix swapping out of WM settings schemas
+
+===============
+Version 3.13.92
+===============
+
+Keyboard:
+- Remove input sources handling: this was moved to mutter/gnome-shell
+  and removes g-s-d's build dependency on IBus
+
+Power:
+- '0' keyboard backlight is a valid value
+
+Rfkill:
+- Add a property to determine whether to show airplane mode
+
+===============
+Version 3.13.91
+===============
+
+Media-keys:
+- Postpone initialisation of libcanberra to avoid blocking on it
+  at startup
+
+Wacom:
+- Fix OLEDs never actually working due to a missing single line
+
+===============
+Version 3.13.90
+===============
+
+Media keys:
+- Don't show Orientation lock popup if not supported
+
+Sharing:
+- Fix crash when run against older NM
+
+Wacom:
+- Add support for LEDs API in newer kernels
+
+==============
+Version 3.13.4
+==============
+
+General:
+- Fix crash when a plugin failed to start
+- Several code cleanups
+- Updated translations
+
+A11Y Keyboard:
+- Make sticky and slow keys notifications more difficult to miss
+
+Housekeeping:
+- Fix regular files not getting deleted from the Trash
+
+Media-keys:
+- Set the keyring environment variables on all processes that we
+  launch
+
+Orientation:
+- Fix plugin on MS Surface devices
+
+Power:
+- Fix crash when logind isn't available
+
+Sharing:
+- Fix compilation without NetworkManager
+
+Wacom:
+- Handle "cursor" tablet devices so that they get properly mapped for
+  different orientations
+
+==============
+Version 3.13.3
+==============
+
+- Plenty of Sharing plugin bug fixes
+
+==============
+Version 3.13.2
+==============
+
+- Add new sharing plugin
+
+General:
+- Implement size matching for touchscreens
+- Fix warnings in the display to input device mapper
+- Remove multiple screens support
+
+Power:
+- Fix wakeup not working with some keymaps
+- Fix restarting of the lid inhibitor check timer
+- Fix suspend happening again when resuming from suspend
+- Discretize the set backlight value fixing problems
+  on some harwdare with limited number of backlight settings
+- Fix initial backlight state in gnome-shell
+- Add sound notification on power plug/unplug
+
+Wacom:
+- Add Bluetooth OLED handling for Intuos4 WL
+- Fix OLED application for wired Intuos4
+- Make OSD always appear on a single monitor
+
+XSettings:
+- Honor changes to the enable-animations setting
+- Better support for GTK+ CSD titlebar button layout
+
+Housekeeping:
+- Fix a possible data loss when symlinks are created from /tmp
+
+Media-keys:
+- Fix possible crash disabling media-keys plugin
+
+==============
+Version 3.13.1
+==============
+
+Color:
+- Fix 13 byte long EDID description text parsing
+
+Common:
+- Improve hotplug scripts exit status checking and correct the
+  documentation
+- Fix possible crasher in device-mapper
+
+Cursor:
+- Remove multi-screen support
+
+Date & Time:
+- Make the geolocation marker in gnome-shell's status area go away
+  after turning Automatic Time Zone off
+
+Keyboard:
+- Fix consecutive xkb grp: options not being stripped
+
+Power:
+- Remove unused session presence proxy
+- Emit change notification for brightness
+- Fix display not blanking after gnome-shell wake up
+- Don't warn when Kdb backlight D-Bus is called
+- Lower the lid safety timeout to 8 seconds
+
+Updates:
+- Remove the updates plugin. The functionality now lives on in the
+  gnome-software session service.
+
+- Translation updates
+
+================
+Version 3.12.0.1
+================
+
+- Fix a long delay on session logout (bug 727049)
+- Translation updates
+
+==============
+Version 3.12.0
+==============
+
+Common:
+- Fix initialization of GsdDeviceMapper
+
+- Translation updates
+
+===============
+Version 3.11.92
+===============
+
+Common:
+- Avoid GsdDeviceMapper blocking on startup
+
+Power:
+- Fix idle time being reset when notifications come in
+
+XSettings:
+- Avoid Hi-DPI getting setup for:
+  - non-primary screens
+  - HDMI outputs (except 4K monitors)
+  - low resolutions
+
+- Translation updates
+
+===============
+Version 3.11.91
+===============
+
+Mouse, Common:
+- Hardening for BadDevice errors
+
+===============
+Version 3.11.90
+===============
+
+Date & Time:
+- Require a newer Geoclue
+
+Keyboard:
+- Move X11 specific code from gnome-desktop to here
+
+Wacom, XRandR:
+- Add explicit input device to display output mapping
+  and apply rotation and mapping to the input devices
+  when the display output changes
+- Use "input-tablet" icon for notifications
+
+Rfkill:
+- Avoid spurious warning on startup
+
+Updates:
+- Update for UPower API changes
+
+Smartcard:
+- Detect explicit cancellation
+- Filter out spurious errors
+
+Wacom:
+- Add OLED handling over Bluetooth
+
+==============
+Version 3.11.5
+==============
+
+- We no longer quit when gnome-session tells all registered clients to
+  stop so that applications still running don't lose their theme and
+  icons briefly before the session ends
+
+Date & Time:
+- Specify the accuracy level for geoclue
+- Provide desktop id to geoclue so that authorization works
+
+Media-keys:
+- Remove the default shortcut to toggle the screen reader since it
+  conflicts with the "panel main menu" shortcut
+
+Wacom:
+- Check for calibration state on startup/device-added
+
+==============
+Version 3.11.3
+==============
+
+Media-keys:
+- Fix "show battery" key handling
+
+Rfkill:
+- Apply permissions for rfkill devices to the local user
+- Add Bluetooth killswitch support
+- Don't autostart ModemManager
+
+Wacom:
+- Skip GSD_WACOM_SET_ALL_MONITORS on the switch monitor pad action
+- Rotate OLED labels on left-handed setups
+- Show OSD when remapping device to a monitor through the pad bindings
+- Maintain per-device calibration notifications
+
+==============
+Version 3.11.2
+==============
+
+XSettings:
+- Fix a possible crash on exit
+- Export a GtkShellShowsDesktop setting
+
+Media keys:
+- All Power key in more places
+- Fix interaction with multiple MPRIS clients
+- Make Pause key work for MPRIS clients
+
+Remote display:
+- Don't disable animations unless we are on a remote display
+
+
+==============
+Version 3.11.1
+==============
+
+Power:
+- Remove battery recall support code
+- Update for new UPower API
+- Remove org.gnome.SettingsDaemon.Power D-Bus interface
+  (deprecated by the new UPower)
+- Fix brightness keys when there's less than 20 brightness steps
+
+Remote display:
+- Merge plugin functionality into the XSettings plugin
+  we shouldn't modify GSettings on startup
+
+RFKill:
+- Handle rfkill for WWAN modems
+
+==============
+Version 3.10.1
+==============
+
+- Several small cleanups and memory leak fixes
+
+Housekeeping:
+- Do not scan the cache directories if not needed
+
+Keyboard:
+- Don't set the XKB group switching option when not needed
+
+Media-keys:
+- Use a gsettings key for the maximum screencast length
+
+Mouse:
+- Enable edge scrolling if two-finger scroll is unavailable (this time
+  for good)
+
+Power:
+- Add test case for lack of warning on startup
+- Fix notifications not showing on critical battery
+- Fix warning when keyboard backlight isn't available
+- Never show a mouse as the status icon
+
+Updates:
+- Add a 'Not Now' button to the distribution upgrade notification
+- Do not show multiple notifications when updates are available
+- Raise PackageKit dependency to 0.8.1 to avoid complexity
+
+Wacom:
+- Fix a couple of crashes
+- Fix default area ordering
+- Fix failure to get area with the cursor device
+- Implement resetting the tablet area to default
+- Make OSD work again
+- Remove Tablet PC setting as we don't have UI for it
+
+XRandR:
+- Don't save the temporary configurations generated by rotate buttons
+  or FN+F7
+
+==============
+Version 3.10.0
+==============
+
+Power:
+- Fix laptop suspend when lid is closed even if external monitor is present
+- Test fixes, add test with a failing device battery
+
+Mouse:
+- Fix critical warning with touchpad settings
+
+Date & Time:
+- Fix possible crasher due to clash between json-c and json-glib
+
+Smartcard:
+- Fix run-time warning
+
+==============
+Version 3.9.92
+==============
+
+- Several fixes to the test suite
+
+Color:
+- Correct the transposed bits in the EDID parser
+
+Datetime:
+- Set geoclue distance threshold
+
+Power:
+- Fix a crash when hibernating on low power
+- Ignore battery devices that aren't present
+- Update the composite device on startup
+- Default to the keyboard backlight being unavailable
+
+Updates:
+- Fix a crash
+- Use gnome-software if it is installed
+- Do not clear the offline-update if rebooting succeeded
+
+Wacom:
+- Fix a crash
+
+================
+Version 3.9.91.1
+================
+
+Datetime:
+- Adapt to geoclue 1.99.3 api changes
+
+Screensaver:
+- Support KDE variant of interface
+- Fix a crash
+
+==============
+Version 3.9.91
+==============
+
+Datetime:
+- Avoid popping up polkit password prompts
+- Display notifications on timezone changes
+- Use reverse geocoding fror country detection
+- Use libgweather timezone info too
+
+Power:
+- Fix error handling in dbus API, avoiding assertions
+
+Printer:
+- Allow building against cups 1.5
+
+Remote display:
+- Disable animations in more situations
+
+Rfkill:
+- Fix a crash
+
+Smartcard:
+- Ignore softtoken
+
+Updates:
+- Add a test application
+- Notify about available offline updates
+
+XSettings:
+- Keep middle-click paste enabled for now
+
+
+==============
+Version 3.9.90
+==============
+
+- Consolidate access to common bus proxies like session and
+  screensaver
+
+Housekeeping:
+- Fixed a bug that would prevent files in the Trash from being purged
+
+Media-keys:
+- Add a way to watch DBus namespaces
+- Use an MPRIS interface to handle Play, Pause, etc. keys in case we
+  don't have a native client registered for our media-keys API
+- Add a binding to take a short screencast of the screen
+- Add a shortcut to toggle the screen reader
+
+Mouse:
+- Enable edge scrolling if two-finger scroll is unavailable
+
+Power:
+- Add Brightness property for keyboard backlights
+- Use logind to discover critical action availability
+
+Printers:
+- Code cleanup
+- Do more things asynchronously
+- Poll remote CUPS servers for notifications
+
+RFKill:
+- Add a property to determine whether we can toggle airplane mode
+
+XRandR:
+- Stop handling monitors.xml and the initial modeset for the session,
+  as well as monitor hotplug and lid switches. All that is implemented
+  in mutter now
+
+XSettings:
+- Disable middle-click paste by default. Can be enabled in
+  gnome-tweak-tool
+- Add support to detect and set a scale factor on high DPI displays
+
+=============
+Version 3.9.5
+=============
+
+- Add RFKill support for Linux systems
+- Smartcard plugin rewrite
+
+Build:
+- Don't create empty directories in /etc
+- Remove some GTK+ includes that we do not use
+
+Color:
+- Update for new functionality in colord
+- Disable X11 specific color management when running on Wayland
+
+Cursor:
+- Request the OSK when the cursor is disabled (requires gnome-shell changes)
+
+Media-keys:
+- Fix launched apps not getting focused
+
+Power:
+- Use a property for the screen brightness, instead of custom API
+
+Housekeeping:
+- Create ~/.local/share/applications so that gnome-shell can monitor it
+
+Printers:
+- Translate printer warnings
+
+Wacom:
+- Use the OSD window to edit button shortcuts
+- Fix the ring not showing up in the OSD in some cases
+- Prevent the OSD flashing on the primary screen
+- Make the highlight duration of buttons in the OSD longer fade in/out
+- Add support for custom OLEDs
+- Make sure we only ignore the touch device when turning it off
+- Fix UI problems with the OSD
+
+XRandR:
+- Use the transformation matrix to rotate touchscreens
+- Simplify layout of adjacent screens, fixing bugs on some changing systems
+- Don't ever show a dialog for xrandr failures
+
+XSettings:
+- Hardcode deprecated GTK+ XSettings
+
+=============
+Version 3.9.3
+=============
+
+Daemon:
+- Fix possible crash on start when calling setenv() after
+  starting threads
+
+Color:
+- Bump colord dependency
+
+Keyboard:
+- Don't show on the bus before we're fully initialised
+
+Wacom:
+- Fix calling for calibration from the notification
+- Add configure button to the OSD window
+
+Power:
+- Fix non-transient notifications sticking around
+- Simplify composite battery as advertised in the D-Bus API
+
+Updates:
+- Make sure only one notification appears
+
+=============
+Version 3.9.2
+=============
+
+Plugins:
+- Fix priority handling
+- Update for gnome-desktop API change
+
+Media-keys:
+- Handle key grabbing and volume OSDs in gnome-shell
+- Remove unused multi-head support
+- Remove label for analog-output ports
+- Avoid leaking DESKTOP_AUTOSTART_ID to children
+- Fix possible crash when changing the volume
+- Add Rotation lock support
+- Change default 'Lock screen' keybinding to be Super+L
+- Show Shell's search when pressing the search button
+- Add support for XF86AudioMicMute key
+
+Keyboard:
+- Get layouts and variants from localed
+- Get XKB options from localed
+- Always try to activate the ibus daemon
+- Use the gtk+ ibus module if there's at least one ibus source
+- Make sure the XKB group in use is always what we want
+- Without settings or under GDM, make sure to add the US layout
+- Add SetInputSource DBus method
+- Remove the input source switcher helper
+- Convert the XKB group switch option from libgnomekbd
+- Stop adding locale based input sources from a hardcoded list
+
+Cursor:
+- Disable plugin if the X version is too old
+
+Color:
+- Simplify code by using new libcolord feature
+- Fix warning with some screens
+- Fix possible CPU burn loop
+
+Mouse:
+- Enable two-finger scrolling by default
+
+Power:
+- Handle the shell coming back with a different screensaver state
+- Don't change active state variable in VM
+- Don't look for screens if we don't have a lid
+- Don't poll for external monitors
+- Remove pre-dim brightness hack
+- Make "Screen when inactive" button in Settings work
+
+Housekeeping:
+- Use GSettings features to clamp options
+- Fix incorrect handling of ignore_paths
+
+Sound:
+- Fix creation of sound theme directories
+
+Updates:
+- Fix a number of possible crashers, especially on exit
+
+Wacom:
+- Warn when screen has changed and calibration is needed
+- Add OLED support for Intuos4 tablets
+- Warn when tablet is not supported in GNOME
+
+XSettings:
+- Drop toolbar-style workaround
+
+==============
+Version 3.7.90
+==============
+
+- Set locale and IBus envvars on startup for our children
+- Remove background plugin, as background handling is now
+  done in gnome-shell
+
+A11y settings:
+- Import GIO instead of GTK+/GDK
+- Do enable toolkit accessibility, even if we don't need it,
+  for the benefit of third-party/legacy toolkits and apps
+
+Media keys:
+- Add other bindings to the whitelist
+
+Cursor:
+- Enable the on-screen keyboard when touch is used
+
+Keyboard:
+- Adapt to gnome-xkb-info API change
+
+Power:
+- Make blanking timeouts match
+- Show notifications when about to suspend from idle
+- Wake up the display when about to logout
+- Adapt to new GnomeIdleMonitor API
+- Don't change the brightness on inactive sessions
+
+Remote Display:
+- Disable animations on Xvnc as well
+- Re-enable animations if Vino is gone
+
+Sound:
+- Avoid polling non-existent directories
+
+Updates:
+- Fix crasher when firmware updates is disabled
+
+XSettings:
+- propagate the remember-recent-files GSetting to XSettings
+
+Wacom:
+- Bump req for GDK_FULLSCREEN_ON_ALL_MONITORS
+
+===============
+Version 3.7.5.1
+===============
+
+Fix keyboard shortcut handling with XI 2.3
+
+=============
+Version 3.7.5
+=============
+
+A11Y Keyboard:
+- Disable everything on exit if no settings changed
+- Remove GTK+ fallback dialogues
+
+Color:
+- Set the correct metadata on the auto-created EDID profile
+- Switching to a new account shouldn't warn
+
+Daemon:
+- Also apply LC_PAPER
+
+Media Keys:
+- Use D-Bus API to lock the screen
+- Use F20 for the temporary mic mute key
+
+Power:
+- Add way to disable the backlight helper
+- Avoid dead-locking with gnome-shell on startup
+- Avoid possible crash when shutting down quickly or at startup
+- Drop explicit screen locking on suspend
+- Fix incorrect backlight level on restore
+- Handle dim idle the same way as other idles
+- Lots of test additions
+- Wake up the display when unplugging the AC too
+
+Remote DIsplay:
+- Detect SPICE sessions as well
+- Monitor Vino's Connected status
+
+Screenshot:
+- Save to GtkRecentManager on success
+- Lots of test additions.
+
+Updates:
+- Allow the shell time to initialize before checking for offline update failures
+
+Wacom:
+- Use regular fullscreen window for OSD
+
+And updated translations
+
+=============
+Version 3.7.4
+=============
+
+Updates:
+- Support notification filtering
+
+Media-keys:
+- Save screenshots without using gnome-screenshot
+- Updated design for the on-screen OSD
+- Show output device when changing the volume
+- Add OSD support for the "Battery" key on certain laptops
+- Add support for the microphone mute key on certain keyboards
+- Move sound initialisation out of the critical startup path
+
+Color:
+- Addition to implement new mockups in gnome-control-center
+
+Housekeeping:
+- Fix purging not working
+
+Keyboard:
+- Don't migrate ibus xkb engines
+
+Power:
+- Add test suite
+- Fix Power settings panel not picking up the updated brightness
+- Fix dimming of the screen not working, and don't dim when inhibited
+- Fix timeouts being longer than configured in some cases
+- Aggressively blank the screen when the shield is down
+- Update idle configuration when plugging or unplugging the mains
+- Really turn off the screen on suspend for MacBook laptops
+- Allow overriding VM detection with the gnome.is_vm=[01] kernel command-line parameter
+
+Wacom:
+- Fix problems resetting touch buttons on 64-bit systems
+- Allow switching modes while OSD is active
+
+XRandR:
+- use default-monitors-setup for autoconfiguration even after boot
+
+=============
+Version 3.7.3
+=============
+
+- Add implementation for Freedesktop.org ScreenSaver inhibition API
+- Disable animations on slow links (VNC for example)
+- Remove fallback mode handling code
+- Disable the smartcard plugin for now
+
+Daemon:
+- Many plugins ordering bug fixes
+- Use gnome-session properties instead of libsystemd-login
+- Allow whitelisting plugins, to make it easier for gdm to catch up
+- Install all the schemas, even the ones for which the plugins aren't
+  installed
+- Add a way to replace the daemon
+- exit gracefully if the session name is already taken
+
+Power:
+- Remove unused settings keys
+- Do not attempt to suspend, dim or blank if running inside a VM
+- Port to GnomeIdleMonitor from gnome-desktop
+- Adjust sleep timer to blank timer in some cases
+- Check if action is available before taking action
+- Hide critical battery warning when power is plugged
+- Fix possible race with gnome-shell on startup
+
+Sound:
+- Fix sound plugin never working properly
+
+Media-keys:
+- Use the shared libgnome-volume-control code
+- Support launching gnome-calculator instead of gcalctool
+- Add default shortcuts for the magnifier
+- Add repeat to the brightness keys
+
+Keyboard:
+- Fix build without IBus
+- Fix potential infinite loop due to num-lock handling
+- Don't print warnings when calls are cancelled
+- Handle keyboard shortcuts with Caps Lock for switching inputs
+
+Mouse:
+- Fix natural horizontal scroll
+
+XRandR:
+- Add new follow-lid behavior and tie gsd-power lid-close to XRandR
+- Avoid crasher if XRandR calls fail on startup
+- Fix the "rotate" button not working
+- Swap axes for some (non-Wacom) tablets as well
+
+Wacom:
+- Avoid infinite recursion with a non-Wacom display
+- Fix handling of Cintiq 24HD mode-switch buttons
+- Mode switch LED fixes for some tablets
+- Add OSD help window (see gnome-control-center for how to launch it)
+
+Cursor:
+- Only show the cursor when the mouse gets used
+
+Housekeeping:
+- Implement automatic purging of trash, along with a D-Bus interface for it
+
+Print-notifications:
+- Don't show strange notifications when printing
+
+Updates:
+- Fix warning on startup with PackageKit < 0.8.1
+
+=============
+Version 3.7.1
+=============
+
+Daemon:
+- Provide a singleton SessionManager proxy object
+- Ensure session registration happens before other idles
+- Use logind for suspending and rebooting the system
+- Require logind for session tracking
+
+Input:
+- Clarify hotplug command exit value handling
+- Add trackball detection
+
+Keyboard:
+- Add default ibus engine for Indic locales
+- Don't apply global settings for every keyboard
+
+Mouse:
+- Re-enable touchpad when mouse isn't present
+
+Power:
+- Fix "no devices" error path in gsd-backlight-helper
+- Add a watchdog to keep X's builtin screen saver disabled
+- Fix a number of possible crashers
+
+Wacom:
+- Add support for touchstrips and touchrings without a modeswitch
+
+XSettings:
+- Optimise xsettings changes
+
+=============
+Version 3.6.1
+=============
+
+Keyboard:
+- Allow grabbing the Menu key
+- Apply XKB variants and options for each IBus engine
+- Don't setup legacy toolkits if IBus is missing
+- Add default setup for some particular languages
+- Convert old libgnomekbd and IBus configurations
+- Add support for more modifiers only combinations
+- Fix input switching eating the modifiers keys in some cases
+
+Mouse:
+- Fix "Locate Pointer" eating the Ctrl key
+- Fix "Locate Pointer" animation showing when the Ctrl key has been used
+
+Updates:
+- Never show the user a message about cancelled transactions
+
+Wacom:
+- Fix LEDs switching for some tablet models
+
+Housekeeping:
+- Fix possible crashers on exit
+
+Color:
+- Fix possible crashers on exit
+
+=============
+Version 3.6.0
+=============
+
+Keyboard:
+- Create sources from the X layouts if the configuration is empty
+- Always do that in GDM, so system-wide layouts work
+- Add modifiers-only shortcuts to switch input sources
+
+==============
+Version 3.5.92
+==============
+
+Keyboard:
+- Don't block getting the IBus global engine
+- Don't touch the XKB layout if no input sources were configured
+- Fix gtk+ IM module getting set to IBus for XKB sources
+
+Media keys:
+- Make "toggle brightness" work
+
+Color:
+- Don't warn about non-existent DMI file
+
+Power:
+- Fix some instances where an external screen would turn off
+
+Wacom:
+- Require wacom 0.6 to fix bugs with some tablets
+
+==============
+Version 3.5.91
+==============
+
+Mouse:
+- Fix natural-scroll not working until switched off and on again
+
+Keyboard:
+- Don't handle IBus for fallback, it will use the same UI it always did
+- Hook IBus support for legacy applications
+
+Power:
+- Do not attempt to change the brightness of an output that was disabled
+- Fix idle blank and sleep timeout
+
+==============
+Version 3.5.90
+==============
+
+Power:
+- Fix D-Bus path of the screensaver
+
+Mouse:
+- Add support for natural scroll for touchpads
+
+Keyboard:
+- Apply XKB options
+
+Wacom:
+- Implement the "switch monitor" combination
+
+And updated translations
+
+=============
+Version 3.5.6
+=============
+
+Build:
+- Add optional man page
+- List plugin schemas as children of the main schema
+
+Updates:
+- Remove unused code
+- Avoid compilation warnings due to PackageKit API changes
+
+Mouse:
+- If one device was ignored, we would ignore all the devices
+
+Smartcard:
+- Don't try to use smartcard drivers that didn't load
+
+Keyboard:
+- Require ibus 1.4.99 for ibus support
+
+Wacom:
+- Avoid a warning at login
+
+=============
+Version 3.5.5
+=============
+
+* Add test applications for a number of plugins
+
+Color:
+- Fix notification-related memory leaks
+
+Keyboard:
+- Add support for switching to IBus input methods
+
+Wacom:
+- Fix crasher related to screen tablets
+- Do not rotate "pad" devices
+- Apply display rotation to device that's mapped to it
+- Make shortcuts that require Shift work as expected
+- Re-apply calibration and aspect-ratio when the screen changes
+  but don't apply it to touch devices
+
+Housekeeping:
+- Fix notification-related memory leaks
+
+Updates:
+- Remove unused settings
+- Remove a number of unused notifications
+- Don't ever live-update packages in the session
+- Fix a number of memory leaks
+- Prevent crash if a device that requires a firmware is removed before the
+  firmware search completes
+
+=============
+Version 3.5.4
+=============
+
+Wacom:
+- Fix crasher related to screen matching (Olivier Fourdan)
+
+Printers:
+- Don't block the session with unreachable printers
+
+=============
+Version 3.5.3
+=============
+
+Keyboard A11y:
+- Don't crash when changing large print in fallback mode
+- Link to an existing help page
+
+Housekeeping:
+- Support new XDG thumbnail directory locations
+
+Keyboard:
+- Don't crash if LANG is empty
+
+Media-keys:
+- Make <Super> keyboard shortcuts work again
+- Use systemd to shutdown or suspend if available
+
+Mouse:
+- Only inhibits mouse clicks and scrolls with syndaemon
+
+Power:
+- End the lid-close safety timer when the lid gets opened
+- Update fallback status icon on icon state change
+- Don't leak notifications
+- Avoid duplicate translations
+- Use systemd to shutdown or suspend if available
+- Don't enable backlight helper if GUdev is not available
+
+Updates:
+- Adapt to new upstream property name
+- Add a notification for offline updates
+
+Wacom:
+- Update display mapping on monitor changes
+- Flag unknown devices created from fallback
+- Add keep aspect ratio option
+- Use GnomeRROutput instead of GnomeRROutputInfo
+- Match built-in monitor
+
+XRandr:
+- Explicitly set clone state variable when generating monitor configs
+
+=============
+Version 3.5.2
+=============
+
+- Remove ability to D-Bus activate (Ray Strode)
+
+Media-keys:
+- Get proper gnome-keyring environment (Bastien Nocera)
+- Simplify the OSD code (Bastien)
+- Add keybindings to switch input sources (Rui Matos)
+
+Mouse:
+- Fix applying settings to newly added touchpads (Owen Taylor)
+- Reduce default touchpad deactivation to 1s (Nicolas Dufresne)
+
+Housekeeping:
+- Split out 'ingnore unix mount' code (Bastien)
+
+Keyboard:
+- Always apply xmodmap (Sergey V. Udaltsov)
+- Lots of cleanups (Bastien)
+- Apply XKB layouts ourselfs and stop relying on libgnomekbd (Rui Matos)
+
+Power:
+- Disconnect from upower signals when needed (Richard Hughes)
+- Add org.gnome.settings-daemon.plugins.power.lid-close-suspend-with-extrnal-monitors
+  key to allow forcing suspend on lid close (Paolo Bonzini)
+
+Print:
+- Fix setting of default media size (Marek Kasik)
+- Don't create an unused proxy object (Matthias Clasen)
+- Speed up initialization (Matthias)
+
+Updates:
+- Automatically download updates rather than installing them (Richard)
+
+Wacom:
+- Disable wacom support on s390 (Dan Horák)
+- Disable wacom support on non-linux (Antoine Jacoutot)
+- Don't put touchscreens in relative mode (Timo Aaltonen)
+- Make tablet configuration per-machine (Bastien)
+
+Color:
+- Be quiet about unloadable profiles (Richard)
+
+Translations:
+- Catalan
+- Crimean Tatar
+- Dutch
+- Galician
+- German
+- Hebrew
+- Italian
+- Kannada
+- Norwegian bokmål
+- Slovenian
+- Swedish
 
 =============
 Version 3.4.0

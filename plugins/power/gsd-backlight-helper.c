@@ -30,56 +30,13 @@
 #include <string.h>
 #include <gudev/gudev.h>
 
+#include "gsd-backlight-linux.h"
+
 #define GSD_BACKLIGHT_HELPER_EXIT_CODE_SUCCESS			0
 #define GSD_BACKLIGHT_HELPER_EXIT_CODE_FAILED			1
 #define GSD_BACKLIGHT_HELPER_EXIT_CODE_ARGUMENTS_INVALID	3
 #define GSD_BACKLIGHT_HELPER_EXIT_CODE_INVALID_USER		4
-
-static gchar *
-gsd_backlight_helper_get_type (GList *devices, const gchar *type)
-{
-	const gchar *type_tmp;
-	GList *d;
-
-	for (d = devices; d != NULL; d = d->next) {
-		type_tmp = g_udev_device_get_sysfs_attr (d->data, "type");
-		if (g_strcmp0 (type_tmp, type) == 0)
-			return g_strdup (g_udev_device_get_sysfs_path (d->data));
-	}
-	return NULL;
-}
-
-static gchar *
-gsd_backlight_helper_get_best_backlight ()
-{
-	gchar *path = NULL;
-	GList *devices;
-	GUdevClient *client;
-
-	client = g_udev_client_new (NULL);
-	devices = g_udev_client_query_by_subsystem (client, "backlight");
-	if (devices == NULL) {
-		g_warning ("failed to find any devices");
-		goto out;
-	}
-
-	/* search the backlight devices and prefer the types:
-	 * firmware -> platform -> raw */
-	path = gsd_backlight_helper_get_type (devices, "firmware");
-	if (path != NULL)
-		goto out;
-	path = gsd_backlight_helper_get_type (devices, "platform");
-	if (path != NULL)
-		goto out;
-	path = gsd_backlight_helper_get_type (devices, "raw");
-	if (path != NULL)
-		goto out;
-out:
-	g_object_unref (client);
-	g_list_foreach (devices, (GFunc) g_object_unref, NULL);
-	g_list_free (devices);
-	return path;
-}
+#define GSD_BACKLIGHT_HELPER_EXIT_CODE_NO_DEVICES		5
 
 static gboolean
 gsd_backlight_helper_write (const gchar *filename, gint value, GError **error)
@@ -144,9 +101,6 @@ main (int argc, char *argv[])
 		{ NULL}
 	};
 
-	/* setup type system */
-	g_type_init ();
-
 	context = g_option_context_new (NULL);
 	g_option_context_set_summary (context, "GNOME Settings Daemon Backlight Helper");
 	g_option_context_add_main_entries (context, options, NULL);
@@ -169,7 +123,10 @@ main (int argc, char *argv[])
 	/* find device */
 	filename = gsd_backlight_helper_get_best_backlight ();
 	if (filename == NULL) {
-		retval = GSD_BACKLIGHT_HELPER_EXIT_CODE_INVALID_USER;
+		retval = GSD_BACKLIGHT_HELPER_EXIT_CODE_NO_DEVICES;
+		g_print ("%s: %s\n",
+			 "Could not get or set the value of the backlight",
+			 "No backlight devices present");
 		goto out;
 	}
 

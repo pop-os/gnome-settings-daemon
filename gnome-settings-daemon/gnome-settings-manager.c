@@ -13,8 +13,7 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
+ * along with this program; if not, see <http://www.gnu.org/licenses/>.
  *
  */
 
@@ -33,12 +32,10 @@
 #define GNOME_DESKTOP_USE_UNSTABLE_API
 #include <libgnome-desktop/gnome-pnp-ids.h>
 
+#include "gnome-settings-plugin.h"
 #include "gnome-settings-plugin-info.h"
 #include "gnome-settings-manager.h"
 #include "gnome-settings-profile.h"
-
-#define GSD_MANAGER_DBUS_PATH "/org/gnome/SettingsDaemon"
-#define GSD_MANAGER_DBUS_NAME "org.gnome.SettingsDaemon"
 
 #define DEFAULT_SETTINGS_PREFIX "org.gnome.settings-daemon"
 
@@ -64,14 +61,17 @@ struct GnomeSettingsManagerPrivate
         guint                       owner_id;
         GDBusNodeInfo              *introspection_data;
         GDBusConnection            *connection;
+        guint                       dbus_register_object_id;
+        GCancellable               *cancellable;
+
         GSettings                  *settings;
+        char                      **whitelist;
         GnomePnpIds                *pnp_ids;
         GSList                     *plugins;
 };
 
 static void     gnome_settings_manager_class_init  (GnomeSettingsManagerClass *klass);
 static void     gnome_settings_manager_init        (GnomeSettingsManager      *settings_manager);
-static void     gnome_settings_manager_finalize    (GObject                   *object);
 
 G_DEFINE_TYPE (GnomeSettingsManager, gnome_settings_manager, G_TYPE_OBJECT)
 
@@ -148,8 +148,8 @@ emit_signal (GnomeSettingsManager    *manager,
 
         if (g_dbus_connection_emit_signal (manager->priv->connection,
                                            NULL,
-                                           GSD_MANAGER_DBUS_PATH,
-                                           GSD_MANAGER_DBUS_NAME,
+                                           GSD_DBUS_PATH,
+                                           GSD_DBUS_NAME,
                                            "PluginActivated",
                                            g_variant_new ("(s)", name),
                                            &error) == FALSE) {
@@ -182,8 +182,8 @@ on_plugin_deactivated (GnomeSettingsPluginInfo *info,
 }
 
 static gboolean
-contained (const char * const *items,
-           const char         *item)
+contained (char       **items,
+           const char  *item)
 {
         while (*items) {
                 if (g_strcmp0 (*items++, item) == 0) {
@@ -197,9 +197,31 @@ contained (const char * const *items,
 static gboolean
 is_schema (const char *schema)
 {
-        return contained (g_settings_list_schemas (), schema);
+        GSettingsSchemaSource *source = NULL;
+        gchar **non_relocatable = NULL;
+        gchar **relocatable = NULL;
+
+        source = g_settings_schema_source_get_default ();
+        if (!source)
+                return FALSE;
+
+        g_settings_schema_source_list_schemas (source, TRUE, &non_relocatable, &relocatable);
+
+        return (contained (non_relocatable, schema) ||
+                contained (relocatable, schema));
 }
 
+static gboolean
+is_whitelisted (char       **whitelist,
+                const char  *plugin_name)
+{
+        if (whitelist == NULL ||
+            whitelist[0] == NULL ||
+            g_strcmp0 (whitelist[0], "all") == 0)
+                return TRUE;
+
+        return contained (whitelist, plugin_name);
+}
 
 static void
 _load_file (GnomeSettingsManager *manager,
@@ -221,6 +243,13 @@ _load_file (GnomeSettingsManager *manager,
                                  info,
                                  (GCompareFunc) compare_location);
         if (l != NULL) {
+                goto out;
+        }
+
+        if (!is_whitelisted (manager->priv->whitelist,
+                             gnome_settings_plugin_info_get_location (info))) {
+                g_debug ("Plugin %s ignored as it's not whitelisted",
+                         gnome_settings_plugin_info_get_location (info));
                 goto out;
         }
 
@@ -332,19 +361,21 @@ on_bus_gotten (GObject             *source_object,
 
         connection = g_bus_get_finish (res, &error);
         if (connection == NULL) {
-                g_warning ("Could not get session bus: %s", error->message);
+                if (!g_error_matches (error, G_IO_ERROR, G_IO_ERROR_CANCELLED))
+                        g_warning ("Could not get session bus: %s", error->message);
                 g_error_free (error);
                 return;
         }
         manager->priv->connection = connection;
 
-        g_dbus_connection_register_object (connection,
-                                           GSD_MANAGER_DBUS_PATH,
-                                           manager->priv->introspection_data->interfaces[0],
-                                           NULL,
-                                           NULL,
-                                           NULL,
-                                           NULL);
+        manager->priv->dbus_register_object_id = g_dbus_connection_register_object (connection,
+                                                                                    GSD_DBUS_PATH,
+                                                                                    manager->priv->introspection_data->interfaces[0],
+                                                                                    NULL,
+                                                                                    NULL,
+                                                                                    NULL,
+                                                                                    NULL);
+        g_assert (manager->priv->dbus_register_object_id > 0);
 }
 
 static void
@@ -353,8 +384,10 @@ register_manager (GnomeSettingsManager *manager)
         manager->priv->introspection_data = g_dbus_node_info_new_for_xml (introspection_xml, NULL);
         g_assert (manager->priv->introspection_data != NULL);
 
+        manager->priv->cancellable = g_cancellable_new ();
+
         g_bus_get (G_BUS_TYPE_SESSION,
-                   NULL,
+                   manager->priv->cancellable,
                    (GAsyncReadyCallback) on_bus_gotten,
                    manager);
 }
@@ -386,6 +419,7 @@ gnome_settings_manager_start (GnomeSettingsManager *manager,
 
         gnome_settings_profile_start ("initializing plugins");
         manager->priv->settings = g_settings_new (DEFAULT_SETTINGS_PREFIX ".plugins");
+        manager->priv->whitelist = g_settings_get_strv (manager->priv->settings, "whitelisted-plugins");
 
         _load_all (manager);
         gnome_settings_profile_end ("initializing plugins");
@@ -397,22 +431,6 @@ gnome_settings_manager_start (GnomeSettingsManager *manager,
         return ret;
 }
 
-void
-gnome_settings_manager_stop (GnomeSettingsManager *manager)
-{
-        g_debug ("Stopping settings manager");
-
-        _unload_all (manager);
-
-        if (manager->priv->owner_id > 0) {
-                g_bus_unown_name (manager->priv->owner_id);
-                manager->priv->owner_id = 0;
-        }
-
-        g_clear_object (&manager->priv->settings);
-        g_clear_object (&manager->priv->pnp_ids);
-}
-
 static void
 gnome_settings_manager_dispose (GObject *object)
 {
@@ -420,7 +438,28 @@ gnome_settings_manager_dispose (GObject *object)
 
         manager = GNOME_SETTINGS_MANAGER (object);
 
-        gnome_settings_manager_stop (manager);
+        g_debug ("Stopping settings manager");
+
+        _unload_all (manager);
+
+        if (manager->priv->cancellable) {
+                g_cancellable_cancel (manager->priv->cancellable);
+                g_clear_object (&manager->priv->cancellable);
+        }
+        if (manager->priv->owner_id > 0) {
+                g_bus_unown_name (manager->priv->owner_id);
+                manager->priv->owner_id = 0;
+        }
+        if (manager->priv->dbus_register_object_id > 0) {
+                g_dbus_connection_unregister_object (manager->priv->connection,
+                                                     manager->priv->dbus_register_object_id);
+                manager->priv->dbus_register_object_id = 0;
+        }
+
+        g_clear_pointer (&manager->priv->whitelist, g_strfreev);
+        g_clear_object (&manager->priv->settings);
+        g_clear_object (&manager->priv->pnp_ids);
+        g_clear_object (&manager->priv->connection);
 
         G_OBJECT_CLASS (gnome_settings_manager_parent_class)->dispose (object);
 }
@@ -431,7 +470,6 @@ gnome_settings_manager_class_init (GnomeSettingsManagerClass *klass)
         GObjectClass   *object_class = G_OBJECT_CLASS (klass);
 
         object_class->dispose = gnome_settings_manager_dispose;
-        object_class->finalize = gnome_settings_manager_finalize;
 
         g_type_class_add_private (klass, sizeof (GnomeSettingsManagerPrivate));
 }
@@ -441,21 +479,6 @@ gnome_settings_manager_init (GnomeSettingsManager *manager)
 {
 
         manager->priv = GNOME_SETTINGS_MANAGER_GET_PRIVATE (manager);
-}
-
-static void
-gnome_settings_manager_finalize (GObject *object)
-{
-        GnomeSettingsManager *manager;
-
-        g_return_if_fail (object != NULL);
-        g_return_if_fail (GNOME_IS_SETTINGS_MANAGER (object));
-
-        manager = GNOME_SETTINGS_MANAGER (object);
-
-        g_return_if_fail (manager->priv != NULL);
-
-        G_OBJECT_CLASS (gnome_settings_manager_parent_class)->finalize (object);
 }
 
 GnomeSettingsManager *

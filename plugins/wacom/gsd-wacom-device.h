@@ -12,8 +12,7 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
+ * along with this program; if not, see <http://www.gnu.org/licenses/>.
  *
  * Author: Bastien Nocera <hadess@hadess.net>
  *
@@ -23,6 +22,7 @@
 #define __GSD_WACOM_DEVICE_MANAGER_H
 
 #include <glib-object.h>
+#include "gsd-enums.h"
 
 G_BEGIN_DECLS
 
@@ -92,11 +92,26 @@ GsdWacomStylusType gsd_wacom_stylus_get_stylus_type (GsdWacomStylus *stylus);
 /* Tablet Buttons */
 typedef enum {
 	WACOM_TABLET_BUTTON_TYPE_NORMAL,
-	WACOM_TABLET_BUTTON_TYPE_ELEVATOR,
+	WACOM_TABLET_BUTTON_TYPE_STRIP,
+	WACOM_TABLET_BUTTON_TYPE_RING,
 	WACOM_TABLET_BUTTON_TYPE_HARDCODED
 } GsdWacomTabletButtonType;
 
+/*
+ * Positions of the buttons on the tablet in default right-handed mode
+ * (ie with no rotation applied).
+ */
+typedef enum {
+	WACOM_TABLET_BUTTON_POS_UNDEF = 0,
+	WACOM_TABLET_BUTTON_POS_LEFT,
+	WACOM_TABLET_BUTTON_POS_RIGHT,
+	WACOM_TABLET_BUTTON_POS_TOP,
+	WACOM_TABLET_BUTTON_POS_BOTTOM
+} GsdWacomTabletButtonPos;
+
 #define MAX_GROUP_ID 4
+
+#define GSD_WACOM_NO_LED -1
 
 typedef struct
 {
@@ -104,7 +119,10 @@ typedef struct
 	char                     *id;
 	GSettings                *settings;
 	GsdWacomTabletButtonType  type;
+	GsdWacomTabletButtonPos   pos;
 	int                       group_id, idx;
+	int                       status_led;
+	int                       has_oled;
 } GsdWacomTabletButton;
 
 void                  gsd_wacom_tablet_button_free (GsdWacomTabletButton *button);
@@ -121,6 +139,9 @@ typedef enum {
         WACOM_TYPE_ALL     =     WACOM_TYPE_STYLUS | WACOM_TYPE_ERASER | WACOM_TYPE_CURSOR | WACOM_TYPE_PAD | WACOM_TYPE_TOUCH
 } GsdWacomDeviceType;
 
+/* We use -1 for entire screen when setting/getting monitor value */
+#define GSD_WACOM_SET_ALL_MONITORS -1
+
 GType gsd_wacom_device_get_type     (void);
 
 void     gsd_wacom_device_set_display         (GsdWacomDevice    *device,
@@ -128,15 +149,21 @@ void     gsd_wacom_device_set_display         (GsdWacomDevice    *device,
 gint     gsd_wacom_device_get_display_monitor (GsdWacomDevice *device);
 gboolean gsd_wacom_device_get_display_matrix  (GsdWacomDevice *device,
                                                float           matrix[NUM_ELEMS_MATRIX]);
+GsdWacomRotation gsd_wacom_device_get_display_rotation (GsdWacomDevice *device);
 
 GsdWacomDevice * gsd_wacom_device_new              (GdkDevice *device);
 GList          * gsd_wacom_device_list_styli       (GsdWacomDevice *device);
 const char     * gsd_wacom_device_get_name         (GsdWacomDevice *device);
+const char     * gsd_wacom_device_get_layout_path  (GsdWacomDevice *device);
 const char     * gsd_wacom_device_get_path         (GsdWacomDevice *device);
 const char     * gsd_wacom_device_get_icon_name    (GsdWacomDevice *device);
 const char     * gsd_wacom_device_get_tool_name    (GsdWacomDevice *device);
 gboolean         gsd_wacom_device_reversible       (GsdWacomDevice *device);
 gboolean         gsd_wacom_device_is_screen_tablet (GsdWacomDevice *device);
+gboolean         gsd_wacom_device_is_isd           (GsdWacomDevice *device);
+gboolean         gsd_wacom_device_is_fallback      (GsdWacomDevice *device);
+gint             gsd_wacom_device_get_num_strips   (GsdWacomDevice *device);
+gint             gsd_wacom_device_get_num_rings    (GsdWacomDevice *device);
 GSettings      * gsd_wacom_device_get_settings     (GsdWacomDevice *device);
 void             gsd_wacom_device_set_current_stylus (GsdWacomDevice *device,
 						      int             stylus_id);
@@ -145,13 +172,21 @@ GsdWacomStylus * gsd_wacom_device_get_stylus_for_type (GsdWacomDevice     *devic
 
 GsdWacomDeviceType gsd_wacom_device_get_device_type (GsdWacomDevice *device);
 gint           * gsd_wacom_device_get_area          (GsdWacomDevice *device);
+gint           * gsd_wacom_device_get_default_area  (GsdWacomDevice *device);
 const char     * gsd_wacom_device_type_to_string    (GsdWacomDeviceType type);
 GList          * gsd_wacom_device_get_buttons       (GsdWacomDevice *device);
 GsdWacomTabletButton *gsd_wacom_device_get_button   (GsdWacomDevice   *device,
 						     int               button,
 						     GtkDirectionType *dir);
-int gsd_wacom_device_set_next_mode                  (GsdWacomDevice *device,
-						     int             group_id);
+int gsd_wacom_device_get_num_modes                  (GsdWacomDevice   *device,
+						     int               group_id);
+int gsd_wacom_device_get_current_mode               (GsdWacomDevice   *device,
+						     int               group_id);
+int gsd_wacom_device_set_next_mode                  (GsdWacomDevice       *device,
+						     GsdWacomTabletButton *button);
+GsdWacomRotation gsd_wacom_device_rotation_name_to_type (const char *rotation);
+const char     * gsd_wacom_device_rotation_type_to_name (GsdWacomRotation type);
+
 
 /* Helper and debug functions */
 GsdWacomDevice * gsd_wacom_device_create_fake (GsdWacomDeviceType  type,

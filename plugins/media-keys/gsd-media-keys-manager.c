@@ -14,8 +14,7 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
+ * along with this program; if not, see <http://www.gnu.org/licenses/>.
  *
  */
 
@@ -36,44 +35,51 @@
 #include <glib/gi18n.h>
 #include <gio/gio.h>
 #include <gdk/gdk.h>
-#include <gdk/gdkx.h>
 #include <gtk/gtk.h>
 #include <gio/gdesktopappinfo.h>
+#include <gio/gunixfdlist.h>
+
+#include <libupower-glib/upower.h>
 
 #ifdef HAVE_GUDEV
 #include <gudev/gudev.h>
 #endif
 
+#include "mpris-controller.h"
+#include "gnome-settings-plugin.h"
+#include "gnome-settings-bus.h"
 #include "gnome-settings-profile.h"
 #include "gsd-marshal.h"
 #include "gsd-media-keys-manager.h"
 
 #include "shortcuts-list.h"
-#include "gsd-media-keys-window.h"
+#include "shell-key-grabber.h"
+#include "gsd-screenshot-utils.h"
 #include "gsd-input-helper.h"
 #include "gsd-enums.h"
+#include "gsd-shell-helper.h"
 
 #include <canberra.h>
 #include <pulse/pulseaudio.h>
 #include "gvc-mixer-control.h"
+#include "gvc-mixer-sink.h"
 
-#define GSD_DBUS_PATH "/org/gnome/SettingsDaemon"
-#define GSD_DBUS_NAME "org.gnome.SettingsDaemon"
 #define GSD_MEDIA_KEYS_DBUS_PATH GSD_DBUS_PATH "/MediaKeys"
 #define GSD_MEDIA_KEYS_DBUS_NAME GSD_DBUS_NAME ".MediaKeys"
-
-#define GNOME_SESSION_DBUS_NAME "org.gnome.SessionManager"
-#define GNOME_SESSION_DBUS_PATH "/org/gnome/SessionManager"
-#define GNOME_SESSION_DBUS_INTERFACE "org.gnome.SessionManager"
 
 #define GNOME_KEYRING_DBUS_NAME "org.gnome.keyring"
 #define GNOME_KEYRING_DBUS_PATH "/org/gnome/keyring/daemon"
 #define GNOME_KEYRING_DBUS_INTERFACE "org.gnome.keyring.Daemon"
 
+#define SHELL_DBUS_NAME "org.gnome.Shell"
+#define SHELL_DBUS_PATH "/org/gnome/Shell"
+
 #define CUSTOM_BINDING_SCHEMA SETTINGS_BINDING_DIR ".custom-keybinding"
 
+#define SHELL_GRABBER_RETRY_INTERVAL 1
+
 static const gchar introspection_xml[] =
-"<node>"
+"<node name='/org/gnome/SettingsDaemon/MediaKeys'>"
 "  <interface name='org.gnome.SettingsDaemon.MediaKeys'>"
 "    <annotation name='org.freedesktop.DBus.GLib.CSymbol' value='gsd_media_keys_manager'/>"
 "    <method name='GrabMediaPlayerKeys'>"
@@ -100,29 +106,40 @@ static const gchar introspection_xml[] =
 #define VOLUME_STEP 6           /* percents for one volume button press */
 #define MAX_VOLUME 65536.0
 
+#define SYSTEMD_DBUS_NAME                       "org.freedesktop.login1"
+#define SYSTEMD_DBUS_PATH                       "/org/freedesktop/login1"
+#define SYSTEMD_DBUS_INTERFACE                  "org.freedesktop.login1.Manager"
+
 #define GSD_MEDIA_KEYS_MANAGER_GET_PRIVATE(o) (G_TYPE_INSTANCE_GET_PRIVATE ((o), GSD_TYPE_MEDIA_KEYS_MANAGER, GsdMediaKeysManagerPrivate))
 
 typedef struct {
         char   *application;
-        char   *name;
+        char   *dbus_name;
         guint32 time;
         guint   watch_id;
 } MediaPlayer;
 
 typedef struct {
         MediaKeyType key_type;
+        ShellKeyBindingMode modes;
         const char *settings_key;
         const char *hard_coded;
         char *custom_path;
         char *custom_command;
-        Key *key;
+        guint accel_id;
 } MediaKey;
+
+typedef struct {
+        GsdMediaKeysManager *manager;
+        MediaKey *key;
+} GrabData;
 
 struct GsdMediaKeysManagerPrivate
 {
         /* Volume bits */
         GvcMixerControl *volume;
-        GvcMixerStream  *stream;
+        GvcMixerStream  *sink;
+        GvcMixerStream  *source;
         ca_context      *ca;
         GtkSettings     *gtksettings;
 #ifdef HAVE_GUDEV
@@ -130,7 +147,6 @@ struct GsdMediaKeysManagerPrivate
         GUdevClient     *udev_client;
 #endif /* HAVE_GUDEV */
 
-        GtkWidget       *dialog;
         GSettings       *settings;
         GHashTable      *custom_settings;
 
@@ -143,14 +159,32 @@ struct GsdMediaKeysManagerPrivate
 
         /* Power stuff */
         GSettings       *power_settings;
-        GDBusProxy      *upower_proxy;
+        GDBusProxy      *power_proxy;
         GDBusProxy      *power_screen_proxy;
         GDBusProxy      *power_keyboard_proxy;
+        UpDevice        *composite_device;
 
-        /* Multihead stuff */
-        GdkScreen       *current_screen;
-        GSList          *screens;
-        int              opcode;
+        /* Shell stuff */
+        GsdShell        *shell_proxy;
+        ShellKeyGrabber *key_grabber;
+        GCancellable    *grab_cancellable;
+
+        /* ScreenSaver stuff */
+        GsdScreenSaver  *screen_saver_proxy;
+
+        /* Screencast stuff */
+        GDBusProxy      *screencast_proxy;
+        guint            screencast_timeout_id;
+        gboolean         screencast_recording;
+        GCancellable    *screencast_cancellable;
+
+        /* Rotation */
+        guint            orientation_watch_id;
+        gboolean         orientation_available;
+
+        /* systemd stuff */
+        GDBusProxy      *logind_proxy;
+        gint             inhibit_keys_fd;
 
         GList           *media_players;
 
@@ -161,6 +195,8 @@ struct GsdMediaKeysManagerPrivate
         GCancellable    *cancellable;
 
         guint            start_idle_id;
+
+        MprisController *mpris_controller;
 };
 
 static void     gsd_media_keys_manager_class_init  (GsdMediaKeysManagerClass *klass);
@@ -170,30 +206,15 @@ static void     register_manager                   (GsdMediaKeysManager      *ma
 static void     custom_binding_changed             (GSettings           *settings,
                                                     const char          *settings_key,
                                                     GsdMediaKeysManager *manager);
+static void     grab_media_keys                    (GsdMediaKeysManager *manager);
+static void     grab_media_key                     (MediaKey            *key,
+                                                    GsdMediaKeysManager *manager);
+static void     ungrab_media_key                   (MediaKey            *key,
+                                                    GsdMediaKeysManager *manager);
 G_DEFINE_TYPE (GsdMediaKeysManager, gsd_media_keys_manager, G_TYPE_OBJECT)
 
 static gpointer manager_object = NULL;
 
-
-static void
-init_screens (GsdMediaKeysManager *manager)
-{
-        GdkDisplay *display;
-        int i;
-
-        display = gdk_display_get_default ();
-        for (i = 0; i < gdk_display_get_n_screens (display); i++) {
-                GdkScreen *screen;
-
-                screen = gdk_display_get_screen (display, i);
-                if (screen == NULL) {
-                        continue;
-                }
-                manager->priv->screens = g_slist_append (manager->priv->screens, screen);
-        }
-
-        manager->priv->current_screen = manager->priv->screens->data;
-}
 
 static void
 media_key_free (MediaKey *key)
@@ -202,43 +223,16 @@ media_key_free (MediaKey *key)
                 return;
         g_free (key->custom_path);
         g_free (key->custom_command);
-        free_key (key->key);
         g_free (key);
 }
 
-static char *
-get_term_command (GsdMediaKeysManager *manager)
-{
-        char *cmd_term, *cmd_args;;
-        char *cmd = NULL;
-        GSettings *settings;
-
-        settings = g_settings_new ("org.gnome.desktop.default-applications.terminal");
-        cmd_term = g_settings_get_string (settings, "exec");
-        if (cmd_term[0] == '\0')
-                cmd_term = g_strdup ("gnome-terminal");
-
-        cmd_args = g_settings_get_string (settings, "exec-arg");
-        if (strcmp (cmd_term, "") != 0) {
-                cmd = g_strdup_printf ("%s %s -e", cmd_term, cmd_args);
-        } else {
-                cmd = g_strdup_printf ("%s -e", cmd_term);
-        }
-
-        g_free (cmd_args);
-        g_free (cmd_term);
-        g_object_unref (settings);
-
-        return cmd;
-}
-
-static char **
-get_keyring_env (GsdMediaKeysManager *manager)
+static void
+set_launch_context_env (GsdMediaKeysManager *manager,
+			GAppLaunchContext   *launch_context)
 {
 	GError *error = NULL;
 	GVariant *variant, *item;
 	GVariantIter *iter;
-	char **envp;
 
 	variant = g_dbus_connection_call_sync (manager->priv->connection,
 					       GNOME_KEYRING_DBUS_NAME,
@@ -254,10 +248,8 @@ get_keyring_env (GsdMediaKeysManager *manager)
 	if (variant == NULL) {
 		g_warning ("Failed to call GetEnvironment on keyring daemon: %s", error->message);
 		g_error_free (error);
-		return NULL;
+		return;
 	}
-
-	envp = g_get_environ ();
 
 	g_variant_get (variant, "(a{ss})", &iter);
 
@@ -270,7 +262,7 @@ get_keyring_env (GsdMediaKeysManager *manager)
 			       &key,
 			       &value);
 
-		envp = g_environ_setenv (envp, key, value, TRUE);
+		g_app_launch_context_setenv (launch_context, key, value);
 
 		g_variant_unref (item);
 		g_free (key);
@@ -279,83 +271,6 @@ get_keyring_env (GsdMediaKeysManager *manager)
 
 	g_variant_iter_free (iter);
 	g_variant_unref (variant);
-
-	return envp;
-}
-
-static void
-execute (GsdMediaKeysManager *manager,
-         char                *cmd,
-         gboolean             need_term)
-{
-        gboolean retval;
-        char   **argv;
-        int      argc;
-        char    *exec;
-        char    *term = NULL;
-        GError  *error = NULL;
-
-        retval = FALSE;
-
-        if (need_term)
-                term = get_term_command (manager);
-
-        if (term) {
-                exec = g_strdup_printf ("%s %s", term, cmd);
-                g_free (term);
-        } else {
-                exec = g_strdup (cmd);
-        }
-
-        if (g_shell_parse_argv (exec, &argc, &argv, NULL)) {
-		char   **envp;
-
-		envp = get_keyring_env (manager);
-
-                retval = g_spawn_async (g_get_home_dir (),
-                                        argv,
-                                        envp,
-                                        G_SPAWN_SEARCH_PATH,
-                                        NULL,
-                                        NULL,
-                                        NULL,
-                                        &error);
-
-                g_strfreev (argv);
-                g_strfreev (envp);
-        }
-
-        if (retval == FALSE) {
-                g_warning ("Couldn't execute command: %s: %s", exec, error->message);
-                g_error_free (error);
-        }
-        g_free (exec);
-}
-
-static void
-dialog_init (GsdMediaKeysManager *manager)
-{
-        if (manager->priv->dialog != NULL
-            && !gsd_osd_window_is_valid (GSD_OSD_WINDOW (manager->priv->dialog))) {
-                gtk_widget_destroy (manager->priv->dialog);
-                manager->priv->dialog = NULL;
-        }
-
-        if (manager->priv->dialog == NULL) {
-                manager->priv->dialog = gsd_media_keys_window_new ();
-        }
-}
-
-static void
-print_key_parse_error (MediaKey      *key,
-		       const char    *str)
-{
-	if (str == NULL || *str == '\0')
-		return;
-	if (key->settings_key != NULL)
-		g_debug ("Unable to parse key '%s' for GSettings entry '%s'", str, key->settings_key);
-	else
-		g_debug ("Unable to parse hard-coded key '%s'", key->hard_coded);
 }
 
 static char *
@@ -376,37 +291,200 @@ get_key_string (GsdMediaKeysManager *manager,
 		g_assert_not_reached ();
 }
 
+static void
+ensure_cancellable (GCancellable **cancellable)
+{
+        if (*cancellable == NULL) {
+                *cancellable = g_cancellable_new ();
+                g_object_add_weak_pointer (G_OBJECT (*cancellable),
+                                           (gpointer *)cancellable);
+        } else {
+                g_object_ref (*cancellable);
+        }
+}
+
+static void
+show_osd (GsdMediaKeysManager *manager,
+          const char          *icon,
+          const char          *label,
+          int                  level)
+{
+        if (manager->priv->shell_proxy == NULL)
+                return;
+
+        shell_show_osd (manager->priv->shell_proxy,
+                        icon, label, level, -1);
+}
+
+static const char *
+get_icon_name_for_volume (gboolean is_mic,
+                          gboolean muted,
+                          int volume)
+{
+        static const char *icon_names[] = {
+                "audio-volume-muted-symbolic",
+                "audio-volume-low-symbolic",
+                "audio-volume-medium-symbolic",
+                "audio-volume-high-symbolic",
+                NULL
+        };
+        static const char *mic_icon_names[] = {
+                "microphone-sensitivity-muted-symbolic",
+                "microphone-sensitivity-low-symbolic",
+                "microphone-sensitivity-medium-symbolic",
+                "microphone-sensitivity-high-symbolic",
+                NULL
+        };
+        int n;
+
+        if (muted) {
+                n = 0;
+        } else {
+                /* select image */
+                n = 3 * volume / 100 + 1;
+                if (n < 1) {
+                        n = 1;
+                } else if (n > 3) {
+                        n = 3;
+                }
+        }
+
+	if (is_mic)
+		return mic_icon_names[n];
+	else
+		return icon_names[n];
+}
+
 static gboolean
+retry_grabs (gpointer data)
+{
+        GsdMediaKeysManager *manager = data;
+
+        grab_media_keys (manager);
+        return FALSE;
+}
+
+static void
+grab_accelerators_complete (GObject      *object,
+                            GAsyncResult *result,
+                            gpointer      user_data)
+{
+        GVariant *actions;
+        gboolean retry = FALSE;
+        GError *error = NULL;
+        GsdMediaKeysManager *manager = user_data;
+
+        shell_key_grabber_call_grab_accelerators_finish (SHELL_KEY_GRABBER (object),
+                                                         &actions, result, &error);
+
+        if (error) {
+                retry = (error->code == G_DBUS_ERROR_UNKNOWN_METHOD);
+                if (!retry)
+                        g_warning ("%d: %s", error->code, error->message);
+                g_error_free (error);
+        } else {
+                int i;
+                for (i = 0; i < manager->priv->keys->len; i++) {
+                        MediaKey *key;
+
+                        key = g_ptr_array_index (manager->priv->keys, i);
+                        g_variant_get_child (actions, i, "u", &key->accel_id);
+                }
+        }
+
+        if (retry) {
+                guint id;
+                id = g_timeout_add_seconds (SHELL_GRABBER_RETRY_INTERVAL,
+                                            retry_grabs, manager);
+                g_source_set_name_by_id (id, "[gnome-settings-daemon] retry_grabs");
+        }
+}
+
+static void
+grab_media_keys (GsdMediaKeysManager *manager)
+{
+        GVariantBuilder builder;
+        int i;
+
+        g_variant_builder_init (&builder, G_VARIANT_TYPE ("a(su)"));
+
+        for (i = 0; i < manager->priv->keys->len; i++) {
+                MediaKey *key;
+                char *tmp;
+
+                key = g_ptr_array_index (manager->priv->keys, i);
+                tmp = get_key_string (manager, key);
+                g_variant_builder_add (&builder, "(su)", tmp, key->modes);
+                g_free (tmp);
+        }
+
+	shell_key_grabber_call_grab_accelerators (manager->priv->key_grabber,
+	                                          g_variant_builder_end (&builder),
+	                                          manager->priv->grab_cancellable,
+	                                          grab_accelerators_complete,
+	                                          manager);
+}
+
+static void
+grab_accelerator_complete (GObject      *object,
+                           GAsyncResult *result,
+                           gpointer      user_data)
+{
+        GrabData *data = user_data;
+        MediaKey *key = data->key;
+
+        shell_key_grabber_call_grab_accelerator_finish (SHELL_KEY_GRABBER (object),
+                                                        &key->accel_id, result, NULL);
+
+        g_slice_free (GrabData, data);
+}
+
+static void
 grab_media_key (MediaKey            *key,
 		GsdMediaKeysManager *manager)
 {
+	GrabData *data;
 	char *tmp;
-	gboolean need_flush;
 
-	need_flush = FALSE;
-
-	if (key->key != NULL) {
-		need_flush = TRUE;
-		grab_key_unsafe (key->key, FALSE, manager->priv->screens);
-	}
-
-	free_key (key->key);
-	key->key = NULL;
+	ungrab_media_key (key, manager);
 
 	tmp = get_key_string (manager, key);
 
-	key->key = parse_key (tmp);
-	if (key->key == NULL) {
-		print_key_parse_error (key, tmp);
-		g_free (tmp);
-		return need_flush;
-	}
+	data = g_slice_new0 (GrabData);
+	data->manager = manager;
+	data->key = key;
 
-	grab_key_unsafe (key->key, TRUE, manager->priv->screens);
+	shell_key_grabber_call_grab_accelerator (manager->priv->key_grabber,
+	                                         tmp, key->modes,
+	                                         manager->priv->grab_cancellable,
+	                                         grab_accelerator_complete,
+	                                         data);
 
 	g_free (tmp);
+}
 
-	return TRUE;
+static void
+ungrab_accelerator_complete (GObject      *object,
+                             GAsyncResult *result,
+                             gpointer      user_data)
+{
+	shell_key_grabber_call_ungrab_accelerator_finish (SHELL_KEY_GRABBER (object),
+	                                                  NULL, result, NULL);
+}
+
+static void
+ungrab_media_key (MediaKey            *key,
+                  GsdMediaKeysManager *manager)
+{
+	if (key->accel_id == 0)
+		return;
+
+	shell_key_grabber_call_ungrab_accelerator (manager->priv->key_grabber,
+	                                           key->accel_id,
+	                                           manager->priv->grab_cancellable,
+	                                           ungrab_accelerator_complete,
+	                                           manager);
+	key->accel_id = 0;
 }
 
 static void
@@ -415,15 +493,27 @@ gsettings_changed_cb (GSettings           *settings,
                       GsdMediaKeysManager *manager)
 {
         int      i;
-        gboolean need_flush = TRUE;
+
+        /* Give up if we don't have proxy to the shell */
+        if (!manager->priv->key_grabber)
+                return;
 
 	/* handled in gsettings_custom_changed_cb() */
         if (g_str_equal (settings_key, "custom-keybindings"))
 		return;
 
-        gdk_error_trap_push ();
+	/* not needed here */
+        if (g_str_equal (settings_key, "max-screencast-length"))
+		return;
+
+	/* Handled by the core */
+        if (g_str_equal (settings_key, "active"))
+                return;
 
         /* Find the key that was modified */
+        if (manager->priv->keys == NULL)
+                return;
+
         for (i = 0; i < manager->priv->keys->len; i++) {
                 MediaKey *key;
 
@@ -433,16 +523,10 @@ gsettings_changed_cb (GSettings           *settings,
                 if (key->settings_key == NULL)
                         continue;
                 if (strcmp (settings_key, key->settings_key) == 0) {
-                        if (grab_media_key (key, manager))
-                                need_flush = TRUE;
+                        grab_media_key (key, manager);
                         break;
                 }
         }
-
-        if (need_flush)
-                gdk_flush ();
-        if (gdk_error_trap_pop ())
-                g_warning ("Grab failed for some keys, another application may already have access the them.");
 }
 
 static MediaKey *
@@ -478,6 +562,7 @@ media_key_new_for_path (GsdMediaKeysManager *manager,
 
         key = g_new0 (MediaKey, 1);
         key->key_type = CUSTOM_KEY;
+        key->modes = GSD_KEYBINDING_MODE_LAUNCHER;
         key->custom_path = g_strdup (path);
         key->custom_command = command;
 
@@ -499,17 +584,7 @@ update_custom_binding (GsdMediaKeysManager *manager,
                         continue;
                 if (strcmp (key->custom_path, path) == 0) {
                         g_debug ("Removing custom key binding %s", path);
-                        if (key->key) {
-                                gdk_error_trap_push ();
-
-                                grab_key_unsafe (key->key,
-                                                 FALSE,
-                                                 manager->priv->screens);
-
-                                gdk_flush ();
-                                if (gdk_error_trap_pop ())
-                                        g_warning ("Ungrab failed for custom key '%s'", path);
-                        }
+                        ungrab_media_key (key, manager);
                         g_ptr_array_remove_index_fast (manager->priv->keys, i);
                         break;
                 }
@@ -521,14 +596,7 @@ update_custom_binding (GsdMediaKeysManager *manager,
                 g_debug ("Adding new custom key binding %s", path);
                 g_ptr_array_add (manager->priv->keys, key);
 
-                gdk_error_trap_push ();
-
                 grab_media_key (key, manager);
-
-                gdk_flush ();
-                if (gdk_error_trap_pop ())
-                        g_warning ("Grab failed for custom key '%s'",
-                                   key->custom_path);
         }
 }
 
@@ -579,17 +647,7 @@ gsettings_custom_changed_cb (GSettings           *settings,
                 if (found)
                         continue;
 
-                if (key->key) {
-                        gdk_error_trap_push ();
-
-                        grab_key_unsafe (key->key,
-                                         FALSE,
-                                         manager->priv->screens);
-
-                        gdk_flush ();
-                        if (gdk_error_trap_pop ())
-                                g_warning ("Ungrab failed for custom key '%s'", key->custom_path);
-                }
+                ungrab_media_key (key, manager);
                 g_hash_table_remove (manager->priv->custom_settings,
                                      key->custom_path);
                 g_ptr_array_remove_index_fast (manager->priv->keys, i);
@@ -607,10 +665,9 @@ add_key (GsdMediaKeysManager *manager, guint i)
 	key->key_type = media_keys[i].key_type;
 	key->settings_key = media_keys[i].settings_key;
 	key->hard_coded = media_keys[i].hard_coded;
+	key->modes = media_keys[i].modes;
 
 	g_ptr_array_add (manager->priv->keys, key);
-
-	grab_media_key (key, manager);
 }
 
 static void
@@ -620,10 +677,6 @@ init_kbd (GsdMediaKeysManager *manager)
         int i;
 
         gnome_settings_profile_start (NULL);
-
-        gdk_error_trap_push ();
-
-        manager->priv->keys = g_ptr_array_new_with_free_func ((GDestroyNotify) media_key_free);
 
         /* Media keys
          * Add hard-coded shortcuts first so that they can't be preempted */
@@ -650,69 +703,18 @@ init_kbd (GsdMediaKeysManager *manager)
                         continue;
                 }
                 g_ptr_array_add (manager->priv->keys, key);
-
-                grab_media_key (key, manager);
         }
         g_strfreev (custom_paths);
 
-        gdk_flush ();
-        if (gdk_error_trap_pop ())
-                g_warning ("Grab failed for some keys, another application may already have access the them.");
+        grab_media_keys (manager);
 
         gnome_settings_profile_end (NULL);
 }
 
 static void
-dialog_show (GsdMediaKeysManager *manager)
-{
-        int            orig_w;
-        int            orig_h;
-        int            screen_w;
-        int            screen_h;
-        int            x;
-        int            y;
-        GtkRequisition win_req;
-        GdkRectangle   geometry;
-        int            monitor;
-
-        gtk_window_set_screen (GTK_WINDOW (manager->priv->dialog),
-                               manager->priv->current_screen);
-
-        /*
-         * get the window size
-         * if the window hasn't been mapped, it doesn't necessarily
-         * know its true size, yet, so we need to jump through hoops
-         */
-        gtk_window_get_default_size (GTK_WINDOW (manager->priv->dialog), &orig_w, &orig_h);
-        gtk_widget_size_request (manager->priv->dialog, &win_req);
-
-        if (win_req.width > orig_w)
-                orig_w = win_req.width;
-        if (win_req.height > orig_h)
-                orig_h = win_req.height;
-
-        monitor = gdk_screen_get_primary_monitor (manager->priv->current_screen);
-
-        gdk_screen_get_monitor_geometry (manager->priv->current_screen,
-                                         monitor,
-                                         &geometry);
-
-        screen_w = geometry.width;
-        screen_h = geometry.height;
-
-        x = ((screen_w - orig_w) / 2) + geometry.x;
-        y = geometry.y + (screen_h / 2) + (screen_h / 2 - orig_h) / 2;
-
-        gtk_window_move (GTK_WINDOW (manager->priv->dialog), x, y);
-
-        gtk_widget_show (manager->priv->dialog);
-
-        gdk_display_sync (gdk_screen_get_display (manager->priv->current_screen));
-}
-
-static void
-launch_app (GAppInfo *app_info,
-	    gint64    timestamp)
+launch_app (GsdMediaKeysManager *manager,
+	    GAppInfo            *app_info,
+	    gint64               timestamp)
 {
 	GError *error = NULL;
         GdkAppLaunchContext *launch_context;
@@ -720,6 +722,7 @@ launch_app (GAppInfo *app_info,
         /* setup the launch context so the startup notification is correct */
         launch_context = gdk_display_get_app_launch_context (gdk_display_get_default ());
         gdk_app_launch_context_set_timestamp (launch_context, timestamp);
+        set_launch_context_env (manager, G_APP_LAUNCH_CONTEXT (launch_context));
 
 	if (!g_app_info_launch (app_info, NULL, G_APP_LAUNCH_CONTEXT (launch_context), &error)) {
 		g_warning ("Could not launch '%s': %s",
@@ -731,6 +734,18 @@ launch_app (GAppInfo *app_info,
 }
 
 static void
+execute (GsdMediaKeysManager *manager,
+         char                *cmd,
+         gint64               timestamp)
+{
+	GAppInfo *app_info;
+
+	app_info = g_app_info_create_from_commandline (cmd, NULL, G_APP_INFO_CREATE_NONE, NULL);
+	launch_app (manager, app_info, timestamp);
+	g_object_unref (app_info);
+}
+
+static void
 do_url_action (GsdMediaKeysManager *manager,
                const char          *scheme,
                gint64               timestamp)
@@ -739,7 +754,7 @@ do_url_action (GsdMediaKeysManager *manager,
 
         app_info = g_app_info_get_default_for_uri_scheme (scheme);
         if (app_info != NULL) {
-                launch_app (app_info, timestamp);
+                launch_app (manager, app_info, timestamp);
                 g_object_unref (app_info);
         } else {
                 g_warning ("Could not find default application for '%s' scheme", scheme);
@@ -754,7 +769,7 @@ do_media_action (GsdMediaKeysManager *manager,
 
         app_info = g_app_info_get_default_for_type ("audio/x-vorbis+ogg", FALSE);
         if (app_info != NULL) {
-                launch_app (app_info, timestamp);
+                launch_app (manager, app_info, timestamp);
                 g_object_unref (app_info);
         } else {
                 g_warning ("Could not find default application for '%s' mime-type", "audio/x-vorbis+ogg");
@@ -766,30 +781,23 @@ gnome_session_shutdown (GsdMediaKeysManager *manager)
 {
 	GError *error = NULL;
 	GVariant *variant;
+        GDBusProxy *proxy;
 
-	/* Shouldn't happen, but you never know */
-	if (manager->priv->connection == NULL) {
-		execute (manager, "gnome-session-quit --logout", FALSE);
-		return;
-	}
-
-	variant = g_dbus_connection_call_sync (manager->priv->connection,
-					       GNOME_SESSION_DBUS_NAME,
-					       GNOME_SESSION_DBUS_PATH,
-					       GNOME_SESSION_DBUS_INTERFACE,
-					       "Shutdown",
-					       NULL,
-					       NULL,
-					       G_DBUS_CALL_FLAGS_NONE,
-					       -1,
-					       NULL,
-					       &error);
+        proxy = G_DBUS_PROXY (gnome_settings_bus_get_session_proxy ());
+	variant = g_dbus_proxy_call_sync (proxy,
+					  "Shutdown",
+					  NULL,
+					  G_DBUS_CALL_FLAGS_NONE,
+					  -1,
+					  NULL,
+					  &error);
 	if (variant == NULL) {
 		g_warning ("Failed to call Shutdown on session manager: %s", error->message);
 		g_error_free (error);
 		return;
 	}
 	g_variant_unref (variant);
+        g_object_unref (proxy);
 }
 
 static void
@@ -838,12 +846,8 @@ do_eject_action (GsdMediaKeysManager *manager)
                 }
         }
 
-        /* Show the dialogue */
-        dialog_init (manager);
-        gsd_media_keys_window_set_action_custom (GSD_MEDIA_KEYS_WINDOW (manager->priv->dialog),
-                                                 "media-eject-symbolic",
-                                                 FALSE);
-        dialog_show (manager);
+        /* Show OSD */
+        show_osd (manager, "media-eject-symbolic", NULL, -1);
 
         /* Clean up the drive selection and exit if no suitable
          * drives are found */
@@ -883,29 +887,42 @@ do_home_key_action (GsdMediaKeysManager *manager,
 }
 
 static void
-do_execute_desktop (GsdMediaKeysManager *manager,
-		    const char          *desktop,
-		    gint64               timestamp)
+do_search_action (GsdMediaKeysManager *manager,
+		  gint64               timestamp)
+{
+        if (manager->priv->shell_proxy == NULL)
+                return;
+
+        gsd_shell_call_focus_search (manager->priv->shell_proxy,
+                                     NULL, NULL, NULL);
+}
+
+static void
+do_execute_desktop_or_desktop (GsdMediaKeysManager *manager,
+			       const char          *desktop,
+			       const char          *alt_desktop,
+			       gint64               timestamp)
 {
         GDesktopAppInfo *app_info;
 
         app_info = g_desktop_app_info_new (desktop);
+        if (app_info == NULL && alt_desktop != NULL)
+                app_info = g_desktop_app_info_new (alt_desktop);
+
         if (app_info != NULL) {
-                launch_app (G_APP_INFO (app_info), timestamp);
+                launch_app (manager, G_APP_INFO (app_info), timestamp);
                 g_object_unref (app_info);
-        } else {
-                g_warning ("Could not find application '%s'", desktop);
-	}
+                return;
+        }
+
+        g_warning ("Could not find application '%s' or '%s'", desktop, alt_desktop);
 }
 
 static void
 do_touchpad_osd_action (GsdMediaKeysManager *manager, gboolean state)
 {
-        dialog_init (manager);
-        gsd_media_keys_window_set_action_custom (GSD_MEDIA_KEYS_WINDOW (manager->priv->dialog),
-                                                 state ? "input-touchpad-symbolic" : "touchpad-disabled-symbolic",
-                                                 FALSE);
-        dialog_show (manager);
+        show_osd (manager, state ? "input-touchpad-symbolic"
+                                 : "touchpad-disabled-symbolic", NULL, -1);
 }
 
 static void
@@ -929,6 +946,72 @@ do_touchpad_action (GsdMediaKeysManager *manager)
 }
 
 static void
+on_screen_locked (GsdScreenSaver      *screen_saver,
+                  GAsyncResult        *result,
+                  GsdMediaKeysManager *manager)
+{
+        gboolean is_locked;
+        GError *error = NULL;
+
+        is_locked = gsd_screen_saver_call_lock_finish (screen_saver, result, &error);
+
+        if (!is_locked) {
+                g_warning ("Couldn't lock screen: %s", error->message);
+                g_error_free (error);
+                return;
+        }
+}
+
+static void
+do_lock_screensaver (GsdMediaKeysManager *manager)
+{
+        GsdMediaKeysManagerPrivate *priv = manager->priv;
+
+        if (priv->screen_saver_proxy == NULL)
+                priv->screen_saver_proxy = gnome_settings_bus_get_screen_saver_proxy ();
+
+        gsd_screen_saver_call_lock (priv->screen_saver_proxy,
+                                    priv->cancellable,
+                                    (GAsyncReadyCallback) on_screen_locked,
+                                    manager);
+}
+
+static void
+sound_theme_changed (GtkSettings         *settings,
+                     GParamSpec          *pspec,
+                     GsdMediaKeysManager *manager)
+{
+        char *theme_name;
+
+        g_object_get (G_OBJECT (manager->priv->gtksettings), "gtk-sound-theme-name", &theme_name, NULL);
+        if (theme_name)
+                ca_context_change_props (manager->priv->ca, CA_PROP_CANBERRA_XDG_THEME_NAME, theme_name, NULL);
+        g_free (theme_name);
+}
+
+static void
+ensure_canberra (GsdMediaKeysManager *manager)
+{
+	char *theme_name;
+
+	if (manager->priv->ca != NULL)
+		return;
+
+        ca_context_create (&manager->priv->ca);
+        ca_context_set_driver (manager->priv->ca, "pulse");
+        ca_context_change_props (manager->priv->ca, 0,
+                                 CA_PROP_APPLICATION_ID, "org.gnome.VolumeControl",
+                                 NULL);
+        manager->priv->gtksettings = gtk_settings_get_for_screen (gdk_screen_get_default ());
+        g_object_get (G_OBJECT (manager->priv->gtksettings), "gtk-sound-theme-name", &theme_name, NULL);
+        if (theme_name)
+                ca_context_change_props (manager->priv->ca, CA_PROP_CANBERRA_XDG_THEME_NAME, theme_name, NULL);
+        g_free (theme_name);
+        g_signal_connect (manager->priv->gtksettings, "notify::gtk-sound-theme-name",
+                          G_CALLBACK (sound_theme_changed), manager);
+}
+
+static void
 update_dialog (GsdMediaKeysManager *manager,
                GvcMixerStream      *stream,
                guint                vol,
@@ -936,6 +1019,10 @@ update_dialog (GsdMediaKeysManager *manager,
                gboolean             sound_changed,
                gboolean             quiet)
 {
+        GvcMixerUIDevice *device;
+        const GvcMixerStreamPort *port;
+        const char *icon;
+
         if (!muted) {
                 vol = (int) (100 * (double) vol / PA_VOLUME_NORM);
                 vol = CLAMP (vol, 0, 100);
@@ -943,15 +1030,21 @@ update_dialog (GsdMediaKeysManager *manager,
                 vol = 0.0;
         }
 
-        dialog_init (manager);
-        gsd_media_keys_window_set_volume_muted (GSD_MEDIA_KEYS_WINDOW (manager->priv->dialog),
-                                                muted);
-        gsd_media_keys_window_set_volume_level (GSD_MEDIA_KEYS_WINDOW (manager->priv->dialog), vol);
-        gsd_media_keys_window_set_action (GSD_MEDIA_KEYS_WINDOW (manager->priv->dialog),
-                                          GSD_MEDIA_KEYS_WINDOW_ACTION_VOLUME);
-        dialog_show (manager);
+        icon = get_icon_name_for_volume (!GVC_IS_MIXER_SINK (stream), muted, vol);
+        port = gvc_mixer_stream_get_port (stream);
+        if (g_strcmp0 (gvc_mixer_stream_get_form_factor (stream), "internal") != 0 ||
+            (port != NULL &&
+             g_strcmp0 (port->port, "analog-output-speaker") != 0 &&
+             g_strcmp0 (port->port, "analog-output") != 0)) {
+                device = gvc_mixer_control_lookup_device_from_stream (manager->priv->volume, stream);
+                show_osd (manager, icon,
+                          gvc_mixer_ui_device_get_description (device), vol);
+        } else {
+                show_osd (manager, icon, NULL, vol);
+        }
 
         if (quiet == FALSE && sound_changed != FALSE && muted == FALSE) {
+                ensure_canberra (manager);
                 ca_context_change_device (manager->priv->ca,
                                           gvc_mixer_stream_get_name (stream));
                 ca_context_play (manager->priv->ca, 1,
@@ -981,13 +1074,14 @@ get_udev_device_for_sysfs_path (GsdMediaKeysManager *manager,
 
 static GvcMixerStream *
 get_stream_for_device_id (GsdMediaKeysManager *manager,
+			  gboolean             is_output,
 			  guint                deviceid)
 {
 	char *devnode;
 	gpointer id_ptr;
 	GvcMixerStream *res;
 	GUdevDevice *dev, *parent;
-	GSList *sinks, *l;
+	GSList *streams, *l;
 
 	id_ptr = g_hash_table_lookup (manager->priv->streams, GUINT_TO_POINTER (deviceid));
 	if (id_ptr != NULL) {
@@ -1028,29 +1122,34 @@ get_stream_for_device_id (GsdMediaKeysManager *manager,
 	}
 
 	res = NULL;
-	sinks = gvc_mixer_control_get_sinks (manager->priv->volume);
-	for (l = sinks; l; l = l->next) {
+	if (is_output)
+		streams = gvc_mixer_control_get_sinks (manager->priv->volume);
+	else
+		streams = gvc_mixer_control_get_sources (manager->priv->volume);
+	for (l = streams; l; l = l->next) {
 		GvcMixerStream *stream = l->data;
 		const char *sysfs_path;
-		GUdevDevice *sink_dev, *sink_parent;
+		GUdevDevice *stream_dev, *stream_parent;
 
 		sysfs_path = gvc_mixer_stream_get_sysfs_path (stream);
-		sink_dev = get_udev_device_for_sysfs_path (manager, sysfs_path);
-		if (sink_dev == NULL)
+		stream_dev = get_udev_device_for_sysfs_path (manager, sysfs_path);
+		if (stream_dev == NULL)
 			continue;
-		sink_parent = g_udev_device_get_parent_with_subsystem (sink_dev, "usb", "usb_device");
-		g_object_unref (sink_dev);
-		if (sink_parent == NULL)
+		stream_parent = g_udev_device_get_parent_with_subsystem (stream_dev, "usb", "usb_device");
+		g_object_unref (stream_dev);
+		if (stream_parent == NULL)
 			continue;
 
-		if (g_strcmp0 (g_udev_device_get_sysfs_path (sink_parent),
+		if (g_strcmp0 (g_udev_device_get_sysfs_path (stream_parent),
 			       g_udev_device_get_sysfs_path (parent)) == 0) {
 			res = stream;
 		}
-		g_object_unref (sink_parent);
+		g_object_unref (stream_parent);
 		if (res != NULL)
 			break;
 	}
+
+	g_slist_free (streams);
 
 	if (res)
 		g_hash_table_insert (manager->priv->streams,
@@ -1069,6 +1168,7 @@ static void
 do_sound_action (GsdMediaKeysManager *manager,
 		 guint                deviceid,
                  int                  type,
+                 gboolean             is_output,
                  gboolean             quiet)
 {
 	GvcMixerStream *stream;
@@ -1077,11 +1177,18 @@ do_sound_action (GsdMediaKeysManager *manager,
         gboolean sound_changed;
 
         /* Find the stream that corresponds to the device, if any */
+        stream = NULL;
 #ifdef HAVE_GUDEV
-        stream = get_stream_for_device_id (manager, deviceid);
-        if (stream == NULL)
+        stream = get_stream_for_device_id (manager, is_output, deviceid);
 #endif /* HAVE_GUDEV */
-                stream = manager->priv->stream;
+
+        if (stream == NULL) {
+                if (is_output)
+                        stream = manager->priv->sink;
+                else
+                        stream = manager->priv->source;
+        }
+
         if (stream == NULL)
                 return;
 
@@ -1128,36 +1235,38 @@ do_sound_action (GsdMediaKeysManager *manager,
 }
 
 static void
-sound_theme_changed (GtkSettings         *settings,
-                     GParamSpec          *pspec,
-                     GsdMediaKeysManager *manager)
-{
-        char *theme_name;
-
-        g_object_get (G_OBJECT (manager->priv->gtksettings), "gtk-sound-theme-name", &theme_name, NULL);
-        if (theme_name)
-                ca_context_change_props (manager->priv->ca, CA_PROP_CANBERRA_XDG_THEME_NAME, theme_name, NULL);
-        g_free (theme_name);
-}
-
-static void
 update_default_sink (GsdMediaKeysManager *manager)
 {
         GvcMixerStream *stream;
 
         stream = gvc_mixer_control_get_default_sink (manager->priv->volume);
-        if (stream == manager->priv->stream)
+        if (stream == manager->priv->sink)
                 return;
 
-        if (manager->priv->stream != NULL) {
-                g_object_unref (manager->priv->stream);
-                manager->priv->stream = NULL;
-        }
+        g_clear_object (&manager->priv->sink);
 
         if (stream != NULL) {
-                manager->priv->stream = g_object_ref (stream);
+                manager->priv->sink = g_object_ref (stream);
         } else {
                 g_warning ("Unable to get default sink");
+        }
+}
+
+static void
+update_default_source (GsdMediaKeysManager *manager)
+{
+        GvcMixerStream *stream;
+
+        stream = gvc_mixer_control_get_default_source (manager->priv->volume);
+        if (stream == manager->priv->source)
+                return;
+
+        g_clear_object (&manager->priv->source);
+
+        if (stream != NULL) {
+                manager->priv->source = g_object_ref (stream);
+        } else {
+                g_warning ("Unable to get default source");
         }
 }
 
@@ -1167,6 +1276,7 @@ on_control_state_changed (GvcMixerControl     *control,
                           GsdMediaKeysManager *manager)
 {
         update_default_sink (manager);
+        update_default_source (manager);
 }
 
 static void
@@ -1175,6 +1285,14 @@ on_control_default_sink_changed (GvcMixerControl     *control,
                                  GsdMediaKeysManager *manager)
 {
         update_default_sink (manager);
+}
+
+static void
+on_control_default_source_changed (GvcMixerControl     *control,
+                                   guint                id,
+                                   GsdMediaKeysManager *manager)
+{
+        update_default_source (manager);
 }
 
 #ifdef HAVE_GUDEV
@@ -1194,11 +1312,13 @@ on_control_stream_removed (GvcMixerControl     *control,
                            guint                id,
                            GsdMediaKeysManager *manager)
 {
-        if (manager->priv->stream != NULL) {
-		if (gvc_mixer_stream_get_id (manager->priv->stream) == id) {
-	                g_object_unref (manager->priv->stream);
-			manager->priv->stream = NULL;
-		}
+        if (manager->priv->sink != NULL) {
+		if (gvc_mixer_stream_get_id (manager->priv->sink) == id)
+			g_clear_object (&manager->priv->sink);
+        }
+        if (manager->priv->source != NULL) {
+		if (gvc_mixer_stream_get_id (manager->priv->source) == id)
+			g_clear_object (&manager->priv->source);
         }
 
 #ifdef HAVE_GUDEV
@@ -1214,7 +1334,7 @@ free_media_player (MediaPlayer *player)
                 player->watch_id = 0;
         }
         g_free (player->application);
-        g_free (player->name);
+        g_free (player->dbus_name);
         g_free (player);
 }
 
@@ -1229,7 +1349,7 @@ static gint
 find_by_name (gconstpointer a,
               gconstpointer b)
 {
-        return strcmp (((MediaPlayer *)a)->name, b);
+        return strcmp (((MediaPlayer *)a)->dbus_name, b);
 }
 
 static gint
@@ -1254,7 +1374,7 @@ name_vanished_handler (GDBusConnection     *connection,
                 MediaPlayer *player;
 
                 player = iter->data;
-                g_debug ("Deregistering vanished %s (name: %s)", player->application, player->name);
+                g_debug ("Deregistering vanished %s (dbus_name: %s)", player->application, player->dbus_name);
                 free_media_player (player);
                 manager->priv->media_players = g_list_delete_link (manager->priv->media_players, iter);
         }
@@ -1270,7 +1390,7 @@ name_vanished_handler (GDBusConnection     *connection,
 static void
 gsd_media_keys_manager_grab_media_player_keys (GsdMediaKeysManager *manager,
                                                const char          *application,
-                                               const char          *name,
+                                               const char          *dbus_name,
                                                guint32              time)
 {
         GList       *iter;
@@ -1299,7 +1419,7 @@ gsd_media_keys_manager_grab_media_player_keys (GsdMediaKeysManager *manager,
         }
 
         watch_id = g_bus_watch_name (G_BUS_TYPE_SESSION,
-                                     name,
+                                     dbus_name,
                                      G_BUS_NAME_WATCHER_FLAGS_NONE,
                                      NULL,
                                      (GBusNameVanishedCallback) name_vanished_handler,
@@ -1309,7 +1429,7 @@ gsd_media_keys_manager_grab_media_player_keys (GsdMediaKeysManager *manager,
         g_debug ("Registering %s at %u", application, time);
         media_player = g_new0 (MediaPlayer, 1);
         media_player->application = g_strdup (application);
-        media_player->name = g_strdup (name);
+        media_player->dbus_name = g_strdup (dbus_name);
         media_player->time = time;
         media_player->watch_id = watch_id;
 
@@ -1343,7 +1463,7 @@ gsd_media_keys_manager_release_media_player_keys (GsdMediaKeysManager *manager,
                 MediaPlayer *player;
 
                 player = iter->data;
-                g_debug ("Deregistering %s (name: %s)", application, player->name);
+                g_debug ("Deregistering %s (dbus_name: %s)", application, player->dbus_name);
                 free_media_player (player);
                 manager->priv->media_players = g_list_delete_link (manager->priv->media_players, iter);
         }
@@ -1365,20 +1485,18 @@ gsd_media_player_key_pressed (GsdMediaKeysManager *manager,
         have_listeners = (manager->priv->media_players != NULL);
 
         if (!have_listeners) {
-                /* Popup a dialog with an (/) icon */
-                dialog_init (manager);
-                gsd_media_keys_window_set_action_custom (GSD_MEDIA_KEYS_WINDOW (manager->priv->dialog),
-                                                         "action-unavailable-symbolic",
-                                                         FALSE);
-                dialog_show (manager);
-                return TRUE;
+                if (!mpris_controller_key (manager->priv->mpris_controller, key)) {
+                        /* Popup a dialog with an (/) icon */
+                        show_osd (manager, "action-unavailable-symbolic", NULL, -1);
+                }
+		return TRUE;
         }
 
         player = manager->priv->media_players->data;
         application = player->application;
 
         if (g_dbus_connection_emit_signal (manager->priv->connection,
-                                           player->name,
+                                           player->dbus_name,
                                            GSD_MEDIA_KEYS_DBUS_PATH,
                                            GSD_MEDIA_KEYS_DBUS_NAME,
                                            "MediaPlayerKeyPressed",
@@ -1512,6 +1630,46 @@ do_video_rotate_action (GsdMediaKeysManager *manager,
 }
 
 static void
+orientation_appeared_cb (GDBusConnection *connection,
+                         const gchar     *name,
+                         const gchar     *name_owner,
+                         gpointer         user_data)
+{
+        GsdMediaKeysManager *manager = user_data;
+
+        manager->priv->orientation_available = TRUE;
+}
+
+static void
+orientation_disappeared_cb (GDBusConnection *connection,
+                            const gchar     *name,
+                            gpointer         user_data)
+{
+        GsdMediaKeysManager *manager = user_data;
+
+        manager->priv->orientation_available = FALSE;
+}
+
+static void
+do_video_rotate_lock_action (GsdMediaKeysManager *manager,
+                             gint64               timestamp)
+{
+        GSettings *settings;
+        gboolean locked;
+
+        if (!manager->priv->orientation_available)
+                return;
+
+        settings = g_settings_new ("org.gnome.settings-daemon.peripherals.touchscreen");
+        locked = !g_settings_get_boolean (settings, "orientation-lock");
+        g_settings_set_boolean (settings, "orientation-lock", locked);
+        g_object_unref (settings);
+
+        show_osd (manager, locked ? "rotation-locked-symbolic"
+                                  : "rotation-allowed-symbolic", NULL, -1);
+}
+
+static void
 do_toggle_accessibility_key (const char *key)
 {
         GSettings *settings;
@@ -1622,28 +1780,23 @@ do_toggle_contrast_action (GsdMediaKeysManager *manager)
 }
 
 static void
-upower_sleep_cb (GObject *source_object,
-                 GAsyncResult *res,
-                 gpointer user_data)
+power_action (GsdMediaKeysManager *manager,
+              const char          *action,
+              gboolean             allow_interaction)
 {
-        GVariant *result;
-        GError *error = NULL;
-
-        result = g_dbus_proxy_call_finish (G_DBUS_PROXY (source_object),
-                                           res,
-                                           &error);
-        if (result == NULL) {
-                g_warning ("couldn't sleep using UPower: %s",
-                           error->message);
-                g_error_free (error);
-        } else {
-                g_variant_unref (result);
-        }
+        g_dbus_proxy_call (manager->priv->logind_proxy,
+                           action,
+                           g_variant_new ("(b)", allow_interaction),
+                           G_DBUS_CALL_FLAGS_NONE,
+                           G_MAXINT,
+                           manager->priv->bus_cancellable,
+                           NULL, NULL);
 }
 
 static void
 do_config_power_action (GsdMediaKeysManager *manager,
-                        const gchar *config_key)
+                        const gchar *config_key,
+                        gboolean in_lock_screen)
 {
         GsdPowerActionType action_type;
 
@@ -1651,26 +1804,20 @@ do_config_power_action (GsdMediaKeysManager *manager,
                                            config_key);
         switch (action_type) {
         case GSD_POWER_ACTION_SUSPEND:
-                g_dbus_proxy_call (manager->priv->upower_proxy,
-                                   "Suspend",
-                                   NULL,
-                                   G_DBUS_CALL_FLAGS_NONE,
-                                   -1, NULL,
-                                   upower_sleep_cb, NULL);
+                power_action (manager, "Suspend", !in_lock_screen);
                 break;
         case GSD_POWER_ACTION_INTERACTIVE:
+                if (!in_lock_screen)
+                        gnome_session_shutdown (manager);
+                break;
         case GSD_POWER_ACTION_SHUTDOWN:
-                gnome_session_shutdown (manager);
+                power_action (manager, "PowerOff", !in_lock_screen);
                 break;
         case GSD_POWER_ACTION_HIBERNATE:
-                g_dbus_proxy_call (manager->priv->upower_proxy,
-                                   "Hibernate",
-                                   NULL,
-                                   G_DBUS_CALL_FLAGS_NONE,
-                                   -1, NULL,
-                                   upower_sleep_cb, NULL);
+                power_action (manager, "Hibernate", !in_lock_screen);
                 break;
         case GSD_POWER_ACTION_BLANK:
+        case GSD_POWER_ACTION_LOGOUT:
         case GSD_POWER_ACTION_NOTHING:
                 /* these actions cannot be handled by media-keys and
                  * are not used in this context */
@@ -1679,105 +1826,73 @@ do_config_power_action (GsdMediaKeysManager *manager,
 }
 
 static void
-update_screen_cb (GObject             *source_object,
-                  GAsyncResult        *res,
-                  gpointer             user_data)
+update_brightness_cb (GObject             *source_object,
+                      GAsyncResult        *res,
+                      gpointer             user_data)
 {
         GError *error = NULL;
-        guint percentage;
+        int percentage;
         GVariant *new_percentage;
         GsdMediaKeysManager *manager = GSD_MEDIA_KEYS_MANAGER (user_data);
+        const char *icon, *debug;
+
+        if (G_DBUS_PROXY (source_object) == manager->priv->power_keyboard_proxy) {
+                icon = "keyboard-brightness-symbolic";
+                debug = "keyboard";
+        } else {
+                icon = "display-brightness-symbolic";
+                debug = "screen";
+        }
 
         new_percentage = g_dbus_proxy_call_finish (G_DBUS_PROXY (source_object),
                                                    res, &error);
         if (new_percentage == NULL) {
-                g_warning ("Failed to set new screen percentage: %s",
-                           error->message);
+                g_warning ("Failed to set new %s percentage: %s",
+                           debug, error->message);
                 g_error_free (error);
                 return;
         }
 
         /* update the dialog with the new value */
-        g_variant_get (new_percentage, "(u)", &percentage);
-        dialog_init (manager);
-        gsd_media_keys_window_set_action_custom (GSD_MEDIA_KEYS_WINDOW (manager->priv->dialog),
-                                                 "display-brightness-symbolic",
-                                                 TRUE);
-        gsd_media_keys_window_set_volume_level (GSD_MEDIA_KEYS_WINDOW (manager->priv->dialog),
-                                                percentage);
-        dialog_show (manager);
+        g_variant_get (new_percentage, "(i)", &percentage);
+        show_osd (manager, icon, NULL, percentage);
         g_variant_unref (new_percentage);
 }
 
 static void
-do_screen_brightness_action (GsdMediaKeysManager *manager,
-                             MediaKeyType type)
-{
-        if (manager->priv->connection == NULL ||
-            manager->priv->power_screen_proxy == NULL) {
-                g_warning ("No existing D-Bus connection trying to handle power keys");
-                return;
-        }
-
-        /* call into the power plugin */
-        g_dbus_proxy_call (manager->priv->power_screen_proxy,
-                           type == SCREEN_BRIGHTNESS_UP_KEY ? "StepUp" : "StepDown",
-                           NULL,
-                           G_DBUS_CALL_FLAGS_NONE,
-                           -1,
-                           NULL,
-                           update_screen_cb,
-                           manager);
-}
-
-static void
-update_keyboard_cb (GObject             *source_object,
-                    GAsyncResult        *res,
-                    gpointer             user_data)
-{
-        GError *error = NULL;
-        guint percentage;
-        GVariant *new_percentage;
-        GsdMediaKeysManager *manager = GSD_MEDIA_KEYS_MANAGER (user_data);
-
-        new_percentage = g_dbus_proxy_call_finish (G_DBUS_PROXY (source_object),
-                                                   res, &error);
-        if (new_percentage == NULL) {
-                g_warning ("Failed to set new keyboard percentage: %s",
-                           error->message);
-                g_error_free (error);
-                return;
-        }
-
-        /* update the dialog with the new value */
-        g_variant_get (new_percentage, "(u)", &percentage);
-        dialog_init (manager);
-        gsd_media_keys_window_set_action_custom (GSD_MEDIA_KEYS_WINDOW (manager->priv->dialog),
-                                                 "keyboard-brightness-symbolic",
-                                                 TRUE);
-        gsd_media_keys_window_set_volume_level (GSD_MEDIA_KEYS_WINDOW (manager->priv->dialog),
-                                                percentage);
-        dialog_show (manager);
-        g_variant_unref (new_percentage);
-}
-
-static void
-do_keyboard_brightness_action (GsdMediaKeysManager *manager,
-                               MediaKeyType type)
+do_brightness_action (GsdMediaKeysManager *manager,
+                      MediaKeyType type)
 {
         const char *cmd;
+        GDBusProxy *proxy;
+
+        switch (type) {
+        case KEYBOARD_BRIGHTNESS_UP_KEY:
+        case KEYBOARD_BRIGHTNESS_DOWN_KEY:
+        case KEYBOARD_BRIGHTNESS_TOGGLE_KEY:
+                proxy = manager->priv->power_keyboard_proxy;
+                break;
+        case SCREEN_BRIGHTNESS_UP_KEY:
+        case SCREEN_BRIGHTNESS_DOWN_KEY:
+                proxy = manager->priv->power_screen_proxy;
+                break;
+        default:
+                g_assert_not_reached ();
+        }
 
         if (manager->priv->connection == NULL ||
-            manager->priv->power_keyboard_proxy == NULL) {
+            proxy == NULL) {
                 g_warning ("No existing D-Bus connection trying to handle power keys");
                 return;
         }
 
         switch (type) {
         case KEYBOARD_BRIGHTNESS_UP_KEY:
+        case SCREEN_BRIGHTNESS_UP_KEY:
                 cmd = "StepUp";
                 break;
         case KEYBOARD_BRIGHTNESS_DOWN_KEY:
+        case SCREEN_BRIGHTNESS_DOWN_KEY:
                 cmd = "StepDown";
                 break;
         case KEYBOARD_BRIGHTNESS_TOGGLE_KEY:
@@ -1788,22 +1903,112 @@ do_keyboard_brightness_action (GsdMediaKeysManager *manager,
         }
 
         /* call into the power plugin */
-        g_dbus_proxy_call (manager->priv->power_keyboard_proxy,
+        g_dbus_proxy_call (proxy,
                            cmd,
                            NULL,
                            G_DBUS_CALL_FLAGS_NONE,
                            -1,
                            NULL,
-                           update_keyboard_cb,
+                           update_brightness_cb,
                            manager);
 }
 
 static void
+do_battery_action (GsdMediaKeysManager *manager)
+{
+        gdouble percentage;
+        UpDeviceKind kind;
+        gchar *icon_name;
+
+        g_return_if_fail (manager->priv->composite_device != NULL);
+
+        g_object_get (manager->priv->composite_device,
+                      "kind", &kind,
+                      "icon-name", &icon_name,
+                      "percentage", &percentage,
+                      NULL);
+
+        if (kind == UP_DEVICE_KIND_UPS || kind == UP_DEVICE_KIND_BATTERY) {
+                g_debug ("showing battery level OSD");
+                show_osd (manager, icon_name, NULL, percentage);
+        }
+
+        g_free (icon_name);
+}
+
+static void
+screencast_stop (GsdMediaKeysManager *manager)
+{
+        if (manager->priv->screencast_timeout_id > 0) {
+                g_source_remove (manager->priv->screencast_timeout_id);
+                manager->priv->screencast_timeout_id = 0;
+        }
+
+        g_dbus_proxy_call (manager->priv->screencast_proxy,
+                           "StopScreencast", NULL,
+                           G_DBUS_CALL_FLAGS_NONE, -1,
+                           manager->priv->screencast_cancellable,
+                           NULL, NULL);
+
+        manager->priv->screencast_recording = FALSE;
+}
+
+static gboolean
+screencast_timeout (gpointer user_data)
+{
+        GsdMediaKeysManager *manager = user_data;
+        screencast_stop (manager);
+        return G_SOURCE_REMOVE;
+}
+
+static void
+screencast_start (GsdMediaKeysManager *manager)
+{
+        guint max_length;
+        g_dbus_proxy_call (manager->priv->screencast_proxy,
+                           "Screencast",
+                           /* Translators: this is a filename used for screencast
+                            * recording, where "%d" and "%t" date and time, e.g.
+                            * "Screencast from 07-17-2013 10:00:46 PM.webm" */
+                           /* xgettext:no-c-format */
+                           g_variant_new_parsed ("(%s, @a{sv} {})",
+                                                 _("Screencast from %d %t.webm")),
+                           G_DBUS_CALL_FLAGS_NONE, -1,
+                           manager->priv->screencast_cancellable,
+                           NULL, NULL);
+
+        max_length = g_settings_get_uint (manager->priv->settings, "max-screencast-length");
+
+        if (max_length > 0) {
+                manager->priv->screencast_timeout_id = g_timeout_add_seconds (max_length,
+                                                                              screencast_timeout,
+                                                                              manager);
+                g_source_set_name_by_id (manager->priv->screencast_timeout_id, "[gnome-settings-daemon] screencast_timeout");
+        }
+        manager->priv->screencast_recording = TRUE;
+}
+
+static void
+do_screencast_action (GsdMediaKeysManager *manager)
+{
+        if (manager->priv->screencast_proxy == NULL)
+                return;
+
+        if (!manager->priv->screencast_recording)
+                screencast_start (manager);
+        else
+                screencast_stop (manager);
+}
+
+static void
 do_custom_action (GsdMediaKeysManager *manager,
+                  guint                deviceid,
                   MediaKey            *key,
                   gint64               timestamp)
 {
-	execute (manager, key->custom_command, FALSE);
+        g_debug ("Launching custom action for key (on device id %d)", deviceid);
+
+	execute (manager, key->custom_command, timestamp);
 }
 
 static gboolean
@@ -1812,8 +2017,6 @@ do_action (GsdMediaKeysManager *manager,
            MediaKeyType         type,
            gint64               timestamp)
 {
-        char *cmd;
-
         g_debug ("Launching action for key type '%d' (on device id %d)", type, deviceid);
 
         switch (type) {
@@ -1829,16 +2032,19 @@ do_action (GsdMediaKeysManager *manager,
         case MUTE_KEY:
         case VOLUME_DOWN_KEY:
         case VOLUME_UP_KEY:
-                do_sound_action (manager, deviceid, type, FALSE);
+                do_sound_action (manager, deviceid, type, TRUE, FALSE);
+                break;
+        case MIC_MUTE_KEY:
+                do_sound_action (manager, deviceid, MUTE_KEY, FALSE, TRUE);
                 break;
         case MUTE_QUIET_KEY:
-                do_sound_action (manager, deviceid, MUTE_KEY, TRUE);
+                do_sound_action (manager, deviceid, MUTE_KEY, TRUE, TRUE);
                 break;
         case VOLUME_DOWN_QUIET_KEY:
-                do_sound_action (manager, deviceid, VOLUME_DOWN_KEY, TRUE);
+                do_sound_action (manager, deviceid, VOLUME_DOWN_KEY, TRUE, TRUE);
                 break;
         case VOLUME_UP_QUIET_KEY:
-                do_sound_action (manager, deviceid, VOLUME_UP_KEY, TRUE);
+                do_sound_action (manager, deviceid, VOLUME_UP_KEY, TRUE, TRUE);
                 break;
         case LOGOUT_KEY:
                 gnome_session_shutdown (manager);
@@ -1850,39 +2056,27 @@ do_action (GsdMediaKeysManager *manager,
                 do_home_key_action (manager, timestamp);
                 break;
         case SEARCH_KEY:
-                cmd = NULL;
-                if ((cmd = g_find_program_in_path ("tracker-search-tool")))
-                        do_execute_desktop (manager, "tracker-needle.desktop", timestamp);
-                else
-                        do_execute_desktop (manager, "gnome-search-tool.desktop", timestamp);
-                g_free (cmd);
+                do_search_action (manager, timestamp);
                 break;
         case EMAIL_KEY:
                 do_url_action (manager, "mailto", timestamp);
                 break;
         case SCREENSAVER_KEY:
-                execute (manager, "gnome-screensaver-command --lock", FALSE);
+                do_lock_screensaver (manager);
                 break;
         case HELP_KEY:
                 do_url_action (manager, "ghelp", timestamp);
                 break;
         case SCREENSHOT_KEY:
-                execute (manager, "gnome-screenshot", FALSE);
-                break;
-        case WINDOW_SCREENSHOT_KEY:
-                execute (manager, "gnome-screenshot --window", FALSE);
-                break;
-        case AREA_SCREENSHOT_KEY:
-                execute (manager, "gnome-screenshot --area", FALSE);
-                break;
         case SCREENSHOT_CLIP_KEY:
-                execute (manager, "gnome-screenshot --clipboard", FALSE);
-                break;
+        case WINDOW_SCREENSHOT_KEY:
         case WINDOW_SCREENSHOT_CLIP_KEY:
-                execute (manager, "gnome-screenshot --window --clipboard", FALSE);
-                break;
+        case AREA_SCREENSHOT_KEY:
         case AREA_SCREENSHOT_CLIP_KEY:
-                execute (manager, "gnome-screenshot --area --clipboard", FALSE);
+                gsd_screenshot_take (type);
+                break;
+        case SCREENCAST_KEY:
+                do_screencast_action (manager);
                 break;
         case WWW_KEY:
                 do_url_action (manager, "http", timestamp);
@@ -1891,7 +2085,10 @@ do_action (GsdMediaKeysManager *manager,
                 do_media_action (manager, timestamp);
                 break;
         case CALCULATOR_KEY:
-                do_execute_desktop (manager, "gcalctool.desktop", timestamp);
+                do_execute_desktop_or_desktop (manager, "gcalctool.desktop", "gnome-calculator.desktop", timestamp);
+                break;
+        case CONTROL_CENTER_KEY:
+                do_execute_desktop_or_desktop (manager, "gnome-control-center.desktop", NULL, timestamp);
                 break;
         case PLAY_KEY:
                 return do_multimedia_player_action (manager, "Play");
@@ -1917,6 +2114,9 @@ do_action (GsdMediaKeysManager *manager,
         case ROTATE_VIDEO_KEY:
                 do_video_rotate_action (manager, timestamp);
                 break;
+        case ROTATE_VIDEO_LOCK_KEY:
+                do_video_rotate_lock_action (manager, timestamp);
+                break;
         case MAGNIFIER_KEY:
                 do_magnifier_action (manager);
                 break;
@@ -1938,28 +2138,38 @@ do_action (GsdMediaKeysManager *manager,
 		do_toggle_contrast_action (manager);
 		break;
         case POWER_KEY:
-                do_config_power_action (manager, "button-power");
+                do_config_power_action (manager, "button-power", FALSE);
                 break;
         case SLEEP_KEY:
-                do_config_power_action (manager, "button-sleep");
+                do_config_power_action (manager, "button-sleep", FALSE);
                 break;
         case SUSPEND_KEY:
-                do_config_power_action (manager, "button-suspend");
+                do_config_power_action (manager, "button-suspend", FALSE);
                 break;
         case HIBERNATE_KEY:
-                do_config_power_action (manager, "button-hibernate");
+                do_config_power_action (manager, "button-hibernate", FALSE);
+                break;
+        case POWER_KEY_NO_DIALOG:
+                do_config_power_action (manager, "button-power", TRUE);
+                break;
+        case SLEEP_KEY_NO_DIALOG:
+                do_config_power_action (manager, "button-sleep", TRUE);
+                break;
+        case SUSPEND_KEY_NO_DIALOG:
+                do_config_power_action (manager, "button-suspend", TRUE);
+                break;
+        case HIBERNATE_KEY_NO_DIALOG:
+                do_config_power_action (manager, "button-hibernate", TRUE);
                 break;
         case SCREEN_BRIGHTNESS_UP_KEY:
         case SCREEN_BRIGHTNESS_DOWN_KEY:
-                do_screen_brightness_action (manager, type);
-                break;
         case KEYBOARD_BRIGHTNESS_UP_KEY:
         case KEYBOARD_BRIGHTNESS_DOWN_KEY:
         case KEYBOARD_BRIGHTNESS_TOGGLE_KEY:
-                do_keyboard_brightness_action (manager, type);
+                do_brightness_action (manager, type);
                 break;
         case BATTERY_KEY:
-                do_execute_desktop (manager, "gnome-power-statistics.desktop", timestamp);
+                do_battery_action (manager);
                 break;
         /* Note, no default so compiler catches missing keys */
         case CUSTOM_KEY:
@@ -1969,89 +2179,29 @@ do_action (GsdMediaKeysManager *manager,
         return FALSE;
 }
 
-static GdkScreen *
-get_screen_from_root (GsdMediaKeysManager *manager,
-                      Window               root)
+static void
+on_accelerator_activated (ShellKeyGrabber     *grabber,
+                          guint                accel_id,
+                          guint                deviceid,
+                          guint                timestamp,
+                          GsdMediaKeysManager *manager)
 {
-        GSList    *l;
-
-        /* Look for which screen we're receiving events */
-        for (l = manager->priv->screens; l != NULL; l = l->next) {
-                GdkScreen *screen = (GdkScreen *) l->data;
-                GdkWindow *window = gdk_screen_get_root_window (screen);
-
-                if (GDK_WINDOW_XID (window) == root)
-                        return screen;
-        }
-
-        return NULL;
-}
-
-static GdkFilterReturn
-filter_key_events (XEvent              *xevent,
-                   GdkEvent            *event,
-                   GsdMediaKeysManager *manager)
-{
-	XIEvent             *xiev;
-	XIDeviceEvent       *xev;
-	XGenericEventCookie *cookie;
-        guint                i;
-	guint                deviceid;
-
-        /* verify we have a key event */
-	if (xevent->type != GenericEvent)
-		return GDK_FILTER_CONTINUE;
-	cookie = &xevent->xcookie;
-	if (cookie->extension != manager->priv->opcode)
-		return GDK_FILTER_CONTINUE;
-
-	xiev = (XIEvent *) xevent->xcookie.data;
-
-	if (xiev->evtype != XI_KeyPress &&
-	    xiev->evtype != XI_KeyRelease)
-		return GDK_FILTER_CONTINUE;
-
-	xev = (XIDeviceEvent *) xiev;
-
-	deviceid = xev->sourceid;
+        guint i;
 
         for (i = 0; i < manager->priv->keys->len; i++) {
                 MediaKey *key;
 
                 key = g_ptr_array_index (manager->priv->keys, i);
 
-                if (match_xi2_key (key->key, xev)) {
-                        switch (key->key_type) {
-                        case VOLUME_DOWN_KEY:
-                        case VOLUME_UP_KEY:
-                        case VOLUME_DOWN_QUIET_KEY:
-                        case VOLUME_UP_QUIET_KEY:
-                                /* auto-repeatable keys */
-                                if (xiev->evtype != XI_KeyPress)
-                                        return GDK_FILTER_CONTINUE;
-                                break;
-                        default:
-                                if (xiev->evtype != XI_KeyRelease) {
-                                        return GDK_FILTER_CONTINUE;
-                                }
-                        }
+                if (key->accel_id != accel_id)
+                        continue;
 
-                        manager->priv->current_screen = get_screen_from_root (manager, xev->root);
-
-                        if (key->key_type == CUSTOM_KEY) {
-                                do_custom_action (manager, key, xev->time);
-                                return GDK_FILTER_REMOVE;
-                        }
-
-                        if (do_action (manager, deviceid, key->key_type, xev->time) == FALSE) {
-                                return GDK_FILTER_REMOVE;
-                        } else {
-                                return GDK_FILTER_CONTINUE;
-                        }
-                }
+                if (key->key_type == CUSTOM_KEY)
+                        do_custom_action (manager, deviceid, key, timestamp);
+                else
+                        do_action (manager, deviceid, key->key_type, timestamp);
+                return;
         }
-
-        return GDK_FILTER_CONTINUE;
 }
 
 static void
@@ -2075,96 +2225,9 @@ update_theme_settings (GSettings           *settings,
 	}
 }
 
-static gboolean
-start_media_keys_idle_cb (GsdMediaKeysManager *manager)
+static void
+initialize_volume_handler (GsdMediaKeysManager *manager)
 {
-        GSList *l;
-        char *theme_name;
-
-        g_debug ("Starting media_keys manager");
-        gnome_settings_profile_start (NULL);
-
-        manager->priv->settings = g_settings_new (SETTINGS_BINDING_DIR);
-        g_signal_connect (G_OBJECT (manager->priv->settings), "changed",
-                          G_CALLBACK (gsettings_changed_cb), manager);
-        g_signal_connect (G_OBJECT (manager->priv->settings), "changed::custom-keybindings",
-                          G_CALLBACK (gsettings_custom_changed_cb), manager);
-
-        manager->priv->custom_settings =
-          g_hash_table_new_full (g_str_hash, g_str_equal,
-                                 g_free, g_object_unref);
-
-        /* Sound events */
-        ca_context_create (&manager->priv->ca);
-        ca_context_set_driver (manager->priv->ca, "pulse");
-        ca_context_change_props (manager->priv->ca, 0,
-                                 CA_PROP_APPLICATION_ID, "org.gnome.VolumeControl",
-                                 NULL);
-        manager->priv->gtksettings = gtk_settings_get_for_screen (gdk_screen_get_default ());
-        g_object_get (G_OBJECT (manager->priv->gtksettings), "gtk-sound-theme-name", &theme_name, NULL);
-        if (theme_name)
-                ca_context_change_props (manager->priv->ca, CA_PROP_CANBERRA_XDG_THEME_NAME, theme_name, NULL);
-        g_free (theme_name);
-        g_signal_connect (manager->priv->gtksettings, "notify::gtk-sound-theme-name",
-                          G_CALLBACK (sound_theme_changed), manager);
-
-        /* for the power plugin interface code */
-        manager->priv->power_settings = g_settings_new (SETTINGS_POWER_DIR);
-
-        /* Logic from http://git.gnome.org/browse/gnome-shell/tree/js/ui/status/accessibility.js#n163 */
-        manager->priv->interface_settings = g_settings_new (SETTINGS_INTERFACE_DIR);
-        g_signal_connect (G_OBJECT (manager->priv->interface_settings), "changed::gtk-theme",
-			  G_CALLBACK (update_theme_settings), manager);
-        g_signal_connect (G_OBJECT (manager->priv->interface_settings), "changed::icon-theme",
-			  G_CALLBACK (update_theme_settings), manager);
-	manager->priv->gtk_theme = g_settings_get_string (manager->priv->interface_settings, "gtk-theme");
-	if (g_str_equal (manager->priv->gtk_theme, HIGH_CONTRAST)) {
-		g_free (manager->priv->gtk_theme);
-		manager->priv->gtk_theme = NULL;
-	}
-	manager->priv->icon_theme = g_settings_get_string (manager->priv->interface_settings, "icon-theme");
-
-        init_screens (manager);
-        init_kbd (manager);
-
-        /* Start filtering the events */
-        for (l = manager->priv->screens; l != NULL; l = l->next) {
-                gnome_settings_profile_start ("gdk_window_add_filter");
-
-                g_debug ("adding key filter for screen: %d",
-                         gdk_screen_get_number (l->data));
-
-                gdk_window_add_filter (gdk_screen_get_root_window (l->data),
-                                       (GdkFilterFunc) filter_key_events,
-                                       manager);
-                gnome_settings_profile_end ("gdk_window_add_filter");
-        }
-
-        gnome_settings_profile_end (NULL);
-
-        manager->priv->start_idle_id = 0;
-
-        return FALSE;
-}
-
-gboolean
-gsd_media_keys_manager_start (GsdMediaKeysManager *manager,
-                              GError             **error)
-{
-        const char * const subsystems[] = { "input", "usb", "sound", NULL };
-
-        gnome_settings_profile_start (NULL);
-
-        if (supports_xinput2_devices (&manager->priv->opcode) == FALSE) {
-                g_debug ("No Xinput2 support, disabling plugin");
-                return TRUE;
-        }
-
-#ifdef HAVE_GUDEV
-        manager->priv->streams = g_hash_table_new (g_direct_hash, g_direct_equal);
-        manager->priv->udev_client = g_udev_client_new (subsystems);
-#endif
-
         /* initialise Volume handler
          *
          * We do this one here to force checking gstreamer cache, etc.
@@ -2184,6 +2247,10 @@ gsd_media_keys_manager_start (GsdMediaKeysManager *manager,
                           G_CALLBACK (on_control_default_sink_changed),
                           manager);
         g_signal_connect (manager->priv->volume,
+                          "default-source-changed",
+                          G_CALLBACK (on_control_default_source_changed),
+                          manager);
+        g_signal_connect (manager->priv->volume,
                           "stream-removed",
                           G_CALLBACK (on_control_stream_removed),
                           manager);
@@ -2191,8 +2258,145 @@ gsd_media_keys_manager_start (GsdMediaKeysManager *manager,
         gvc_mixer_control_open (manager->priv->volume);
 
         gnome_settings_profile_end ("gvc_mixer_control_new");
+}
+
+static void
+on_screencast_proxy_ready (GObject      *source,
+                           GAsyncResult *result,
+                           gpointer      data)
+{
+        GsdMediaKeysManager *manager = data;
+
+        manager->priv->screencast_proxy =
+                g_dbus_proxy_new_for_bus_finish (result, NULL);
+}
+
+static void
+on_key_grabber_ready (GObject      *source,
+                      GAsyncResult *result,
+                      gpointer      data)
+{
+        GsdMediaKeysManager *manager = data;
+
+        manager->priv->key_grabber =
+		shell_key_grabber_proxy_new_for_bus_finish (result, NULL);
+
+        if (!manager->priv->key_grabber)
+                return;
+
+        g_signal_connect (manager->priv->key_grabber, "accelerator-activated",
+                          G_CALLBACK (on_accelerator_activated), manager);
+
+        init_kbd (manager);
+}
+
+static void
+shell_presence_changed (GsdMediaKeysManager *manager)
+{
+        gchar *name_owner;
+
+        name_owner = g_dbus_proxy_get_name_owner (G_DBUS_PROXY (manager->priv->shell_proxy));
+
+        if (name_owner) {
+                shell_key_grabber_proxy_new_for_bus (G_BUS_TYPE_SESSION,
+                                                     0,
+                                                     name_owner,
+                                                     SHELL_DBUS_PATH,
+                                                     manager->priv->grab_cancellable,
+                                                     on_key_grabber_ready, manager);
+
+                g_dbus_proxy_new_for_bus (G_BUS_TYPE_SESSION,
+                                          0, NULL,
+                                          name_owner,
+                                          SHELL_DBUS_PATH "/Screencast",
+                                          SHELL_DBUS_NAME ".Screencast",
+                                          manager->priv->screencast_cancellable,
+                                          on_screencast_proxy_ready, manager);
+                g_free (name_owner);
+        } else {
+                g_ptr_array_set_size (manager->priv->keys, 0);
+                g_clear_object (&manager->priv->key_grabber);
+                g_clear_object (&manager->priv->screencast_proxy);
+        }
+}
+
+static gboolean
+start_media_keys_idle_cb (GsdMediaKeysManager *manager)
+{
+        g_debug ("Starting media_keys manager");
+        gnome_settings_profile_start (NULL);
+
+        manager->priv->keys = g_ptr_array_new_with_free_func ((GDestroyNotify) media_key_free);
+
+        initialize_volume_handler (manager);
+
+        manager->priv->settings = g_settings_new (SETTINGS_BINDING_DIR);
+        g_signal_connect (G_OBJECT (manager->priv->settings), "changed",
+                          G_CALLBACK (gsettings_changed_cb), manager);
+        g_signal_connect (G_OBJECT (manager->priv->settings), "changed::custom-keybindings",
+                          G_CALLBACK (gsettings_custom_changed_cb), manager);
+
+        manager->priv->custom_settings =
+          g_hash_table_new_full (g_str_hash, g_str_equal,
+                                 g_free, g_object_unref);
+
+        /* for the power plugin interface code */
+        manager->priv->power_settings = g_settings_new (SETTINGS_POWER_DIR);
+
+        /* Logic from http://git.gnome.org/browse/gnome-shell/tree/js/ui/status/accessibility.js#n163 */
+        manager->priv->interface_settings = g_settings_new (SETTINGS_INTERFACE_DIR);
+        g_signal_connect (G_OBJECT (manager->priv->interface_settings), "changed::gtk-theme",
+			  G_CALLBACK (update_theme_settings), manager);
+        g_signal_connect (G_OBJECT (manager->priv->interface_settings), "changed::icon-theme",
+			  G_CALLBACK (update_theme_settings), manager);
+	manager->priv->gtk_theme = g_settings_get_string (manager->priv->interface_settings, "gtk-theme");
+	if (g_str_equal (manager->priv->gtk_theme, HIGH_CONTRAST)) {
+		g_free (manager->priv->gtk_theme);
+		manager->priv->gtk_theme = NULL;
+	}
+	manager->priv->icon_theme = g_settings_get_string (manager->priv->interface_settings, "icon-theme");
+
+        ensure_cancellable (&manager->priv->grab_cancellable);
+        ensure_cancellable (&manager->priv->screencast_cancellable);
+
+        manager->priv->shell_proxy = gnome_settings_bus_get_shell_proxy ();
+        g_signal_connect_swapped (manager->priv->shell_proxy, "notify::g-name-owner",
+                                  G_CALLBACK (shell_presence_changed), manager);
+        shell_presence_changed (manager);
+
+        g_debug ("Starting mpris controller");
+        manager->priv->mpris_controller = mpris_controller_new ();
+
+        /* Rotation */
+        manager->priv->orientation_watch_id = g_bus_watch_name (G_BUS_TYPE_SESSION,
+                                                                "org.gnome.SettingsDaemon.Orientation",
+                                                                G_BUS_NAME_WATCHER_FLAGS_NONE,
+                                                                orientation_appeared_cb,
+                                                                orientation_disappeared_cb,
+                                                                manager, NULL);
+
+        gnome_settings_profile_end (NULL);
+
+        manager->priv->start_idle_id = 0;
+
+        return FALSE;
+}
+
+gboolean
+gsd_media_keys_manager_start (GsdMediaKeysManager *manager,
+                              GError             **error)
+{
+        const char * const subsystems[] = { "input", "usb", "sound", NULL };
+
+        gnome_settings_profile_start (NULL);
+
+#ifdef HAVE_GUDEV
+        manager->priv->streams = g_hash_table_new (g_direct_hash, g_direct_equal);
+        manager->priv->udev_client = g_udev_client_new (subsystems);
+#endif
 
         manager->priv->start_idle_id = g_idle_add ((GSourceFunc) start_media_keys_idle_cb, manager);
+        g_source_set_name_by_id (manager->priv->start_idle_id, "[gnome-settings-daemon] start_media_keys_idle_cb");
 
         register_manager (manager_object);
 
@@ -2205,11 +2409,14 @@ void
 gsd_media_keys_manager_stop (GsdMediaKeysManager *manager)
 {
         GsdMediaKeysManagerPrivate *priv = manager->priv;
-        GSList *ls;
-        GList *l;
         int i;
 
         g_debug ("Stopping media_keys manager");
+
+        if (priv->start_idle_id != 0) {
+                g_source_remove (priv->start_idle_id);
+                priv->start_idle_id = 0;
+        }
 
         if (priv->bus_cancellable != NULL) {
                 g_cancellable_cancel (priv->bus_cancellable);
@@ -2217,134 +2424,74 @@ gsd_media_keys_manager_stop (GsdMediaKeysManager *manager)
                 priv->bus_cancellable = NULL;
         }
 
-        for (ls = priv->screens; ls != NULL; ls = ls->next) {
-                gdk_window_remove_filter (gdk_screen_get_root_window (ls->data),
-                                          (GdkFilterFunc) filter_key_events,
-                                          manager);
-        }
-
         if (manager->priv->gtksettings != NULL) {
                 g_signal_handlers_disconnect_by_func (manager->priv->gtksettings, sound_theme_changed, manager);
                 manager->priv->gtksettings = NULL;
         }
 
-        if (manager->priv->ca) {
-                ca_context_destroy (manager->priv->ca);
-                manager->priv->ca = NULL;
+        if (manager->priv->orientation_watch_id > 0) {
+                g_bus_unwatch_name (manager->priv->orientation_watch_id);
+                manager->priv->orientation_watch_id = 0;
         }
+
+        g_clear_pointer (&manager->priv->ca, ca_context_destroy);
 
 #ifdef HAVE_GUDEV
-        if (priv->streams) {
-                g_hash_table_destroy (priv->streams);
-                priv->streams = NULL;
-        }
-        if (priv->udev_client) {
-                g_object_unref (priv->udev_client);
-                priv->udev_client = NULL;
-        }
+        g_clear_pointer (&priv->streams, g_hash_table_destroy);
+        g_clear_object (&priv->udev_client);
 #endif /* HAVE_GUDEV */
 
-        if (priv->settings) {
-                g_object_unref (priv->settings);
-                priv->settings = NULL;
-        }
-
-        if (priv->power_settings) {
-                g_object_unref (priv->power_settings);
-                priv->power_settings = NULL;
-        }
-
-        if (priv->power_screen_proxy) {
-                g_object_unref (priv->power_screen_proxy);
-                priv->power_screen_proxy = NULL;
-        }
-
-        if (priv->power_keyboard_proxy) {
-                g_object_unref (priv->power_keyboard_proxy);
-                priv->power_keyboard_proxy = NULL;
-        }
-
-        if (priv->upower_proxy) {
-                g_object_unref (priv->upower_proxy);
-                priv->upower_proxy = NULL;
-        }
+        g_clear_object (&priv->logind_proxy);
+        g_clear_object (&priv->settings);
+        g_clear_object (&priv->power_settings);
+        g_clear_object (&priv->power_proxy);
+        g_clear_object (&priv->power_screen_proxy);
+        g_clear_object (&priv->power_keyboard_proxy);
+        g_clear_object (&priv->composite_device);
+        g_clear_object (&priv->mpris_controller);
+        g_clear_object (&priv->screencast_proxy);
 
         if (priv->cancellable != NULL) {
                 g_cancellable_cancel (priv->cancellable);
-                g_object_unref (priv->cancellable);
-                priv->cancellable = NULL;
+                g_clear_object (&priv->cancellable);
         }
 
-        if (priv->introspection_data) {
-                g_dbus_node_info_unref (priv->introspection_data);
-                priv->introspection_data = NULL;
-        }
-
-        if (priv->connection != NULL) {
-                g_object_unref (priv->connection);
-                priv->connection = NULL;
-        }
+        g_clear_pointer (&priv->introspection_data, g_dbus_node_info_unref);
+        g_clear_object (&priv->connection);
 
         if (priv->keys != NULL) {
-                gdk_error_trap_push ();
                 for (i = 0; i < priv->keys->len; ++i) {
                         MediaKey *key;
 
                         key = g_ptr_array_index (manager->priv->keys, i);
-
-                        if (key->key)
-                                grab_key_unsafe (key->key, FALSE, priv->screens);
+                        ungrab_media_key (key, manager);
                 }
                 g_ptr_array_free (priv->keys, TRUE);
                 priv->keys = NULL;
-
-                gdk_flush ();
-                gdk_error_trap_pop_ignored ();
         }
 
-        if (priv->screens != NULL) {
-                g_slist_free (priv->screens);
-                priv->screens = NULL;
+        g_clear_object (&priv->key_grabber);
+
+        if (priv->grab_cancellable != NULL) {
+                g_cancellable_cancel (priv->grab_cancellable);
+                g_clear_object (&priv->grab_cancellable);
         }
 
-        if (priv->stream) {
-                g_object_unref (priv->stream);
-                priv->stream = NULL;
+        if (priv->screencast_cancellable != NULL) {
+                g_cancellable_cancel (priv->screencast_cancellable);
+                g_clear_object (&priv->screencast_cancellable);
         }
 
-        if (priv->volume) {
-                g_object_unref (priv->volume);
-                priv->volume = NULL;
-        }
-
-        if (priv->dialog != NULL) {
-                gtk_widget_destroy (priv->dialog);
-                priv->dialog = NULL;
-        }
+        g_clear_object (&priv->sink);
+        g_clear_object (&priv->source);
+        g_clear_object (&priv->volume);
 
         if (priv->media_players != NULL) {
-                for (l = priv->media_players; l; l = l->next) {
-                        MediaPlayer *mp = l->data;
-                        g_free (mp->application);
-                        g_free (mp);
-                }
-                g_list_free (priv->media_players);
+                g_list_free_full (priv->media_players, (GDestroyNotify) free_media_player);
                 priv->media_players = NULL;
         }
-}
 
-static GObject *
-gsd_media_keys_manager_constructor (GType                  type,
-                              guint                  n_construct_properties,
-                              GObjectConstructParam *construct_properties)
-{
-        GsdMediaKeysManager      *media_keys_manager;
-
-        media_keys_manager = GSD_MEDIA_KEYS_MANAGER (G_OBJECT_CLASS (gsd_media_keys_manager_parent_class)->constructor (type,
-                                                                                                      n_construct_properties,
-                                                                                                      construct_properties));
-
-        return G_OBJECT (media_keys_manager);
+        g_clear_object (&priv->shell_proxy);
 }
 
 static void
@@ -2352,16 +2499,91 @@ gsd_media_keys_manager_class_init (GsdMediaKeysManagerClass *klass)
 {
         GObjectClass   *object_class = G_OBJECT_CLASS (klass);
 
-        object_class->constructor = gsd_media_keys_manager_constructor;
         object_class->finalize = gsd_media_keys_manager_finalize;
 
         g_type_class_add_private (klass, sizeof (GsdMediaKeysManagerPrivate));
 }
 
 static void
+inhibit_done (GObject      *source,
+              GAsyncResult *result,
+              gpointer      user_data)
+{
+        GDBusProxy *proxy = G_DBUS_PROXY (source);
+        GsdMediaKeysManager *manager = GSD_MEDIA_KEYS_MANAGER (user_data);
+        GError *error = NULL;
+        GVariant *res;
+        GUnixFDList *fd_list = NULL;
+        gint idx;
+
+        res = g_dbus_proxy_call_with_unix_fd_list_finish (proxy, &fd_list, result, &error);
+        if (res == NULL) {
+                g_warning ("Unable to inhibit keypresses: %s", error->message);
+                g_error_free (error);
+        } else {
+                g_variant_get (res, "(h)", &idx);
+                manager->priv->inhibit_keys_fd = g_unix_fd_list_get (fd_list, idx, &error);
+                if (manager->priv->inhibit_keys_fd == -1) {
+                        g_warning ("Failed to receive system inhibitor fd: %s", error->message);
+                        g_error_free (error);
+                }
+                g_debug ("System inhibitor fd is %d", manager->priv->inhibit_keys_fd);
+                g_object_unref (fd_list);
+                g_variant_unref (res);
+        }
+}
+
+static void
 gsd_media_keys_manager_init (GsdMediaKeysManager *manager)
 {
+        GError *error;
+        GDBusConnection *bus;
+
+        error = NULL;
         manager->priv = GSD_MEDIA_KEYS_MANAGER_GET_PRIVATE (manager);
+
+        bus = g_bus_get_sync (G_BUS_TYPE_SYSTEM, NULL, &error);
+        if (bus == NULL) {
+                g_warning ("Failed to connect to system bus: %s",
+                           error->message);
+                g_error_free (error);
+                return;
+        }
+
+        manager->priv->logind_proxy =
+                g_dbus_proxy_new_sync (bus,
+                                       0,
+                                       NULL,
+                                       SYSTEMD_DBUS_NAME,
+                                       SYSTEMD_DBUS_PATH,
+                                       SYSTEMD_DBUS_INTERFACE,
+                                       NULL,
+                                       &error);
+
+        if (manager->priv->logind_proxy == NULL) {
+                g_warning ("Failed to connect to systemd: %s",
+                           error->message);
+                g_error_free (error);
+        }
+
+        g_object_unref (bus);
+
+        g_debug ("Adding system inhibitors for power keys");
+        manager->priv->inhibit_keys_fd = -1;
+        g_dbus_proxy_call_with_unix_fd_list (manager->priv->logind_proxy,
+                                             "Inhibit",
+                                             g_variant_new ("(ssss)",
+                                                            "handle-power-key:handle-suspend-key:handle-hibernate-key",
+                                                            g_get_user_name (),
+                                                            "GNOME handling keypresses",
+                                                            "block"),
+                                             0,
+                                             G_MAXINT,
+                                             NULL,
+                                             NULL,
+                                             inhibit_done,
+                                             manager);
+
 }
 
 static void
@@ -2376,8 +2598,13 @@ gsd_media_keys_manager_finalize (GObject *object)
 
         g_return_if_fail (media_keys_manager->priv != NULL);
 
-        if (media_keys_manager->priv->start_idle_id != 0)
-                g_source_remove (media_keys_manager->priv->start_idle_id);
+        gsd_media_keys_manager_stop (media_keys_manager);
+
+        if (media_keys_manager->priv->inhibit_keys_fd != -1)
+                close (media_keys_manager->priv->inhibit_keys_fd);
+
+        g_clear_object (&media_keys_manager->priv->logind_proxy);
+        g_clear_object (&media_keys_manager->priv->screen_saver_proxy);
 
         G_OBJECT_CLASS (gsd_media_keys_manager_parent_class)->finalize (object);
 }
@@ -2397,15 +2624,15 @@ xrandr_ready_cb (GObject             *source_object,
 }
 
 static void
-upower_ready_cb (GObject             *source_object,
-                 GAsyncResult        *res,
-                 GsdMediaKeysManager *manager)
+power_ready_cb (GObject             *source_object,
+                GAsyncResult        *res,
+                GsdMediaKeysManager *manager)
 {
         GError *error = NULL;
 
-        manager->priv->upower_proxy = g_dbus_proxy_new_finish (res, &error);
-        if (manager->priv->upower_proxy == NULL) {
-                g_warning ("Failed to get proxy for upower: %s",
+        manager->priv->power_proxy = g_dbus_proxy_new_finish (res, &error);
+        if (manager->priv->power_proxy == NULL) {
+                g_warning ("Failed to get proxy for power: %s",
                            error->message);
                 g_error_free (error);
         }
@@ -2448,6 +2675,7 @@ on_bus_gotten (GObject             *source_object,
 {
         GDBusConnection *connection;
         GError *error = NULL;
+        UpClient *up_client;
 
         if (manager->priv->bus_cancellable == NULL ||
             g_cancellable_is_cancelled (manager->priv->bus_cancellable)) {
@@ -2474,9 +2702,9 @@ on_bus_gotten (GObject             *source_object,
         g_dbus_proxy_new (manager->priv->connection,
                           G_DBUS_PROXY_FLAGS_NONE,
                           NULL,
-                          "org.gnome.SettingsDaemon",
-                          "/org/gnome/SettingsDaemon/XRANDR",
-                          "org.gnome.SettingsDaemon.XRANDR_2",
+                          GSD_DBUS_NAME ".XRANDR",
+                          GSD_DBUS_PATH "/XRANDR",
+                          GSD_DBUS_BASE_INTERFACE ".XRANDR_2",
                           NULL,
                           (GAsyncReadyCallback) xrandr_ready_cb,
                           manager);
@@ -2484,9 +2712,19 @@ on_bus_gotten (GObject             *source_object,
         g_dbus_proxy_new (manager->priv->connection,
                           G_DBUS_PROXY_FLAGS_NONE,
                           NULL,
-                          "org.gnome.SettingsDaemon",
-                          "/org/gnome/SettingsDaemon/Power",
-                          "org.gnome.SettingsDaemon.Power.Screen",
+                          GSD_DBUS_NAME ".Power",
+                          GSD_DBUS_PATH "/Power",
+                          GSD_DBUS_BASE_INTERFACE ".Power",
+                          NULL,
+                          (GAsyncReadyCallback) power_ready_cb,
+                          manager);
+
+        g_dbus_proxy_new (manager->priv->connection,
+                          G_DBUS_PROXY_FLAGS_NONE,
+                          NULL,
+                          GSD_DBUS_NAME ".Power",
+                          GSD_DBUS_PATH "/Power",
+                          GSD_DBUS_BASE_INTERFACE ".Power.Screen",
                           NULL,
                           (GAsyncReadyCallback) power_screen_ready_cb,
                           manager);
@@ -2494,12 +2732,16 @@ on_bus_gotten (GObject             *source_object,
         g_dbus_proxy_new (manager->priv->connection,
                           G_DBUS_PROXY_FLAGS_NONE,
                           NULL,
-                          "org.gnome.SettingsDaemon",
-                          "/org/gnome/SettingsDaemon/Power",
-                          "org.gnome.SettingsDaemon.Power.Keyboard",
+                          GSD_DBUS_NAME ".Power",
+                          GSD_DBUS_PATH "/Power",
+                          GSD_DBUS_BASE_INTERFACE ".Power.Keyboard",
                           NULL,
                           (GAsyncReadyCallback) power_keyboard_ready_cb,
                           manager);
+
+        up_client = up_client_new ();
+        manager->priv->composite_device = up_client_get_display_device (up_client);
+        g_object_unref (up_client);
 }
 
 static void
@@ -2513,16 +2755,6 @@ register_manager (GsdMediaKeysManager *manager)
                    manager->priv->bus_cancellable,
                    (GAsyncReadyCallback) on_bus_gotten,
                    manager);
-
-        g_dbus_proxy_new_for_bus (G_BUS_TYPE_SYSTEM,
-                                  G_DBUS_PROXY_FLAGS_NONE,
-                                  NULL,
-                                  "org.freedesktop.UPower",
-                                  "/org/freedesktop/UPower",
-                                  "org.freedesktop.UPower",
-                                  NULL,
-                                  (GAsyncReadyCallback) upower_ready_cb,
-                                  manager);
 }
 
 GsdMediaKeysManager *

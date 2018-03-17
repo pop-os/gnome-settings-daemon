@@ -13,8 +13,7 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
+ * along with this program; if not, see <http://www.gnu.org/licenses/>.
  *
  */
 
@@ -54,7 +53,7 @@ print_disabled_devices (void)
 int main (int argc, char **argv)
 {
 	gboolean supports_xinput;
-	gboolean has_touchpad, has_touchscreen;
+	gboolean has_touchpad, has_touchscreen, has_trackball;
         XDeviceInfo *device_info;
         gint n_devices, opcode;
         guint i;
@@ -82,6 +81,9 @@ int main (int argc, char **argv)
 	has_touchscreen = touchscreen_is_present ();
 	g_print ("Has touchscreen:\t\t\t%s\n", has_touchscreen ? "yes" : "no");
 
+	has_trackball = trackball_is_present ();
+	g_print ("Has trackball:\t\t\t\t%s\n", has_trackball ? "yes" : "no");
+
         device_info = XListInputDevices (GDK_DISPLAY_XDISPLAY (gdk_display_get_default ()), &n_devices);
         if (device_info == NULL) {
 		g_warning ("Has no input devices");
@@ -95,6 +97,14 @@ int main (int argc, char **argv)
 
 		if (device_info_is_touchscreen (&device_info[i])) {
 			g_print ("Device %d is touchscreen:\t\t%s\n", (int) device_info[i].id, "yes");
+			continue;
+		}
+		if (device_info_is_trackball (&device_info[i])) {
+			g_print ("Device %d is trackball:\t\t\t%s\n", (int) device_info[i].id, "yes");
+			continue;
+		}
+		if (device_info_is_tablet (&device_info[i])) {
+			g_print ("Device %d is tablet:\t\t\t%s\n", (int) device_info[i].id, "yes");
 			continue;
 		}
 

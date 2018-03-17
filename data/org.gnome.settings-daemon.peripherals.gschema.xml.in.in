@@ -21,12 +21,12 @@
       <_description>Set this to TRUE if you have problems with accidentally hitting the touchpad while typing.</_description>
     </key>
     <key name="horiz-scroll-enabled" type="b">
-      <default>false</default>
+      <default>true</default>
       <_summary>Enable horizontal scrolling</_summary>
       <_description>Set this to TRUE to allow horizontal scrolling by the same method selected with the scroll_method key.</_description>
     </key>
     <key name="scroll-method" enum="org.gnome.settings-daemon.GsdTouchpadScrollMethod">
-      <default>'edge-scrolling'</default>
+      <default>'two-finger-scrolling'</default>
       <_summary>Select the touchpad scroll method</_summary>
       <_description>Select the touchpad scroll method. Supported values are: "disabled", "edge-scrolling", "two-finger-scrolling".</_description>
     </key>
@@ -54,6 +54,11 @@
       <default>-1</default>
       <summary>Motion Threshold</summary>
       <description>Distance in pixels the pointer must move before accelerated mouse motion is activated. A value of -1 is the system default.</description>
+    </key>
+    <key name="natural-scroll" type="b">
+      <default>false</default>
+      <summary>Natural scrolling</summary>
+      <description>Set this to TRUE to enable natural (reverse) scrolling for touchpads.</description>
     </key>
   </schema>
   <schema gettext-domain="@GETTEXT_PACKAGE@" id="org.gnome.settings-daemon.peripherals.keyboard" path="/org/gnome/settings-daemon/peripherals/keyboard/">
@@ -148,7 +153,7 @@
     <key name="hotplug-command" type="s">
       <default>''</default>
       <_summary>Device hotplug custom command</_summary>
-      <_description>Command to be run when a device is added or removed.</_description>
+      <_description>Command to be run when a device is added or removed. An exit value of 1 means that the device will not be handled further by gnome-settings-daemon.</_description>
     </key>
   </schema>
 </schemalist>

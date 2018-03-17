@@ -13,8 +13,7 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
+ * along with this program; if not, see <http://www.gnu.org/licenses/>.
  *
  */
 
@@ -51,7 +50,6 @@ GsdKeyboardManager *       gsd_keyboard_manager_new                 (void);
 gboolean                gsd_keyboard_manager_start               (GsdKeyboardManager *manager,
                                                                GError         **error);
 void                    gsd_keyboard_manager_stop                (GsdKeyboardManager *manager);
-void                    gsd_keyboard_manager_apply_settings      (GsdKeyboardManager *manager);
 
 G_END_DECLS
 

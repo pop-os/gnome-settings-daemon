@@ -11,7 +11,6 @@ ICON_FILES = 			\
 	gsd-xrandr.svg
 
 install-data-local:
-	$(mkinstalldirs) $(DESTDIR)$(sysconfdir)/gnome-settings-daemon/xrandr
 	$(mkinstalldirs) $(DESTDIR)$(icondir)/16x16/$(context)
 	$(mkinstalldirs) $(DESTDIR)$(icondir)/22x22/$(context)
 	$(mkinstalldirs) $(DESTDIR)$(icondir)/24x24/$(context)
@@ -30,17 +29,46 @@ uninstall-local:
 	rm -f $(DESTDIR)$(icondir)/32x32/$(context)/gsd-xrandr.png
 	rm -f $(DESTDIR)$(icondir)/scalable/$(context)/gsd-xrandr.svg
 
+libexec_PROGRAMS = gsd-test-xrandr
+
+gsd_test_xrandr_SOURCES =		\
+	test-xrandr.c			\
+	gsd-xrandr-manager.c		\
+	gsd-xrandr-manager.h
+
+gsd_test_xrandr_CPPFLAGS =					\
+	-I$(top_srcdir)/data/					\
+	-I$(top_srcdir)/gnome-settings-daemon			\
+	-I$(top_builddir)/gnome-settings-daemon			\
+	-I$(top_srcdir)/plugins/common				\
+	-DGNOME_SETTINGS_LOCALEDIR=\""$(datadir)/locale"\"	\
+	-DLIBEXECDIR=\""$(libexecdir)"\"			\
+	$(AM_CPPFLAGS)
+
+gsd_test_xrandr_CFLAGS =			\
+	$(PLUGIN_CFLAGS)		\
+	$(SETTINGS_PLUGIN_CFLAGS)	\
+	$(XRANDR_CFLAGS)		\
+	$(AM_CFLAGS)
+
+gsd_test_xrandr_LDADD =						\
+	$(top_builddir)/gnome-settings-daemon/libgsd.la		\
+	$(top_builddir)/plugins/common/libcommon.la		\
+	$(SETTINGS_DAEMON_LIBS)			\
+	$(SETTINGS_PLUGIN_LIBS)			\
+	$(XRANDR_LIBS)
+
 plugin_LTLIBRARIES = \
 	libxrandr.la
 
 libxrandr_la_SOURCES = 		\
-	gsd-xrandr-plugin.h	\
 	gsd-xrandr-plugin.c	\
 	gsd-xrandr-manager.h	\
 	gsd-xrandr-manager.c
 
 libxrandr_la_CPPFLAGS =						\
 	-I$(top_srcdir)/gnome-settings-daemon			\
+	-I$(top_builddir)/gnome-settings-daemon			\
 	-I$(top_srcdir)/data/					\
 	-I$(top_srcdir)/plugins/common/				\
 	-DBINDIR=\"$(bindir)\"					\
@@ -49,9 +77,9 @@ libxrandr_la_CPPFLAGS =						\
 
 libxrandr_la_CFLAGS =			\
 	$(PLUGIN_CFLAGS)		\
-	$(UPOWER_CFLAGS)		\
+	$(XRANDR_CFLAGS)		\
 	$(SETTINGS_PLUGIN_CFLAGS)	\
-	$(GNOME_DESKTOP_CFLAGS)		\
+	$(WACOM_CFLAGS)			\
 	$(AM_CFLAGS)
 
 libxrandr_la_LDFLAGS = 			\
@@ -59,9 +87,9 @@ libxrandr_la_LDFLAGS = 			\
 
 libxrandr_la_LIBADD  =					\
 	$(top_builddir)/plugins/common/libcommon.la	\
-	$(UPOWER_LIBS)					\
-	$(SETTINGS_PLUGIN_LIBS)				\
-	$(GNOME_DESKTOP_LIBS)
+	$(XRANDR_LIBS)					\
+	$(WACOM_LIBS)					\
+	$(SETTINGS_PLUGIN_LIBS)
 
 plugin_in_files =			\
 	xrandr.gnome-settings-plugin.in

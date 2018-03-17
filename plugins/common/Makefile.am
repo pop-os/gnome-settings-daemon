@@ -3,18 +3,27 @@ plugin_name = common
 noinst_LTLIBRARIES = libcommon.la
 
 libcommon_la_SOURCES = \
+	gsd-device-mapper.c	\
+	gsd-device-mapper.h	\
 	gsd-keygrab.c		\
 	gsd-keygrab.h		\
 	gsd-input-helper.c	\
-	gsd-input-helper.h
+	gsd-input-helper.h	\
+	gsd-shell-helper.c	\
+	gsd-shell-helper.h
 
 libcommon_la_CPPFLAGS = \
+	-I$(top_srcdir)/gnome-settings-daemon	\
+	-I$(top_builddir)/gnome-settings-daemon	\
+	-I$(top_srcdir)/data/				\
 	$(AM_CPPFLAGS)
 
 libcommon_la_CFLAGS = \
 	$(PLUGIN_CFLAGS)		\
 	$(SETTINGS_PLUGIN_CFLAGS)	\
 	$(COMMON_CFLAGS)		\
+	$(GNOME_DESKTOP_CFLAGS)		\
+	$(LIBWACOM_CFLAGS)		\
 	$(AM_CFLAGS)
 
 libcommon_la_LDFLAGS = \
@@ -22,13 +31,17 @@ libcommon_la_LDFLAGS = \
 
 libcommon_la_LIBADD  = \
 	$(SETTINGS_PLUGIN_LIBS)		\
+	$(GNOME_DESKTOP_LIBS)		\
+	$(LIBWACOM_LIBS)		\
 	$(COMMON_LIBS)
 
-noinst_PROGRAMS = test-input-helper test-egg-key-parsing
+libexec_PROGRAMS = gsd-test-input-helper
 
-test_input_helper_SOURCES = test-input-helper.c
-test_input_helper_LDADD = libcommon.la
-test_input_helper_CFLAGS = $(libcommon_la_CFLAGS)
+gsd_test_input_helper_SOURCES = test-input-helper.c
+gsd_test_input_helper_LDADD = libcommon.la
+gsd_test_input_helper_CFLAGS = $(libcommon_la_CFLAGS)
+
+noinst_PROGRAMS = test-egg-key-parsing
 
 test_egg_key_parsing_SOURCES = test-egg-key-parsing.c
 test_egg_key_parsing_LDADD = libcommon.la $(COMMON_LIBS)
@@ -37,4 +50,4 @@ test_egg_key_parsing_CFLAGS = $(libcommon_la_CFLAGS)
 scriptsdir = $(datadir)/gnome-settings-daemon-@GSD_API_VERSION@
 scripts_DATA = input-device-example.sh
 
-EXTRA_DIST = $(scripts_DATA)
+EXTRA_DIST = $(scripts_DATA) test-plugin.h

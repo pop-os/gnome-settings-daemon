@@ -13,8 +13,7 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
+ * along with this program; if not, see <http://www.gnu.org/licenses/>.
  */
 
 #ifndef __GSD_INPUT_HELPER_H
@@ -53,6 +52,7 @@ typedef struct {
 
 gboolean  supports_xinput_devices  (void);
 gboolean  supports_xinput2_devices (int *opcode);
+gboolean  supports_xtest           (void);
 
 gboolean set_device_enabled       (int device_id,
                                    gboolean enabled);
@@ -61,9 +61,14 @@ gboolean  device_is_touchpad       (XDevice                *xdevice);
 
 gboolean  device_info_is_touchpad    (XDeviceInfo         *device_info);
 gboolean  device_info_is_touchscreen (XDeviceInfo         *device_info);
+gboolean  device_info_is_tablet (XDeviceInfo         *device_info);
+gboolean  device_info_is_mouse       (XDeviceInfo         *device_info);
+gboolean  device_info_is_trackball   (XDeviceInfo         *device_info);
 
 gboolean  touchpad_is_present     (void);
 gboolean  touchscreen_is_present  (void);
+gboolean  mouse_is_present        (void);
+gboolean  trackball_is_present    (void);
 
 gboolean  device_set_property     (XDevice                *xdevice,
                                    const char             *device_name,
@@ -75,6 +80,12 @@ gboolean  run_custom_command      (GdkDevice              *device,
 GList *   get_disabled_devices     (GdkDeviceManager       *manager);
 char *    xdevice_get_device_node  (int                     deviceid);
 int       xdevice_get_last_tool_id (int                     deviceid);
+gboolean  xdevice_get_dimensions   (int                     deviceid,
+                                    guint                  *width,
+                                    guint                  *height);
+void      xdevice_close      (XDevice                *xdevice);
+
+const char * xdevice_get_wacom_tool_type (int               deviceid);
 
 G_END_DECLS
 

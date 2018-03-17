@@ -13,8 +13,7 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
+ * along with this program; if not, see <http://www.gnu.org/licenses/>.
  *
  */
 
@@ -31,9 +30,8 @@
 
 #include <locale.h>
 
-#include <glib.h>
 #include <glib/gi18n.h>
-#include <gtk/gtk.h>
+#include <gio/gio.h>
 #include <pulse/pulseaudio.h>
 
 #include "gsd-sound-manager.h"
@@ -194,6 +192,7 @@ trigger_flush (GsdSoundManager *manager)
         /* We delay the flushing a bit so that we can coalesce
          * multiple changes into a single cache flush */
         manager->priv->timeout = g_timeout_add (500, (GSourceFunc) flush_cb, manager);
+        g_source_set_name_by_id (manager->priv->timeout, "[gnome-settings-daemon] flush_cb");
 }
 
 static void
@@ -255,8 +254,9 @@ gboolean
 gsd_sound_manager_start (GsdSoundManager *manager,
                          GError **error)
 {
-        char *p, **ps, **k;
-        const char *env, *dd;
+        guint i;
+        const gchar * const * dirs;
+        char *p;
 
         g_debug ("Starting sound manager");
         gnome_settings_profile_start (NULL);
@@ -266,29 +266,19 @@ gsd_sound_manager_start (GsdSoundManager *manager,
 
         /* ... and we listen to changes of the theme base directories
          * in $HOME ...*/
-
-        if ((env = g_getenv ("XDG_DATA_HOME")) && *env == '/')
-                p = g_build_filename (env, "sounds", NULL);
-        else if (((env = g_getenv ("HOME")) && *env == '/') || (env = g_get_home_dir ()))
-                p = g_build_filename (env, ".local", "share", "sounds", NULL);
-        else
-                p = NULL;
-
-        if (p) {
+        p = g_build_filename (g_get_user_data_dir (), "sounds", NULL);
+        if (g_mkdir_with_parents(p, 0700) == 0)
                 register_directory_callback (manager, p, NULL);
-                g_free (p);
-        }
+        g_free (p);
 
         /* ... and globally. */
-        if (!(dd = g_getenv ("XDG_DATA_DIRS")) || *dd == 0)
-                dd = "/usr/local/share:/usr/share";
-
-        ps = g_strsplit (dd, ":", 0);
-
-        for (k = ps; *k; ++k)
-                register_directory_callback (manager, *k, NULL);
-
-        g_strfreev (ps);
+        dirs = g_get_system_data_dirs ();
+        for (i = 0; dirs[i] != NULL; i++) {
+                p = g_build_filename (dirs[i], "sounds", NULL);
+                if (g_file_test (p, G_FILE_TEST_IS_DIR))
+                        register_directory_callback (manager, p, NULL);
+                g_free (p);
+        }
 
         gnome_settings_profile_end (NULL);
 
@@ -317,22 +307,6 @@ gsd_sound_manager_stop (GsdSoundManager *manager)
         }
 }
 
-static GObject *
-gsd_sound_manager_constructor (
-                GType type,
-                guint n_construct_properties,
-                GObjectConstructParam *construct_properties)
-{
-        GsdSoundManager *m;
-
-        m = GSD_SOUND_MANAGER (G_OBJECT_CLASS (gsd_sound_manager_parent_class)->constructor (
-                                                           type,
-                                                           n_construct_properties,
-                                                           construct_properties));
-
-        return G_OBJECT (m);
-}
-
 static void
 gsd_sound_manager_dispose (GObject *object)
 {
@@ -350,7 +324,6 @@ gsd_sound_manager_class_init (GsdSoundManagerClass *klass)
 {
         GObjectClass *object_class = G_OBJECT_CLASS (klass);
 
-        object_class->constructor = gsd_sound_manager_constructor;
         object_class->dispose = gsd_sound_manager_dispose;
         object_class->finalize = gsd_sound_manager_finalize;
 

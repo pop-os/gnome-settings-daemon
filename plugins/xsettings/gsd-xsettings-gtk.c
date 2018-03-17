@@ -13,8 +13,7 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
+ * along with this program; if not, see <http://www.gnu.org/licenses/>.
  *
  */
 
@@ -129,8 +128,7 @@ process_desktop_file (const char      *path,
                 g_object_set_data_full (G_OBJECT (settings), "module-name", g_strdup (module_name), (GDestroyNotify) g_free);
 
                 signal = g_strdup_printf ("changed::%s", key);
-                g_signal_connect (G_OBJECT (settings), signal,
-                                  G_CALLBACK (cond_setting_changed), gtk);
+                g_signal_connect_object (G_OBJECT (settings), signal, G_CALLBACK (cond_setting_changed), gtk, 0);
                 g_free (signal);
                 g_free (schema);
                 g_free (key);

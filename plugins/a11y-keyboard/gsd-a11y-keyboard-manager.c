@@ -14,8 +14,7 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
+ * along with this program; if not, see <http://www.gnu.org/licenses/>.
  *
  */
 
@@ -35,7 +34,6 @@
 #include <glib/gi18n.h>
 #include <gdk/gdk.h>
 #include <gdk/gdkx.h>
-#include <gtk/gtk.h>
 #include <libnotify/notify.h>
 
 #include <X11/XKBlib.h>
@@ -43,10 +41,8 @@
 
 #include "gnome-settings-profile.h"
 #include "gsd-a11y-keyboard-manager.h"
-#include "gsd-a11y-preferences-dialog.h"
 
 #define KEYBOARD_A11Y_SCHEMA "org.gnome.desktop.a11y.keyboard"
-#define NOTIFICATION_TIMEOUT 30
 
 #define GSD_A11Y_KEYBOARD_MANAGER_GET_PRIVATE(o) (G_TYPE_INSTANCE_GET_PRIVATE ((o), GSD_TYPE_A11Y_KEYBOARD_MANAGER, GsdA11yKeyboardManagerPrivate))
 
@@ -58,20 +54,28 @@ struct GsdA11yKeyboardManagerPrivate
         guint             device_added_id;
         gboolean          stickykeys_shortcut_val;
         gboolean          slowkeys_shortcut_val;
-        GtkWidget        *stickykeys_alert;
-        GtkWidget        *slowkeys_alert;
-        GtkWidget        *preferences_dialog;
-        GtkStatusIcon    *status_icon;
+
+        XkbDescRec       *desc;
 
         GSettings        *settings;
 
         NotifyNotification *notification;
 };
 
+#define DEFAULT_XKB_SET_CONTROLS_MASK           XkbSlowKeysMask         | \
+                                                XkbBounceKeysMask       | \
+                                                XkbStickyKeysMask       | \
+                                                XkbMouseKeysMask        | \
+                                                XkbMouseKeysAccelMask   | \
+                                                XkbAccessXKeysMask      | \
+                                                XkbAccessXTimeoutMask   | \
+                                                XkbAccessXFeedbackMask  | \
+                                                XkbControlsEnabledMask
+
+
 static void     gsd_a11y_keyboard_manager_class_init  (GsdA11yKeyboardManagerClass *klass);
 static void     gsd_a11y_keyboard_manager_init        (GsdA11yKeyboardManager      *a11y_keyboard_manager);
 static void     gsd_a11y_keyboard_manager_finalize    (GObject             *object);
-static void     gsd_a11y_keyboard_manager_ensure_status_icon (GsdA11yKeyboardManager *manager);
 static void     set_server_from_gsettings (GsdA11yKeyboardManager *manager);
 
 G_DEFINE_TYPE (GsdA11yKeyboardManager, gsd_a11y_keyboard_manager, G_TYPE_OBJECT)
@@ -313,15 +317,7 @@ set_server_from_gsettings (GsdA11yKeyboardManager *manager)
 
         gdk_error_trap_push ();
         XkbSetControls (GDK_DISPLAY_XDISPLAY (gdk_display_get_default ()),
-                        XkbSlowKeysMask         |
-                        XkbBounceKeysMask       |
-                        XkbStickyKeysMask       |
-                        XkbMouseKeysMask        |
-                        XkbMouseKeysAccelMask   |
-                        XkbAccessXKeysMask      |
-                        XkbAccessXTimeoutMask   |
-                        XkbAccessXFeedbackMask  |
-                        XkbControlsEnabledMask,
+                        DEFAULT_XKB_SET_CONTROLS_MASK,
                         desc);
 
         XkbFreeKeyboard (desc, XkbAllComponentsMask, True);
@@ -332,106 +328,27 @@ set_server_from_gsettings (GsdA11yKeyboardManager *manager)
         gnome_settings_profile_end (NULL);
 }
 
-static gboolean
+static void
 ax_response_callback (GsdA11yKeyboardManager *manager,
-                      GtkWindow              *parent,
-                      gint                    response_id,
+                      const char             *action,
                       guint                   revert_controls_mask,
                       gboolean                enabled)
 {
-        GSettings *settings;
-        GdkScreen *screen;
-        GError *err;
-
-        settings = manager->priv->settings;
-
-        switch (response_id) {
-        case GTK_RESPONSE_DELETE_EVENT:
-        case GTK_RESPONSE_REJECT:
-        case GTK_RESPONSE_CANCEL:
-
+        if (g_strcmp0 (action, "reject") == 0) {
                 /* we're reverting, so we invert sense of 'enabled' flag */
                 g_debug ("cancelling AccessX request");
                 if (revert_controls_mask == XkbStickyKeysMask) {
-                        g_settings_set_boolean (settings,
+                        g_settings_set_boolean (manager->priv->settings,
                                                 "stickykeys-enable",
                                                 !enabled);
                 } else if (revert_controls_mask == XkbSlowKeysMask) {
-                        g_settings_set_boolean (settings,
+                        g_settings_set_boolean (manager->priv->settings,
                                                 "slowkeys-enable",
                                                 !enabled);
                 }
 
                 set_server_from_gsettings (manager);
-                break;
-
-        case GTK_RESPONSE_HELP:
-                if (!parent)
-                        screen = gdk_screen_get_default ();
-                else
-                        screen = gtk_widget_get_screen (GTK_WIDGET (parent));
-
-                err = NULL;
-                if (!gtk_show_uri (screen,
-                                   "help:gnome-help/a11y",
-                                   gtk_get_current_event_time(),
-                                   &err)) {
-                        GtkWidget *error_dialog = gtk_message_dialog_new (parent,
-                                                                          0,
-                                                                          GTK_MESSAGE_ERROR,
-                                                                          GTK_BUTTONS_CLOSE,
-                                                                          _("There was an error displaying help: %s"),
-                                                                          err->message);
-                        g_signal_connect (error_dialog, "response",
-                                          G_CALLBACK (gtk_widget_destroy), NULL);
-                        gtk_window_set_resizable (GTK_WINDOW (error_dialog), FALSE);
-                        gtk_widget_show (error_dialog);
-                        g_error_free (err);
-                }
-                return FALSE;
-        default:
-                break;
         }
-        return TRUE;
-}
-
-static void
-ax_stickykeys_response (GtkDialog              *dialog,
-                        gint                    response_id,
-                        GsdA11yKeyboardManager *manager)
-{
-        if (ax_response_callback (manager, GTK_WINDOW (dialog),
-                                  response_id, XkbStickyKeysMask,
-                                  manager->priv->stickykeys_shortcut_val)) {
-                gtk_widget_destroy (GTK_WIDGET (dialog));
-        }
-}
-
-static void
-ax_slowkeys_response (GtkDialog              *dialog,
-                      gint                    response_id,
-                      GsdA11yKeyboardManager *manager)
-{
-        if (ax_response_callback (manager, GTK_WINDOW (dialog),
-                                  response_id, XkbSlowKeysMask,
-                                  manager->priv->slowkeys_shortcut_val)) {
-                gtk_widget_destroy (GTK_WIDGET (dialog));
-        }
-}
-
-static void
-maybe_show_status_icon (GsdA11yKeyboardManager *manager)
-{
-        gboolean     show;
-
-        /* for now, show if accessx is enabled */
-        show = g_settings_get_boolean (manager->priv->settings, "enable");
-
-        if (!show && manager->priv->status_icon == NULL)
-                return;
-
-        gsd_a11y_keyboard_manager_ensure_status_icon (manager);
-        gtk_status_icon_set_visible (manager->priv->status_icon, show);
 }
 
 static void
@@ -447,25 +364,12 @@ on_slow_keys_action (NotifyNotification     *notification,
                      const char             *action,
                      GsdA11yKeyboardManager *manager)
 {
-        gboolean res;
-        int      response_id;
-
         g_assert (action != NULL);
 
-        if (strcmp (action, "accept") == 0) {
-                response_id = GTK_RESPONSE_ACCEPT;
-        } else if (strcmp (action, "reject") == 0) {
-                response_id = GTK_RESPONSE_REJECT;
-        } else {
-                return;
-        }
-
-        res = ax_response_callback (manager, NULL,
-                                    response_id, XkbSlowKeysMask,
-                                    manager->priv->slowkeys_shortcut_val);
-        if (res) {
-                notify_notification_close (manager->priv->notification, NULL);
-        }
+        ax_response_callback (manager,
+                              action, XkbSlowKeysMask,
+                              manager->priv->slowkeys_shortcut_val);
+        notify_notification_close (manager->priv->notification, NULL);
 }
 
 static void
@@ -473,32 +377,18 @@ on_sticky_keys_action (NotifyNotification     *notification,
                        const char             *action,
                        GsdA11yKeyboardManager *manager)
 {
-        gboolean res;
-        int      response_id;
-
         g_assert (action != NULL);
 
-        if (strcmp (action, "accept") == 0) {
-                response_id = GTK_RESPONSE_ACCEPT;
-        } else if (strcmp (action, "reject") == 0) {
-                response_id = GTK_RESPONSE_REJECT;
-        } else {
-                return;
-        }
-
-        res = ax_response_callback (manager, NULL,
-                                    response_id, XkbStickyKeysMask,
-                                    manager->priv->stickykeys_shortcut_val);
-        if (res) {
-                notify_notification_close (manager->priv->notification, NULL);
-        }
+        ax_response_callback (manager,
+                              action, XkbStickyKeysMask,
+                              manager->priv->stickykeys_shortcut_val);
+        notify_notification_close (manager->priv->notification, NULL);
 }
 
 static gboolean
 ax_slowkeys_warning_post_bubble (GsdA11yKeyboardManager *manager,
                                  gboolean                enabled)
 {
-#if 1
         gboolean    res;
         const char *title;
         const char *message;
@@ -510,25 +400,16 @@ ax_slowkeys_warning_post_bubble (GsdA11yKeyboardManager *manager,
         message = _("You just held down the Shift key for 8 seconds.  This is the shortcut "
                     "for the Slow Keys feature, which affects the way your keyboard works.");
 
-        if (manager->priv->status_icon == NULL || ! gtk_status_icon_is_embedded (manager->priv->status_icon)) {
-                return FALSE;
-        }
-
-        if (manager->priv->slowkeys_alert != NULL) {
-                gtk_widget_destroy (manager->priv->slowkeys_alert);
-        }
-
         if (manager->priv->notification != NULL) {
                 notify_notification_close (manager->priv->notification, NULL);
         }
 
-        gsd_a11y_keyboard_manager_ensure_status_icon (manager);
         manager->priv->notification = notify_notification_new (title,
                                                                message,
                                                                "preferences-desktop-accessibility-symbolic");
         notify_notification_set_app_name (manager->priv->notification, _("Universal Access"));
-        notify_notification_set_timeout (manager->priv->notification, NOTIFICATION_TIMEOUT * 1000);
-        notify_notification_set_hint (manager->priv->notification, "transient", g_variant_new_boolean (TRUE));
+        notify_notification_set_timeout (manager->priv->notification, 0);
+        notify_notification_set_urgency (manager->priv->notification, NOTIFY_URGENCY_CRITICAL);
 
         notify_notification_add_action (manager->priv->notification,
                                         "reject",
@@ -557,62 +438,8 @@ ax_slowkeys_warning_post_bubble (GsdA11yKeyboardManager *manager,
         }
 
         return res;
-#endif /* 1 */
 }
 
-
-static void
-ax_slowkeys_warning_post_dialog (GsdA11yKeyboardManager *manager,
-                                 gboolean                enabled)
-{
-        const char *title;
-        const char *message;
-
-        title = enabled ?
-                _("Slow Keys Turned On") :
-                _("Slow Keys Turned Off");
-        message = _("You just held down the Shift key for 8 seconds.  This is the shortcut "
-                    "for the Slow Keys feature, which affects the way your keyboard works.");
-
-        if (manager->priv->slowkeys_alert != NULL) {
-                gtk_widget_show (manager->priv->slowkeys_alert);
-                return;
-        }
-
-        manager->priv->slowkeys_alert = gtk_message_dialog_new (NULL,
-                                                                0,
-                                                                GTK_MESSAGE_WARNING,
-                                                                GTK_BUTTONS_NONE,
-                                                                "%s", title);
-
-        gtk_message_dialog_format_secondary_text (GTK_MESSAGE_DIALOG (manager->priv->slowkeys_alert),
-                                                  "%s", message);
-
-        gtk_dialog_add_button (GTK_DIALOG (manager->priv->slowkeys_alert),
-                               GTK_STOCK_HELP,
-                               GTK_RESPONSE_HELP);
-        gtk_dialog_add_button (GTK_DIALOG (manager->priv->slowkeys_alert),
-                               enabled ? _("_Turn Off") : _("_Turn On"),
-                               GTK_RESPONSE_REJECT);
-        gtk_dialog_add_button (GTK_DIALOG (manager->priv->slowkeys_alert),
-                               enabled ? _("_Leave On") : _("_Leave Off"),
-                               GTK_RESPONSE_ACCEPT);
-
-        gtk_window_set_title (GTK_WINDOW (manager->priv->slowkeys_alert), "");
-        gtk_window_set_icon_name (GTK_WINDOW (manager->priv->slowkeys_alert),
-                                  "preferences-desktop-accessibility");
-        gtk_dialog_set_default_response (GTK_DIALOG (manager->priv->slowkeys_alert),
-                                         GTK_RESPONSE_ACCEPT);
-
-        g_signal_connect (manager->priv->slowkeys_alert,
-                          "response",
-                          G_CALLBACK (ax_slowkeys_response),
-                          manager);
-        gtk_widget_show (manager->priv->slowkeys_alert);
-
-        g_object_add_weak_pointer (G_OBJECT (manager->priv->slowkeys_alert),
-                                   (gpointer*) &manager->priv->slowkeys_alert);
-}
 
 static void
 ax_slowkeys_warning_post (GsdA11yKeyboardManager *manager,
@@ -620,18 +447,13 @@ ax_slowkeys_warning_post (GsdA11yKeyboardManager *manager,
 {
 
         manager->priv->slowkeys_shortcut_val = enabled;
-
-        /* alway try to show something */
-        if (! ax_slowkeys_warning_post_bubble (manager, enabled)) {
-                ax_slowkeys_warning_post_dialog (manager, enabled);
-        }
+        ax_slowkeys_warning_post_bubble (manager, enabled);
 }
 
 static gboolean
 ax_stickykeys_warning_post_bubble (GsdA11yKeyboardManager *manager,
                                    gboolean                enabled)
 {
-#if 1
         gboolean    res;
         const char *title;
         const char *message;
@@ -646,25 +468,16 @@ ax_stickykeys_warning_post_bubble (GsdA11yKeyboardManager *manager,
                 _("You just pressed two keys at once, or pressed the Shift key 5 times in a row.  "
                   "This turns off the Sticky Keys feature, which affects the way your keyboard works.");
 
-        if (manager->priv->status_icon == NULL || ! gtk_status_icon_is_embedded (manager->priv->status_icon)) {
-                return FALSE;
-        }
-
-        if (manager->priv->slowkeys_alert != NULL) {
-                gtk_widget_destroy (manager->priv->slowkeys_alert);
-        }
-
         if (manager->priv->notification != NULL) {
                 notify_notification_close (manager->priv->notification, NULL);
         }
 
-        gsd_a11y_keyboard_manager_ensure_status_icon (manager);
         manager->priv->notification = notify_notification_new (title,
                                                                message,
                                                                "preferences-desktop-accessibility-symbolic");
         notify_notification_set_app_name (manager->priv->notification, _("Universal Access"));
-        notify_notification_set_timeout (manager->priv->notification, NOTIFICATION_TIMEOUT * 1000);
-        notify_notification_set_hint (manager->priv->notification, "transient", g_variant_new_boolean (TRUE));
+        notify_notification_set_timeout (manager->priv->notification, 0);
+        notify_notification_set_urgency (manager->priv->notification, NOTIFY_URGENCY_CRITICAL);
 
         notify_notification_add_action (manager->priv->notification,
                                         "reject",
@@ -693,63 +506,6 @@ ax_stickykeys_warning_post_bubble (GsdA11yKeyboardManager *manager,
         }
 
         return res;
-#endif /* 1 */
-}
-
-static void
-ax_stickykeys_warning_post_dialog (GsdA11yKeyboardManager *manager,
-                                   gboolean                enabled)
-{
-        const char *title;
-        const char *message;
-
-        title = enabled ?
-                _("Sticky Keys Turned On") :
-                _("Sticky Keys Turned Off");
-        message = enabled ?
-                _("You just pressed the Shift key 5 times in a row.  This is the shortcut "
-                  "for the Sticky Keys feature, which affects the way your keyboard works.") :
-                _("You just pressed two keys at once, or pressed the Shift key 5 times in a row.  "
-                  "This turns off the Sticky Keys feature, which affects the way your keyboard works.");
-
-        if (manager->priv->stickykeys_alert != NULL) {
-                gtk_widget_show (manager->priv->stickykeys_alert);
-                return;
-        }
-
-        manager->priv->stickykeys_alert = gtk_message_dialog_new (NULL,
-                                                                  0,
-                                                                  GTK_MESSAGE_WARNING,
-                                                                  GTK_BUTTONS_NONE,
-                                                                  "%s", title);
-
-        gtk_message_dialog_format_secondary_text (GTK_MESSAGE_DIALOG (manager->priv->stickykeys_alert),
-                                                  "%s", message);
-
-        gtk_dialog_add_button (GTK_DIALOG (manager->priv->stickykeys_alert),
-                               GTK_STOCK_HELP,
-                               GTK_RESPONSE_HELP);
-        gtk_dialog_add_button (GTK_DIALOG (manager->priv->stickykeys_alert),
-                               enabled ? _("_Turn Off") : _("_Turn On"),
-                               GTK_RESPONSE_REJECT);
-        gtk_dialog_add_button (GTK_DIALOG (manager->priv->stickykeys_alert),
-                               enabled ? _("_Leave On") : _("_Leave Off"),
-                               GTK_RESPONSE_ACCEPT);
-
-        gtk_window_set_title (GTK_WINDOW (manager->priv->stickykeys_alert), "");
-        gtk_window_set_icon_name (GTK_WINDOW (manager->priv->stickykeys_alert),
-                                  "preferences-desktop-accessibility");
-        gtk_dialog_set_default_response (GTK_DIALOG (manager->priv->stickykeys_alert),
-                                         GTK_RESPONSE_ACCEPT);
-
-        g_signal_connect (manager->priv->stickykeys_alert,
-                          "response",
-                          G_CALLBACK (ax_stickykeys_response),
-                          manager);
-        gtk_widget_show (manager->priv->stickykeys_alert);
-
-        g_object_add_weak_pointer (G_OBJECT (manager->priv->stickykeys_alert),
-                                   (gpointer*) &manager->priv->stickykeys_alert);
 }
 
 static void
@@ -758,11 +514,7 @@ ax_stickykeys_warning_post (GsdA11yKeyboardManager *manager,
 {
 
         manager->priv->stickykeys_shortcut_val = enabled;
-
-        /* alway try to show something */
-        if (! ax_stickykeys_warning_post_bubble (manager, enabled)) {
-                ax_stickykeys_warning_post_dialog (manager, enabled);
-        }
+        ax_stickykeys_warning_post_bubble (manager, enabled);
 }
 
 static void
@@ -927,7 +679,6 @@ keyboard_callback (GSettings              *settings,
                    GsdA11yKeyboardManager *manager)
 {
         set_server_from_gsettings (manager);
-        maybe_show_status_icon (manager);
 }
 
 static gboolean
@@ -947,6 +698,9 @@ start_a11y_keyboard_idle_cb (GsdA11yKeyboardManager *manager)
 
         set_devicepresence_handler (manager);
 
+        /* Get the original configuration from the server */
+        manager->priv->desc = get_xkb_desc_rec (manager);
+
         event_mask = XkbControlsNotifyMask;
         event_mask |= XkbAccessXNotifyMask; /* make default when AXN_AXKWarning works */
 
@@ -961,8 +715,6 @@ start_a11y_keyboard_idle_cb (GsdA11yKeyboardManager *manager)
         gdk_window_add_filter (NULL,
                                (GdkFilterFunc) cb_xkb_event_filter,
                                manager);
-
-        maybe_show_status_icon (manager);
 
  out:
         gnome_settings_profile_end (NULL);
@@ -979,6 +731,7 @@ gsd_a11y_keyboard_manager_start (GsdA11yKeyboardManager *manager,
         gnome_settings_profile_start (NULL);
 
         manager->priv->start_idle_id = g_idle_add ((GSourceFunc) start_a11y_keyboard_idle_cb, manager);
+        g_source_set_name_by_id (manager->priv->start_idle_id, "[gnome-settings-daemon] start_a11y_keyboard_idle_cb");
 
         gnome_settings_profile_end (NULL);
 
@@ -992,6 +745,26 @@ gsd_a11y_keyboard_manager_stop (GsdA11yKeyboardManager *manager)
 
         g_debug ("Stopping a11y_keyboard manager");
 
+        if (p->desc != NULL) {
+                XkbDescRec *desc;
+
+                desc = get_xkb_desc_rec (manager);
+                if (desc != NULL) {
+                        if (p->desc->ctrls->enabled_ctrls != desc->ctrls->enabled_ctrls) {
+                                gdk_error_trap_push ();
+                                XkbSetControls (GDK_DISPLAY_XDISPLAY (gdk_display_get_default ()),
+                                                DEFAULT_XKB_SET_CONTROLS_MASK,
+                                                p->desc);
+
+                                XSync (GDK_DISPLAY_XDISPLAY (gdk_display_get_default ()), FALSE);
+                                gdk_error_trap_pop_ignored ();
+                        }
+                        XkbFreeKeyboard (desc, XkbAllComponentsMask, True);
+                }
+                XkbFreeKeyboard (p->desc, XkbAllComponentsMask, True);
+                p->desc = NULL;
+        }
+
         if (p->start_idle_id != 0) {
                 g_source_remove (p->start_idle_id);
                 p->start_idle_id = 0;
@@ -1000,11 +773,6 @@ gsd_a11y_keyboard_manager_stop (GsdA11yKeyboardManager *manager)
         if (p->device_manager != NULL) {
                 g_signal_handler_disconnect (p->device_manager, p->device_added_id);
                 p->device_manager = NULL;
-        }
-
-        if (p->status_icon) {
-                gtk_status_icon_set_visible (p->status_icon, FALSE);
-                p->status_icon = NULL;
         }
 
         if (p->settings != NULL) {
@@ -1017,32 +785,8 @@ gsd_a11y_keyboard_manager_stop (GsdA11yKeyboardManager *manager)
                                   (GdkFilterFunc) cb_xkb_event_filter,
                                   manager);
 
-        if (p->slowkeys_alert != NULL) {
-                gtk_widget_destroy (p->slowkeys_alert);
-                p->slowkeys_alert = NULL;
-        }
-
-        if (p->stickykeys_alert != NULL) {
-                gtk_widget_destroy (p->stickykeys_alert);
-                p->stickykeys_alert = NULL;
-        }
-
         p->slowkeys_shortcut_val = FALSE;
         p->stickykeys_shortcut_val = FALSE;
-}
-
-static GObject *
-gsd_a11y_keyboard_manager_constructor (GType                  type,
-                                       guint                  n_construct_properties,
-                                       GObjectConstructParam *construct_properties)
-{
-        GsdA11yKeyboardManager      *a11y_keyboard_manager;
-
-        a11y_keyboard_manager = GSD_A11Y_KEYBOARD_MANAGER (G_OBJECT_CLASS (gsd_a11y_keyboard_manager_parent_class)->constructor (type,
-                                                                                                      n_construct_properties,
-                                                                                                      construct_properties));
-
-        return G_OBJECT (a11y_keyboard_manager);
 }
 
 static void
@@ -1050,75 +794,9 @@ gsd_a11y_keyboard_manager_class_init (GsdA11yKeyboardManagerClass *klass)
 {
         GObjectClass *object_class = G_OBJECT_CLASS (klass);
 
-        object_class->constructor = gsd_a11y_keyboard_manager_constructor;
         object_class->finalize = gsd_a11y_keyboard_manager_finalize;
 
         g_type_class_add_private (klass, sizeof (GsdA11yKeyboardManagerPrivate));
-}
-
-static void
-on_preferences_dialog_response (GtkDialog              *dialog,
-                                int                     response,
-                                GsdA11yKeyboardManager *manager)
-{
-        g_signal_handlers_disconnect_by_func (dialog,
-                                              on_preferences_dialog_response,
-                                              manager);
-
-        gtk_widget_destroy (GTK_WIDGET (dialog));
-        manager->priv->preferences_dialog = NULL;
-}
-
-static void
-on_status_icon_activate (GtkStatusIcon          *status_icon,
-                         GsdA11yKeyboardManager *manager)
-{
-        if (manager->priv->preferences_dialog == NULL) {
-                manager->priv->preferences_dialog = gsd_a11y_preferences_dialog_new ();
-                g_signal_connect (manager->priv->preferences_dialog,
-                                  "response",
-                                  G_CALLBACK (on_preferences_dialog_response),
-                                  manager);
-
-                gtk_window_present (GTK_WINDOW (manager->priv->preferences_dialog));
-        } else {
-                g_signal_handlers_disconnect_by_func (manager->priv->preferences_dialog,
-                                                      on_preferences_dialog_response,
-                                                      manager);
-                gtk_widget_destroy (GTK_WIDGET (manager->priv->preferences_dialog));
-                manager->priv->preferences_dialog = NULL;
-        }
-}
-
-static void
-on_status_icon_popup_menu (GtkStatusIcon *status_icon,
-                           guint          button,
-                           guint          activate_time,
-                           GsdA11yKeyboardManager *manager)
-{
-        on_status_icon_activate (status_icon, manager);
-}
-
-static void
-gsd_a11y_keyboard_manager_ensure_status_icon (GsdA11yKeyboardManager *manager)
-{
-        gnome_settings_profile_start (NULL);
-
-        if (!manager->priv->status_icon) {
-
-                manager->priv->status_icon = gtk_status_icon_new_from_icon_name ("preferences-desktop-accessibility");
-                gtk_status_icon_set_name (manager->priv->status_icon, "a11y-keyboard");
-                g_signal_connect (manager->priv->status_icon,
-                                  "activate",
-                                  G_CALLBACK (on_status_icon_activate),
-                                  manager);
-                g_signal_connect (manager->priv->status_icon,
-                                  "popup-menu",
-                                  G_CALLBACK (on_status_icon_popup_menu),
-                                  manager);
-        }
-
-        gnome_settings_profile_end (NULL);
 }
 
 static void
@@ -1139,8 +817,7 @@ gsd_a11y_keyboard_manager_finalize (GObject *object)
 
         g_return_if_fail (a11y_keyboard_manager->priv != NULL);
 
-        if (a11y_keyboard_manager->priv->start_idle_id != 0)
-                g_source_remove (a11y_keyboard_manager->priv->start_idle_id);
+        gsd_a11y_keyboard_manager_stop (a11y_keyboard_manager);
 
         G_OBJECT_CLASS (gsd_a11y_keyboard_manager_parent_class)->finalize (object);
 }

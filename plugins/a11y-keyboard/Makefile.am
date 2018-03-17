@@ -1,54 +1,44 @@
 NULL =
 
-plugin_name = keyboard
+plugin_name = a11y-keyboard
 
-gtkbuilderdir = $(pkgdatadir)
-gtkbuilder_DATA = 			\
-	gsd-a11y-preferences-dialog.ui	\
-	$(NULL)
+libexec_PROGRAMS = gsd-test-a11y-keyboard
 
-noinst_PROGRAMS =				\
-	test-a11y-preferences-dialog		\
-	$(NULL)
+gsd_test_a11y_keyboard_SOURCES =		\
+	gsd-a11y-keyboard-manager.h		\
+	gsd-a11y-keyboard-manager.c		\
+	test-a11y-keyboard.c
 
-test_a11y_preferences_dialog_SOURCES =		\
-	gsd-a11y-preferences-dialog.c		\
-	gsd-a11y-preferences-dialog.h		\
-	test-a11y-preferences-dialog.c		\
-	$(NULL)
-
-test_a11y_preferences_dialog_CPPFLAGS = \
+gsd_test_a11y_keyboard_CFLAGS =					\
 	-I$(top_srcdir)/gnome-settings-daemon			\
-	-DPIXMAPDIR=\""$(pkgdatadir)"\"				\
-	-DGTKBUILDERDIR=\""$(pkgdatadir)"\"				\
+	-I$(top_builddir)/gnome-settings-daemon			\
+	-I$(top_srcdir)/plugins/common				\
 	-DGNOME_SETTINGS_LOCALEDIR=\""$(datadir)/locale"\"	\
-	$(AM_CPPFLAGS)
-
-test_a11y_preferences_dialog_CFLAGS = \
-	$(PLUGIN_CFLAGS)		\
-	$(SETTINGS_PLUGIN_CFLAGS)	\
+	-DGTKBUILDERDIR=\""$(pkgdatadir)"\"			\
+	$(PLUGIN_CFLAGS)					\
+	$(LIBNOTIFY_CFLAGS)					\
+	$(SETTINGS_PLUGIN_CFLAGS)				\
 	$(AM_CFLAGS)
 
-test_a11y_preferences_dialog_LDADD = \
-	$(SETTINGS_DAEMON_LIBS)			\
-	$(SETTINGS_PLUGIN_LIBS)			\
-	$(NULL)
+gsd_test_a11y_keyboard_LDADD =					\
+	$(top_builddir)/gnome-settings-daemon/libgsd.la		\
+	$(top_builddir)/plugins/common/libcommon.la		\
+	$(LIBNOTIFY_LIBS)					\
+	$(SETTINGS_PLUGIN_LIBS)
 
 plugin_LTLIBRARIES = \
 	liba11y-keyboard.la		\
 	$(NULL)
 
 liba11y_keyboard_la_SOURCES = 		\
-	gsd-a11y-keyboard-plugin.h	\
 	gsd-a11y-keyboard-plugin.c	\
 	gsd-a11y-keyboard-manager.h	\
 	gsd-a11y-keyboard-manager.c	\
-	gsd-a11y-preferences-dialog.h	\
-	gsd-a11y-preferences-dialog.c	\
 	$(NULL)
 
 liba11y_keyboard_la_CPPFLAGS = \
 	-I$(top_srcdir)/gnome-settings-daemon		\
+	-I$(top_builddir)/gnome-settings-daemon		\
 	-DGNOME_SETTINGS_LOCALEDIR=\""$(datadir)/locale"\" \
 	-DGTKBUILDERDIR=\""$(gtkbuilderdir)"\" \
 	$(AM_CPPFLAGS)

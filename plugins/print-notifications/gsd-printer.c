@@ -13,8 +13,7 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
+ * along with this program; if not, see <http://www.gnu.org/licenses/>.
  *
  */
 
@@ -62,6 +61,14 @@ static GDBusNodeInfo *pdi_introspection_data = NULL;
 
 #define GNOME_SESSION_PRESENCE_DBUS_PATH  "/org/gnome/SessionManager/Presence"
 #define GNOME_SESSION_PRESENCE_DBUS_IFACE "org.gnome.SessionManager.Presence"
+
+#if (CUPS_VERSION_MAJOR > 1) || (CUPS_VERSION_MINOR > 5)
+#define HAVE_CUPS_1_6 1
+#endif
+
+#ifndef HAVE_CUPS_1_6
+#define ippGetState(ipp) ipp->state
+#endif
 
 enum {
   PRESENCE_STATUS_AVAILABLE = 0,
@@ -475,9 +482,9 @@ add_printer (gchar *printer_name,
         output = g_dbus_proxy_call_sync (proxy,
                                          "PrinterAdd",
                                          g_variant_new ("(sssss)",
-                                                        printer_name ? printer_name : "",
-                                                        device_uri ? device_uri : "",
-                                                        ppd_name ? ppd_name : "",
+                                                        printer_name,
+                                                        device_uri,
+                                                        ppd_name,
                                                         info ? info : "",
                                                         location ? location : ""),
                                          G_DBUS_CALL_FLAGS_NONE,
@@ -725,7 +732,7 @@ printer_autoconfigure (gchar *printer_name)
                                                         "AutoConfigure",
                                                         ("Automatic configuration"));
                 if (response) {
-                        if (response->state == IPP_ERROR)
+                        if (ippGetState (response) == IPP_ERROR)
                                 g_warning ("An error has occured during automatic configuration of new printer.");
                         ippDelete (response);
                 }
@@ -1293,8 +1300,6 @@ main (int argc, char *argv[])
   pdi_registration_id = 0;
   npn_owner_id = 0;
   pdi_owner_id = 0;
-
-  g_type_init ();
 
   notify_init ("gnome-settings-daemon-printer");
 

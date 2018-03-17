@@ -13,8 +13,7 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
+ * along with this program; if not, see <http://www.gnu.org/licenses/>.
  *
  */
 
@@ -31,10 +30,7 @@
 #include <locale.h>
 
 #include <glib.h>
-#include <glib/gi18n.h>
-#include <gdk/gdk.h>
-#include <gdk/gdkx.h>
-#include <gtk/gtk.h>
+#include <gio/gio.h>
 
 #include "gnome-settings-profile.h"
 #include "gsd-a11y-settings-manager.h"
@@ -123,33 +119,11 @@ gsd_a11y_settings_manager_stop (GsdA11ySettingsManager *manager)
         g_debug ("Stopping a11y_settings manager");
 }
 
-static GObject *
-gsd_a11y_settings_manager_constructor (GType                  type,
-                                       guint                  n_construct_properties,
-                                       GObjectConstructParam *construct_properties)
-{
-        GsdA11ySettingsManager      *a11y_settings_manager;
-
-        a11y_settings_manager = GSD_A11Y_SETTINGS_MANAGER (G_OBJECT_CLASS (gsd_a11y_settings_manager_parent_class)->constructor (type,
-                                                                                                                                 n_construct_properties,
-                                                                                                                                 construct_properties));
-
-        return G_OBJECT (a11y_settings_manager);
-}
-
-static void
-gsd_a11y_settings_manager_dispose (GObject *object)
-{
-        G_OBJECT_CLASS (gsd_a11y_settings_manager_parent_class)->dispose (object);
-}
-
 static void
 gsd_a11y_settings_manager_class_init (GsdA11ySettingsManagerClass *klass)
 {
         GObjectClass   *object_class = G_OBJECT_CLASS (klass);
 
-        object_class->constructor = gsd_a11y_settings_manager_constructor;
-        object_class->dispose = gsd_a11y_settings_manager_dispose;
         object_class->finalize = gsd_a11y_settings_manager_finalize;
 
         g_type_class_add_private (klass, sizeof (GsdA11ySettingsManagerPrivate));
@@ -173,6 +147,8 @@ gsd_a11y_settings_manager_finalize (GObject *object)
         a11y_settings_manager = GSD_A11Y_SETTINGS_MANAGER (object);
 
         g_return_if_fail (a11y_settings_manager->priv != NULL);
+
+        gsd_a11y_settings_manager_stop (a11y_settings_manager);
 
         G_OBJECT_CLASS (gsd_a11y_settings_manager_parent_class)->finalize (object);
 }

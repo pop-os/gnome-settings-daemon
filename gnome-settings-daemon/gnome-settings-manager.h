@@ -13,8 +13,7 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
+ * along with this program; if not, see <http://www.gnu.org/licenses/>.
  *
  */
 
@@ -63,7 +62,6 @@ GType                  gnome_settings_manager_get_type   (void);
 GnomeSettingsManager * gnome_settings_manager_new        (void);
 gboolean               gnome_settings_manager_start      (GnomeSettingsManager *manager,
                                                           GError              **error);
-void                   gnome_settings_manager_stop       (GnomeSettingsManager *manager);
 
 G_END_DECLS
 
