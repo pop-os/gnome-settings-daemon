@@ -24,17 +24,32 @@ import gsdpowerenums
 
 import dbus
 
+import gi
+gi.require_version('UPowerGlib', '1.0')
+
 from gi.repository import Gio
 from gi.repository import GLib
+from gi.repository import UPowerGlib
 
 class PowerPluginTest(gsdtestcase.GSDTestCase):
     '''Test the power plugin'''
 
     def setUp(self):
-        os.environ['GSD_MOCK']='1'
+        os.environ['GSD_MOCKED']='1'
         self.check_logind_gnome_session()
         self.start_logind()
         self.daemon_death_expected = False
+
+        # start mock upowerd
+        (self.upowerd, self.obj_upower) = self.spawn_server_template(
+            'upower', {'DaemonVersion': '0.99', 'OnBattery': True, 'LidIsClosed': False}, stdout=subprocess.PIPE)
+        gsdtestcase.set_nonblock(self.upowerd.stdout)
+
+        # start mock gnome-shell screensaver
+        (self.screensaver, self.obj_screensaver) = self.spawn_server_template(
+            'gnome_screensaver', stdout=subprocess.PIPE)
+        gsdtestcase.set_nonblock(self.screensaver.stdout)
+
         self.session_log_write = open(os.path.join(self.workdir, 'gnome-session.log'), 'wb')
         self.session = subprocess.Popen(['gnome-session', '-f',
                                          '-a', os.path.join(self.workdir, 'autostart'),
@@ -56,16 +71,6 @@ class PowerPluginTest(gsdtestcase.GSDTestCase):
 
         self.obj_session_mgr = self.session_bus_con.get_object(
             'org.gnome.SessionManager', '/org/gnome/SessionManager')
-
-        # start mock upowerd
-        (self.upowerd, self.obj_upower) = self.spawn_server_template(
-            'upower', {'DaemonVersion': '0.99', 'OnBattery': True, 'LidIsClosed': False}, stdout=subprocess.PIPE)
-        gsdtestcase.set_nonblock(self.upowerd.stdout)
-
-        # start mock gnome-shell screensaver
-        (self.screensaver, self.obj_screensaver) = self.spawn_server_template(
-            'gnome_screensaver', stdout=subprocess.PIPE)
-        gsdtestcase.set_nonblock(self.screensaver.stdout)
 
         self.start_mutter()
 
@@ -94,7 +99,7 @@ class PowerPluginTest(gsdtestcase.GSDTestCase):
         env['CANBERRA_DRIVER'] = 'null'
 
         self.daemon = subprocess.Popen(
-            [os.path.join(builddir, 'gsd-power')],
+            [os.path.join(builddir, 'gsd-power'), '--verbose'],
             # comment out this line if you want to see the logs in real time
             stdout=self.plugin_log_write,
             stderr=subprocess.STDOUT,
@@ -207,6 +212,26 @@ class PowerPluginTest(gsdtestcase.GSDTestCase):
             val = '0'
         GLib.file_set_contents ('GSD_MOCK_EXTERNAL_MONITOR', val)
 
+    def set_composite_battery_discharging(self, icon='battery-good-symbolic'):
+        self.obj_upower.SetupDisplayDevice(
+            UPowerGlib.DeviceKind.BATTERY,
+            UPowerGlib.DeviceState.DISCHARGING,
+            50., 50., 100., # 50%, charge 50 of 100
+            0.01, 600, 0, # Discharge rate 0.01 with 600 seconds remaining, 0 time to full
+            True, # present
+            icon, UPowerGlib.DeviceLevel.NONE
+        )
+
+    def set_composite_battery_critical(self, icon='battery-caution-symbolic'):
+        self.obj_upower.SetupDisplayDevice(
+            UPowerGlib.DeviceKind.BATTERY,
+            UPowerGlib.DeviceState.DISCHARGING,
+            2., 2., 100., # 2%, charge 2 of 100
+            0.01, 60, 0, # Discharge rate 0.01 with 60 seconds remaining, 0 time to full
+            True, # present
+            icon, UPowerGlib.DeviceLevel.CRITICAL
+        )
+
     def check_for_logout(self, timeout):
         '''Check that logout is requested.
 
@@ -257,17 +282,33 @@ class PowerPluginTest(gsdtestcase.GSDTestCase):
         else:
             self.fail('timed out waiting for logind Suspend() call')
 
-    def check_for_uninhibited(self):
+    def check_for_lid_inhibited(self, timeout=0):
+        '''Check that the lid inhibitor has been added.
+
+        Fail after the given timeout.
+        '''
+        self.check_plugin_log('Adding lid switch system inhibitor', timeout,
+                              'Timed out waiting for lid inhibitor')
+
+    def check_for_lid_uninhibited(self, timeout=0):
         '''Check that the lid inhibitor has been dropped.
 
         Fail after the given timeout.
         '''
+        self.check_plugin_log('uninhibiting lid close', timeout,
+                              'Timed out waiting for lid uninhibition')
+
+    def check_no_lid_uninhibited(self, timeout=0):
+        '''Check that the lid inhibitor has been dropped.
+
+        Fail after the given timeout.
+        '''
+        time.sleep(timeout)
         # check that it requested uninhibition
         log = self.plugin_log.read()
 
         if 'uninhibiting lid close' in log:
-            return
-        self.fail('timed out waiting for lid uninhibition')
+            self.fail('lid uninhibit should not have happened')
 
     def check_no_suspend(self, seconds):
         '''Check that no Suspend or Hibernate is requested in the given time'''
@@ -291,6 +332,31 @@ class PowerPluginTest(gsdtestcase.GSDTestCase):
             self.assertTrue(b' Suspend' in log, 'missing Suspend request')
             self.assertFalse(b' Hibernate' in log, 'unexpected Hibernate request')
 
+    def check_plugin_log(self, needle, timeout=0, failmsg=None):
+        '''Check that needle is found in the log within the given timeout.
+        Returns immediately when found.
+
+        Fail after the given timeout.
+        '''
+        # Fast path if the message was already logged
+        log = self.plugin_log.read()
+        if needle in log:
+            return
+
+        while timeout > 0:
+            time.sleep(0.5)
+            timeout -= 0.5
+
+            # read new data (lines) from the log
+            log = self.plugin_log.read()
+            if needle in log:
+                break
+        else:
+            if failmsg is not None:
+                self.fail(failmsg)
+            else:
+                self.fail('timed out waiting for needle "%s"' % needle)
+
     def check_no_dim(self, seconds):
         '''Check that mode is not set to dim in the given time'''
 
@@ -304,66 +370,32 @@ class PowerPluginTest(gsdtestcase.GSDTestCase):
     def check_dim(self, timeout):
         '''Check that mode is set to dim in the given time'''
 
-        # wait for specified time to ensure it didn't do anything
-        while timeout > 0:
-            time.sleep(1)
-            timeout -= 1
-            # check that it requested dim
-            log = self.plugin_log.read()
-
-            if 'Doing a state transition: dim' in log:
-                break
-        else:
-            self.fail('timed out waiting for dim')
+        self.check_plugin_log('Doing a state transition: dim', timeout,
+                              'timed out waiting for dim')
 
     def check_undim(self, timeout):
         '''Check that mode is set to normal in the given time'''
 
-        # wait for specified time to ensure it didn't do anything
-        while timeout > 0:
-            time.sleep(1)
-            timeout -= 1
-            # check that it requested normal
-            log = self.plugin_log.read()
-
-            if 'Doing a state transition: normal' in log:
-                break
-        else:
-            self.fail('timed out waiting for normal mode')
+        self.check_plugin_log('Doing a state transition: normal', timeout,
+                              'timed out waiting for normal mode')
 
     def check_blank(self, timeout):
         '''Check that blank is requested.
 
         Fail after the given timeout.
         '''
-        # check that it request blank
-        while timeout > 0:
-            time.sleep(1)
-            timeout -= 1
-            # check that it requested blank
-            log = self.plugin_log.read()
 
-            if 'TESTSUITE: Blanked screen' in log:
-                break
-        else:
-            self.fail('timed out waiting for blank')
+        self.check_plugin_log('TESTSUITE: Blanked screen', timeout,
+                              'timed out waiting for blank')
 
     def check_unblank(self, timeout):
         '''Check that unblank is requested.
 
         Fail after the given timeout.
         '''
-        # check that it request blank
-        while timeout > 0:
-            time.sleep(1)
-            timeout -= 1
-            # check that it requested unblank
-            log = self.plugin_log.read()
 
-            if 'TESTSUITE: Unblanked screen' in log:
-                break
-        else:
-            self.fail('timed out waiting for unblank')
+        self.check_plugin_log('TESTSUITE: Unblanked screen', timeout,
+                              'timed out waiting for unblank')
 
     def check_no_blank(self, seconds):
         '''Check that no blank is requested in the given time'''
@@ -373,6 +405,15 @@ class PowerPluginTest(gsdtestcase.GSDTestCase):
         # check that it did not blank
         log = self.plugin_log.read()
         self.assertFalse('TESTSUITE: Blanked screen' in log, 'unexpected blank request')
+
+    def check_no_unblank(self, seconds):
+        '''Check that no unblank is requested in the given time'''
+
+        # wait for specified time to ensure it didn't unblank
+        time.sleep(seconds)
+        # check that it did not unblank
+        log = self.plugin_log.read()
+        self.assertFalse('TESTSUITE: Unblanked screen' in log, 'unexpected unblank request')
 
     def test_screensaver(self):
         # Note that the screensaver mock object
@@ -387,8 +428,9 @@ class PowerPluginTest(gsdtestcase.GSDTestCase):
         # blank is supposed to happen straight away
         self.check_blank(2)
 
-        # wiggle the mouse now and check for unblank; this is expected to pop up
-        # the locked screen saver
+        # Wait a bit for the active watch to be registered through dbus, then
+        # fake user activity and check that the screen is unblanked.
+        time.sleep(0.5)
         self.reset_idle_timer()
         self.check_unblank(2)
 
@@ -399,9 +441,9 @@ class PowerPluginTest(gsdtestcase.GSDTestCase):
         # and check for blank after the blank timeout
         self.check_blank(10)
 
-        # and do it again
-
-        # wiggle
+        # Wait a bit for the active watch to be registered through dbus, then
+        # fake user activity and check that the screen is unblanked.
+        time.sleep(0.5)
         self.reset_idle_timer()
         self.check_unblank(2)
 
@@ -425,8 +467,9 @@ class PowerPluginTest(gsdtestcase.GSDTestCase):
         # blank is supposed to happen straight away
         self.check_blank(2)
 
-        # wiggle the mouse now and check for unblank; this is expected to pop up
-        # the locked screen saver
+        # Wait a bit for the active watch to be registered through dbus, then
+        # fake user activity and check that the screen is unblanked.
+        time.sleep(0.5)
         self.reset_idle_timer()
         self.check_unblank(2)
         self.assertTrue(self.get_brightness() == gsdpowerconstants.GSD_MOCK_DEFAULT_BRIGHTNESS , 'incorrect unblanked brightness (%d != %d)' % (self.get_brightness(), gsdpowerconstants.GSD_MOCK_DEFAULT_BRIGHTNESS))
@@ -441,6 +484,33 @@ class PowerPluginTest(gsdtestcase.GSDTestCase):
         # Drop inhibitor
         self.obj_session_mgr.Uninhibit(dbus.UInt32(inhibit_id),
                 dbus_interface='org.gnome.SessionManager')
+
+    def test_screensaver_no_unblank(self):
+        '''Ensure the screensaver is not unblanked for new inhibitors.'''
+
+        # Lower idle delay a lot
+        self.settings_session['idle-delay'] = 1
+
+        # Bring down the screensaver
+        self.obj_screensaver.SetActive(True)
+        self.assertTrue(self.obj_screensaver.GetActive(), 'screensaver not turned on')
+
+        # Check that we blank
+        self.check_blank(2)
+
+        # Create the different possible inhibitors
+        inhibit_id = self.obj_session_mgr.Inhibit(
+            'testsuite', dbus.UInt32(0), 'for testing',
+            dbus.UInt32(gsdpowerenums.GSM_INHIBITOR_FLAG_IDLE | gsdpowerenums.GSM_INHIBITOR_FLAG_SUSPEND | gsdpowerenums.GSM_INHIBITOR_FLAG_LOGOUT),
+            dbus_interface='org.gnome.SessionManager')
+
+        self.check_no_unblank(2)
+
+        # Drop inhibitor
+        self.obj_session_mgr.Uninhibit(dbus.UInt32(inhibit_id),
+                dbus_interface='org.gnome.SessionManager')
+
+        self.check_no_unblank(2)
 
     def test_session_idle_delay(self):
         '''verify that session idle delay works as expected when changed'''
@@ -480,11 +550,11 @@ class PowerPluginTest(gsdtestcase.GSDTestCase):
         self.assertEqual(self.get_status(), gsdpowerenums.GSM_PRESENCE_STATUS_IDLE)
 
         # Go to sleep
-        self.obj_logind.EmitSignal('', 'PrepareForSleep', 'b', [True], dbus_interface='org.freedesktop.DBus.Mock')
+        self.logind_obj.EmitSignal('', 'PrepareForSleep', 'b', [True], dbus_interface='org.freedesktop.DBus.Mock')
         time.sleep(1)
 
         # Wake up
-        self.obj_logind.EmitSignal('', 'PrepareForSleep', 'b', [False], dbus_interface='org.freedesktop.DBus.Mock')
+        self.logind_obj.EmitSignal('', 'PrepareForSleep', 'b', [False], dbus_interface='org.freedesktop.DBus.Mock')
         time.sleep(1)
 
         # And check we're not idle
@@ -554,6 +624,8 @@ class PowerPluginTest(gsdtestcase.GSDTestCase):
             dbus.UInt32(gsdpowerenums.GSM_INHIBITOR_FLAG_SUSPEND),
             dbus_interface='org.gnome.SessionManager')
 
+        time.sleep (gsdpowerconstants.LID_CLOSE_SAFETY_TIMEOUT)
+
         # Close the lid
         self.obj_upower.Set('org.freedesktop.UPower', 'LidIsClosed', True)
         self.obj_upower.EmitSignal('', 'Changed', '', [], dbus_interface='org.freedesktop.DBus.Mock')
@@ -578,6 +650,8 @@ class PowerPluginTest(gsdtestcase.GSDTestCase):
             dbus.UInt32(gsdpowerenums.GSM_INHIBITOR_FLAG_SUSPEND),
             dbus_interface='org.gnome.SessionManager')
 
+        time.sleep (gsdpowerconstants.LID_CLOSE_SAFETY_TIMEOUT)
+
         # Close the lid
         self.obj_upower.Set('org.freedesktop.UPower', 'LidIsClosed', True)
         self.obj_upower.EmitSignal('', 'Changed', '', [], dbus_interface='org.freedesktop.DBus.Mock')
@@ -598,6 +672,8 @@ class PowerPluginTest(gsdtestcase.GSDTestCase):
             'testsuite', dbus.UInt32(0), 'for testing',
             dbus.UInt32(gsdpowerenums.GSM_INHIBITOR_FLAG_SUSPEND),
             dbus_interface='org.gnome.SessionManager')
+
+        time.sleep (gsdpowerconstants.LID_CLOSE_SAFETY_TIMEOUT)
 
         # Close the lid
         self.obj_upower.Set('org.freedesktop.UPower', 'LidIsClosed', True)
@@ -648,137 +724,86 @@ class PowerPluginTest(gsdtestcase.GSDTestCase):
         self.check_blank(2)
 
         # Go to sleep
-        self.obj_logind.EmitSignal('', 'PrepareForSleep', 'b', [True], dbus_interface='org.freedesktop.DBus.Mock')
+        self.logind_obj.EmitSignal('', 'PrepareForSleep', 'b', [True], dbus_interface='org.freedesktop.DBus.Mock')
         time.sleep(1)
 
         # Wake up
-        self.obj_logind.EmitSignal('', 'PrepareForSleep', 'b', [False], dbus_interface='org.freedesktop.DBus.Mock')
+        self.logind_obj.EmitSignal('', 'PrepareForSleep', 'b', [False], dbus_interface='org.freedesktop.DBus.Mock')
         time.sleep(1)
 
         # And check that we have the pre-dim brightness
         self.assertTrue(self.get_brightness() == gsdpowerconstants.GSD_MOCK_DEFAULT_BRIGHTNESS , 'incorrect unblanked brightness (%d != %d)' % (self.get_brightness(), gsdpowerconstants.GSD_MOCK_DEFAULT_BRIGHTNESS))
 
-    def test_no_suspend_lid_close(self):
-        '''Check that we don't suspend on lid close with an external monitor'''
+    def test_lid_close_inhibition(self):
+        '''Check that we correctly inhibit suspend with an external monitor'''
+
+        # Wait and flush log
+        time.sleep (gsdpowerconstants.LID_CLOSE_SAFETY_TIMEOUT + 1)
+        self.plugin_log.read()
 
         # Add an external monitor
         self.set_has_external_monitor(True)
-        time.sleep (1)
+        self.check_for_lid_inhibited(1)
+
+        # Check that we do not uninhibit with the external monitor attached
+        self.check_no_lid_uninhibited(gsdpowerconstants.LID_CLOSE_SAFETY_TIMEOUT + 1)
 
         # Close the lid
         self.obj_upower.Set('org.freedesktop.UPower', 'LidIsClosed', True)
         self.obj_upower.EmitSignal('', 'Changed', '', [], dbus_interface='org.freedesktop.DBus.Mock')
-
-        # Check for no suspend, and for no screen blanking
-        self.check_no_suspend (10)
-        self.check_no_blank(0)
+        time.sleep(0.5)
 
         # Unplug the external monitor
         self.set_has_external_monitor(False)
-        # Wait for the safety timer + 3 seconds
-        time.sleep (gsdpowerconstants.LID_CLOSE_SAFETY_TIMEOUT + 3)
-        # Check that we're uninhibited
-        self.check_for_uninhibited()
 
-    def test_action_critical_battery(self):
+        # Check that no action happens during the safety time minus 1 second
+        self.check_no_lid_uninhibited(gsdpowerconstants.LID_CLOSE_SAFETY_TIMEOUT - 1)
+        # Check that we're uninhibited after the safety time
+        self.check_for_lid_uninhibited(4)
+
+    def test_notify_critical_battery(self):
         '''action on critical battery'''
 
-        # add a fake battery with 30%/2 hours charge to upower
-        bat_path = self.obj_upower.AddDischargingBattery('mock_BAT', 'Mock Bat', 30.0, 1200)
-        obj_bat = self.system_bus_con.get_object('org.freedesktop.UPower', bat_path)
-        self.obj_upower.EmitSignal('', 'DeviceAdded', 'o', [bat_path],
-                                   dbus_interface='org.freedesktop.DBus.Mock')
+        self.set_composite_battery_discharging()
 
-        time.sleep(1)
+        time.sleep(2)
 
-        # now change battery to critical charge
-        obj_bat.Set('org.freedesktop.UPower.Device', 'TimeToEmpty',
-                    dbus.Int64(30, variant_level=1),
-                    dbus_interface=dbus.PROPERTIES_IFACE)
-        obj_bat.EmitSignal('', 'Changed', '', [], dbus_interface='org.freedesktop.DBus.Mock')
-        self.obj_upower.EmitSignal('', 'DeviceChanged', 'o', [obj_bat.object_path],
-                                   dbus_interface='org.freedesktop.DBus.Mock')
+        self.set_composite_battery_critical()
 
+        # Check that it was picked up
+        self.check_plugin_log('EMIT: charge-critical', 2)
+
+        # Wait a bit longer to ensure event has been fired
         time.sleep(0.5)
         # we should have gotten a notification now
         notify_log = self.p_notify.stdout.read()
 
-        self.check_for_suspend(5)
-
         # verify notification
-        self.assertRegex(notify_log, b'[0-9.]+ Notify "Power" 0 "battery-.*" ".*battery critical.*"')
+        self.assertRegex(notify_log, b'[0-9.]+ Notify "Power" 0 "battery-caution-symbolic" ".*battery critical.*"')
 
-    def test_action_critical_battery_on_start(self):
+    def test_notify_critical_battery_on_start(self):
         '''action on critical battery on startup'''
 
-        # add a fake battery with 2%/1 minute charge to upower
-        bat_path = self.obj_upower.AddDischargingBattery('mock_BAT', 'Mock Bat', 2.0, 60)
-        obj_bat = self.system_bus_con.get_object('org.freedesktop.UPower', bat_path)
-        self.obj_upower.EmitSignal('', 'DeviceAdded', 'o', [bat_path],
-                                   dbus_interface='org.freedesktop.DBus.Mock')
+        self.set_composite_battery_critical()
 
-        time.sleep(5)
+        # Check that it was picked up
+        self.check_plugin_log('EMIT: charge-critical', 2)
 
-        # we should have gotten a notification now
+        time.sleep(0.5)
+
+        # we should have gotten a notification by now
         notify_log = self.p_notify.stdout.read()
 
-        self.check_for_suspend(5)
-
         # verify notification
-        self.assertRegex(notify_log, b'[0-9.]+ Notify "Power" 0 "battery-.*" ".*battery critical.*"')
+        self.assertRegex(notify_log, b'[0-9.]+ Notify "Power" 0 "battery-caution-symbolic" ".*battery critical.*"')
 
-    def test_action_multiple_batteries(self):
-        '''critical actions for multiple batteries'''
+    def test_notify_device_battery(self):
+        '''critical power level notification for device batteries'''
 
-        # add two fake batteries to upower
-        bat1_path = self.obj_upower.AddDischargingBattery('mock_BAT1', 'Bat0', 30.0, 1200)
-        obj_bat1 = self.system_bus_con.get_object('org.freedesktop.UPower', bat1_path)
-        self.obj_upower.EmitSignal('', 'DeviceAdded', 'o', [bat1_path],
-                                   dbus_interface='org.freedesktop.DBus.Mock')
+        # Set internal battery to discharging
+        self.set_composite_battery_discharging()
 
-        bat2_path = self.obj_upower.AddDischargingBattery('mock_BAT2', 'Bat2', 40.0, 1600)
-        obj_bat2 = self.system_bus_con.get_object('org.freedesktop.UPower', bat2_path)
-        self.obj_upower.EmitSignal('', 'DeviceAdded', 'o', [bat2_path],
-                                   dbus_interface='org.freedesktop.DBus.Mock')
-        time.sleep(1)
-
-        # now change one battery to critical charge
-        obj_bat1.Set('org.freedesktop.UPower.Device', 'TimeToEmpty',
-                     dbus.Int64(30, variant_level=1),
-                     dbus_interface=dbus.PROPERTIES_IFACE)
-        obj_bat1.Set('org.freedesktop.UPower.Device', 'Energy',
-                     dbus.Double(0.5, variant_level=1),
-                     dbus_interface=dbus.PROPERTIES_IFACE)
-        obj_bat1.EmitSignal('', 'Changed', '', [], dbus_interface='org.freedesktop.DBus.Mock')
-        self.obj_upower.EmitSignal('', 'DeviceChanged', 'o', [bat1_path],
-                                   dbus_interface='org.freedesktop.DBus.Mock')
-
-        # wait long enough to ensure it didn't do anything (as we still have
-        # the second battery)
-        self.check_no_suspend(5)
-
-        # now change the other battery to critical charge as well
-        obj_bat2.Set('org.freedesktop.UPower.Device', 'TimeToEmpty',
-                     dbus.Int64(25, variant_level=1),
-                     dbus_interface=dbus.PROPERTIES_IFACE)
-        obj_bat2.Set('org.freedesktop.UPower.Device', 'Energy',
-                     dbus.Double(0.4, variant_level=1),
-                     dbus_interface=dbus.PROPERTIES_IFACE)
-        obj_bat2.EmitSignal('', 'Changed', '', [], dbus_interface='org.freedesktop.DBus.Mock')
-        self.obj_upower.EmitSignal('', 'DeviceChanged', 'o', [bat2_path],
-                                   dbus_interface='org.freedesktop.DBus.Mock')
-
-        self.check_for_suspend(5)
-
-    def test_action_multiple_device_batteries(self):
-        '''critical actions for multiple device batteries'''
-
-        # add a fake battery to upower
-        bat1_path = self.obj_upower.AddDischargingBattery('mock_BAT1', 'Bat0', 30.0, 1200)
-        obj_bat1 = self.system_bus_con.get_object('org.freedesktop.UPower', bat1_path)
-        self.obj_upower.EmitSignal('', 'DeviceAdded', 'o', [bat1_path],
-                                   dbus_interface='org.freedesktop.DBus.Mock')
-
+        # Add a device battery
         bat2_path = '/org/freedesktop/UPower/devices/' + 'mock_MOUSE_BAT1'
         self.obj_upower.AddObject(bat2_path,
                                   'org.freedesktop.UPower.Device',
@@ -790,10 +815,9 @@ class PowerPluginTest(gsdtestcase.GSDTestCase):
                                       'TimeToEmpty': dbus.Int64(1600, variant_level=1),
                                       'EnergyFull': dbus.Double(100.0, variant_level=1),
                                       'Energy': dbus.Double(40.0, variant_level=1),
-                                      # UP_DEVICE_STATE_DISCHARGING
-                                      'State': dbus.UInt32(2, variant_level=1),
-                                      # UP_DEVICE_KIND_BATTERY
-                                      'Type': dbus.UInt32(2, variant_level=1),
+                                      'State': dbus.UInt32(UPowerGlib.DeviceState.DISCHARGING, variant_level=1),
+                                      'Type': dbus.UInt32(UPowerGlib.DeviceKind.MOUSE, variant_level=1),
+                                      'WarningLevel': dbus.UInt32(UPowerGlib.DeviceLevel.NONE, variant_level=1),
                                    }, dbus.Array([], signature='(ssss)'))
 
         obj_bat2 = self.system_bus_con.get_object('org.freedesktop.UPower', bat2_path)
@@ -808,26 +832,21 @@ class PowerPluginTest(gsdtestcase.GSDTestCase):
         obj_bat2.Set('org.freedesktop.UPower.Device', 'Energy',
                      dbus.Double(0.5, variant_level=1),
                      dbus_interface=dbus.PROPERTIES_IFACE)
+        obj_bat2.Set('org.freedesktop.UPower.Device', 'WarningLevel',
+                     dbus.UInt32(UPowerGlib.DeviceLevel.CRITICAL, variant_level=1),
+                     dbus_interface=dbus.PROPERTIES_IFACE)
         obj_bat2.EmitSignal('', 'Changed', '', [], dbus_interface='org.freedesktop.DBus.Mock')
         self.obj_upower.EmitSignal('', 'DeviceChanged', 'o', [bat2_path],
                                    dbus_interface='org.freedesktop.DBus.Mock')
 
-        # wait long enough to ensure it didn't do anything (as we still have
-        # the second battery)
-        self.check_no_suspend(5)
+        self.check_plugin_log('EMIT: charge-critical', 2)
+        time.sleep(0.5)
 
-        # now change the main battery to critical charge as well
-        obj_bat1.Set('org.freedesktop.UPower.Device', 'TimeToEmpty',
-                     dbus.Int64(25, variant_level=1),
-                     dbus_interface=dbus.PROPERTIES_IFACE)
-        obj_bat1.Set('org.freedesktop.UPower.Device', 'Energy',
-                     dbus.Double(0.4, variant_level=1),
-                     dbus_interface=dbus.PROPERTIES_IFACE)
-        obj_bat1.EmitSignal('', 'Changed', '', [], dbus_interface='org.freedesktop.DBus.Mock')
-        self.obj_upower.EmitSignal('', 'DeviceChanged', 'o', [bat1_path],
-                                   dbus_interface='org.freedesktop.DBus.Mock')
+        # we should have gotten a notification by now
+        notify_log = self.p_notify.stdout.read()
 
-        self.check_for_suspend(5)
+        # verify notification
+        self.assertRegex(notify_log, b'[0-9.]+ Notify "Power" 0 ".*" ".*Wireless mouse .*low.* power.*"')
 
     def test_forced_logout(self):
         '''Test forced logout'''
@@ -865,6 +884,22 @@ class PowerPluginTest(gsdtestcase.GSDTestCase):
         # Drop inhibitor
         self.obj_session_mgr.Uninhibit(dbus.UInt32(inhibit_id),
                 dbus_interface='org.gnome.SessionManager')
+
+    def test_check_missing_kbd_brightness(self):
+        ''' https://bugzilla.gnome.org/show_bug.cgi?id=793512 '''
+
+        obj_gsd_power_kbd = self.session_bus_con.get_object(
+            'org.gnome.SettingsDaemon.Power', '/org/gnome/SettingsDaemon/Power')
+        obj_gsd_power_kbd_props = dbus.Interface(obj_gsd_power_kbd, dbus.PROPERTIES_IFACE)
+
+        # Will return -1 if gsd-power crashed, and an exception if the code caught the problem
+        with self.assertRaises(dbus.DBusException) as exc:
+            kbd_brightness = obj_gsd_power_kbd_props.Get('org.gnome.SettingsDaemon.Power.Keyboard', 'Brightness')
+
+            # We should not have arrived here, if we did then the test failed, let's print this to help debugging
+            print('Got keyboard brightness: {}'.format(kbd_brightness))
+
+        self.assertEqual(exc.exception.get_dbus_message(), 'Failed to get property Brightness on interface org.gnome.SettingsDaemon.Power.Keyboard')
 
     def disabled_test_unindle_on_ac_plug(self):
         idle_delay = round(gsdpowerconstants.MINIMUM_IDLE_DIM_DELAY / gsdpowerconstants.IDLE_DELAY_TO_IDLE_DIM_MULTIPLIER)

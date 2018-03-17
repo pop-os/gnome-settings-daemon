@@ -71,6 +71,18 @@
 #define FONT_HINTING_KEY      "hinting"
 #define FONT_RGBA_ORDER_KEY   "rgba-order"
 
+#define GTK_SETTINGS_DBUS_PATH "/org/gtk/Settings"
+#define GTK_SETTINGS_DBUS_NAME "org.gtk.Settings"
+
+static const gchar introspection_xml[] =
+"<node name='/org/gtk/Settings'>"
+"  <interface name='org.gtk.Settings'>"
+"    <property name='FontconfigTimestamp' type='x' access='read'/>"
+"    <property name='Modules' type='s' access='read'/>"
+"    <property name='EnableAnimations' type='b' access='read'/>"
+"  </interface>"
+"</node>";
+
 typedef enum _DisplayLayoutMode {
         DISPLAY_LAYOUT_MODE_LOGICAL = 1,
         DISPLAY_LAYOUT_MODE_PHYSICAL = 2
@@ -230,17 +242,6 @@ typedef enum _DisplayLayoutMode {
  */
 #define DPI_FALLBACK 96
 
-/* The minimum resolution at which we turn on a window-scale of 2 */
-#define HIDPI_LIMIT (DPI_FALLBACK * 2)
-
-/* The minimum screen height at which we turn on a window-scale of 2;
- * below this there just isn't enough vertical real estate for GNOME
- * apps to work, and it's better to just be tiny */
-#define HIDPI_MIN_HEIGHT 1200
-
-/* From http://en.wikipedia.org/wiki/4K_resolution#Resolutions_of_common_formats */
-#define SMALLEST_4K_WIDTH 3656
-
 typedef struct _TranslationEntry TranslationEntry;
 typedef void (* TranslationFunc) (GnomeXSettingsManager *manager,
                                   TranslationEntry      *trans,
@@ -257,9 +258,15 @@ struct _TranslationEntry {
 typedef struct _FixedEntry FixedEntry;
 typedef void (* FixedFunc) (GnomeXSettingsManager *manager,
                             FixedEntry            *fixed);
+typedef union {
+        const char *str;
+        int num;
+} FixedEntryValue;
+
 struct _FixedEntry {
         const char     *xsetting_name;
         FixedFunc       func;
+        FixedEntryValue val;
 };
 
 struct GnomeXSettingsManagerPrivate
@@ -270,10 +277,12 @@ struct GnomeXSettingsManagerPrivate
 
         GSettings         *plugin_settings;
         FcMonitor         *fontconfig_monitor;
+        gint64             fontconfig_timestamp;
 
         GsdXSettingsGtk   *gtk;
 
         GsdRemoteDisplayManager *remote_display;
+        gboolean           enable_animations;
 
         guint              display_config_watch_id;
         guint              monitors_changed_id;
@@ -283,7 +292,9 @@ struct GnomeXSettingsManagerPrivate
 
         guint              notify_idle_id;
 
+        GDBusNodeInfo     *introspection_data;
         GDBusConnection   *dbus_connection;
+        guint              gtk_settings_name_id;
 };
 
 #define GSD_XSETTINGS_ERROR gsd_xsettings_error_quark ()
@@ -295,6 +306,8 @@ enum {
 static void     gnome_xsettings_manager_class_init  (GnomeXSettingsManagerClass *klass);
 static void     gnome_xsettings_manager_init        (GnomeXSettingsManager      *xsettings_manager);
 static void     gnome_xsettings_manager_finalize    (GObject                  *object);
+
+static void     register_manager_dbus               (GnomeXSettingsManager *manager);
 
 G_DEFINE_TYPE (GnomeXSettingsManager, gnome_xsettings_manager, G_TYPE_OBJECT)
 
@@ -412,6 +425,26 @@ fixed_bus_id (GnomeXSettingsManager *manager,
         g_object_unref (bus);
 }
 
+static void
+fixed_string (GnomeXSettingsManager *manager,
+              FixedEntry            *fixed)
+{
+        xsettings_manager_set_string (manager->priv->manager,
+                                      fixed->xsetting_name,
+                                      fixed->val.str);
+}
+
+static void
+fixed_int (GnomeXSettingsManager *manager,
+           FixedEntry            *fixed)
+{
+        xsettings_manager_set_int (manager->priv->manager,
+                                   fixed->xsetting_name,
+                                   fixed->val.num);
+}
+
+#define DEFAULT_COLOR_PALETTE "black:white:gray50:red:purple:blue:light blue:green:yellow:orange:lavender:brown:goldenrod4:dodger blue:pink:light green:gray10:gray30:gray75:gray90"
+
 static FixedEntry fixed_entries [] = {
         { "Gtk/MenuImages",          fixed_false_int },
         { "Gtk/ButtonImages",        fixed_false_int },
@@ -420,6 +453,17 @@ static FixedEntry fixed_entries [] = {
         { "Gtk/AutoMnemonics",       fixed_true_int },
         { "Gtk/DialogsUseHeader",    fixed_true_int },
         { "Gtk/SessionBusId",        fixed_bus_id },
+        { "Gtk/ColorPalette",        fixed_string,      { .str = DEFAULT_COLOR_PALETTE } },
+        { "Net/FallbackIconTheme",   fixed_string,      { .str = "gnome" } },
+        { "Gtk/ToolbarStyle",        fixed_string,      { .str =  "both-horiz" } },
+        { "Gtk/ToolbarIconSize",     fixed_string,      { .str = "large" } },
+        { "Gtk/CanChangeAccels",     fixed_false_int },
+        { "Gtk/TimeoutInitial",      fixed_int,         { .num = 200 } },
+        { "Gtk/TimeoutRepeat",       fixed_int,         { .num = 20 } },
+        { "Gtk/ColorScheme",         fixed_string,      { .str = "" } },
+        { "Gtk/IMPreeditStyle",      fixed_string,      { .str = "callback" } },
+        { "Gtk/IMStatusStyle",       fixed_string,      { .str = "callback" } },
+        { "Gtk/MenuBarAccel",        fixed_string,      { .str = "F10" } }
 };
 
 static TranslationEntry translations [] = {
@@ -428,24 +472,14 @@ static TranslationEntry translations [] = {
 
         { "org.gnome.desktop.background", "show-desktop-icons",    "Gtk/ShellShowsDesktop",   translate_bool_int },
 
-        { "org.gnome.desktop.interface", "gtk-color-palette",      "Gtk/ColorPalette",        translate_string_string },
         { "org.gnome.desktop.interface", "font-name",              "Gtk/FontName",            translate_string_string },
         { "org.gnome.desktop.interface", "gtk-key-theme",          "Gtk/KeyThemeName",        translate_string_string },
-        { "org.gnome.desktop.interface", "toolbar-style",          "Gtk/ToolbarStyle",        translate_string_string },
-        { "org.gnome.desktop.interface", "toolbar-icons-size",     "Gtk/ToolbarIconSize",     translate_string_string },
-        { "org.gnome.desktop.interface", "can-change-accels",      "Gtk/CanChangeAccels",     translate_bool_int },
         { "org.gnome.desktop.interface", "cursor-blink",           "Net/CursorBlink",         translate_bool_int },
         { "org.gnome.desktop.interface", "cursor-blink-time",      "Net/CursorBlinkTime",     translate_int_int },
         { "org.gnome.desktop.interface", "cursor-blink-timeout",   "Gtk/CursorBlinkTimeout",  translate_int_int },
         { "org.gnome.desktop.interface", "gtk-theme",              "Net/ThemeName",           translate_string_string },
-        { "org.gnome.desktop.interface", "gtk-timeout-initial",    "Gtk/TimeoutInitial",      translate_int_int },
-        { "org.gnome.desktop.interface", "gtk-timeout-repeat",     "Gtk/TimeoutRepeat",       translate_int_int },
-        { "org.gnome.desktop.interface", "gtk-color-scheme",       "Gtk/ColorScheme",         translate_string_string },
-        { "org.gnome.desktop.interface", "gtk-im-preedit-style",   "Gtk/IMPreeditStyle",      translate_string_string },
-        { "org.gnome.desktop.interface", "gtk-im-status-style",    "Gtk/IMStatusStyle",       translate_string_string },
         { "org.gnome.desktop.interface", "gtk-im-module",          "Gtk/IMModule",            translate_string_string },
         { "org.gnome.desktop.interface", "icon-theme",             "Net/IconThemeName",       translate_string_string },
-        { "org.gnome.desktop.interface", "menubar-accel",          "Gtk/MenuBarAccel",        translate_string_string },
         { "org.gnome.desktop.interface", "cursor-theme",           "Gtk/CursorThemeName",     translate_string_string },
         { "org.gnome.desktop.interface", "gtk-enable-primary-paste", "Gtk/EnablePrimaryPaste", translate_bool_int },
         /* cursor-size is handled via the Xft side as it needs the scaling factor */
@@ -467,7 +501,9 @@ static gboolean
 notify_idle (gpointer data)
 {
         GnomeXSettingsManager *manager = data;
+
         xsettings_manager_notify (manager->priv->manager);
+
         manager->priv->notify_idle_id = 0;
         return G_SOURCE_REMOVE;
 }
@@ -480,6 +516,49 @@ queue_notify (GnomeXSettingsManager *manager)
 
         manager->priv->notify_idle_id = g_idle_add (notify_idle, manager);
         g_source_set_name_by_id (manager->priv->notify_idle_id, "[gnome-settings-daemon] notify_idle");
+}
+
+typedef enum {
+        GTK_SETTINGS_FONTCONFIG_TIMESTAMP = 1 << 0,
+        GTK_SETTINGS_MODULES              = 1 << 1,
+        GTK_SETTINGS_ENABLE_ANIMATIONS    = 1 << 2
+} GtkSettingsMask;
+
+static void
+send_dbus_event (GnomeXSettingsManager *manager,
+                 GtkSettingsMask        mask)
+{
+        GVariantBuilder props_builder;
+        GVariant *props_changed = NULL;
+
+        g_variant_builder_init (&props_builder, G_VARIANT_TYPE ("a{sv}"));
+
+        if (mask & GTK_SETTINGS_FONTCONFIG_TIMESTAMP) {
+                g_variant_builder_add (&props_builder, "{sv}", "FontconfigTimestamp",
+                                       g_variant_new_int64 (manager->priv->fontconfig_timestamp));
+        }
+
+        if (mask & GTK_SETTINGS_MODULES) {
+                const char *modules = gsd_xsettings_gtk_get_modules (manager->priv->gtk);
+                g_variant_builder_add (&props_builder, "{sv}", "Modules",
+                                       g_variant_new_string (modules ? modules : ""));
+        }
+
+        if (mask & GTK_SETTINGS_ENABLE_ANIMATIONS) {
+                g_variant_builder_add (&props_builder, "{sv}", "EnableAnimations",
+                                       g_variant_new_boolean (manager->priv->enable_animations));
+        }
+
+        props_changed = g_variant_new ("(s@a{sv}@as)", GTK_SETTINGS_DBUS_NAME,
+                                       g_variant_builder_end (&props_builder),
+                                       g_variant_new_strv (NULL, 0));
+
+        g_dbus_connection_emit_signal (manager->priv->dbus_connection,
+                                       NULL,
+                                       GTK_SETTINGS_DBUS_PATH,
+                                       "org.freedesktop.DBus.Properties",
+                                       "PropertiesChanged",
+                                       props_changed, NULL);
 }
 
 static double
@@ -873,18 +952,24 @@ gtk_modules_callback (GsdXSettingsGtk       *gtk,
         }
 
         queue_notify (manager);
+        send_dbus_event (manager, GTK_SETTINGS_MODULES);
 }
 
 static void
 fontconfig_callback (FcMonitor              *monitor,
                      GnomeXSettingsManager  *manager)
 {
-        int timestamp = time (NULL);
+        gint64 timestamp = g_get_real_time ();
+        gint timestamp_sec = (int)(timestamp / G_TIME_SPAN_SECOND);
 
         gnome_settings_profile_start (NULL);
 
-        xsettings_manager_set_int (manager->priv->manager, "Fontconfig/Timestamp", timestamp);
+        xsettings_manager_set_int (manager->priv->manager, "Fontconfig/Timestamp", timestamp_sec);
+
+        manager->priv->fontconfig_timestamp = timestamp;
+
         queue_notify (manager);
+        send_dbus_event (manager, GTK_SETTINGS_FONTCONFIG_TIMESTAMP);
         gnome_settings_profile_end (NULL);
 }
 
@@ -1006,9 +1091,6 @@ xsettings_callback (GSettings             *settings,
 
         g_variant_unref (value);
 
-        xsettings_manager_set_string (manager->priv->manager,
-                                      "Net/FallbackIconTheme",
-                                      "gnome");
         queue_notify (manager);
 }
 
@@ -1087,9 +1169,11 @@ force_disable_animation_changed (GObject    *gobject,
                 value = g_settings_get_boolean (settings, "enable-animations");
         }
 
+        manager->priv->enable_animations = value;
         xsettings_manager_set_int (manager->priv->manager, "Gtk/EnableAnimations", value);
 
         queue_notify (manager);
+        send_dbus_event (manager, GTK_SETTINGS_ENABLE_ANIMATIONS);
 }
 
 static void
@@ -1251,13 +1335,11 @@ gnome_xsettings_manager_start (GnomeXSettingsManager *manager,
         /* Xft settings */
         update_xft_settings (manager);
 
+        register_manager_dbus (manager);
+
         start_fontconfig_monitor (manager);
 
         start_shell_monitor (manager);
-
-        xsettings_manager_set_string (manager->priv->manager,
-                                      "Net/FallbackIconTheme",
-                                      "gnome");
 
         overrides = g_settings_get_value (manager->priv->plugin_settings, XSETTINGS_OVERRIDE_KEY);
         xsettings_manager_set_overrides (manager->priv->manager, overrides);
@@ -1304,6 +1386,11 @@ gnome_xsettings_manager_stop (GnomeXSettingsManager *manager)
                 g_signal_handlers_disconnect_by_data (p->plugin_settings, manager);
                 g_object_unref (p->plugin_settings);
                 p->plugin_settings = NULL;
+        }
+
+        if (p->gtk_settings_name_id > 0) {
+                g_bus_unown_name (p->gtk_settings_name_id);
+                p->gtk_settings_name_id = 0;
         }
 
         if (p->fontconfig_monitor != NULL) {
@@ -1367,6 +1454,60 @@ gnome_xsettings_manager_finalize (GObject *object)
         g_clear_object (&xsettings_manager->priv->dbus_connection);
 
         G_OBJECT_CLASS (gnome_xsettings_manager_parent_class)->finalize (object);
+}
+
+static GVariant *
+handle_get_property (GDBusConnection *connection,
+                     const gchar *sender,
+                     const gchar *object_path,
+                     const gchar *interface_name,
+                     const gchar *property_name,
+                     GError **error,
+                     gpointer user_data)
+{
+        GnomeXSettingsManager *manager = user_data;
+
+        if (g_strcmp0 (property_name, "FontconfigTimestamp") == 0) {
+                return g_variant_new_int64 (manager->priv->fontconfig_timestamp);
+        } else if (g_strcmp0 (property_name, "Modules") == 0) {
+                const char *modules = gsd_xsettings_gtk_get_modules (manager->priv->gtk);
+                return g_variant_new_string (modules ? modules : "");
+        } else if (g_strcmp0 (property_name, "EnableAnimations") == 0) {
+                return g_variant_new_boolean (manager->priv->enable_animations);
+        } else {
+                g_set_error (error, G_DBUS_ERROR, G_DBUS_ERROR_FAILED,
+                             "No such interface: %s", interface_name);
+                return NULL;
+        }
+}
+
+static const GDBusInterfaceVTable interface_vtable =
+{
+        NULL,
+        handle_get_property,
+        NULL
+};
+
+static void
+register_manager_dbus (GnomeXSettingsManager *manager)
+{
+        g_assert (manager->priv->dbus_connection != NULL);
+
+        manager->priv->introspection_data = g_dbus_node_info_new_for_xml (introspection_xml, NULL);
+        g_assert (manager->priv->introspection_data != NULL);
+
+        g_dbus_connection_register_object (manager->priv->dbus_connection,
+                                           GTK_SETTINGS_DBUS_PATH,
+                                           manager->priv->introspection_data->interfaces[0],
+                                           &interface_vtable,
+                                           manager,
+                                           NULL,
+                                           NULL);
+
+        manager->priv->gtk_settings_name_id = g_bus_own_name_on_connection (manager->priv->dbus_connection,
+                                                                            GTK_SETTINGS_DBUS_NAME,
+                                                                            G_BUS_NAME_OWNER_FLAGS_NONE,
+                                                                            NULL, NULL, NULL, NULL);
 }
 
 GnomeXSettingsManager *
