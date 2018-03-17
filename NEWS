@@ -1,27 +1,367 @@
 ==============
-Version 3.14.2
+Version 3.22.2
+==============
+
+Media keys:
+- Fix custom keyboard shortcuts not working in some hardware
+  combinations, including potential crashes
+- Fix shutdown dialog delay when using kbd shortcut
+
+Smartcard:
+- Fix plugin not working due to a conflict with the Sharing
+  plugin's use of NetworkManager client libraries
+
+==============
+Version 3.22.1
+==============
+
+- Translation updates
+
+Power:
+- Ensure we blank the screen when locked
+
+Sharing:
+- Fix crash on exit
+
+Wacom:
+- Avoid warnings when switching VTs
+
+==============
+Version 3.22.0
+==============
+
+Power:
+- Fix possible problem with battery and mains timeouts
+
+=================
+Version 3.21.92.1
+=================
+
+- Fix a build problem in the smartcard plugin
+
+===============
+Version 3.21.92
+===============
+
+- Use systemd to track running services in the Sharing plugin
+- Translation updates
+
+===============
+Version 3.21.90
+===============
+
+Color:
+- Ignore fake VNC devices
+
+Housekeeping:
+- Code cleanups
+
+Media keys:
+- Add Super+F1 as a hardcoded shortcut for launching Help
+- Update gvc to fix a crash setting a headset
+
+Power:
+- Don't claim the light sensor if we're not active
+
+Smartcard:
+- Complete activation task right away if no drivers
+- Fix crash on startup
+
+Wacom:
+- Fix hot(un)plug related crashes
+- Fix memory leaks
+
+XSettings:
+- Fix keynav-use-caret setting not working
+
+==============
+Version 3.20.0
+==============
+
+- Fix cancellation handling and possible crashes in all plugins
+
+===============
+Version 3.19.92
+===============
+
+XSettings:
+- Export Gtk/KeynavUseCaret accessibility setting
+
+Remote display:
+- Remove Spice special-casing now that it can do accelerated rendering
+
+===============
+Version 3.19.91
+===============
+
+Media keys:
+- Fix a typo in the "Airplane" string
+- Fix a number of possible crashers when plugging in audio
+  devices on some machines
+- Add debug output to a number of custom shortcuts related functions
+
+Housekeeping:
+- Don't remove X11 sockets, breaking sandboxed X11 applications
+
+===============
+Version 3.19.90
+===============
+
+- Fixed a few leaks, crashes and endless loops
+- Updated translations
+
+Media keys:
+- Fix orientation keybindings/keys not working
+- Added support to ask users which kind of headset was plugged in
+
+==============
+Version 3.19.5
+==============
+
+- Remove "hotplug-command" helper
+- Updated translations
+
+Media keys:
+- Add support for Killswitch media keys
+- Add labels for the rfkill OSD
+
+Mouse:
+- Remove support for non-libinput mouse configurations
+
+Power:
+- Don't try to automatically set brightness on inactive sessions
+
+Rfkill:
+- Fix a problem when the system has a platform rfkill device for
+  Bluetooth and the Bluetooth adapter's rfkill support somehow got
+  blocked
+
+Sharing:
+- Port to the new libnm NetworkManager library - required NM version
+  bumped to 1.0
+
+==============
+Version 3.19.4
+==============
+
+Mouse:
+- Force 2-finger scroll by default if available
+- Migrate scroll-method key to new edge-scrolling-enabled key
+
+==============
+Version 3.19.3
+==============
+
+- Export the cursor theme through XSettings
+- Use the convenience Geoclue library for the automatic timezone setting
+- Don't overwrite existing XIM configurations
+- Fix application of left-handed mode, keep-aspect and area settings
+  for Wacom tablets
+- Change default font hinting to slight (see git log for details)
+- Re-add a way to configure the power button for desktops and laptops
+  (tablets and VMs have hard-coded defaults)
+- Always expand power notifications
+
+==============
+Version 3.18.1
+==============
+
+- Updated translations
+- Fix cursor-size changes being ignored
+- Build fixes
+
+==============
+Version 3.18.0
 ==============
 
 - Updated translations
 
-Media-keys:
-- Fixed a few minor leaks
+===============
+Version 3.17.92
+===============
 
-Power:
-- Disable touchscreens when turning off its screen
+- Plug a number of memory leaks
+- Updated translations
 
-Smartcard:
-- Fixed a locking issue
+Media keys:
+- Remove "button-*" configurations, they work as labelled
+
+===============
+Version 3.17.90
+===============
+
+Date & Time:
+- Fix auto-timezone changes not getting applied after changed
+
+Orientation:
+- Fix screen lock not getting applied
+
+Print notifications:
+- Fix setting of page size
 
 Wacom:
-- Fix possible crash in GsdDeviceMapper
-- Make sure that display-less tablets can be set back to mapping to
-  the full desktop extent
-- Make sure that the output is looked up again from settings when the
-  connected outputs change
+- Fix some settings not getting applied after changed
 
 XSettings:
+- Fix some settings not getting applied after changed
+
+==============
+Version 3.17.3
+==============
+
+- Make device type presence checks work on libinput and wayland
+- Fix orientation setting on startup
+
+==============
+Version 3.17.2
+==============
+
+Orientation:
+- Get accelerometer information from iio-sensor-proxy
+
+Power:
+- Add automatic screen brightness support, using iio-sensor-proxy
+- Remove critical-battery-action key as it's not used anymore with UPower 1.0
+- Fix a crash when reading invalid backlight values
+
+Print notifications:
+- Don't show error for job in progress
+
+Wacom:
+- Fix possible crash when Bamboo tablet is plugged at login time
+- Fix possible double-frees
+
+==============
+Version 3.16.2
+==============
+
+Media keys:
+- Don't crash when toggling the touchpad enabled button
+
+Mouse:
+- Fix scroll methods settings for multiple devices
+- Enable tap to click on devices without hw buttons
+- Don't disable soft buttons when disabling the touchpad on devices
+  without hw buttons
+
+Power:
+- Avoid screen being left ON indefinitely after waking from sleep if
+  there's a notification when we wake up
+- Fix backlight adjustment not working under gdm in some
+  configurations
+
+Print Notifications:
+- Do not block because of authentication
+
+Wacom:
+- Remove calibration notification
+
+XSettings:
+- Export cursor size to X resources
+- Update fonts immediately as they are added/removed/changed
+
+- Updated translations
+
+==============
+Version 3.16.1
+==============
+
+Housekeeping:
+- Remove support for notification servers without action support
+
+Media keys:
+- Fix a logic error that caused the power key not to work
+
+Print Notifications:
+- Fix HTTP connection leaks
+- Don't show printer-deleted notifications
+
+Wacom:
+- Add support with stylii without an eraser, as used in some Huion tablets
+- Fix possible crashes
+
+- Updated translations
+
+==============
+Version 3.16.0
+==============
+
+- Fix a problem when hot-plugging Wacom devices
+- Updated translations
+
+===============
+Version 3.15.92
+===============
+
+- Updated translations
+
+Cursor:
+- Plugin removed, its functionality was moved to mutter
+
+Keyboard:
+- Remove the special handling of settings under GDM - moved to
+  gnome-shell
+
+Power:
+- Make sure to set an error when GDBus set_property fails
+
+Wacom:
+- Remove use of removed "display" settings key
+- Remove handling of moved "display" key
+- Add fake Huion H610 Pro for tests
+
+===============
+Version 3.15.91
+===============
+
+- Fix build with some build systems
+- Use proper quotes in Housekeeping plugin
+- Fix possible crashes in the Wacom plugin
+- Fix a regression in XSettings caused by recent glib changes
+- Updated translations
+
+===============
+Version 3.15.90
+===============
+
+- When disabling the backlight, also suspend on tablets
+- Don't use colons in screenshot filenames
+- Fix multiple Settings button being added to notifications
+- Fix text wrapping in housekeeping dialogues
+- Use the backlight helper on Linux unconditionally
+- Avoid turning off the backlight altogether on some Linux systems
+
+==============
+Version 3.15.4
+==============
+
+- Added GsdDeviceManager with X11 and udev (for native wayland
+  sessions) backends
+- Most keyboard, mouse, touchpad and wacom settings schemas moved to
+  gsettings-desktop-schemas. User settings migration is done
+  automatically at startup
+- The moved settings are now applied by mutter >= 3.15.4
+
+Media-keys:
+- Adjust to ShellKeyGrabber changes (requires gnome-shell >= 3.15.4 at
+  run time)
+- Make power-actions non-interactive based on mode
+
+XSettings:
+- Export the session bus ID as an xsetting
+
+==============
+Version 3.15.1
+==============
+
+- Add scroll wheel emulation in trackballs
+- Disable touchscreens when the screen is turned off
+- Show backlight OSD on the monitor which it affects
 - Don't check for hi-dpi on monitors with broken EDID
+- Fix possible race with XRandR D-Bus initialisation
+- Output matching for input device fixes
+- Fix memory and resource leaks
+- Fix possible deadlock in smartcard handling
 
 ==============
 Version 3.14.1

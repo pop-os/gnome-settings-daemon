@@ -1,7 +1,7 @@
 AC_PREREQ([2.60])
 
 AC_INIT([gnome-settings-daemon],
-        [3.14.2],
+        [3.22.2],
         [http://bugzilla.gnome.org/enter_bug.cgi?product=gnome-settings-daemon])
 
 AC_CONFIG_SRCDIR([gnome-settings-daemon/gnome-settings-manager.c])
@@ -45,7 +45,7 @@ dnl ---------------------------------------------------------------------------
 
 GLIB_REQUIRED_VERSION=2.37.7
 GIO_REQUIRED_VERSION=${GLIB_REQUIRED_VERSION}
-GTK_REQUIRED_VERSION=3.7.8
+GTK_REQUIRED_VERSION=3.15.3
 GCONF_REQUIRED_VERSION=2.6.1
 GNOME_DESKTOP_REQUIRED_VERSION=3.11.1
 LIBGWEATHER_REQUIRED_VERSION=3.9.5
@@ -56,10 +56,11 @@ LIBRSVG_REQUIRED_VERSION=2.36.2
 PANGO_REQUIRED_VERSION=1.20.0
 POLKIT_REQUIRED_VERSION=0.103
 UPOWER_REQUIRED_VERSION=0.99.0
-GSETTINGS_DESKTOP_SCHEMAS_REQUIRED_VERSION=3.9.91
+GSETTINGS_DESKTOP_SCHEMAS_REQUIRED_VERSION=3.20.0
 GEOCODE_GLIB_REQUIRED_VERSION=3.10.0
-GEOCLUE_REQUIRED_VERSION=2.1.2
-NM_REQUIRED_VERSION=0.9.9.1
+GEOCLUE_REQUIRED_VERSION=2.3.1
+NM_REQUIRED_VERSION=1.0
+LCMS_REQUIRED_VERSION=2.2
 
 EXTRA_COMPILE_WARNINGS(yes)
 
@@ -102,16 +103,6 @@ dnl ---------------------------------------------------------------------------
 PKG_CHECK_MODULES(GNOME_DESKTOP, gnome-desktop-3.0 >= $GNOME_DESKTOP_REQUIRED_VERSION)
 
 dnl ---------------------------------------------------------------------------
-dnl - Check for LCMS2
-dnl ---------------------------------------------------------------------------
-PKG_CHECK_MODULES(LCMS, lcms2 >= 2.2, have_new_lcms=yes, have_new_lcms=no)
-if test x$have_new_lcms = xyes; then
-        AC_DEFINE(HAVE_NEW_LCMS,1,[Got new lcms2])
-else
-        PKG_CHECK_MODULES(LCMS, lcms2)
-fi
-
-dnl ---------------------------------------------------------------------------
 dnl - Check for libnotify
 dnl ---------------------------------------------------------------------------
 
@@ -144,6 +135,26 @@ fi
 AM_CONDITIONAL(HAVE_GUDEV, test x$have_gudev = xyes)
 
 dnl ---------------------------------------------------------------------------
+dnl - ALSA integration (default enabled)
+dnl ---------------------------------------------------------------------------
+ALSA_PKG=""
+AC_ARG_ENABLE(alsa, AS_HELP_STRING([--disable-alsa],[Disable ALSA support (not optional on Linux platforms)]), enable_alsa=$enableval)
+if test x$enable_alsa != xno; then
+	PKG_CHECK_MODULES(ALSA, alsa, have_alsa="yes", have_alsa="no")
+	if test "x$have_alsa" = "xyes"; then
+		AC_DEFINE(HAVE_ALSA, 1, [define if ALSA is available])
+		ALSA_PKG="alsa"
+	else
+		if test x$enable_alsa = xyes; then
+			AC_MSG_ERROR([ALSA enabled but not found])
+		fi
+	fi
+else
+	have_alsa=no
+fi
+AM_CONDITIONAL(HAVE_ALSA, test x$have_alsa = xyes)
+
+dnl ---------------------------------------------------------------------------
 dnl - Check for libwayland-client
 dnl ---------------------------------------------------------------------------
 AC_ARG_ENABLE(wayland,
@@ -164,7 +175,7 @@ dnl ---------------------------------------------------------------------------
 dnl - common
 dnl ---------------------------------------------------------------------------
 
-PKG_CHECK_MODULES(COMMON, x11 kbproto xi)
+PKG_CHECK_MODULES(COMMON, x11 kbproto xi $GUDEV_PKG)
 
 dnl ---------------------------------------------------------------------------
 dnl - XTest
@@ -179,12 +190,6 @@ dnl - mouse
 dnl ---------------------------------------------------------------------------
 
 PKG_CHECK_MODULES(MOUSE, x11 xi)
-
-dnl ---------------------------------------------------------------------------
-dnl - cursor
-dnl ---------------------------------------------------------------------------
-
-PKG_CHECK_MODULES(CURSOR, xfixes gnome-desktop-3.0 >= $GNOME_DESKTOP_REQUIRED_VERSION)
 
 dnl ---------------------------------------------------------------------------
 dnl - xsettings
@@ -203,7 +208,7 @@ dnl - media-keys plugin stuff
 dnl ---------------------------------------------------------------------------
 
 PKG_CHECK_MODULES(MEDIA_KEYS, [gio-unix-2.0 libpulse >= $PA_REQUIRED_VERSION $GUDEV_PKG libpulse-mainloop-glib >= $PA_REQUIRED_VERSION libcanberra-gtk3 upower-glib >= $UPOWER_REQUIRED_VERSION])
-PKG_CHECK_MODULES(GVC, [gobject-2.0 libpulse >= $PA_REQUIRED_VERSION libpulse-mainloop-glib >= $PA_REQUIRED_VERSION])
+PKG_CHECK_MODULES(GVC, [gobject-2.0 libpulse >= $PA_REQUIRED_VERSION libpulse-mainloop-glib >= $PA_REQUIRED_VERSION $ALSA_PKG])
 AM_CONDITIONAL(HAVE_INTROSPECTION, false)
 
 dnl ---------------------------------------------------------------------------
@@ -216,9 +221,7 @@ dnl ---------------------------------------------------------------------------
 dnl - orientation plugin stuff
 dnl ---------------------------------------------------------------------------
 
-if test x$have_gudev != xno; then
-	PKG_CHECK_MODULES(ORIENTATION, [gnome-desktop-3.0 >= $GNOME_DESKTOP_REQUIRED_VERSION gudev-1.0])
-fi
+PKG_CHECK_MODULES(ORIENTATION, [gnome-desktop-3.0 >= $GNOME_DESKTOP_REQUIRED_VERSION])
 
 dnl ---------------------------------------------------------------------------
 dnl - sound plugin stuff
@@ -242,7 +245,7 @@ dnl ---------------------------------------------------------------------------
 dnl - color
 dnl ---------------------------------------------------------------------------
 
-PKG_CHECK_MODULES(COLOR, [colord >= 1.0.2 gnome-desktop-3.0 >= $GNOME_DESKTOP_REQUIRED_VERSION libcanberra-gtk3])
+PKG_CHECK_MODULES(COLOR, [colord >= 1.0.2 gnome-desktop-3.0 >= $GNOME_DESKTOP_REQUIRED_VERSION libcanberra-gtk3 lcms2 >= $LCMS_REQUIRED_VERSION])
 
 dnl ---------------------------------------------------------------------------
 dnl - datetime
@@ -252,17 +255,11 @@ AC_CHECK_LIBM
 AC_SUBST(LIBM)
 
 PKG_CHECK_MODULES(DATETIME,
-        geoclue-2.0 >= $GEOCLUE_REQUIRED_VERSION
+        libgeoclue-2.0 >= $GEOCLUE_REQUIRED_VERSION
 	geocode-glib-1.0 >= $GEOCODE_GLIB_REQUIRED_VERSION
 	gweather-3.0 >= $LIBGWEATHER_REQUIRED_VERSION
 	polkit-gobject-1 >= $POLKIT_REQUIRED_VERSION
 )
-
-GEOCLUE_DBUS_INTERFACE_XML=`pkg-config --variable=dbus_interface geoclue-2.0`
-if test "x$GEOCLUE_DBUS_INTERFACE_XML" = "x"; then
-	AC_MSG_ERROR([Cannot find dbus_interface variable in geoclue-2.0.pc])
-fi
-AC_SUBST(GEOCLUE_DBUS_INTERFACE_XML)
 
 dnl ---------------------------------------------------------------------------
 dnl - wacom (disabled for s390/s390x and non Linux platforms)
@@ -407,7 +404,7 @@ AC_ARG_ENABLE(network-manager,
         enable_network_manager=yes)
 
 if test "x$enable_network_manager" = "xyes" ; then
-        NM_MODULE="libnm-glib >= $NM_REQUIRED_VERSION libnm-util >= $NM_REQUIRED_VERSION"
+        NM_MODULE="libnm >= $NM_REQUIRED_VERSION"
         AC_DEFINE(HAVE_NETWORK_MANAGER, 1, [Defined if NetworkManager support is enabled])
 else
         NM_MODULE=
@@ -521,7 +518,6 @@ plugins/a11y-settings/Makefile
 plugins/clipboard/Makefile
 plugins/color/Makefile
 plugins/common/Makefile
-plugins/cursor/Makefile
 plugins/datetime/Makefile
 plugins/dummy/Makefile
 plugins/power/Makefile
@@ -585,7 +581,6 @@ echo "
         cflags:                   ${CFLAGS}
         Maintainer mode:          ${USE_MAINTAINER_MODE}
 
-        LCMS DICT support:        ${have_new_lcms}
         NetworkManager support:   ${enable_network_manager}
         Libnotify support:        ${have_libnotify}
         Smartcard support:        ${have_smartcard_support}

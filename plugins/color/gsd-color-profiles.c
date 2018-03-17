@@ -29,6 +29,7 @@
 
 struct GsdColorProfilesPrivate
 {
+        GCancellable    *cancellable;
         CdClient        *client;
         CdIccStore      *icc_store;
 };
@@ -56,18 +57,20 @@ gcm_session_client_connect_cb (GObject *source_object,
 {
         gboolean ret;
         GError *error = NULL;
-        GsdColorProfiles *profiles = GSD_COLOR_PROFILES (user_data);
-        GsdColorProfilesPrivate *priv = profiles->priv;
+        CdClient *client = CD_CLIENT (source_object);
+        GsdColorProfiles *profiles;
 
         /* connected */
-        ret = cd_client_connect_finish (profiles->priv->client, res, &error);
+        ret = cd_client_connect_finish (client, res, &error);
         if (!ret) {
-                g_warning ("failed to connect to colord: %s", error->message);
+                if (!g_error_matches (error, G_IO_ERROR, G_IO_ERROR_CANCELLED))
+                        g_warning ("failed to connect to colord: %s", error->message);
                 g_error_free (error);
                 return;
         }
 
         /* is there an available colord instance? */
+        profiles = GSD_COLOR_PROFILES (user_data);
         ret = cd_client_get_has_server (profiles->priv->client);
         if (!ret) {
                 g_warning ("There is no colord server available");
@@ -75,10 +78,10 @@ gcm_session_client_connect_cb (GObject *source_object,
         }
 
         /* add profiles */
-        ret = cd_icc_store_search_kind (priv->icc_store,
+        ret = cd_icc_store_search_kind (profiles->priv->icc_store,
                                         CD_ICC_STORE_SEARCH_KIND_USER,
                                         CD_ICC_STORE_SEARCH_FLAGS_CREATE_LOCATION,
-                                        NULL,
+                                        profiles->priv->cancellable,
                                         &error);
         if (!ret) {
                 g_warning ("failed to add user icc: %s", error->message);
@@ -90,12 +93,26 @@ gboolean
 gsd_color_profiles_start (GsdColorProfiles *profiles,
                           GError          **error)
 {
-        cd_client_connect (profiles->priv->client,
-                           NULL,
+        GsdColorProfilesPrivate *priv = profiles->priv;
+
+        /* use a fresh cancellable for each start->stop operation */
+        g_cancellable_cancel (priv->cancellable);
+        g_clear_object (&priv->cancellable);
+        priv->cancellable = g_cancellable_new ();
+
+        cd_client_connect (priv->client,
+                           priv->cancellable,
                            gcm_session_client_connect_cb,
                            profiles);
 
         return TRUE;
+}
+
+void
+gsd_color_profiles_stop (GsdColorProfiles *profiles)
+{
+        GsdColorProfilesPrivate *priv = profiles->priv;
+        g_cancellable_cancel (priv->cancellable);
 }
 
 static void
@@ -109,8 +126,8 @@ gcm_session_create_profile_cb (GObject *object,
 
         profile = cd_client_create_profile_finish (client, res, &error);
         if (profile == NULL) {
-                if (error->domain != CD_CLIENT_ERROR ||
-                    error->code != CD_CLIENT_ERROR_ALREADY_EXISTS)
+                if (!g_error_matches (error, G_IO_ERROR, G_IO_ERROR_CANCELLED) &&
+                    !g_error_matches (error, CD_CLIENT_ERROR, CD_CLIENT_ERROR_ALREADY_EXISTS))
                         g_warning ("%s", error->message);
                 g_error_free (error);
                 return;
@@ -128,7 +145,7 @@ gcm_session_icc_store_added_cb (CdIccStore *icc_store,
         cd_client_create_profile_for_icc (priv->client,
                                           icc,
                                           CD_OBJECT_SCOPE_TEMP,
-                                          NULL,
+                                          priv->cancellable,
                                           gcm_session_create_profile_cb,
                                           profiles);
 #else
@@ -155,7 +172,7 @@ gcm_session_icc_store_added_cb (CdIccStore *icc_store,
                                   profile_id,
                                   CD_OBJECT_SCOPE_TEMP,
                                   profile_props,
-                                  NULL,
+                                  priv->cancellable,
                                   gcm_session_create_profile_cb,
                                   profiles);
         g_free (profile_id);
@@ -175,7 +192,8 @@ gcm_session_delete_profile_cb (GObject *object,
 
         ret = cd_client_delete_profile_finish (client, res, &error);
         if (!ret) {
-                g_warning ("%s", error->message);
+                if (!g_error_matches (error, G_IO_ERROR, G_IO_ERROR_CANCELLED))
+                        g_warning ("%s", error->message);
                 g_error_free (error);
         }
 }
@@ -192,7 +210,8 @@ gcm_session_find_profile_by_filename_cb (GObject *object,
 
         profile = cd_client_find_profile_by_filename_finish (client, res, &error);
         if (profile == NULL) {
-                g_warning ("%s", error->message);
+                if (!g_error_matches (error, G_IO_ERROR, G_IO_ERROR_CANCELLED))
+                        g_warning ("%s", error->message);
                 g_error_free (error);
                 goto out;
         }
@@ -200,7 +219,7 @@ gcm_session_find_profile_by_filename_cb (GObject *object,
         /* remove it from colord */
         cd_client_delete_profile (profiles->priv->client,
                                   profile,
-                                  NULL,
+                                  profiles->priv->cancellable,
                                   gcm_session_delete_profile_cb,
                                   profiles);
 out:
@@ -217,7 +236,7 @@ gcm_session_icc_store_removed_cb (CdIccStore *icc_store,
         g_debug ("filename %s removed", cd_icc_get_filename (icc));
         cd_client_find_profile_by_filename (profiles->priv->client,
                                             cd_icc_get_filename (icc),
-                                            NULL,
+                                            profiles->priv->cancellable,
                                             gcm_session_find_profile_by_filename_cb,
                                             profiles);
 }
@@ -251,6 +270,8 @@ gsd_color_profiles_finalize (GObject *object)
 
         profiles = GSD_COLOR_PROFILES (object);
 
+        g_cancellable_cancel (profiles->priv->cancellable);
+        g_clear_object (&profiles->priv->cancellable);
         g_clear_object (&profiles->priv->icc_store);
         g_clear_object (&profiles->priv->client);
 

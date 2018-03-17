@@ -29,9 +29,7 @@
 #include <X11/extensions/XInput2.h>
 
 #include "gsd-input-helper.h"
-
-#define INPUT_DEVICES_SCHEMA "org.gnome.settings-daemon.peripherals.input-devices"
-#define KEY_HOTPLUG_COMMAND  "hotplug-command"
+#include "gsd-device-manager.h"
 
 #define ABS_MT_X "Abs MT Position X"
 #define ABS_MT_Y "Abs MT Position Y"
@@ -117,12 +115,6 @@ supports_xinput_devices_with_opcode (int *opcode)
 }
 
 gboolean
-supports_xinput_devices (void)
-{
-	return supports_xinput_devices_with_opcode (NULL);
-}
-
-gboolean
 supports_xtest (void)
 {
         gint op_code, event, error;
@@ -162,148 +154,31 @@ supports_xinput2_devices (int *opcode)
         return TRUE;
 }
 
-gboolean
-device_is_touchpad (XDevice *xdevice)
-{
-        Atom realtype, prop;
-        int realformat;
-        unsigned long nitems, bytes_after;
-        unsigned char *data;
-
-        /* we don't check on the type being XI_TOUCHPAD here,
-         * but having a "Synaptics Off" property should be enough */
-
-        prop = XInternAtom (GDK_DISPLAY_XDISPLAY (gdk_display_get_default ()), "Synaptics Off", False);
-        if (!prop)
-                return FALSE;
-
-        gdk_error_trap_push ();
-        if ((XGetDeviceProperty (GDK_DISPLAY_XDISPLAY (gdk_display_get_default ()), xdevice, prop, 0, 1, False,
-                                XA_INTEGER, &realtype, &realformat, &nitems,
-                                &bytes_after, &data) == Success) && (realtype != None)) {
-                gdk_error_trap_pop_ignored ();
-                XFree (data);
-                return TRUE;
-        }
-        gdk_error_trap_pop_ignored ();
-
-        return FALSE;
-}
-
-gboolean
-device_info_is_touchpad (XDeviceInfo *device_info)
-{
-        return (device_info->type == XInternAtom (GDK_DISPLAY_XDISPLAY (gdk_display_get_default ()), XI_TOUCHPAD, False));
-}
-
-gboolean
-device_info_is_touchscreen (XDeviceInfo *device_info)
-{
-        return (device_info->type == XInternAtom (GDK_DISPLAY_XDISPLAY (gdk_display_get_default ()), XI_TOUCHSCREEN, False));
-}
-
-gboolean
-device_info_is_tablet (XDeviceInfo *device_info)
-{
-        /* Note that this doesn't match Wacom tablets */
-        return (device_info->type == XInternAtom (GDK_DISPLAY_XDISPLAY (gdk_display_get_default ()), XI_TABLET, False));
-}
-
-gboolean
-device_info_is_mouse (XDeviceInfo *device_info)
-{
-        return (device_info->type == XInternAtom (GDK_DISPLAY_XDISPLAY (gdk_display_get_default ()), XI_MOUSE, False));
-}
-
-gboolean
-device_info_is_trackball (XDeviceInfo *device_info)
-{
-        gboolean retval;
-
-        retval = (device_info->type == XInternAtom (GDK_DISPLAY_XDISPLAY (gdk_display_get_default ()), XI_TRACKBALL, False));
-        if (retval == FALSE &&
-            device_info->name != NULL) {
-                char *lowercase;
-
-                lowercase = g_ascii_strdown (device_info->name, -1);
-                retval = strstr (lowercase, "trackball") != NULL;
-                g_free (lowercase);
-        }
-
-        return retval;
-}
-
 static gboolean
-device_type_is_present (InfoIdentifyFunc info_func,
-                        DeviceIdentifyFunc device_func)
+device_type_is_present (GsdDeviceType type)
 {
-        XDeviceInfo *device_info;
-        gint n_devices;
-        guint i;
-        gboolean retval;
-
-        if (supports_xinput_devices () == FALSE)
-                return TRUE;
-
-        retval = FALSE;
-
-        device_info = XListInputDevices (GDK_DISPLAY_XDISPLAY (gdk_display_get_default ()), &n_devices);
-        if (device_info == NULL)
-                return FALSE;
-
-        for (i = 0; i < n_devices; i++) {
-                XDevice *device;
-
-                /* Check with the device info first */
-                retval = (info_func) (&device_info[i]);
-                if (retval == FALSE)
-                        continue;
-
-                /* If we only have an info func, we're done checking */
-                if (device_func == NULL)
-                        break;
-
-                gdk_error_trap_push ();
-                device = XOpenDevice (GDK_DISPLAY_XDISPLAY (gdk_display_get_default ()), device_info[i].id);
-                if (gdk_error_trap_pop () || (device == NULL))
-                        continue;
-
-                retval = (device_func) (device);
-                xdevice_close (device);
-                if (retval)
-                        break;
-        }
-        XFreeDeviceList (device_info);
-
-        return retval;
+        GList *l = gsd_device_manager_list_devices (gsd_device_manager_get (),
+                                                    type);
+        g_list_free (l);
+        return l != NULL;
 }
 
 gboolean
 touchscreen_is_present (void)
 {
-        return device_type_is_present (device_info_is_touchscreen,
-                                       NULL);
+        return device_type_is_present (GSD_DEVICE_TYPE_TOUCHSCREEN);
 }
 
 gboolean
 touchpad_is_present (void)
 {
-        return device_type_is_present (device_info_is_touchpad,
-                                       device_is_touchpad);
+        return device_type_is_present (GSD_DEVICE_TYPE_TOUCHPAD);
 }
 
 gboolean
 mouse_is_present (void)
 {
-        return device_type_is_present (device_info_is_mouse,
-                                       NULL);
-}
-
-gboolean
-trackball_is_present (void)
-{
-        return device_type_is_present (device_info_is_trackball,
-                                       NULL);
+        return device_type_is_present (GSD_DEVICE_TYPE_MOUSE);
 }
 
 char *
@@ -464,131 +339,6 @@ set_device_enabled (int device_id,
         return TRUE;
 }
 
-static const char *
-custom_command_to_string (CustomCommand command)
-{
-        switch (command) {
-        case COMMAND_DEVICE_ADDED:
-                return "added";
-        case COMMAND_DEVICE_REMOVED:
-                return "removed";
-        case COMMAND_DEVICE_PRESENT:
-                return "present";
-        default:
-                g_assert_not_reached ();
-        }
-}
-
-/* Run a custom command on device presence events. Parameters passed into
- * the custom command are:
- * command -t [added|removed|present] -i <device ID> <device name>
- * Type 'added' and 'removed' signal 'device added' and 'device removed',
- * respectively. Type 'present' signals 'device present at
- * gnome-settings-daemon init'.
- *
- * The script is expected to run synchronously, and an exit value
- * of "1" means that no other settings will be applied to this
- * particular device.
- *
- * More options may be added in the future.
- *
- * This function returns TRUE if we should not apply any more settings
- * to the device.
- */
-gboolean
-run_custom_command (GdkDevice              *device,
-                    CustomCommand           command)
-{
-        GSettings *settings;
-        GError *error = NULL;
-        char *cmd;
-        char *argv[7];
-        int exit_status;
-        gboolean rc;
-        int id;
-        char *out;
-
-        settings = g_settings_new (INPUT_DEVICES_SCHEMA);
-        cmd = g_settings_get_string (settings, KEY_HOTPLUG_COMMAND);
-        g_object_unref (settings);
-
-        if (!cmd || cmd[0] == '\0') {
-                g_free (cmd);
-                return FALSE;
-        }
-
-        /* Easter egg! */
-        g_object_get (device, "device-id", &id, NULL);
-
-        argv[0] = cmd;
-        argv[1] = "-t";
-        argv[2] = (char *) custom_command_to_string (command);
-        argv[3] = "-i";
-        argv[4] = g_strdup_printf ("%d", id);
-        argv[5] = (char*) gdk_device_get_name (device);
-        argv[6] = NULL;
-
-        out = g_strjoinv (" ", argv);
-        g_debug ("About to launch command: %s", out);
-        g_free (out);
-
-        rc = g_spawn_sync (g_get_home_dir (), argv, NULL, G_SPAWN_SEARCH_PATH,
-                           NULL, NULL, NULL, NULL, &exit_status, &error);
-
-        if (rc == FALSE) {
-                g_warning ("Couldn't execute command '%s', verify that this is a valid command: %s", cmd, error->message);
-                g_clear_error (&error);
-        }
-
-        g_free (argv[0]);
-        g_free (argv[4]);
-
-        if (!g_spawn_check_exit_status (exit_status, &error)) {
-                if (g_error_matches (error, G_SPAWN_EXIT_ERROR, 1)) {
-                        g_clear_error (&error);
-                        return TRUE;
-                }
-                g_clear_error (&error);
-        }
-
-        return FALSE;
-}
-
-GList *
-get_disabled_devices (GdkDeviceManager *manager)
-{
-        XDeviceInfo *device_info;
-        gint n_devices;
-        guint i;
-        GList *ret;
-
-        ret = NULL;
-
-        device_info = XListInputDevices (GDK_DISPLAY_XDISPLAY (gdk_display_get_default ()), &n_devices);
-        if (device_info == NULL)
-                return ret;
-
-        for (i = 0; i < n_devices; i++) {
-                GdkDevice *device;
-
-                /* Ignore core devices */
-                if (device_info[i].use == IsXKeyboard ||
-                    device_info[i].use == IsXPointer)
-                        continue;
-
-                /* Check whether the device is actually available */
-                device = gdk_x11_device_manager_lookup (manager, device_info[i].id);
-                if (device != NULL)
-                        continue;
-
-                ret = g_list_prepend (ret, GINT_TO_POINTER (device_info[i].id));
-        }
-
-        XFreeDeviceList (device_info);
-
-        return ret;
-}
-
 const char *
 xdevice_get_wacom_tool_type (int deviceid)
 {
@@ -642,8 +392,13 @@ xdevice_get_dimensions (int    deviceid,
         guint *value, w, h;
         int i, n_info;
 
+        gdk_error_trap_push ();
+
         info = XIQueryDevice (GDK_DISPLAY_XDISPLAY (display), deviceid, &n_info);
         *width = *height = w = h = 0;
+
+        if (gdk_error_trap_pop ())
+                return FALSE;
 
         if (!info)
                 return FALSE;

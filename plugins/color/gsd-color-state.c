@@ -45,6 +45,7 @@
 
 struct GsdColorStatePrivate
 {
+        GCancellable    *cancellable;
         GsdSessionManager *session;
         CdClient        *client;
         GnomeRRScreen   *state_screen;
@@ -672,8 +673,8 @@ gcm_session_device_assign_profile_connect_cb (GObject *object,
         /* get properties */
         ret = cd_profile_connect_finish (profile, res, &error);
         if (!ret) {
-                g_warning ("failed to connect to profile: %s",
-                           error->message);
+                if (!g_error_matches (error, G_IO_ERROR, G_IO_ERROR_CANCELLED))
+                        g_warning ("failed to connect to profile: %s", error->message);
                 g_error_free (error);
                 goto out;
         }
@@ -795,8 +796,8 @@ gcm_session_device_assign_connect_cb (GObject *object,
         /* get properties */
         ret = cd_device_connect_finish (device, res, &error);
         if (!ret) {
-                g_warning ("failed to connect to device: %s",
-                           error->message);
+                if (!g_error_matches (error, G_IO_ERROR, G_IO_ERROR_CANCELLED))
+                        g_warning ("failed to connect to device: %s", error->message);
                 g_error_free (error);
                 goto out;
         }
@@ -890,7 +891,7 @@ gcm_session_device_assign_connect_cb (GObject *object,
         helper->state = g_object_ref (state);
         helper->device = g_object_ref (device);
         cd_profile_connect (profile,
-                            NULL,
+                            priv->cancellable,
                             gcm_session_device_assign_profile_connect_cb,
                             helper);
 out:
@@ -921,7 +922,7 @@ gcm_session_device_assign (GsdColorState *state, CdDevice *device)
                              g_strdup (key),
                              GINT_TO_POINTER (TRUE));
         cd_device_connect (device,
-                           NULL,
+                           state->priv->cancellable,
                            gcm_session_device_assign_connect_cb,
                            state);
 }
@@ -955,11 +956,9 @@ gcm_session_create_device_cb (GObject *object,
                                                  res,
                                                  &error);
         if (device == NULL) {
-                if (error->domain != CD_CLIENT_ERROR ||
-                    error->code != CD_CLIENT_ERROR_ALREADY_EXISTS) {
-                        g_warning ("failed to create device: %s",
-                                   error->message);
-                }
+                if (!g_error_matches (error, G_IO_ERROR, G_IO_ERROR_CANCELLED) &&
+                    !g_error_matches (error, CD_CLIENT_ERROR, CD_CLIENT_ERROR_ALREADY_EXISTS))
+                        g_warning ("failed to create device: %s", error->message);
                 g_error_free (error);
                 return;
         }
@@ -971,6 +970,7 @@ gcm_session_add_state_output (GsdColorState *state, GnomeRROutput *output)
 {
         const gchar *edid_checksum = NULL;
         const gchar *model = NULL;
+        const gchar *output_name = NULL;
         const gchar *serial = NULL;
         const gchar *vendor = NULL;
         gboolean ret;
@@ -979,6 +979,13 @@ gcm_session_add_state_output (GsdColorState *state, GnomeRROutput *output)
         GError *error = NULL;
         GHashTable *device_props = NULL;
         GsdColorStatePrivate *priv = state->priv;
+
+        /* VNC creates a fake device that cannot be color managed */
+        output_name = gnome_rr_output_get_name (output);
+        if (output_name != NULL && g_str_has_prefix (output_name, "VNC-")) {
+                g_debug ("ignoring %s as fake VNC device detected", output_name);
+                return;
+        }
 
         /* try to get edid */
         edid = gcm_session_get_output_edid (state, output, &error);
@@ -1060,7 +1067,7 @@ gcm_session_add_state_output (GsdColorState *state, GnomeRROutput *output)
                                  device_id,
                                  CD_OBJECT_SCOPE_TEMP,
                                  device_props,
-                                 NULL,
+                                 priv->cancellable,
                                  gcm_session_create_device_cb,
                                  state);
         g_free (device_id);
@@ -1090,8 +1097,8 @@ gcm_session_screen_removed_delete_device_cb (GObject *object, GAsyncResult *res,
                                               res,
                                               &error);
         if (!ret) {
-                g_warning ("failed to delete device: %s",
-                           error->message);
+                if (!g_error_matches (error, G_IO_ERROR, G_IO_ERROR_CANCELLED))
+                        g_warning ("failed to delete device: %s", error->message);
                 g_error_free (error);
         }
 }
@@ -1107,8 +1114,8 @@ gcm_session_screen_removed_find_device_cb (GObject *object, GAsyncResult *res, g
                                                res,
                                                &error);
         if (device == NULL) {
-                g_warning ("failed to find device: %s",
-                           error->message);
+                if (!g_error_matches (error, G_IO_ERROR, G_IO_ERROR_CANCELLED))
+                        g_warning ("failed to find device: %s", error->message);
                 g_error_free (error);
                 return;
         }
@@ -1116,7 +1123,7 @@ gcm_session_screen_removed_find_device_cb (GObject *object, GAsyncResult *res, g
                  cd_device_get_object_path (device));
         cd_client_delete_device (state->priv->client,
                                  device,
-                                 NULL,
+                                 state->priv->cancellable,
                                  gcm_session_screen_removed_delete_device_cb,
                                  state);
         g_object_unref (device);
@@ -1134,7 +1141,7 @@ gnome_rr_screen_output_removed_cb (GnomeRRScreen *screen,
         cd_client_find_device_by_property (state->priv->client,
                                            CD_DEVICE_METADATA_XRANDR_NAME,
                                            gnome_rr_output_get_name (output),
-                                           NULL,
+                                           state->priv->cancellable,
                                            gcm_session_screen_removed_find_device_cb,
                                            state);
 }
@@ -1150,8 +1157,8 @@ gcm_session_get_devices_cb (GObject *object, GAsyncResult *res, gpointer user_da
 
         array = cd_client_get_devices_finish (CD_CLIENT (object), res, &error);
         if (array == NULL) {
-                g_warning ("failed to get devices: %s",
-                           error->message);
+                if (!g_error_matches (error, G_IO_ERROR, G_IO_ERROR_CANCELLED))
+                        g_warning ("failed to get devices: %s", error->message);
                 g_error_free (error);
                 goto out;
         }
@@ -1178,15 +1185,15 @@ gcm_session_profile_gamma_find_device_cb (GObject *object,
                                                            res,
                                                            &error);
         if (device == NULL) {
-                g_warning ("could not find device: %s",
-                           error->message);
+                if (!g_error_matches (error, G_IO_ERROR, G_IO_ERROR_CANCELLED))
+                        g_warning ("could not find device: %s", error->message);
                 g_error_free (error);
                 goto out;
         }
 
         /* get properties */
         cd_device_connect (device,
-                           NULL,
+                           state->priv->cancellable,
                            gcm_session_device_assign_connect_cb,
                            state);
 out:
@@ -1216,7 +1223,7 @@ gnome_rr_screen_output_changed_cb (GnomeRRScreen *screen,
                 cd_client_find_device_by_property (state->priv->client,
                                                    CD_DEVICE_METADATA_XRANDR_NAME,
                                                    gnome_rr_output_get_name (outputs[i]),
-                                                   NULL,
+                                                   priv->cancellable,
                                                    gcm_session_profile_gamma_find_device_cb,
                                                    state);
         }
@@ -1266,7 +1273,8 @@ gcm_session_active_changed_cb (GDBusProxy      *session,
          */
         if (is_active && !priv->session_is_active) {
                 g_debug ("Done switch to new account, reload devices");
-                cd_client_get_devices (state->priv->client, NULL,
+                cd_client_get_devices (priv->client,
+                                       priv->cancellable,
                                        gcm_session_get_devices_cb,
                                        state);
         }
@@ -1288,7 +1296,8 @@ gcm_session_client_connect_cb (GObject *source_object,
         /* connected */
         ret = cd_client_connect_finish (state->priv->client, res, &error);
         if (!ret) {
-                g_warning ("failed to connect to colord: %s", error->message);
+                if (!g_error_matches (error, G_IO_ERROR, G_IO_ERROR_CANCELLED))
+                        g_warning ("failed to connect to colord: %s", error->message);
                 g_error_free (error);
                 return;
         }
@@ -1341,7 +1350,8 @@ gcm_session_client_connect_cb (GObject *source_object,
                           state);
 
         /* set for each device that already exist */
-        cd_client_get_devices (priv->client, NULL,
+        cd_client_get_devices (priv->client,
+                               priv->cancellable,
                                gcm_session_get_devices_cb,
                                state);
 out:
@@ -1356,26 +1366,51 @@ on_rr_screen_acquired (GObject      *object,
         GsdColorState *state = data;
         GsdColorStatePrivate *priv = state->priv;
         GnomeRRScreen *screen;
+        GError *error = NULL;
 
-        screen = gnome_rr_screen_new_finish (result, NULL);
-        if (!screen)
-                return;
+        /* gnome_rr_screen_new_async() does not take a GCancellable */
+        if (g_cancellable_is_cancelled (priv->cancellable))
+                goto out;
+
+        screen = gnome_rr_screen_new_finish (result, &error);
+        if (screen == NULL) {
+                g_warning ("failed to get screens: %s", error->message);
+                g_error_free (error);
+                goto out;
+        }
 
         priv->state_screen = screen;
 
         cd_client_connect (priv->client,
-                           NULL,
+                           priv->cancellable,
                            gcm_session_client_connect_cb,
                            state);
+out:
+        /* manually added */
+        g_object_unref (state);
 }
 
 void
 gsd_color_state_start (GsdColorState *state)
 {
+        GsdColorStatePrivate *priv = state->priv;
+
+        /* use a fresh cancellable for each start->stop operation */
+        g_cancellable_cancel (priv->cancellable);
+        g_clear_object (&priv->cancellable);
+        priv->cancellable = g_cancellable_new ();
+
         /* coldplug the list of screens */
         gnome_rr_screen_new_async (gdk_screen_get_default (),
                                    on_rr_screen_acquired,
-                                   state);
+                                   g_object_ref (state));
+}
+
+void
+gsd_color_state_stop (GsdColorState *state)
+{
+        GsdColorStatePrivate *priv = state->priv;
+        g_cancellable_cancel (priv->cancellable);
 }
 
 static void
@@ -1428,6 +1463,8 @@ gsd_color_state_finalize (GObject *object)
 
         state = GSD_COLOR_STATE (object);
 
+        g_cancellable_cancel (state->priv->cancellable);
+        g_clear_object (&state->priv->cancellable);
         g_clear_object (&state->priv->client);
         g_clear_object (&state->priv->session);
         g_clear_pointer (&state->priv->edid_cache, g_hash_table_destroy);

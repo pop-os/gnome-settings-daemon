@@ -42,7 +42,7 @@ struct GvcMixerStreamPrivate
         pa_context    *pa_context;
         guint          id;
         guint          index;
-        gint           card_index;
+        guint          card_index;
         GvcChannelMap *channel_map;
         char          *name;
         char          *description;
@@ -84,8 +84,6 @@ enum
         PROP_PORT,
 };
 
-static void     gvc_mixer_stream_class_init (GvcMixerStreamClass *klass);
-static void     gvc_mixer_stream_init       (GvcMixerStream      *mixer_stream);
 static void     gvc_mixer_stream_finalize   (GObject            *object);
 
 G_DEFINE_ABSTRACT_TYPE (GvcMixerStream, gvc_mixer_stream, G_TYPE_OBJECT)
@@ -611,7 +609,7 @@ gvc_mixer_stream_set_ports (GvcMixerStream *stream,
         return TRUE;
 }
 
-gint
+guint
 gvc_mixer_stream_get_card_index (GvcMixerStream *stream)
 {
         g_return_val_if_fail (GVC_IS_MIXER_STREAM (stream), PA_INVALID_INDEX);
@@ -620,7 +618,7 @@ gvc_mixer_stream_get_card_index (GvcMixerStream *stream)
 
 gboolean
 gvc_mixer_stream_set_card_index (GvcMixerStream *stream,
-                                 gint            card_index)
+                                 guint           card_index)
 {
         g_return_val_if_fail (GVC_IS_MIXER_STREAM (stream), FALSE);
 

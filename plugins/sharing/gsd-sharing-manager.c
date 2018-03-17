@@ -26,9 +26,7 @@
 #include <glib/gstdio.h>
 
 #ifdef HAVE_NETWORK_MANAGER
-#include <nm-client.h>
-#include <nm-device.h>
-#include <nm-remote-settings.h>
+#include <NetworkManager.h>
 #endif /* HAVE_NETWORK_MANAGER */
 
 #include "gnome-settings-plugin.h"
@@ -41,8 +39,6 @@
 typedef struct {
         const char  *name;
         GSettings   *settings;
-        gboolean     started;
-        GSubprocess *process;
 } ServiceInfo;
 
 struct GsdSharingManagerPrivate
@@ -54,7 +50,6 @@ struct GsdSharingManagerPrivate
         GCancellable            *cancellable;
 #ifdef HAVE_NETWORK_MANAGER
         NMClient                *client;
-        NMRemoteSettings        *remote_settings;
 #endif /* HAVE_NETWORK_MANAGER */
 
         GHashTable              *services;
@@ -105,48 +100,69 @@ static const char * const services[] = {
 };
 
 static void
+handle_unit_cb (GObject      *source_object,
+                GAsyncResult *res,
+                gpointer      user_data)
+{
+        GError *error = NULL;
+        GVariant *ret;
+        const char *operation = user_data;
+
+        ret = g_dbus_connection_call_finish (G_DBUS_CONNECTION (source_object),
+                                             res, &error);
+        if (!ret) {
+                if (!g_error_matches (error, G_IO_ERROR, G_IO_ERROR_CANCELLED))
+                        g_warning ("Failed to %s service: %s", operation, error->message);
+                g_error_free (error);
+                return;
+        }
+
+        g_variant_unref (ret);
+
+}
+
+static void
+gsd_sharing_manager_handle_service (GsdSharingManager   *manager,
+                                    const char          *method,
+                                    ServiceInfo         *service)
+{
+        char *service_file;
+
+        service_file = g_strdup_printf ("%s.service", service->name);
+        g_dbus_connection_call (manager->priv->connection,
+                                "org.freedesktop.systemd1",
+                                "/org/freedesktop/systemd1",
+                                "org.freedesktop.systemd1.Manager",
+                                method,
+                                g_variant_new ("(ss)", service_file, "replace"),
+                                NULL,
+                                G_DBUS_CALL_FLAGS_NONE,
+                                -1,
+                                manager->priv->cancellable,
+                                handle_unit_cb,
+                                (gpointer) method);
+        g_free (service_file);
+}
+
+static void
 gsd_sharing_manager_start_service (GsdSharingManager *manager,
                                    ServiceInfo       *service)
 {
-        GDesktopAppInfo *app;
-        const char *exec;
-        char *desktop, **argvp;
-        GError *error = NULL;
-
-        if (service->started)
-                return;
         g_debug ("About to start %s", service->name);
 
-        desktop = g_strdup_printf ("%s.desktop", service->name);
-        app = g_desktop_app_info_new (desktop);
-        g_free (desktop);
+        /* We use StartUnit, not StartUnitReplace, since the latter would
+         * cancel any pending start we already have going from an
+         * earlier _start_service() call */
+        gsd_sharing_manager_handle_service (manager, "StartUnit", service);
+}
 
-        if (!app) {
-                g_warning ("Could not find desktop file for service '%s'", service->name);
-                return;
-        }
+static void
+gsd_sharing_manager_stop_service (GsdSharingManager *manager,
+                                  ServiceInfo       *service)
+{
+        g_debug ("About to stop %s", service->name);
 
-        exec = g_app_info_get_commandline (G_APP_INFO (app));
-
-        if (!g_shell_parse_argv (exec, NULL, &argvp, &error)) {
-                g_warning ("Could not parse command-line '%s': %s", exec, error->message);
-                g_error_free (error);
-                g_object_unref (app);
-                return;
-        }
-
-        service->process = g_subprocess_newv ((const gchar * const*) argvp, G_SUBPROCESS_FLAGS_NONE, &error);
-
-        if (!service->process) {
-                g_warning ("Could not start command-line '%s': %s", exec, error->message);
-                g_error_free (error);
-                service->started = FALSE;
-        } else {
-                service->started = TRUE;
-        }
-
-        g_strfreev (argvp);
-        g_object_unref (app);
+        gsd_sharing_manager_handle_service (manager, "StopUnit", service);
 }
 
 #ifdef HAVE_NETWORK_MANAGER
@@ -179,22 +195,6 @@ service_is_enabled_on_current_connection (GsdSharingManager *manager,
 #endif /* HAVE_NETWORK_MANAGER */
 
 static void
-gsd_sharing_manager_stop_service (GsdSharingManager *manager,
-                                  ServiceInfo       *service)
-{
-        if (!service->started ||
-            service->process == NULL) {
-                    return;
-        }
-
-        g_debug ("About to stop %s", service->name);
-
-        g_subprocess_send_signal (service->process, SIGTERM);
-        g_clear_object (&service->process);
-        service->started = FALSE;
-}
-
-static void
 gsd_sharing_manager_sync_services (GsdSharingManager *manager)
 {
         GList *services, *l;
@@ -209,12 +209,10 @@ gsd_sharing_manager_sync_services (GsdSharingManager *manager)
                     service_is_enabled_on_current_connection (manager, service))
                         should_be_started = TRUE;
 
-                if (service->started != should_be_started) {
-                        if (service->started)
-                                gsd_sharing_manager_stop_service (manager, service);
-                        else
-                                gsd_sharing_manager_start_service (manager, service);
-                }
+                if (should_be_started)
+                        gsd_sharing_manager_start_service (manager, service);
+                else
+                        gsd_sharing_manager_stop_service (manager, service);
         }
         g_list_free (services);
 }
@@ -369,10 +367,10 @@ get_type_and_name_for_connection_uuid (GsdSharingManager *manager,
         NMRemoteConnection *conn;
         const char *type;
 
-        if (!manager->priv->remote_settings)
+        if (!manager->priv->client)
                 return NULL;
 
-        conn = nm_remote_settings_get_connection_by_uuid (manager->priv->remote_settings, uuid);
+        conn = nm_client_get_connection_by_uuid (manager->priv->client, uuid);
         if (!conn)
                 return NULL;
         type = nm_connection_get_connection_type (NM_CONNECTION (conn));
@@ -397,10 +395,10 @@ connection_is_low_security (GsdSharingManager *manager,
 {
         NMRemoteConnection *conn;
 
-        if (!manager->priv->remote_settings)
+        if (!manager->priv->client)
                 return TRUE;
 
-        conn = nm_remote_settings_get_connection_by_uuid (manager->priv->remote_settings, uuid);
+        conn = nm_client_get_connection_by_uuid (manager->priv->client, uuid);
         if (!conn)
                 return TRUE;
 
@@ -423,7 +421,7 @@ gsd_sharing_manager_list_networks (GsdSharingManager  *manager,
                 return NULL;
 
 #ifdef HAVE_NETWORK_MANAGER
-        if (!manager->priv->remote_settings) {
+        if (!manager->priv->client) {
                 g_set_error (error, G_DBUS_ERROR, G_DBUS_ERROR_FAILED, "Not ready yet");
                 return NULL;
         }
@@ -554,7 +552,8 @@ on_bus_gotten (GObject               *source_object,
 
         connection = g_bus_get_finish (res, &error);
         if (connection == NULL) {
-                g_warning ("Could not get session bus: %s", error->message);
+                if (!g_error_matches (error, G_IO_ERROR, G_IO_ERROR_CANCELLED))
+                        g_warning ("Could not get session bus: %s", error->message);
                 g_error_free (error);
                 return;
         }
@@ -655,25 +654,6 @@ nm_client_ready (GObject      *source_object,
         primary_connection_changed (NULL, NULL, manager);
 }
 
-static void
-remote_settings_ready_cb (GObject      *source_object,
-                          GAsyncResult *res,
-                          gpointer      user_data)
-{
-        GError *error = NULL;
-        GsdSharingManager *manager = user_data;
-        NMRemoteSettings *remote_settings;
-
-        remote_settings = nm_remote_settings_new_finish (res, &error);
-        if (!remote_settings) {
-                if (!g_error_matches (error, G_IO_ERROR, G_IO_ERROR_CANCELLED))
-                        g_warning ("Couldn't get remote settings: %s", error->message);
-                g_error_free (error);
-                return;
-        }
-
-        manager->priv->remote_settings = remote_settings;
-}
 #endif /* HAVE_NETWORK_MANAGER */
 
 #define RYGEL_BUS_NAME "org.gnome.Rygel1"
@@ -720,7 +700,6 @@ gsd_sharing_manager_start (GsdSharingManager *manager,
         manager->priv->cancellable = g_cancellable_new ();
 #ifdef HAVE_NETWORK_MANAGER
         nm_client_new_async (manager->priv->cancellable, nm_client_ready, manager);
-        nm_remote_settings_new_async (NULL, manager->priv->cancellable, remote_settings_ready_cb, manager);
 #endif /* HAVE_NETWORK_MANAGER */
 
         /* Start process of owning a D-Bus name */
@@ -748,7 +727,6 @@ gsd_sharing_manager_stop (GsdSharingManager *manager)
 
 #ifdef HAVE_NETWORK_MANAGER
         g_clear_object (&manager->priv->client);
-        g_clear_object (&manager->priv->remote_settings);
 #endif /* HAVE_NETWORK_MANAGER */
 
         if (manager->priv->name_id != 0) {
@@ -780,7 +758,6 @@ service_free (gpointer pointer)
         ServiceInfo *service = pointer;
 
         g_clear_object (&service->settings);
-        gsd_sharing_manager_stop_service (NULL, service);
         g_free (service);
 }
 

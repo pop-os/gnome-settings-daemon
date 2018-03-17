@@ -6,7 +6,7 @@
 
 G_BEGIN_DECLS
 
-/* VOID:STRING,STRING (gsd-marshal.list:1) */
+/* VOID:STRING,STRING (/home/hadess/Projects/jhbuild/gnome-settings-daemon/plugins/media-keys/gsd-marshal.list:1) */
 G_GNUC_INTERNAL void gsd_marshal_VOID__STRING_STRING (GClosure     *closure,
                                                       GValue       *return_value,
                                                       guint         n_param_values,

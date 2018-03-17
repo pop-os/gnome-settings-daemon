@@ -35,7 +35,6 @@
 #include <libnotify/notify.h>
 
 #include "gsd-disk-space.h"
-#include "gsd-ldsm-dialog.h"
 #include "gsd-disk-space-helper.h"
 
 #define GIGABYTE                   1024 * 1024 * 1024
@@ -73,7 +72,6 @@ static unsigned int       min_notify_period = 10;
 static GSList            *ignore_paths = NULL;
 static GSettings         *settings = NULL;
 static GSettings         *privacy_settings = NULL;
-static GsdLdsmDialog     *dialog = NULL;
 static NotifyNotification *notification = NULL;
 
 static guint64           *time_read;
@@ -106,7 +104,7 @@ ldsm_get_fs_id_for_path (const gchar *path)
 }
 
 static gboolean
-ldsm_mount_has_trash (LdsmMountInfo *mount)
+ldsm_mount_has_trash (const char *path)
 {
         const gchar *user_data_dir;
         gchar *user_data_attr_id_fs;
@@ -115,12 +113,10 @@ ldsm_mount_has_trash (LdsmMountInfo *mount)
         gchar *trash_files_dir;
         gboolean has_trash = FALSE;
         GDir *dir;
-        const gchar *path;
 
         user_data_dir = g_get_user_data_dir ();
         user_data_attr_id_fs = ldsm_get_fs_id_for_path (user_data_dir);
 
-        path = g_unix_mount_get_mount_path (mount->mount);
         path_attr_id_fs = ldsm_get_fs_id_for_path (path);
 
         if (g_strcmp0 (user_data_attr_id_fs, path_attr_id_fs) == 0) {
@@ -177,28 +173,6 @@ ldsm_analyze_path (const gchar *path)
 
         g_spawn_async (NULL, (gchar **) argv, NULL, G_SPAWN_SEARCH_PATH,
                         NULL, NULL, NULL, NULL);
-}
-
-static gboolean
-server_has_actions (void)
-{
-        gboolean has;
-        GList   *caps;
-        GList   *l;
-
-        caps = notify_get_server_caps ();
-        if (caps == NULL) {
-                fprintf (stderr, "Failed to receive server caps.\n");
-                return FALSE;
-        }
-
-        l = g_list_find_custom (caps, "actions", (GCompareFunc)strcmp);
-        has = l != NULL;
-
-        g_list_foreach (caps, (GFunc) g_free, NULL);
-        g_list_free (caps);
-
-        return has;
 }
 
 static void
@@ -391,7 +365,8 @@ delete_subdir (GObject      *source,
 
         enumerator = g_file_enumerate_children_finish (file, res, &error);
         if (error) {
-                if (!g_error_matches (error, G_IO_ERROR, G_IO_ERROR_NOT_DIRECTORY))
+                if (!g_error_matches (error, G_IO_ERROR, G_IO_ERROR_NOT_DIRECTORY) &&
+                    !g_error_matches (error, G_IO_ERROR, G_IO_ERROR_CANCELLED))
                         g_warning ("Failed to enumerate children of %s: %s\n", data->name, error->message);
         }
         if (enumerator) {
@@ -423,7 +398,6 @@ delete_subdir_check_symlink (GObject      *source,
         GFile *file = G_FILE (source);
         DeleteData *data = user_data;
         GFileInfo *info;
-        GFileType type;
 
         info = g_file_query_info_finish (file, res, NULL);
         if (!info) {
@@ -431,16 +405,15 @@ delete_subdir_check_symlink (GObject      *source,
                 return;
         }
 
-        type = g_file_info_get_file_type (info);
-        g_object_unref (info);
-
-        if (type == G_FILE_TYPE_SYMBOLIC_LINK) {
+        if (g_file_info_get_file_type (info) == G_FILE_TYPE_SYMBOLIC_LINK) {
                 if (should_purge_file (data->file, data->cancellable, data->old)) {
                         g_debug ("Purging %s leaf node", data->name);
                         if (!data->dry_run) {
                                 g_file_delete (data->file, data->cancellable, NULL);
                         }
                 }
+        } else if (g_strcmp0 (g_file_info_get_name (info), ".X11-unix") == 0) {
+                g_debug ("Skipping X11 socket directory");
         } else {
                 g_file_enumerate_children_async (data->file,
                                                  G_FILE_ATTRIBUTE_STANDARD_NAME ","
@@ -451,6 +424,7 @@ delete_subdir_check_symlink (GObject      *source,
                                                  delete_subdir,
                                                  delete_data_ref (data));
         }
+        g_object_unref (info);
         delete_data_unref (data);
 }
 
@@ -464,6 +438,7 @@ delete_recursively_by_age (DeleteData *data)
         }
 
         g_file_query_info_async (data->file,
+                                 G_FILE_ATTRIBUTE_STANDARD_NAME ","
                                  G_FILE_ATTRIBUTE_STANDARD_TYPE,
                                  G_FILE_QUERY_INFO_NOFOLLOW_SYMLINKS,
                                  0,
@@ -577,143 +552,114 @@ on_notification_closed (NotifyNotification *n)
         notification = NULL;
 }
 
-static gboolean
-ldsm_notify_for_mount (LdsmMountInfo *mount,
-                       gboolean       multiple_volumes,
-                       gboolean       other_usable_volumes)
+static void
+ldsm_notify (const char *summary,
+             const char *body,
+             const char *mount_path)
 {
-        gchar  *name, *program;
-        gint64 free_space;
-        gint response;
-        gboolean has_trash;
+        gchar *program;
         gboolean has_disk_analyzer;
-        gboolean retval = TRUE;
-        gchar *path;
+        gboolean has_trash;
 
         /* Don't show a notice if one is already displayed */
-        if (dialog != NULL || notification != NULL)
-                return retval;
+        if (notification != NULL)
+                return;
 
-        name = g_unix_mount_guess_name (mount->mount);
-        free_space = (gint64) mount->buf.f_frsize * (gint64) mount->buf.f_bavail;
-        has_trash = ldsm_mount_has_trash (mount);
-        path = g_strdup (g_unix_mount_get_mount_path (mount->mount));
+        notification = notify_notification_new (summary, body, "drive-harddisk-symbolic");
+        g_signal_connect (notification,
+                          "closed",
+                          G_CALLBACK (on_notification_closed),
+                          NULL);
+
+        notify_notification_set_app_name (notification, _("Disk space"));
+        notify_notification_set_hint (notification, "transient", g_variant_new_boolean (TRUE));
+        notify_notification_set_urgency (notification, NOTIFY_URGENCY_CRITICAL);
+        notify_notification_set_timeout (notification, NOTIFY_EXPIRES_DEFAULT);
 
         program = g_find_program_in_path (DISK_SPACE_ANALYZER);
         has_disk_analyzer = (program != NULL);
         g_free (program);
 
-        if (server_has_actions ()) {
-                char *free_space_str;
-                char *summary;
-                char *body;
-
-                free_space_str = g_format_size (free_space);
-
-                if (multiple_volumes) {
-                        summary = g_strdup_printf (_("Low Disk Space on \"%s\""), name);
-                        if (has_trash) {
-                                body = g_strdup_printf (_("The volume \"%s\" has only %s disk space remaining.  You may free up some space by emptying the trash."),
-                                                        name,
-                                                        free_space_str);
-                        } else {
-                                body = g_strdup_printf (_("The volume \"%s\" has only %s disk space remaining."),
-                                                        name,
-                                                        free_space_str);
-                        }
-                } else {
-                        summary = g_strdup (_("Low Disk Space"));
-                        if (has_trash) {
-                                body = g_strdup_printf (_("This computer has only %s disk space remaining.  You may free up some space by emptying the trash."),
-                                                        free_space_str);
-                        } else {
-                                body = g_strdup_printf (_("This computer has only %s disk space remaining."),
-                                                        free_space_str);
-                        }
-                }
-                g_free (free_space_str);
-
-                notification = notify_notification_new (summary, body, "drive-harddisk-symbolic");
-                g_free (summary);
-                g_free (body);
-
-                g_signal_connect (notification,
-                                  "closed",
-                                  G_CALLBACK (on_notification_closed),
-                                  NULL);
-
-                notify_notification_set_app_name (notification, _("Disk space"));
-                notify_notification_set_hint (notification, "transient", g_variant_new_boolean (TRUE));
-                notify_notification_set_urgency (notification, NOTIFY_URGENCY_CRITICAL);
-                notify_notification_set_timeout (notification, NOTIFY_EXPIRES_DEFAULT);
-                if (has_disk_analyzer) {
-                        notify_notification_add_action (notification,
-                                                        "examine",
-                                                        _("Examine"),
-                                                        (NotifyActionCallback) examine_callback,
-                                                        g_strdup (path),
-                                                        g_free);
-                }
-                if (has_trash) {
-                        notify_notification_add_action (notification,
-                                                        "empty-trash",
-                                                        _("Empty Trash"),
-                                                        (NotifyActionCallback) empty_trash_callback,
-                                                        NULL,
-                                                        NULL);
-                }
+        if (has_disk_analyzer) {
                 notify_notification_add_action (notification,
-                                                "ignore",
-                                                _("Ignore"),
-                                                (NotifyActionCallback) ignore_callback,
+                                                "examine",
+                                                _("Examine"),
+                                                (NotifyActionCallback) examine_callback,
+                                                g_strdup (mount_path),
+                                                g_free);
+        }
+
+        has_trash = ldsm_mount_has_trash (mount_path);
+
+        if (has_trash) {
+                notify_notification_add_action (notification,
+                                                "empty-trash",
+                                                _("Empty Trash"),
+                                                (NotifyActionCallback) empty_trash_callback,
                                                 NULL,
                                                 NULL);
-                notify_notification_set_category (notification, "device");
+        }
 
-                if (!notify_notification_show (notification, NULL)) {
-                        g_warning ("failed to send disk space notification\n");
+        notify_notification_add_action (notification,
+                                        "ignore",
+                                        _("Ignore"),
+                                        (NotifyActionCallback) ignore_callback,
+                                        NULL,
+                                        NULL);
+        notify_notification_set_category (notification, "device");
+
+        if (!notify_notification_show (notification, NULL)) {
+                g_warning ("failed to send disk space notification\n");
+        }
+}
+
+static void
+ldsm_notify_for_mount (LdsmMountInfo *mount,
+                       gboolean       multiple_volumes)
+{
+        gboolean has_trash;
+        gchar  *name;
+        gint64 free_space;
+        const gchar *path;
+        char *free_space_str;
+        char *summary;
+        char *body;
+
+        name = g_unix_mount_guess_name (mount->mount);
+        path = g_unix_mount_get_mount_path (mount->mount);
+        has_trash = ldsm_mount_has_trash (path);
+
+        free_space = (gint64) mount->buf.f_frsize * (gint64) mount->buf.f_bavail;
+        free_space_str = g_format_size (free_space);
+
+        if (multiple_volumes) {
+                summary = g_strdup_printf (_("Low Disk Space on “%s”"), name);
+                if (has_trash) {
+                        body = g_strdup_printf (_("The volume “%s” has only %s disk space remaining.  You may free up some space by emptying the trash."),
+                                                name,
+                                                free_space_str);
+                } else {
+                        body = g_strdup_printf (_("The volume “%s” has only %s disk space remaining."),
+                                                name,
+                                                free_space_str);
                 }
-
         } else {
-                dialog = gsd_ldsm_dialog_new (other_usable_volumes,
-                                              multiple_volumes,
-                                              has_disk_analyzer,
-                                              has_trash,
-                                              free_space,
-                                              name,
-                                              path);
-
-                g_object_ref (G_OBJECT (dialog));
-                response = gtk_dialog_run (GTK_DIALOG (dialog));
-
-                gtk_widget_destroy (GTK_WIDGET (dialog));
-                dialog = NULL;
-
-                switch (response) {
-                case GTK_RESPONSE_CANCEL:
-                        retval = FALSE;
-                        break;
-                case GSD_LDSM_DIALOG_RESPONSE_ANALYZE:
-                        retval = FALSE;
-                        ldsm_analyze_path (path);
-                        break;
-                case GSD_LDSM_DIALOG_RESPONSE_EMPTY_TRASH:
-                        retval = TRUE;
-                        gsd_ldsm_show_empty_trash ();
-                        break;
-                case GTK_RESPONSE_NONE:
-                case GTK_RESPONSE_DELETE_EVENT:
-                        retval = TRUE;
-                        break;
-                default:
-                        g_assert_not_reached ();
+                summary = g_strdup (_("Low Disk Space"));
+                if (has_trash) {
+                        body = g_strdup_printf (_("This computer has only %s disk space remaining.  You may free up some space by emptying the trash."),
+                                                free_space_str);
+                } else {
+                        body = g_strdup_printf (_("This computer has only %s disk space remaining."),
+                                                free_space_str);
                 }
         }
 
-        g_free (name);
-        g_free (path);
+        ldsm_notify (summary, body, path);
 
-        return retval;
+        g_free (free_space_str);
+        g_free (summary);
+        g_free (body);
+        g_free (name);
 }
 
 static gboolean
@@ -774,8 +720,7 @@ ldsm_free_mount_info (gpointer data)
 
 static void
 ldsm_maybe_warn_mounts (GList *mounts,
-                        gboolean multiple_volumes,
-                        gboolean other_usable_volumes)
+                        gboolean multiple_volumes)
 {
         GList *l;
         gboolean done = FALSE;
@@ -832,8 +777,8 @@ ldsm_maybe_warn_mounts (GList *mounts,
                 }
 
                 if (show_notify) {
-                        if (ldsm_notify_for_mount (mount_info, multiple_volumes, other_usable_volumes))
-                                done = TRUE;
+                        ldsm_notify_for_mount (mount_info, multiple_volumes);
+                        done = TRUE;
                 }
         }
 }
@@ -846,9 +791,7 @@ ldsm_check_all_mounts (gpointer data)
         GList *check_mounts = NULL;
         GList *full_mounts = NULL;
         guint number_of_mounts;
-        guint number_of_full_mounts;
         gboolean multiple_volumes = FALSE;
-        gboolean other_usable_volumes = FALSE;
 
         /* We iterate through the static mounts in /etc/fstab first, seeing if
          * they're mounted by checking if the GUnixMountPoint has a corresponding GUnixMountEntry.
@@ -880,7 +823,7 @@ ldsm_check_all_mounts (gpointer data)
                         continue;
                 }
 
-                if (ldsm_mount_is_user_ignore (g_unix_mount_get_mount_path (mount))) {
+                if (ldsm_mount_is_user_ignore (path)) {
                         ldsm_free_mount_info (mount_info);
                         continue;
                 }
@@ -920,12 +863,7 @@ ldsm_check_all_mounts (gpointer data)
                 }
         }
 
-        number_of_full_mounts = g_list_length (full_mounts);
-        if (number_of_mounts > number_of_full_mounts)
-                other_usable_volumes = TRUE;
-
-        ldsm_maybe_warn_mounts (full_mounts, multiple_volumes,
-                                other_usable_volumes);
+        ldsm_maybe_warn_mounts (full_mounts, multiple_volumes);
 
         g_list_free (check_mounts);
         g_list_free (full_mounts);
@@ -1045,8 +983,7 @@ gsd_ldsm_setup (gboolean check_now)
         g_signal_connect (G_OBJECT (settings), "changed",
                           G_CALLBACK (gsd_ldsm_update_config), NULL);
 
-        ldsm_monitor = g_unix_mount_monitor_new ();
-        g_unix_mount_monitor_set_rate_limit (ldsm_monitor, 1000);
+        ldsm_monitor = g_unix_mount_monitor_get ();
         g_signal_connect (ldsm_monitor, "mounts-changed",
                           G_CALLBACK (ldsm_mounts_changed), NULL);
 
@@ -1080,7 +1017,6 @@ gsd_ldsm_clean (void)
         g_clear_object (&ldsm_monitor);
         g_clear_object (&settings);
         g_clear_object (&privacy_settings);
-        g_clear_object (&dialog);
         g_clear_pointer (&notification, notify_notification_close);
         g_slist_free_full (ignore_paths, g_free);
         ignore_paths = NULL;

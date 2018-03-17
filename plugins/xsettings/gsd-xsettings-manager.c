@@ -60,6 +60,7 @@
 #define SOUND_SETTINGS_SCHEMA     "org.gnome.desktop.sound"
 #define PRIVACY_SETTINGS_SCHEMA     "org.gnome.desktop.privacy"
 #define WM_SETTINGS_SCHEMA        "org.gnome.desktop.wm.preferences"
+#define A11Y_SCHEMA               "org.gnome.desktop.a11y"
 #define CLASSIC_WM_SETTINGS_SCHEMA "org.gnome.shell.extensions.classic-overrides"
 
 #define XSETTINGS_PLUGIN_SCHEMA "org.gnome.settings-daemon.plugins.xsettings"
@@ -71,6 +72,7 @@
 #define TEXT_SCALING_FACTOR_KEY "text-scaling-factor"
 #define SCALING_FACTOR_KEY "scaling-factor"
 #define CURSOR_SIZE_KEY "cursor-size"
+#define CURSOR_THEME_KEY "cursor-theme"
 
 #define FONT_ANTIALIASING_KEY "antialiasing"
 #define FONT_HINTING_KEY      "hinting"
@@ -378,6 +380,37 @@ fixed_true_int (GnomeXSettingsManager *manager,
         xsettings_manager_set_int (manager->priv->manager, fixed->xsetting_name, TRUE);
 }
 
+static void
+fixed_bus_id (GnomeXSettingsManager *manager,
+              FixedEntry            *fixed)
+{
+        const gchar *id;
+        GDBusConnection *bus;
+        GVariant *res;
+
+        bus = g_bus_get_sync (G_BUS_TYPE_SESSION, NULL, NULL);
+        res = g_dbus_connection_call_sync (bus,
+                                           "org.freedesktop.DBus",
+                                           "/org/freedesktop/DBus",
+                                           "org.freedesktop.DBus",
+                                           "GetId",
+                                           NULL,
+                                           NULL,
+                                           G_DBUS_CALL_FLAGS_NONE,
+                                           -1,
+                                           NULL,
+                                           NULL);
+
+        if (res) {
+                g_variant_get (res, "(&s)", &id);
+
+                xsettings_manager_set_string (manager->priv->manager, fixed->xsetting_name, id);
+                g_variant_unref (res);
+        }
+
+        g_object_unref (bus);
+}
+
 static FixedEntry fixed_entries [] = {
         { "Gtk/MenuImages",          fixed_false_int },
         { "Gtk/ButtonImages",        fixed_false_int },
@@ -386,6 +419,7 @@ static FixedEntry fixed_entries [] = {
         { "Gtk/AutoMnemonics",       fixed_true_int },
         { "Gtk/EnablePrimaryPaste",  fixed_true_int },
         { "Gtk/DialogsUseHeader",    fixed_true_int },
+        { "Gtk/SessionBusId",        fixed_bus_id },
 };
 
 static TranslationEntry translations [] = {
@@ -424,7 +458,8 @@ static TranslationEntry translations [] = {
         { "org.gnome.desktop.wm.preferences", "button-layout",     "Gtk/DecorationLayout", translate_button_layout },
         { "org.gnome.desktop.wm.preferences", "action-double-click-titlebar",  "Gtk/TitlebarDoubleClick",     translate_string_string },
         { "org.gnome.desktop.wm.preferences", "action-middle-click-titlebar",  "Gtk/TitlebarMiddleClick",     translate_string_string },
-        { "org.gnome.desktop.wm.preferences", "action-right-click-titlebar",  "Gtk/TitlebarRightClick",     translate_string_string }
+        { "org.gnome.desktop.wm.preferences", "action-right-click-titlebar",  "Gtk/TitlebarRightClick",     translate_string_string },
+        { "org.gnome.desktop.a11y", "always-show-text-caret",       "Gtk/KeynavUseCaret",         translate_bool_int }
 };
 
 static gboolean
@@ -630,6 +665,7 @@ typedef struct {
         int         dpi;
         int         window_scale;
         int         cursor_size;
+        char       *cursor_theme;
         const char *rgba;
         const char *hintstyle;
 } GnomeXftSettings;
@@ -661,6 +697,7 @@ xft_settings_get (GnomeXSettingsManager *manager,
         settings->scaled_dpi = dpi * settings->window_scale * 1024;
         cursor_size = g_settings_get_int (interface_settings, CURSOR_SIZE_KEY);
         settings->cursor_size = cursor_size * settings->window_scale;
+        settings->cursor_theme = g_settings_get_string (interface_settings, CURSOR_THEME_KEY);
         settings->rgba = "rgb";
         settings->hintstyle = "hintfull";
 
@@ -715,6 +752,12 @@ xft_settings_get (GnomeXSettingsManager *manager,
 }
 
 static void
+xft_settings_clear (GnomeXftSettings *settings)
+{
+        g_free (settings->cursor_theme);
+}
+
+static void
 xft_settings_set_xsettings (GnomeXSettingsManager *manager,
                             GnomeXftSettings      *settings)
 {
@@ -728,6 +771,7 @@ xft_settings_set_xsettings (GnomeXSettingsManager *manager,
         xsettings_manager_set_int (manager->priv->manager, "Xft/DPI", settings->scaled_dpi);
         xsettings_manager_set_string (manager->priv->manager, "Xft/RGBA", settings->rgba);
         xsettings_manager_set_int (manager->priv->manager, "Gtk/CursorThemeSize", settings->cursor_size);
+        xsettings_manager_set_string (manager->priv->manager, "Gtk/CursorThemeName", settings->cursor_theme);
 
         gnome_settings_profile_end (NULL);
 }
@@ -789,6 +833,10 @@ xft_settings_set_xresources (GnomeXftSettings *settings)
                                 settings->hintstyle);
         update_property (add_string, "Xft.rgba",
                                 settings->rgba);
+        update_property (add_string, "Xcursor.size",
+                                g_ascii_dtostr (dpibuf, sizeof (dpibuf), (double) settings->cursor_size));
+        update_property (add_string, "Xcursor.theme",
+                                settings->cursor_theme);
 
         g_debug("xft_settings_set_xresources: new res '%s'", add_string->str);
 
@@ -815,6 +863,7 @@ update_xft_settings (GnomeXSettingsManager *manager)
         xft_settings_get (manager, &settings);
         xft_settings_set_xsettings (manager, &settings);
         xft_settings_set_xresources (&settings);
+        xft_settings_clear (&settings);
 
         gnome_settings_profile_end (NULL);
 }
@@ -849,7 +898,8 @@ plugin_callback (GSettings             *settings,
                  GnomeXSettingsManager *manager)
 {
         if (g_str_equal (key, GTK_MODULES_DISABLED_KEY) ||
-            g_str_equal (key, GTK_MODULES_ENABLED_KEY)) {
+            g_str_equal (key, GTK_MODULES_ENABLED_KEY) ||
+            g_str_equal (key, "active")) {
                 /* Do nothing, as GsdXsettingsGtk will handle it */
         } else if (g_str_equal (key, XSETTINGS_OVERRIDE_KEY)) {
                 override_callback (settings, key, manager);
@@ -999,7 +1049,9 @@ xsettings_callback (GSettings             *settings,
         GVariant         *value;
 
         if (g_str_equal (key, TEXT_SCALING_FACTOR_KEY) ||
-            g_str_equal (key, SCALING_FACTOR_KEY)) {
+            g_str_equal (key, SCALING_FACTOR_KEY) ||
+            g_str_equal (key, CURSOR_SIZE_KEY) ||
+            g_str_equal (key, CURSOR_THEME_KEY)) {
         	xft_callback (NULL, key, manager);
         	return;
 	}
@@ -1178,6 +1230,8 @@ gnome_xsettings_manager_start (GnomeXSettingsManager *manager,
                              PRIVACY_SETTINGS_SCHEMA, g_settings_new (PRIVACY_SETTINGS_SCHEMA));
         g_hash_table_insert (manager->priv->settings,
                              WM_SETTINGS_SCHEMA, g_settings_new (WM_SETTINGS_SCHEMA));
+        g_hash_table_insert (manager->priv->settings,
+                             A11Y_SCHEMA, g_settings_new (A11Y_SCHEMA));
 
         session = g_getenv ("XDG_CURRENT_DESKTOP");
         if (session && strstr (session, "GNOME-Classic")) {
@@ -1201,6 +1255,12 @@ gnome_xsettings_manager_start (GnomeXSettingsManager *manager,
                 (* fixed->func) (manager, fixed);
         }
 
+        list = g_hash_table_get_values (manager->priv->settings);
+        for (l = list; l != NULL; l = l->next) {
+                g_signal_connect_object (G_OBJECT (l->data), "changed", G_CALLBACK (xsettings_callback), manager, 0);
+        }
+        g_list_free (list);
+
         for (i = 0; i < G_N_ELEMENTS (translations); i++) {
                 GVariant *val;
                 GSettings *settings;
@@ -1217,12 +1277,6 @@ gnome_xsettings_manager_start (GnomeXSettingsManager *manager,
                 process_value (manager, &translations[i], val);
                 g_variant_unref (val);
         }
-
-        list = g_hash_table_get_values (manager->priv->settings);
-        for (l = list; l != NULL; l = l->next) {
-                g_signal_connect_object (G_OBJECT (l->data), "changed", G_CALLBACK (xsettings_callback), manager, 0);
-        }
-        g_list_free (list);
 
         /* Plugin settings (GTK modules and Xft) */
         manager->priv->plugin_settings = g_settings_new (XSETTINGS_PLUGIN_SCHEMA);
@@ -1285,6 +1339,7 @@ gnome_xsettings_manager_stop (GnomeXSettingsManager *manager)
         }
 
         if (p->plugin_settings != NULL) {
+                g_signal_handlers_disconnect_by_data (p->plugin_settings, manager);
                 g_object_unref (p->plugin_settings);
                 p->plugin_settings = NULL;
         }

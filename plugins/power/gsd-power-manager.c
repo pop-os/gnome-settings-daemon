@@ -1,7 +1,7 @@
 /* -*- Mode: C; tab-width: 8; indent-tabs-mode: nil; c-basic-offset: 8 -*-
  *
  * Copyright (C) 2007 William Jon McCann <mccann@jhu.edu>
- * Copyright (C) 2011-2012 Richard Hughes <richard@hughsie.com>
+ * Copyright (C) 2011-2012, 2015 Richard Hughes <richard@hughsie.com>
  * Copyright (C) 2011 Ritesh Khadgaray <khadgaray@gmail.com>
  * Copyright (C) 2012-2013 Red Hat Inc.
  *
@@ -77,15 +77,22 @@
 /* And the time before we stop the warning sound */
 #define GSD_STOP_SOUND_DELAY GSD_ACTION_DELAY - 2
 
+/* the amount of smoothing done to the the ambient light readings; a lower
+ * number means the backlight changes slower in response to changing ambient
+ * conditions, a hugher number may lead to noticable jitteryness */
+#define GSD_AMBIENT_SMOOTH          0.3f
+
 static const gchar introspection_xml[] =
 "<node>"
 "  <interface name='org.gnome.SettingsDaemon.Power.Screen'>"
 "    <property name='Brightness' type='i' access='readwrite'/>"
 "    <method name='StepUp'>"
 "      <arg type='i' name='new_percentage' direction='out'/>"
+"      <arg type='i' name='output_id' direction='out'/>"
 "    </method>"
 "    <method name='StepDown'>"
 "      <arg type='i' name='new_percentage' direction='out'/>"
+"      <arg type='i' name='output_id' direction='out'/>"
 "    </method>"
 "  </interface>"
 "  <interface name='org.gnome.SettingsDaemon.Power.Keyboard'>"
@@ -129,11 +136,12 @@ struct GsdPowerManagerPrivate
         /* Screensaver */
         GsdScreenSaver          *screensaver_proxy;
         gboolean                 screensaver_active;
-        GList                   *disabled_devices;
+        GHashTable              *disabled_devices;
 
         /* State */
         gboolean                 lid_is_present;
         gboolean                 lid_is_closed;
+        gboolean                 session_is_active;
         UpClient                *up_client;
         GPtrArray               *devices_array;
         UpDevice                *device_composite;
@@ -155,6 +163,15 @@ struct GsdPowerManagerPrivate
         gint                     kbd_brightness_old;
         gint                     kbd_brightness_pre_dim;
 
+        /* Ambient */
+        GDBusProxy              *iio_proxy;
+        guint                    iio_proxy_watch_id;
+        gboolean                 ambient_norm_required;
+        gdouble                  ambient_accumulator;
+        gdouble                  ambient_norm_value;
+        gdouble                  ambient_percentage_old;
+        gdouble                  ambient_last_absolute;
+
         /* Sound */
         guint32                  critical_alert_timeout_id;
 
@@ -166,6 +183,7 @@ struct GsdPowerManagerPrivate
         gboolean                 inhibit_suspend_taken;
         guint                    inhibit_lid_switch_timer_id;
         gboolean                 is_virtual_machine;
+        gboolean                 is_tablet;
 
         /* Idles */
         GnomeIdleMonitor        *idle_monitor;
@@ -196,6 +214,7 @@ static void      main_battery_or_ups_low_changed (GsdPowerManager *manager, gboo
 static gboolean  idle_is_session_inhibited (GsdPowerManager *manager, guint mask, gboolean *is_inhibited);
 static void      idle_triggered_idle_cb (GnomeIdleMonitor *monitor, guint watch_id, gpointer user_data);
 static void      idle_became_active_cb (GnomeIdleMonitor *monitor, guint watch_id, gpointer user_data);
+static void      iio_proxy_changed (GsdPowerManager *manager);
 
 G_DEFINE_TYPE (GsdPowerManager, gsd_power_manager, G_TYPE_OBJECT)
 
@@ -296,6 +315,10 @@ create_notification (const char *summary,
         NotifyNotification *notification;
 
         notification = notify_notification_new (summary, body, icon_name);
+        /* TRANSLATORS: this is the notification application name */
+        notify_notification_set_app_name (notification, _("Power"));
+        notify_notification_set_urgency (notification,
+                                         NOTIFY_URGENCY_CRITICAL);
         *weak_pointer_location = notification;
         g_object_add_weak_pointer (G_OBJECT (notification),
                                    (gpointer *) weak_pointer_location);
@@ -346,10 +369,6 @@ engine_ups_discharging (GsdPowerManager *manager, UpDevice *device)
                              &manager->priv->notification_ups_discharging);
         notify_notification_set_timeout (manager->priv->notification_ups_discharging,
                                          GSD_POWER_MANAGER_NOTIFY_TIMEOUT_LONG);
-        notify_notification_set_urgency (manager->priv->notification_ups_discharging,
-                                         NOTIFY_URGENCY_NORMAL);
-        /* TRANSLATORS: this is the notification application name */
-        notify_notification_set_app_name (manager->priv->notification_ups_discharging, _("Power"));
         notify_notification_set_hint (manager->priv->notification_ups_discharging,
                                       "transient", g_variant_new_boolean (TRUE));
 
@@ -495,9 +514,6 @@ engine_charge_low (GsdPowerManager *manager, UpDevice *device)
                              &manager->priv->notification_low);
         notify_notification_set_timeout (manager->priv->notification_low,
                                          GSD_POWER_MANAGER_NOTIFY_TIMEOUT_LONG);
-        notify_notification_set_urgency (manager->priv->notification_low,
-                                         NOTIFY_URGENCY_NORMAL);
-        notify_notification_set_app_name (manager->priv->notification_low, _("Power"));
         notify_notification_set_hint (manager->priv->notification_low,
                                       "transient", g_variant_new_boolean (TRUE));
 
@@ -646,9 +662,6 @@ engine_charge_critical (GsdPowerManager *manager, UpDevice *device)
                              &manager->priv->notification_low);
         notify_notification_set_timeout (manager->priv->notification_low,
                                          NOTIFY_EXPIRES_NEVER);
-        notify_notification_set_urgency (manager->priv->notification_low,
-                                         NOTIFY_URGENCY_CRITICAL);
-        notify_notification_set_app_name (manager->priv->notification_low, _("Power"));
 
         notify_notification_show (manager->priv->notification_low, NULL);
 
@@ -754,9 +767,6 @@ engine_charge_action (GsdPowerManager *manager, UpDevice *device)
                              &manager->priv->notification_low);
         notify_notification_set_timeout (manager->priv->notification_low,
                                          NOTIFY_EXPIRES_NEVER);
-        notify_notification_set_urgency (manager->priv->notification_low,
-                                         NOTIFY_URGENCY_CRITICAL);
-        notify_notification_set_app_name (manager->priv->notification_low, _("Power"));
 
         /* try to show */
         notify_notification_show (manager->priv->notification_low, NULL);
@@ -919,42 +929,82 @@ action_hibernate (GsdPowerManager *manager)
 static void
 screen_devices_disable (GsdPowerManager *manager)
 {
-        GsdDeviceMapper *mapper;
         GdkDeviceManager *device_manager;
-        GList *devices, *l, *to_change;
+        GList *devices, *l;
 
-        mapper = gsd_device_mapper_get ();
+        /* This will be managed by the compositor eventually on X11 too:
+         * https://bugzilla.gnome.org/show_bug.cgi?id=742598
+         */
+        if (gnome_settings_is_wayland ())
+                return;
+
         device_manager = gdk_display_get_device_manager (gdk_display_get_default ());
         devices = gdk_device_manager_list_devices (device_manager, GDK_DEVICE_TYPE_SLAVE);
-        to_change = NULL;
         for (l = devices; l != NULL; l = l->next ) {
                 GdkDevice *device = l->data;
+                GdkInputSource source;
 
-                if (gsd_device_mapper_get_device_output (mapper, device) != NULL) {
+                source = gdk_device_get_source (device);
+
+                if (source == GDK_SOURCE_PEN ||
+                    source == GDK_SOURCE_ERASER ||
+                    source == GDK_SOURCE_TOUCHSCREEN) {
                         int device_id;
 
                         g_object_get (device, "device-id", &device_id, NULL);
-                        to_change = g_list_prepend (to_change, GINT_TO_POINTER (device_id));
+                        g_hash_table_insert (manager->priv->disabled_devices,
+                                             GINT_TO_POINTER (device_id),
+                                             GINT_TO_POINTER (TRUE));
                 }
         }
         g_list_free (devices);
 
-        for (l = to_change; l != NULL; l = l->next)
+        devices = g_hash_table_get_keys (manager->priv->disabled_devices);
+        for (l = devices; l != NULL; l = l->next)
                 set_device_enabled (GPOINTER_TO_INT (l->data), FALSE);
-
-        g_clear_pointer (&manager->priv->disabled_devices, g_list_free);
-        manager->priv->disabled_devices = to_change;
+        g_list_free (devices);
 }
 
 static void
 screen_devices_enable (GsdPowerManager *manager)
 {
-        GList *l;
+        GList *l, *disabled_devices;
 
-        for (l = manager->priv->disabled_devices; l != NULL; l = l->next)
+        if (gnome_settings_is_wayland ())
+                return;
+
+        disabled_devices = g_hash_table_get_keys (manager->priv->disabled_devices);
+        for (l = disabled_devices; l != NULL; l = l->next)
                 set_device_enabled (GPOINTER_TO_INT (l->data), TRUE);
+        g_list_free (disabled_devices);
 
-        g_clear_pointer (&manager->priv->disabled_devices, g_list_free);
+        g_hash_table_remove_all (manager->priv->disabled_devices);
+}
+
+static void
+iio_proxy_claim_light (GsdPowerManager *manager, gboolean active)
+{
+        GError *error = NULL;
+        if (manager->priv->iio_proxy == NULL)
+                return;
+        if (!manager->priv->backlight_available)
+                return;
+	if (active != manager->priv->session_is_active)
+		return;
+
+        if (!g_dbus_proxy_call_sync (manager->priv->iio_proxy,
+                                     active ? "ClaimLight" : "ReleaseLight",
+                                     NULL,
+                                     G_DBUS_CALL_FLAGS_NONE,
+                                     -1,
+                                     NULL,
+                                     &error)) {
+                g_warning ("Call to iio-proxy failed: %s", error->message);
+                g_error_free (error);
+        }
+
+        if (active)
+                iio_proxy_changed (manager);
 }
 
 static void
@@ -963,6 +1013,7 @@ backlight_enable (GsdPowerManager *manager)
         gboolean ret;
         GError *error = NULL;
 
+        iio_proxy_claim_light (manager, TRUE);
         ret = gnome_rr_screen_set_dpms_mode (manager->priv->rr_screen,
                                              GNOME_RR_DPMS_ON,
                                              &error);
@@ -983,6 +1034,7 @@ backlight_disable (GsdPowerManager *manager)
         gboolean ret;
         GError *error = NULL;
 
+        iio_proxy_claim_light (manager, FALSE);
         ret = gnome_rr_screen_set_dpms_mode (manager->priv->rr_screen,
                                              GNOME_RR_DPMS_OFF,
                                              &error);
@@ -992,7 +1044,10 @@ backlight_disable (GsdPowerManager *manager)
                 g_error_free (error);
         }
 
-        screen_devices_disable (manager);
+        if (manager->priv->is_tablet)
+                action_suspend (manager);
+        else
+                screen_devices_disable (manager);
 
         g_debug ("TESTSUITE: Blanked screen");
 }
@@ -1426,7 +1481,6 @@ idle_set_mode (GsdPowerManager *manager, GsdPowerIdleMode mode)
         GError *error = NULL;
         gint idle_percentage;
         GsdPowerActionType action_type;
-        gboolean is_active = FALSE;
 
         /* Ignore attempts to set "less idle" modes */
         if (mode <= manager->priv->current_idle_mode &&
@@ -1438,8 +1492,7 @@ idle_set_mode (GsdPowerManager *manager, GsdPowerIdleMode mode)
         }
 
         /* ensure we're still on an active console */
-        is_active = is_session_active (manager);
-        if (!is_active) {
+        if (!manager->priv->session_is_active) {
                 g_debug ("ignoring state transition to %s as inactive",
                          idle_mode_to_string (mode));
                 return;
@@ -1600,7 +1653,6 @@ idle_configure (GsdPowerManager *manager)
 {
         gboolean is_idle_inhibited;
         GsdPowerActionType action_type;
-        guint timeout_blank;
         guint timeout_sleep;
         guint timeout_dim;
         gboolean on_battery;
@@ -1612,16 +1664,30 @@ idle_configure (GsdPowerManager *manager)
                 return;
         }
 
+        /* set up blank callback only when the screensaver is on,
+         * as it's what will drive the blank */
+        clear_idle_watch (manager->priv->idle_monitor,
+                          &manager->priv->idle_blank_id);
+        if (manager->priv->screensaver_active) {
+                /* The tail is wagging the dog.
+                 * The screensaver coming on will blank the screen.
+                 * If an event occurs while the screensaver is on,
+                 * the aggressive idle watch will handle it */
+                guint timeout_blank = SCREENSAVER_TIMEOUT_BLANK;
+                g_debug ("setting up blank callback for %is", timeout_blank);
+                manager->priv->idle_blank_id = gnome_idle_monitor_add_idle_watch (manager->priv->idle_monitor,
+                                                                                  timeout_blank * 1000,
+                                                                                  idle_triggered_idle_cb, manager, NULL);
+        }
+
         /* are we inhibited from going idle */
-        if (!is_session_active (manager) || is_idle_inhibited) {
+        if (!manager->priv->session_is_active || is_idle_inhibited) {
                 if (is_idle_inhibited)
                         g_debug ("inhibited, so using normal state");
                 else
                         g_debug ("inactive, so using normal state");
                 idle_set_mode (manager, GSD_POWER_IDLE_MODE_NORMAL);
 
-                clear_idle_watch (manager->priv->idle_monitor,
-                                  &manager->priv->idle_blank_id);
                 clear_idle_watch (manager->priv->idle_monitor,
                                   &manager->priv->idle_sleep_id);
                 clear_idle_watch (manager->priv->idle_monitor,
@@ -1630,28 +1696,6 @@ idle_configure (GsdPowerManager *manager)
                                   &manager->priv->idle_sleep_warning_id);
                 notify_close_if_showing (&manager->priv->notification_sleep_warning);
                 return;
-        }
-
-        /* set up blank callback only when the screensaver is on,
-         * as it's what will drive the blank */
-        timeout_blank = 0;
-        if (manager->priv->screensaver_active) {
-                /* The tail is wagging the dog.
-                 * The screensaver coming on will blank the screen.
-                 * If an event occurs while the screensaver is on,
-                 * the aggressive idle watch will handle it */
-                timeout_blank = SCREENSAVER_TIMEOUT_BLANK;
-        }
-
-        clear_idle_watch (manager->priv->idle_monitor,
-                          &manager->priv->idle_blank_id);
-
-        if (timeout_blank != 0) {
-                g_debug ("setting up blank callback for %is", timeout_blank);
-
-                manager->priv->idle_blank_id = gnome_idle_monitor_add_idle_watch (manager->priv->idle_monitor,
-                                                                                  timeout_blank * 1000,
-                                                                                  idle_triggered_idle_cb, manager, NULL);
         }
 
         /* only do the sleep timeout when the session is idle
@@ -1663,6 +1707,7 @@ idle_configure (GsdPowerManager *manager)
         if (!is_action_inhibited (manager, action_type)) {
                 timeout_sleep = g_settings_get_int (manager->priv->settings, on_battery ?
                                                     "sleep-inactive-battery-timeout" : "sleep-inactive-ac-timeout");
+                timeout_sleep = CLAMP(timeout_sleep, 0, G_MAXINT);
         }
 
         clear_idle_watch (manager->priv->idle_monitor,
@@ -1828,10 +1873,16 @@ gsd_power_manager_finalize (GObject *object)
 
         gsd_power_manager_stop (manager);
 
+        g_clear_pointer (&manager->priv->disabled_devices, g_hash_table_unref);
+
         g_clear_object (&manager->priv->connection);
 
         if (manager->priv->name_id != 0)
                 g_bus_unown_name (manager->priv->name_id);
+
+        if (manager->priv->iio_proxy_watch_id != 0)
+                g_bus_unwatch_name (manager->priv->iio_proxy_watch_id);
+        manager->priv->iio_proxy_watch_id = 0;
 
         G_OBJECT_CLASS (gsd_power_manager_parent_class)->finalize (object);
 }
@@ -1997,7 +2048,6 @@ show_sleep_warning (GsdPowerManager *manager)
                                          NOTIFY_EXPIRES_NEVER);
         notify_notification_set_urgency (manager->priv->notification_sleep_warning,
                                          NOTIFY_URGENCY_CRITICAL);
-        notify_notification_set_app_name (manager->priv->notification_sleep_warning, _("Power"));
 
         notify_notification_show (manager->priv->notification_sleep_warning, NULL);
 }
@@ -2006,9 +2056,10 @@ static void
 idle_set_mode_no_temp (GsdPowerManager  *manager,
                        GsdPowerIdleMode  mode)
 {
-        if (manager->priv->temporary_unidle_on_ac_id != 0 &&
-            manager->priv->previous_idle_mode == mode)
+        if (manager->priv->temporary_unidle_on_ac_id != 0) {
+                manager->priv->previous_idle_mode = mode;
                 return;
+        }
 
         idle_set_mode (manager, mode);
 }
@@ -2056,6 +2107,19 @@ idle_became_active_cb (GnomeIdleMonitor *monitor,
 }
 
 static void
+ch_backlight_renormalize (GsdPowerManager *manager)
+{
+        if (manager->priv->ambient_percentage_old < 0)
+                return;
+        if (manager->priv->ambient_last_absolute < 0)
+                return;
+        manager->priv->ambient_norm_value = manager->priv->ambient_last_absolute /
+                                        (gdouble) manager->priv->ambient_percentage_old;
+        manager->priv->ambient_norm_value *= 100.f;
+        manager->priv->ambient_norm_required = FALSE;
+}
+
+static void
 engine_settings_key_changed_cb (GSettings *settings,
                                 const gchar *key,
                                 GsdPowerManager *manager)
@@ -2082,10 +2146,15 @@ engine_session_properties_changed_cb (GDBusProxy      *session,
 
                 active = g_variant_get_boolean (v);
                 g_debug ("Received session is active change: now %s", active ? "active" : "inactive");
+                manager->priv->session_is_active = active;
                 /* when doing the fast-user-switch into a new account,
                  * ensure the new account is undimmed and with the backlight on */
-                if (active)
+                if (active) {
                         idle_set_mode (manager, GSD_POWER_IDLE_MODE_NORMAL);
+                        iio_proxy_claim_light (manager, TRUE);
+                } else {
+                        iio_proxy_claim_light (manager, FALSE);
+                }
                 g_variant_unref (v);
 
         }
@@ -2338,6 +2407,7 @@ on_rr_screen_acquired (GObject      *object,
         g_signal_connect (manager->priv->session, "g-properties-changed",
                           G_CALLBACK (engine_session_properties_changed_cb),
                           manager);
+        manager->priv->session_is_active = is_session_active (manager);
 
         manager->priv->screensaver_proxy = gnome_settings_bus_get_screen_saver_proxy ();
 
@@ -2391,16 +2461,120 @@ on_rr_screen_acquired (GObject      *object,
         /* don't blank inside a VM */
         manager->priv->is_virtual_machine = gsd_power_is_hardware_a_vm ();
 
+        /* Suspend when the screen is turned off on tablets */
+        manager->priv->is_tablet = gsd_power_is_hardware_a_tablet ();
+
         /* queue a signal in case the proxy from gnome-shell was created before we got here
            (likely, considering that to get here we need a reply from gnome-shell)
         */
-        if (manager->priv->backlight_available)
+        if (manager->priv->backlight_available) {
+                manager->priv->ambient_percentage_old = backlight_get_percentage (manager->priv->rr_screen, NULL);
                 backlight_iface_emit_changed (manager, GSD_POWER_DBUS_INTERFACE_SCREEN,
-                                              backlight_get_percentage (manager->priv->rr_screen, NULL));
-        else
+                                              manager->priv->ambient_percentage_old);
+        } else {
                 backlight_iface_emit_changed (manager, GSD_POWER_DBUS_INTERFACE_SCREEN, -1);
+        }
 
         gnome_settings_profile_end (NULL);
+}
+
+static void
+iio_proxy_changed (GsdPowerManager *manager)
+{
+        GError *error = NULL;
+        GVariant *val_has = NULL;
+        GVariant *val_als = NULL;
+        gdouble brightness;
+        gint pc;
+
+        /* no display hardware */
+        if (!manager->priv->backlight_available)
+                return;
+
+        /* disabled */
+        if (!g_settings_get_boolean (manager->priv->settings, "ambient-enabled"))
+                return;
+
+        /* get latest results, which do not have to be Lux */
+        val_has = g_dbus_proxy_get_cached_property (manager->priv->iio_proxy, "HasAmbientLight");
+        if (val_has == NULL || !g_variant_get_boolean (val_has))
+                goto out;
+        val_als = g_dbus_proxy_get_cached_property (manager->priv->iio_proxy, "LightLevel");
+        if (val_als == NULL)
+                goto out;
+        manager->priv->ambient_last_absolute = g_variant_get_double (val_als);
+        g_debug ("Read last absolute light level: %f", manager->priv->ambient_last_absolute);
+
+        /* the user has asked to renormalize */
+        if (manager->priv->ambient_norm_required) {
+                g_debug ("Renormalizing light level from old light percentage: %.1f%%",
+                         manager->priv->ambient_percentage_old);
+                manager->priv->ambient_accumulator = manager->priv->ambient_percentage_old;
+                ch_backlight_renormalize (manager);
+        }
+
+        /* calculate exponential moving average */
+        brightness = manager->priv->ambient_last_absolute * 100.f / manager->priv->ambient_norm_value;
+        brightness = MIN (brightness, 100.f);
+        brightness = MAX (brightness, 0.f);
+        manager->priv->ambient_accumulator = (GSD_AMBIENT_SMOOTH * brightness) +
+                (1.0 - GSD_AMBIENT_SMOOTH) * manager->priv->ambient_accumulator;
+
+        /* no valid readings yet */
+        if (manager->priv->ambient_accumulator < 0.f)
+                goto out;
+
+        /* set new value */
+        g_debug ("Setting brightness from ambient %.1f%%",
+                 manager->priv->ambient_accumulator);
+        pc = manager->priv->ambient_accumulator;
+        if (!backlight_set_percentage (manager->priv->rr_screen, &pc, &error)) {
+                g_warning ("failed to set brightness: %s", error->message);
+                g_error_free (error);
+        }
+        manager->priv->ambient_percentage_old = pc;
+out:
+        g_clear_pointer (&val_has, g_variant_unref);
+        g_clear_pointer (&val_als, g_variant_unref);
+}
+
+static void
+iio_proxy_changed_cb (GDBusProxy *proxy,
+                      GVariant   *changed_properties,
+                      GStrv       invalidated_properties,
+                      gpointer    user_data)
+{
+        iio_proxy_changed ((GsdPowerManager *) user_data);
+}
+
+static void
+iio_proxy_appeared_cb (GDBusConnection *connection,
+                       const gchar *name,
+                       const gchar *name_owner,
+                       gpointer user_data)
+{
+        GsdPowerManager *manager = GSD_POWER_MANAGER (user_data);
+        manager->priv->iio_proxy =
+                g_dbus_proxy_new_for_bus_sync (G_BUS_TYPE_SYSTEM,
+                                               0,
+                                               NULL,
+                                               "net.hadess.SensorProxy",
+                                               "/net/hadess/SensorProxy",
+                                               "net.hadess.SensorProxy",
+                                               NULL,
+                                               NULL);
+        g_signal_connect (manager->priv->iio_proxy, "g-properties-changed",
+                          G_CALLBACK (iio_proxy_changed_cb), manager);
+        iio_proxy_claim_light (manager, TRUE);
+}
+
+static void
+iio_proxy_vanished_cb (GDBusConnection *connection,
+                       const gchar *name,
+                       gpointer user_data)
+{
+        GsdPowerManager *manager = GSD_POWER_MANAGER (user_data);
+        g_clear_object (&manager->priv->iio_proxy);
 }
 
 gboolean
@@ -2446,6 +2620,20 @@ gsd_power_manager_start (GsdPowerManager *manager,
         manager->priv->settings_bus = g_settings_new ("org.gnome.desktop.session");
         manager->priv->settings_xrandr = g_settings_new (GSD_XRANDR_SETTINGS_SCHEMA);
 
+        /* setup ambient light support */
+        manager->priv->iio_proxy_watch_id =
+                g_bus_watch_name (G_BUS_TYPE_SYSTEM,
+                                  "net.hadess.SensorProxy",
+                                  G_BUS_NAME_WATCHER_FLAGS_NONE,
+                                  iio_proxy_appeared_cb,
+                                  iio_proxy_vanished_cb,
+                                  manager, NULL);
+        manager->priv->ambient_norm_required = TRUE;
+        manager->priv->ambient_accumulator = -1.f;
+        manager->priv->ambient_norm_value = -1.f;
+        manager->priv->ambient_percentage_old = -1.f;
+        manager->priv->ambient_last_absolute = -1.f;
+
         gnome_settings_profile_end (NULL);
         return TRUE;
 }
@@ -2481,6 +2669,9 @@ gsd_power_manager_stop (GsdPowerManager *manager)
         g_clear_object (&manager->priv->settings_screensaver);
         g_clear_object (&manager->priv->settings_bus);
         g_clear_object (&manager->priv->up_client);
+
+        iio_proxy_claim_light (manager, FALSE);
+        g_clear_object (&manager->priv->iio_proxy);
 
         if (manager->priv->inhibit_lid_switch_fd != -1) {
                 close (manager->priv->inhibit_lid_switch_fd);
@@ -2521,6 +2712,7 @@ gsd_power_manager_init (GsdPowerManager *manager)
         manager->priv->inhibit_lid_switch_fd = -1;
         manager->priv->inhibit_suspend_fd = -1;
         manager->priv->bus_cancellable = g_cancellable_new ();
+        manager->priv->disabled_devices = g_hash_table_new (g_direct_hash, g_direct_equal);
 }
 
 /* returns new level */
@@ -2602,6 +2794,10 @@ handle_method_call_screen (GsdPowerManager *manager,
                 g_assert_not_reached ();
         }
 
+        /* ambient brightness no longer valid */
+        manager->priv->ambient_percentage_old = value;
+        manager->priv->ambient_norm_required = TRUE;
+
 out:
         /* return value */
         if (value < 0) {
@@ -2609,8 +2805,9 @@ out:
                                                      error);
         } else {
                 g_dbus_method_invocation_return_value (invocation,
-                                                       g_variant_new ("(i)",
-                                                                      value));
+                                                       g_variant_new ("(ii)",
+                                                                      value,
+                                                                      backlight_get_output_id (manager->priv->rr_screen)));
         }
 }
 
@@ -2727,6 +2924,10 @@ handle_set_property_other (GsdPowerManager *manager,
                 g_variant_get (value, "i", &brightness_value);
                 if (backlight_set_percentage (manager->priv->rr_screen, &brightness_value, error)) {
                         backlight_iface_emit_changed (manager, GSD_POWER_DBUS_INTERFACE_SCREEN, brightness_value);
+
+                        /* ambient brightness no longer valid */
+                        manager->priv->ambient_percentage_old = brightness_value;
+                        manager->priv->ambient_norm_required = TRUE;
                         return TRUE;
                 } else {
                         g_set_error (error, G_DBUS_ERROR, G_DBUS_ERROR_FAILED,
@@ -2766,6 +2967,8 @@ handle_set_property (GDBusConnection *connection,
         /* Check session pointer as a proxy for whether the manager is in the
            start or stop state */
         if (manager->priv->session == NULL) {
+                g_set_error (error, G_DBUS_ERROR, G_DBUS_ERROR_FAILED,
+                             "Manager is starting or stopping");
                 return FALSE;
         }
 

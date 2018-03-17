@@ -47,20 +47,6 @@ G_DEFINE_TYPE (GsdDatetimeManager, gsd_datetime_manager, G_TYPE_OBJECT)
 
 static gpointer manager_object = NULL;
 
-static gboolean
-notification_server_has_actions (void)
-{
-        GList *caps;
-        gboolean has_actions = FALSE;
-
-        caps = notify_get_server_caps ();
-        if (g_list_find_custom (caps, "actions", (GCompareFunc)g_strcmp0) != NULL)
-                has_actions = TRUE;
-        g_list_free_full (caps, g_free);
-
-        return has_actions;
-}
-
 static void
 notification_closed_cb (NotifyNotification *n,
                         GsdDatetimeManager *self)
@@ -89,7 +75,6 @@ timezone_changed_cb (GsdTimezoneMonitor *timezone_monitor,
 {
         GDateTime *datetime;
         GTimeZone *tz;
-        gchar *control_center;
         gchar *notification_summary;
         gchar *timezone_name;
         gchar *utc_offset;
@@ -117,6 +102,12 @@ timezone_changed_cb (GsdTimezoneMonitor *timezone_monitor,
                                   "closed",
                                   G_CALLBACK (notification_closed_cb),
                                   self);
+
+                notify_notification_add_action (self->priv->notification,
+                                                "settings",
+                                                _("Settings"),
+                                                (NotifyActionCallback) open_settings_cb,
+                                                NULL, NULL);
         } else {
                 notify_notification_update (self->priv->notification,
                                             notification_summary, NULL,
@@ -127,16 +118,6 @@ timezone_changed_cb (GsdTimezoneMonitor *timezone_monitor,
         notify_notification_set_app_name (self->priv->notification, _("Date & Time Settings"));
         notify_notification_set_urgency (self->priv->notification, NOTIFY_URGENCY_NORMAL);
         notify_notification_set_timeout (self->priv->notification, NOTIFY_EXPIRES_NEVER);
-
-        control_center = g_find_program_in_path ("gnome-control-center");
-        if (control_center != NULL && notification_server_has_actions ()) {
-                notify_notification_add_action (self->priv->notification,
-                                                "settings",
-                                                _("Settings"),
-                                                (NotifyActionCallback) open_settings_cb,
-                                                NULL, NULL);
-        }
-        g_free (control_center);
 
         if (!notify_notification_show (self->priv->notification, NULL)) {
                 g_warning ("Failed to send timezone notification");
@@ -172,9 +153,9 @@ gsd_datetime_manager_start (GsdDatetimeManager *self,
 
         self->priv->settings = g_settings_new (DATETIME_SCHEMA);
 
-        auto_timezone_settings_changed_cb (self->priv->settings, AUTO_TIMEZONE_KEY, self);
         g_signal_connect (self->priv->settings, "changed::" AUTO_TIMEZONE_KEY,
                           G_CALLBACK (auto_timezone_settings_changed_cb), self);
+        auto_timezone_settings_changed_cb (self->priv->settings, AUTO_TIMEZONE_KEY, self);
 
         gnome_settings_profile_end (NULL);
 

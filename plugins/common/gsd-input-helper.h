@@ -28,12 +28,6 @@ G_BEGIN_DECLS
 
 #define WACOM_SERIAL_IDS_PROP "Wacom Serial IDs"
 
-typedef enum {
-        COMMAND_DEVICE_ADDED,
-        COMMAND_DEVICE_REMOVED,
-        COMMAND_DEVICE_PRESENT
-} CustomCommand;
-
 /* Generic property setting code. Fill up the struct property with the property
  * data and pass it into device_set_property together with the device to be
  * changed.  Note: doesn't cater for non-zero offsets yet, but we don't have
@@ -50,34 +44,20 @@ typedef struct {
         } data;
 } PropertyHelper;
 
-gboolean  supports_xinput_devices  (void);
 gboolean  supports_xinput2_devices (int *opcode);
 gboolean  supports_xtest           (void);
 
 gboolean set_device_enabled       (int device_id,
                                    gboolean enabled);
 
-gboolean  device_is_touchpad       (XDevice                *xdevice);
-
-gboolean  device_info_is_touchpad    (XDeviceInfo         *device_info);
-gboolean  device_info_is_touchscreen (XDeviceInfo         *device_info);
-gboolean  device_info_is_tablet (XDeviceInfo         *device_info);
-gboolean  device_info_is_mouse       (XDeviceInfo         *device_info);
-gboolean  device_info_is_trackball   (XDeviceInfo         *device_info);
-
 gboolean  touchpad_is_present     (void);
 gboolean  touchscreen_is_present  (void);
 gboolean  mouse_is_present        (void);
-gboolean  trackball_is_present    (void);
 
 gboolean  device_set_property     (XDevice                *xdevice,
                                    const char             *device_name,
                                    PropertyHelper         *property);
 
-gboolean  run_custom_command      (GdkDevice              *device,
-                                   CustomCommand           command);
-
-GList *   get_disabled_devices     (GdkDeviceManager       *manager);
 char *    xdevice_get_device_node  (int                     deviceid);
 int       xdevice_get_last_tool_id (int                     deviceid);
 gboolean  xdevice_get_dimensions   (int                     deviceid,

@@ -54,7 +54,7 @@ struct GsdSmartcardManagerPrivate
 
         GSettings *settings;
 
-        guint32 nss_is_loaded : 1;
+        NSSInitContext *nss_context;
 };
 
 #define CONF_SCHEMA "org.gnome.settings-daemon.peripherals.smartcard"
@@ -93,7 +93,14 @@ static void
 load_nss (GsdSmartcardManager *self)
 {
         GsdSmartcardManagerPrivate *priv = self->priv;
-        SECStatus status = SECSuccess;
+        NSSInitContext *context = NULL;
+
+        /* The first field in the NSSInitParameters structure
+         * is the size of the structure. NSS requires this, so
+         * that it can change the size of the structure in future
+         * versions of NSS in a detectable way
+         */
+        NSSInitParameters parameters = { sizeof (parameters), };
         static const guint32 flags = NSS_INIT_READONLY
                                    | NSS_INIT_FORCEOPEN
                                    | NSS_INIT_NOROOTINIT
@@ -105,10 +112,10 @@ load_nss (GsdSmartcardManager *self)
 
         PR_Init (PR_USER_THREAD, PR_PRIORITY_NORMAL, 0);
 
-        status = NSS_Initialize (GSD_SMARTCARD_MANAGER_NSS_DB,
-                                 "", "", SECMOD_DB, flags);
+        context = NSS_InitContext (GSD_SMARTCARD_MANAGER_NSS_DB,
+                                   "", "", SECMOD_DB, &parameters, flags);
 
-        if (status != SECSuccess) {
+        if (context == NULL) {
                 gsize error_message_size;
                 char *error_message;
 
@@ -123,13 +130,14 @@ load_nss (GsdSmartcardManager *self)
                         g_debug ("NSS security system could not be initialized - %s",
                                  error_message);
                 }
-                priv->nss_is_loaded = FALSE;
+
+                priv->nss_context = NULL;
                 return;
 
         }
 
         g_debug ("NSS database '%s' loaded", GSD_SMARTCARD_MANAGER_NSS_DB);
-        priv->nss_is_loaded = TRUE;
+        priv->nss_context = context;
 }
 
 static void
@@ -138,9 +146,9 @@ unload_nss (GsdSmartcardManager *self)
         g_debug ("attempting to unload NSS security system with database '%s'",
                  GSD_SMARTCARD_MANAGER_NSS_DB);
 
-        if (self->priv->nss_is_loaded) {
-                NSS_Shutdown ();
-                self->priv->nss_is_loaded = FALSE;
+        if (self->priv->nss_context != NULL) {
+                g_clear_pointer (&self->priv->nss_context,
+                                 NSS_ShutdownContext);
                 g_debug ("NSS database '%s' unloaded", GSD_SMARTCARD_MANAGER_NSS_DB);
         } else {
                 g_debug ("NSS database '%s' already not loaded", GSD_SMARTCARD_MANAGER_NSS_DB);
@@ -344,8 +352,6 @@ watch_smartcards_from_driver_async (GsdSmartcardManager *self,
         G_UNLOCK (gsd_smartcards_watch_tasks);
 
         g_task_run_in_thread (task, (GTaskThreadFunc) watch_smartcards_from_driver);
-
-        g_object_unref (task);
 }
 
 static gboolean
@@ -353,7 +359,7 @@ register_driver_finish (GsdSmartcardManager  *self,
                         GAsyncResult         *result,
                         GError              **error)
 {
-        return gsd_smartcard_utils_finish_boolean_task (G_OBJECT (self), result, error);
+        return g_task_propagate_boolean (G_TASK (result), error);
 }
 
 static void
@@ -365,10 +371,13 @@ on_driver_registered (GsdSmartcardManager *self,
 
         if (!register_driver_finish (self, result, &error)) {
                 g_task_return_error (task, error);
+                g_object_unref (task);
                 return;
         }
 
         g_task_return_boolean (task, TRUE);
+
+        g_object_unref (task);
 }
 
 static void
@@ -487,7 +496,7 @@ activate_driver_async_finish (GsdSmartcardManager  *self,
                               GAsyncResult         *result,
                               GError              **error)
 {
-        return gsd_smartcard_utils_finish_boolean_task (G_OBJECT (self), result, error);
+        return g_task_propagate_boolean (G_TASK (result), error);
 }
 
 static void
@@ -569,6 +578,8 @@ activate_all_drivers_async (GsdSmartcardManager *self,
 
         }
         SECMOD_ReleaseReadLock (lock);
+
+        try_to_complete_all_drivers_activation (task);
 }
 
 static gboolean
@@ -576,7 +587,7 @@ activate_all_drivers_async_finish (GsdSmartcardManager  *self,
                                    GAsyncResult         *result,
                                    GError              **error)
 {
-        return gsd_smartcard_utils_finish_boolean_task (G_OBJECT (self), result, error);
+        return g_task_propagate_boolean (G_TASK (result), error);
 }
 
 static void
@@ -606,6 +617,7 @@ on_all_drivers_activated (GsdSmartcardManager *self,
         }
 
         g_task_return_boolean (task, TRUE);
+        g_object_unref (task);
 }
 
 static void
@@ -645,8 +657,6 @@ watch_smartcards_async (GsdSmartcardManager *self,
         task = g_task_new (self, cancellable, callback, user_data);
 
         g_task_run_in_thread (task, (GTaskThreadFunc) watch_smartcards);
-
-        g_object_unref (task);
 }
 
 static gboolean
@@ -654,7 +664,7 @@ watch_smartcards_async_finish (GsdSmartcardManager  *self,
                                GAsyncResult         *result,
                                GError              **error)
 {
-        return gsd_smartcard_utils_finish_boolean_task (G_OBJECT (self), result, error);
+        return g_task_propagate_boolean (G_TASK (result), error);
 }
 
 static void

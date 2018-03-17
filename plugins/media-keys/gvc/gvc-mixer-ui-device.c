@@ -32,7 +32,8 @@ struct GvcMixerUIDevicePrivate
 
         GvcMixerCard               *card;
         gchar                      *port_name;
-        gint                        stream_id;
+        char                       *icon_name; 
+        guint                       stream_id;
         guint                       id;
         gboolean                    port_available;
 
@@ -55,11 +56,13 @@ enum
         PROP_STREAM_ID,
         PROP_UI_DEVICE_TYPE,
         PROP_PORT_AVAILABLE,
+        PROP_ICON_NAME,
 };
 
-static void     gvc_mixer_ui_device_class_init (GvcMixerUIDeviceClass *klass);
-static void     gvc_mixer_ui_device_init       (GvcMixerUIDevice      *device);
 static void     gvc_mixer_ui_device_finalize   (GObject               *object);
+
+static void     gvc_mixer_ui_device_set_icon_name (GvcMixerUIDevice *device,
+                                                   const char       *icon_name);
 
 G_DEFINE_TYPE (GvcMixerUIDevice, gvc_mixer_ui_device, G_TYPE_OBJECT);
 
@@ -99,13 +102,16 @@ gvc_mixer_ui_device_get_property  (GObject       *object,
                 g_value_set_string (value, self->priv->port_name);
                 break;
         case PROP_STREAM_ID:
-                g_value_set_int (value, self->priv->stream_id);
+                g_value_set_uint (value, self->priv->stream_id);
                 break;
         case PROP_UI_DEVICE_TYPE:
                 g_value_set_uint (value, (guint)self->priv->type);
                 break;
         case PROP_PORT_AVAILABLE:
                 g_value_set_boolean (value, self->priv->port_available);
+                break;
+        case PROP_ICON_NAME:
+                g_value_set_string (value, gvc_mixer_ui_device_get_icon_name (self));
                 break;
         default:
                 G_OBJECT_WARN_INVALID_PROPERTY_ID (object, property_id, pspec);
@@ -146,7 +152,7 @@ gvc_mixer_ui_device_set_property  (GObject      *object,
                          self->priv->port_name);
                 break;
         case PROP_STREAM_ID:
-                self->priv->stream_id = g_value_get_int (value);
+                self->priv->stream_id = g_value_get_uint (value);
                 g_debug ("gvc-mixer-output-set-property - sink/source id: %i\n",
                          self->priv->stream_id);
                 break;
@@ -157,6 +163,9 @@ gvc_mixer_ui_device_set_property  (GObject      *object,
                 self->priv->port_available = g_value_get_boolean (value);
                 g_debug ("gvc-mixer-output-set-property - port available %i, value passed in %i \n",
                          self->priv->port_available, g_value_get_boolean (value));
+                break;
+        case PROP_ICON_NAME:
+                gvc_mixer_ui_device_set_icon_name (self, g_value_get_string (value));
                 break;
         default:
                 G_OBJECT_WARN_INVALID_PROPERTY_ID (object, property_id, pspec);
@@ -197,6 +206,7 @@ gvc_mixer_ui_device_dispose (GObject *object)
         device = GVC_MIXER_UI_DEVICE (object);
 
         g_clear_pointer (&device->priv->port_name, g_free);
+        g_clear_pointer (&device->priv->icon_name, g_free);
         g_clear_pointer (&device->priv->first_line_desc, g_free);
         g_clear_pointer (&device->priv->second_line_desc, g_free);
         g_clear_pointer (&device->priv->profiles, g_list_free);
@@ -252,11 +262,11 @@ gvc_mixer_ui_device_class_init (GvcMixerUIDeviceClass *klass)
                                      G_PARAM_READWRITE);
         g_object_class_install_property (object_class, PROP_PORT_NAME, pspec);
 
-        pspec = g_param_spec_int ("stream-id",
-                                  "stream id assigned by gvc-stream",
-                                  "Set/Get stream id",
-                                  -1,
-                                   G_MAXINT,
+        pspec = g_param_spec_uint ("stream-id",
+                                   "stream id assigned by gvc-stream",
+                                   "Set/Get stream id",
+                                   0,
+                                   G_MAXUINT,
                                    GVC_MIXER_UI_DEVICE_INVALID,
                                    G_PARAM_READWRITE);
         g_object_class_install_property (object_class, PROP_STREAM_ID, pspec);
@@ -273,6 +283,13 @@ gvc_mixer_ui_device_class_init (GvcMixerUIDeviceClass *klass)
                                       FALSE,
                                       G_PARAM_READWRITE);
         g_object_class_install_property (object_class, PROP_PORT_AVAILABLE, pspec);
+
+        pspec = g_param_spec_string ("icon-name",
+                                     "Icon Name",
+                                     "Name of icon to display for this card",
+                                     NULL,
+                                     G_PARAM_READWRITE|G_PARAM_CONSTRUCT);
+        g_object_class_install_property (object_class, PROP_ICON_NAME, pspec);
 
         g_type_class_add_private (klass, sizeof (GvcMixerUIDevicePrivate));
 }
@@ -291,7 +308,7 @@ get_profile_canonical_name (const gchar *profile_name, const gchar *skip_prefix)
 {
         gchar *result = NULL;
         gchar **s;
-        int i;
+        guint i;
 
         /* optimisation for the simple case. */
         if (strstr (profile_name, skip_prefix) == NULL)
@@ -321,7 +338,7 @@ get_profile_canonical_name (const gchar *profile_name, const gchar *skip_prefix)
 const gchar *
 gvc_mixer_ui_device_get_matching_profile (GvcMixerUIDevice *device, const gchar *profile)
 {
-        gchar *skip_prefix = device->priv->type == UIDeviceInput ? "output:" : "input:";
+        const gchar *skip_prefix = device->priv->type == UIDeviceInput ? "output:" : "input:";
         gchar *target_cname = get_profile_canonical_name (profile, skip_prefix);
         GList *l;
         gchar *result = NULL;
@@ -370,6 +387,11 @@ add_canonical_names_of_profiles (GvcMixerUIDevice *device,
 
                 g_free (canonical_name);
 
+                /* https://bugzilla.gnome.org/show_bug.cgi?id=693654
+                 * Don't add a profile that will make the UI device completely disappear */
+                if (p->n_sinks == 0 && p->n_sources == 0)
+                        continue;
+
                 g_debug ("Adding profile to combobox: '%s' - '%s'", p->profile, p->human_profile);
                 g_hash_table_insert (added_profiles, g_strdup (p->profile), p);
                 device->priv->profiles = g_list_append (device->priv->profiles, p);
@@ -404,7 +426,7 @@ gvc_mixer_ui_device_set_profiles (GvcMixerUIDevice *device,
                                   const GList      *in_profiles)
 {
         GHashTable *added_profiles;
-        gchar *skip_prefix = device->priv->type == UIDeviceInput ? "output:" : "input:";
+        const gchar *skip_prefix = device->priv->type == UIDeviceInput ? "output:" : "input:";
 
         g_debug ("Set profiles for '%s'", gvc_mixer_ui_device_get_description(device));
 
@@ -441,7 +463,7 @@ gvc_mixer_ui_device_get_best_profile (GvcMixerUIDevice *device,
 {
         GList *candidates, *l;
         const gchar *result;
-        gchar *skip_prefix;
+        const gchar *skip_prefix;
         gchar *canonical_name_selected;
 
         if (device->priv->type == UIDeviceInput)
@@ -463,6 +485,7 @@ gvc_mixer_ui_device_get_best_profile (GvcMixerUIDevice *device,
                         candidates = g_list_append (candidates, p);
                         g_debug ("Candidate for profile switching: '%s'", p->profile);
                 }
+                g_free (canonical_name);
         }
 
         if (!candidates) {
@@ -482,7 +505,7 @@ gvc_mixer_ui_device_get_best_profile (GvcMixerUIDevice *device,
         /* 2) Try to keep the other side unchanged if possible */
         if (result == NULL) {
                 guint prio = 0;
-                gchar *skip_prefix_reverse = device->priv->type == UIDeviceInput ? "input:" : "output:";
+                const gchar *skip_prefix_reverse = device->priv->type == UIDeviceInput ? "input:" : "output:";
                 gchar *current_reverse = get_profile_canonical_name (current, skip_prefix_reverse);
                 for (l = candidates; l != NULL; l = l->next) {
                         gchar *p_reverse;
@@ -577,7 +600,7 @@ gvc_mixer_ui_device_get_id (GvcMixerUIDevice *device)
         return device->priv->id;
 }
 
-gint
+guint
 gvc_mixer_ui_device_get_stream_id (GvcMixerUIDevice *device)
 {
         g_return_val_if_fail (GVC_IS_MIXER_UI_DEVICE (device), 0);
@@ -599,6 +622,51 @@ gvc_mixer_ui_device_get_description (GvcMixerUIDevice *device)
         g_return_val_if_fail (GVC_IS_MIXER_UI_DEVICE (device), NULL);
 
         return device->priv->first_line_desc;
+}
+
+const char *
+gvc_mixer_ui_device_get_icon_name (GvcMixerUIDevice *device)
+{
+        g_return_val_if_fail (GVC_IS_MIXER_UI_DEVICE (device), NULL);
+
+        if (device->priv->icon_name)
+                return device->priv->icon_name;
+
+        if (device->priv->card)
+                return gvc_mixer_card_get_icon_name (device->priv->card);
+
+        return NULL;
+}
+
+static void
+gvc_mixer_ui_device_set_icon_name (GvcMixerUIDevice *device,
+                                   const char       *icon_name)
+{
+        g_return_if_fail (GVC_IS_MIXER_UI_DEVICE (device));
+
+        g_free (device->priv->icon_name);
+        device->priv->icon_name = g_strdup (icon_name);
+        g_object_notify (G_OBJECT (device), "icon-name");
+}
+
+
+/**
+ * gvc_mixer_ui_device_get_gicon:
+ * @device:
+ *
+ * Returns: (transfer full):
+ */
+GIcon *
+gvc_mixer_ui_device_get_gicon (GvcMixerUIDevice *device)
+{
+        const char *icon_name;
+
+        icon_name = gvc_mixer_ui_device_get_icon_name (device);
+
+        if (icon_name != NULL)
+                return g_themed_icon_new_with_default_fallbacks (icon_name);
+        else
+                return NULL;
 }
 
 const gchar *

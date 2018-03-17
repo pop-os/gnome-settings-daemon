@@ -77,13 +77,9 @@ screenshot_context_free (ScreenshotContext *ctx)
 }
 
 static void
-screenshot_context_error (ScreenshotContext *ctx,
-                          GError *error,
-                          const gchar *warning_format)
+screenshot_play_error_sound_effect (void)
 {
   screenshot_play_sound_effect ("dialog-error", _("Unable to capture a screenshot"));
-  g_warning (warning_format, error->message);
-  g_error_free (error);
 }
 
 static void
@@ -108,7 +104,9 @@ screenshot_save_to_clipboard (ScreenshotContext *ctx)
   screenshot = gdk_pixbuf_new_from_file (ctx->used_filename, &error);
   if (error != NULL)
     {
-      screenshot_context_error (ctx, error, "Failed to save a screenshot to clipboard: %s\n");
+      screenshot_play_error_sound_effect ();
+      g_warning ("Failed to save a screenshot to clipboard: %s\n", error->message);
+      g_error_free (error);
       return;
     }
 
@@ -136,7 +134,9 @@ bus_call_ready_cb (GObject *source,
 
   if (error != NULL)
     {
-      screenshot_context_error (ctx, error, "Failed to save a screenshot: %s\n");
+      screenshot_play_error_sound_effect ();
+      g_warning ("Failed to save a screenshot: %s\n", error->message);
+      g_error_free (error);
       screenshot_context_free (ctx);
 
       return;
@@ -248,7 +248,9 @@ bus_connection_ready_cb (GObject *source,
 
   if (error != NULL)
     {
-      screenshot_context_error (ctx, error, "Failed to save a screenshot: %s\n");
+      screenshot_play_error_sound_effect ();
+      g_warning ("Failed to save a screenshot: %s\n", error->message);
+      g_error_free (error);
       screenshot_context_free (ctx);
 
       return;
@@ -296,7 +298,7 @@ screenshot_build_filename (void)
   GDateTime *d;
 
   d = g_date_time_new_now_local ();
-  origin = g_date_time_format (d, "%Y-%m-%d %H:%M:%S");
+  origin = g_date_time_format (d, "%Y-%m-%d %H-%M-%S");
   g_date_time_unref (d);
 
   /* translators: this is the name of the file that gets made up

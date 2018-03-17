@@ -101,7 +101,7 @@ struct GsdXrandrManagerPrivate {
         GCancellable    *bus_cancellable;
 
         GsdDeviceMapper  *device_mapper;
-        GdkDeviceManager *device_manager;
+        GsdDeviceManager *device_manager;
         guint             device_added_id;
         guint             device_removed_id;
 
@@ -129,6 +129,7 @@ static void get_allowed_rotations_for_output (GnomeRRConfig *config,
                                               GnomeRRRotation *out_rotations);
 static void handle_fn_f7 (GsdXrandrManager *mgr, gint64 timestamp);
 static void handle_rotate_windows (GsdXrandrManager *mgr, GnomeRRRotation rotation, gint64 timestamp);
+static void register_manager_dbus (GsdXrandrManager *manager);
 
 G_DEFINE_TYPE (GsdXrandrManager, gsd_xrandr_manager, G_TYPE_OBJECT)
 
@@ -893,14 +894,8 @@ sanitize (GsdXrandrManager *manager, GPtrArray *array)
 }
 
 static void
-generate_fn_f7_configs (GsdXrandrManager *mgr)
+free_fn_f7_configs (GsdXrandrManager *mgr)
 {
-        GPtrArray *array = g_ptr_array_new ();
-        GnomeRRScreen *screen = mgr->priv->rw_screen;
-
-        g_debug ("Generating configurations");
-
-        /* Free any existing list of configurations */
         if (mgr->priv->fn_f7_configs) {
                 int i;
 
@@ -911,6 +906,18 @@ generate_fn_f7_configs (GsdXrandrManager *mgr)
                 mgr->priv->fn_f7_configs = NULL;
                 mgr->priv->current_fn_f7_config = -1;
         }
+}
+
+static void
+generate_fn_f7_configs (GsdXrandrManager *mgr)
+{
+        GPtrArray *array = g_ptr_array_new ();
+        GnomeRRScreen *screen = mgr->priv->rw_screen;
+
+        g_debug ("Generating configurations");
+
+        /* Free any existing list of configurations */
+        free_fn_f7_configs (mgr);
 
         g_ptr_array_add (array, gnome_rr_config_new_current (screen, NULL));
         g_ptr_array_add (array, make_clone_setup (mgr, screen));
@@ -1151,21 +1158,27 @@ get_allowed_rotations_for_output (GnomeRRConfig *config,
 
 static void
 manager_device_added (GsdXrandrManager *manager,
-                      GdkDevice        *device)
+                      GsdDevice        *device)
 {
-        if (gdk_device_get_device_type (device) == GDK_DEVICE_TYPE_MASTER ||
-            gdk_device_get_source (device) != GDK_SOURCE_TOUCHSCREEN)
+        GsdDeviceType type;
+
+        type = gsd_device_get_device_type (device);
+
+        if ((type & GSD_DEVICE_TYPE_TOUCHSCREEN) == 0)
                 return;
 
-        gsd_device_mapper_add_input (manager->priv->device_mapper, device, NULL);
+        gsd_device_mapper_add_input (manager->priv->device_mapper, device);
 }
 
 static void
 manager_device_removed (GsdXrandrManager *manager,
-                        GdkDevice        *device)
+                        GsdDevice        *device)
 {
-        if (gdk_device_get_device_type (device) == GDK_DEVICE_TYPE_MASTER ||
-            gdk_device_get_source (device) != GDK_SOURCE_TOUCHSCREEN)
+        GsdDeviceType type;
+
+        type = gsd_device_get_device_type (device);
+
+        if ((type & GSD_DEVICE_TYPE_TOUCHSCREEN) == 0)
                 return;
 
         gsd_device_mapper_remove_input (manager->priv->device_mapper, device);
@@ -1174,15 +1187,10 @@ manager_device_removed (GsdXrandrManager *manager,
 static void
 manager_init_devices (GsdXrandrManager *manager)
 {
-        GdkDisplay *display;
         GList *devices, *d;
-        GdkScreen *screen;
-
-        screen = gdk_screen_get_default ();
-        display = gdk_screen_get_display (screen);
 
         manager->priv->device_mapper = gsd_device_mapper_get ();
-        manager->priv->device_manager = gdk_display_get_device_manager (display);
+        manager->priv->device_manager = gsd_device_manager_get ();
         manager->priv->device_added_id =
                 g_signal_connect_swapped (manager->priv->device_manager, "device-added",
                                           G_CALLBACK (manager_device_added), manager);
@@ -1190,8 +1198,8 @@ manager_init_devices (GsdXrandrManager *manager)
                 g_signal_connect_swapped (manager->priv->device_manager, "device-removed",
                                   G_CALLBACK (manager_device_removed), manager);
 
-        devices = gdk_device_manager_list_devices (manager->priv->device_manager,
-                                                   GDK_DEVICE_TYPE_SLAVE);
+        devices = gsd_device_manager_list_devices (manager->priv->device_manager,
+                                                   GSD_DEVICE_TYPE_TOUCHSCREEN);
 
         for (d = devices; d; d = d->next)
                 manager_device_added (manager, d->data);
@@ -1226,6 +1234,7 @@ on_rr_screen_acquired (GObject      *object,
         manager->priv->settings = g_settings_new (CONF_SCHEMA);
 
         manager_init_devices (manager);
+        register_manager_dbus (manager);
 
         log_close ();
 }
@@ -1277,6 +1286,9 @@ gsd_xrandr_manager_stop (GsdXrandrManager *manager)
                 manager->priv->upower_client = NULL;
         }
 
+        if (manager->priv->name_id != 0)
+                g_bus_unown_name (manager->priv->name_id);
+
         if (manager->priv->introspection_data) {
                 g_dbus_node_info_unref (manager->priv->introspection_data);
                 manager->priv->introspection_data = NULL;
@@ -1294,6 +1306,8 @@ gsd_xrandr_manager_stop (GsdXrandrManager *manager)
                                              manager->priv->device_removed_id);
                 manager->priv->device_manager = NULL;
         }
+
+        free_fn_f7_configs (manager);
 
         log_open ();
         log_msg ("STOPPING XRANDR PLUGIN\n------------------------------------------------------------\n");
@@ -1332,9 +1346,6 @@ gsd_xrandr_manager_finalize (GObject *object)
         g_return_if_fail (manager->priv != NULL);
 
         gsd_xrandr_manager_stop (manager);
-
-        if (manager->priv->name_id != 0)
-                g_bus_unown_name (manager->priv->name_id);
 
         G_OBJECT_CLASS (gsd_xrandr_manager_parent_class)->finalize (object);
 }
@@ -1454,8 +1465,6 @@ gsd_xrandr_manager_new (void)
                 manager_object = g_object_new (GSD_TYPE_XRANDR_MANAGER, NULL);
                 g_object_add_weak_pointer (manager_object,
                                            (gpointer *) &manager_object);
-
-                register_manager_dbus (manager_object);
         }
 
         return GSD_XRANDR_MANAGER (manager_object);

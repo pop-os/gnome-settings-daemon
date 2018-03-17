@@ -29,6 +29,7 @@
 #include "gnome-settings-profile.h"
 #include "gsd-rfkill-manager.h"
 #include "rfkill-glib.h"
+#include "gnome-settings-bus.h"
 
 #define GSD_RFKILL_MANAGER_GET_PRIVATE(o) (G_TYPE_INSTANCE_GET_PRIVATE ((o), GSD_TYPE_RFKILL_MANAGER, GsdRfkillManagerPrivate))
 
@@ -56,7 +57,6 @@ struct GsdRfkillManagerPrivate
         GDBusObjectManager      *mm_client;
         gboolean                 wwan_interesting;
 
-        GDBusProxy              *hostnamed_client;
         gchar                   *chassis_type;
 };
 
@@ -279,6 +279,10 @@ rfkill_changed (CcRfkillGlib     *rfkill,
 				g_hash_table_insert (manager->priv->bt_killswitches,
 						     GINT_TO_POINTER (event->idx),
 						     GINT_TO_POINTER (value));
+			g_debug ("%s %srfkill with ID %d",
+				 event->op == RFKILL_OP_ADD ? "Added" : "Changed",
+				 event->type == RFKILL_TYPE_BLUETOOTH ? "Bluetooth " : "",
+				 event->idx);
                         break;
                 case RFKILL_OP_DEL:
 			g_hash_table_remove (manager->priv->killswitches,
@@ -286,6 +290,8 @@ rfkill_changed (CcRfkillGlib     *rfkill,
 			if (event->type == RFKILL_TYPE_BLUETOOTH)
 				g_hash_table_remove (manager->priv->bt_killswitches,
 						     GINT_TO_POINTER (event->idx));
+			g_debug ("Removed %srfkill with ID %d", event->type == RFKILL_TYPE_BLUETOOTH ? "Bluetooth " : "",
+				 event->idx);
                         break;
                 }
 	}
@@ -301,9 +307,12 @@ rfkill_set_cb (GObject      *source_object,
 	gboolean ret;
 	GError *error = NULL;
 
-	ret = cc_rfkill_glib_send_event_finish (CC_RFKILL_GLIB (source_object), res, &error);
+	ret = cc_rfkill_glib_send_change_all_event_finish (CC_RFKILL_GLIB (source_object), res, &error);
 	if (!ret) {
-		g_warning ("Failed to set RFKill: %s", error->message);
+		if (g_error_matches (error, G_IO_ERROR, G_IO_ERROR_TIMED_OUT))
+			g_debug ("Timed out waiting for blocked rfkills");
+		else if (!g_error_matches (error, G_IO_ERROR, G_IO_ERROR_CANCELLED))
+			g_warning ("Failed to set RFKill: %s", error->message);
 		g_error_free (error);
 	}
 }
@@ -333,28 +342,18 @@ static gboolean
 engine_set_bluetooth_airplane_mode (GsdRfkillManager *manager,
                                     gboolean          enable)
 {
-	struct rfkill_event event;
+        cc_rfkill_glib_send_change_all_event (manager->priv->rfkill, RFKILL_TYPE_BLUETOOTH,
+                                              enable, manager->priv->cancellable, rfkill_set_cb, manager);
 
-	memset (&event, 0, sizeof(event));
-	event.op = RFKILL_OP_CHANGE_ALL;
-	event.type = RFKILL_TYPE_BLUETOOTH;
-	event.soft = enable ? 1 : 0;
-	cc_rfkill_glib_send_event (manager->priv->rfkill, &event, NULL, rfkill_set_cb, manager);
-
-	return TRUE;
+        return TRUE;
 }
 
 static gboolean
 engine_set_airplane_mode (GsdRfkillManager *manager,
                           gboolean          enable)
 {
-	struct rfkill_event event;
-
-	memset (&event, 0, sizeof(event));
-	event.op = RFKILL_OP_CHANGE_ALL;
-	event.type = RFKILL_TYPE_ALL;
-	event.soft = enable ? 1 : 0;
-	cc_rfkill_glib_send_event (manager->priv->rfkill, &event, NULL, rfkill_set_cb, manager);
+        cc_rfkill_glib_send_change_all_event (manager->priv->rfkill, RFKILL_TYPE_ALL,
+                                              enable, manager->priv->cancellable, rfkill_set_cb, manager);
 
         /* Note: we set the the NM property even if there are no modems, so we don't
            need to resync when one is plugged in */
@@ -626,76 +625,6 @@ on_mm_proxy_gotten (GObject      *source,
         g_object_unref (manager);
 }
 
-static void
-sync_chassis_type (GsdRfkillManager *manager)
-{
-        GVariant *property;
-        const gchar *chassis_type;
-
-        property = g_dbus_proxy_get_cached_property (manager->priv->hostnamed_client,
-                                                     "Chassis");
-
-        if (property == NULL)
-                return;
-
-        chassis_type = g_variant_get_string (property, NULL);
-        if (g_strcmp0 (manager->priv->chassis_type, chassis_type) != 0) {
-                g_free (manager->priv->chassis_type);
-                manager->priv->chassis_type = g_strdup (chassis_type);
-
-                engine_properties_changed (manager);
-        }
-
-        g_variant_unref (property);
-}
-
-static void
-hostnamed_properties_changed (GDBusProxy *proxy,
-                              GVariant   *changed_properties,
-                              GStrv       invalidated_properties,
-                              gpointer    user_data)
-{
-        GsdRfkillManager *manager = user_data;
-        GVariant *value;
-
-        value = g_variant_lookup_value (changed_properties, "Chassis", G_VARIANT_TYPE_STRING);
-        if (value != NULL) {
-                sync_chassis_type (manager);
-                g_variant_unref (value);
-        }
-}
-
-static void
-on_hostnamed_proxy_gotten (GObject      *source,
-                           GAsyncResult *result,
-                           gpointer      user_data)
-{
-        GsdRfkillManager *manager = user_data;
-        GDBusProxy *proxy;
-        GError *error;
-
-        error = NULL;
-        proxy = g_dbus_proxy_new_for_bus_finish (result, &error);
-
-        if (proxy == NULL) {
-                if (!g_error_matches (error, G_IO_ERROR, G_IO_ERROR_CANCELLED) &&
-                    !g_error_matches (error, G_DBUS_ERROR, G_DBUS_ERROR_SERVICE_UNKNOWN))
-                        g_warning ("Failed to acquire hostnamed proxy: %s", error->message);
-
-                g_error_free (error);
-                goto out;
-        }
-
-        manager->priv->hostnamed_client = proxy;
-
-        g_signal_connect (manager->priv->hostnamed_client, "g-properties-changed",
-                          G_CALLBACK (hostnamed_properties_changed), manager);
-        sync_chassis_type (manager);
-
- out:
-        g_object_unref (manager);
-}
-
 gboolean
 gsd_rfkill_manager_start (GsdRfkillManager *manager,
                          GError         **error)
@@ -714,14 +643,7 @@ gsd_rfkill_manager_start (GsdRfkillManager *manager,
 
         manager->priv->cancellable = g_cancellable_new ();
 
-        g_dbus_proxy_new_for_bus (G_BUS_TYPE_SYSTEM,
-                                  G_DBUS_PROXY_FLAGS_NONE,
-                                  NULL, /* g-interface-info */
-                                  "org.freedesktop.hostname1",
-                                  "/org/freedesktop/hostname1",
-                                  "org.freedesktop.hostname1",
-                                  manager->priv->cancellable,
-                                  on_hostnamed_proxy_gotten, g_object_ref (manager));
+        manager->priv->chassis_type = gnome_settings_get_chassis_type ();
 
         g_dbus_proxy_new_for_bus (G_BUS_TYPE_SYSTEM,
                                   G_DBUS_PROXY_FLAGS_NONE,
@@ -779,7 +701,6 @@ gsd_rfkill_manager_stop (GsdRfkillManager *manager)
         p->wwan_enabled = FALSE;
         p->wwan_interesting = FALSE;
 
-        g_clear_object (&p->hostnamed_client);
         g_clear_pointer (&p->chassis_type, g_free);
 }
 

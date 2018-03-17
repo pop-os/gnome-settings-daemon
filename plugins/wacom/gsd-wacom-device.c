@@ -37,6 +37,8 @@
 
 #include "gsd-enums.h"
 #include "gsd-wacom-device.h"
+#include "gsd-device-manager.h"
+#include "gsd-device-manager-x11.h"
 
 #define GSD_WACOM_STYLUS_GET_PRIVATE(o) (G_TYPE_INSTANCE_GET_PRIVATE ((o), GSD_TYPE_WACOM_STYLUS, GsdWacomStylusPrivate))
 
@@ -120,8 +122,10 @@ gsd_wacom_stylus_finalize (GObject *object)
 }
 
 static const char *
-get_icon_name_from_type (WacomStylusType type)
+get_icon_name_from_type (const WacomStylus *wstylus)
 {
+	WacomStylusType type = libwacom_stylus_get_type (wstylus);
+
 	switch (type) {
 	case WSTYLUS_INKING:
 	case WSTYLUS_STROKE:
@@ -135,6 +139,8 @@ get_icon_name_from_type (WacomStylusType type)
 	case WSTYLUS_CLASSIC:
 		return "wacom-stylus-classic";
 	default:
+		if (!libwacom_stylus_has_eraser (wstylus))
+			return "wacom-stylus-no-eraser";
 		return "wacom-stylus";
 	}
 }
@@ -156,7 +162,7 @@ gsd_wacom_stylus_new (GsdWacomDevice    *device,
 	stylus->priv->name = g_strdup (libwacom_stylus_get_name (wstylus));
 	stylus->priv->settings = settings;
 	stylus->priv->type = libwacom_stylus_get_type (wstylus);
-	stylus->priv->icon_name = get_icon_name_from_type (stylus->priv->type);
+	stylus->priv->icon_name = get_icon_name_from_type (wstylus);
 	stylus->priv->has_eraser = libwacom_stylus_has_eraser (wstylus);
 	stylus->priv->num_buttons = libwacom_stylus_get_num_buttons (wstylus);
 
@@ -423,9 +429,12 @@ setup_property_notify (GsdWacomDevice *device)
 	XISetMask (evmask.mask, XI_PropertyEvent);
 
 	dpy = GDK_DISPLAY_XDISPLAY (gdk_display_get_default ());
-	XISelectEvents (dpy, DefaultRootWindow (dpy), &evmask, 1);
 
+	gdk_error_trap_push ();
+	XISelectEvents (dpy, DefaultRootWindow (dpy), &evmask, 1);
 	g_free (evmask.mask);
+	if (gdk_error_trap_pop ())
+		return TRUE;
 
 	gdk_window_add_filter (NULL,
 			       (GdkFilterFunc) filter_events,
@@ -603,12 +612,19 @@ find_output_by_display (GnomeRRScreen *rr_screen, GsdWacomDevice *device)
 	GVariant *display;
 	const gchar **edid;
 	GnomeRROutput *ret;
+	GsdDevice *gsd_device;
 
 	if (device == NULL)
 		return NULL;
 
+	gsd_device = gsd_x11_device_manager_lookup_gdk_device (GSD_X11_DEVICE_MANAGER (gsd_device_manager_get ()),
+							       device->priv->gdk_device);
+
+	if (gsd_device == NULL)
+		return NULL;
+
 	ret      = NULL;
-	tablet   = device->priv->wacom_settings;
+	tablet   = gsd_device_get_settings (gsd_device);
 	display  = g_settings_get_value (tablet, "display");
 	edid     = g_variant_get_strv (display, &n);
 
@@ -625,6 +641,7 @@ find_output_by_display (GnomeRRScreen *rr_screen, GsdWacomDevice *device)
 out:
 	g_free (edid);
 	g_variant_unref (display);
+	g_object_unref (tablet);
 
 	return ret;
 }
@@ -691,12 +708,23 @@ set_display_by_output (GsdWacomDevice  *device,
 	gsize        nvalues;
 	gchar       *o_vendor, *o_product, *o_serial;
 	const gchar *values[3];
+	GsdDevice *gsd_device;
 
-	tablet  = gsd_wacom_device_get_settings (device);
+	if (device == NULL)
+		return;
+
+	gsd_device = gsd_x11_device_manager_lookup_gdk_device (GSD_X11_DEVICE_MANAGER (gsd_device_manager_get ()),
+							       device->priv->gdk_device);
+
+	if (gsd_device == NULL)
+		return;
+
+	tablet  = gsd_device_get_settings (gsd_device);
 	c_array = g_settings_get_value (tablet, "display");
 	g_variant_get_strv (c_array, &nvalues);
 	if (nvalues != 3) {
 		g_warning ("Unable set set display property. Got %"G_GSIZE_FORMAT" items; expected %d items.\n", nvalues, 4);
+		g_object_unref (tablet);
 		return;
 	}
 
@@ -720,6 +748,7 @@ set_display_by_output (GsdWacomDevice  *device,
 	g_free (o_vendor);
 	g_free (o_product);
 	g_free (o_serial);
+	g_object_unref (tablet);
 }
 
 static GsdWacomRotation
@@ -778,34 +807,6 @@ find_output (GnomeRRScreen  *rr_screen,
 	return rr_output;
 }
 
-static void
-calculate_transformation_matrix (const GdkRectangle mapped, const GdkRectangle desktop, float matrix[NUM_ELEMS_MATRIX])
-{
-	float x_scale = (float)mapped.x / desktop.width;
-	float y_scale = (float)mapped.y / desktop.height;
-	float width_scale  = (float)mapped.width / desktop.width;
-	float height_scale = (float)mapped.height / desktop.height;
-
-	matrix[0] = width_scale;
-	matrix[1] = 0.0f;
-	matrix[2] = x_scale;
-
-	matrix[3] = 0.0f;
-	matrix[4] = height_scale;
-	matrix[5] = y_scale;
-
-	matrix[6] = 0.0f;
-	matrix[7] = 0.0f;
-	matrix[8] = 1.0f;
-
-	g_debug ("Matrix is %f,%f,%f,%f,%f,%f,%f,%f,%f.",
-	         matrix[0], matrix[1], matrix[2],
-	         matrix[3], matrix[4], matrix[5],
-	         matrix[6], matrix[7], matrix[8]);
-
-	return;
-}
-
 int
 gsd_wacom_device_get_display_monitor (GsdWacomDevice *device)
 {
@@ -855,59 +856,26 @@ gsd_wacom_device_get_display_monitor (GsdWacomDevice *device)
 	return gdk_screen_get_monitor_at_point (gdk_screen_get_default (), area[0], area[1]);
 }
 
-gboolean
-gsd_wacom_device_get_display_matrix (GsdWacomDevice *device, float matrix[NUM_ELEMS_MATRIX])
-{
-	int monitor;
-	GdkRectangle display;
-	GdkRectangle desktop;
-	GdkScreen *screen = gdk_screen_get_default ();
-
-	matrix[0] = 1.0f;
-	matrix[1] = 0.0f;
-	matrix[2] = 0.0f;
-	matrix[3] = 0.0f;
-	matrix[4] = 1.0f;
-	matrix[5] = 0.0f;
-	matrix[6] = 0.0f;
-	matrix[7] = 0.0f;
-	matrix[8] = 1.0f;
-
-	monitor = gsd_wacom_device_get_display_monitor (device);
-	if (monitor < 0)
-		return FALSE;
-
-	desktop.x = 0;
-	desktop.y = 0;
-	desktop.width = gdk_screen_get_width (screen);
-	desktop.height = gdk_screen_get_height (screen);
-
-	gdk_screen_get_monitor_geometry (screen, monitor, &display);
-	calculate_transformation_matrix (display, desktop, matrix);
-	return TRUE;
-}
-
 GsdWacomRotation
 gsd_wacom_device_get_display_rotation (GsdWacomDevice *device)
 {
-	GError *error = NULL;
 	GnomeRRScreen *rr_screen;
 	GnomeRROutput *rr_output;
 	GnomeRRRotation rotation = GNOME_RR_ROTATION_0;
 
-	rr_screen = gnome_rr_screen_new (gdk_screen_get_default (), &error);
-	if (rr_screen == NULL) {
-		g_warning ("Failed to create GnomeRRScreen: %s", error->message);
-		g_error_free (error);
-		return GSD_WACOM_ROTATION_NONE;
-	}
+	rr_screen = gnome_rr_screen_new (gdk_screen_get_default (), NULL);
 
-	rr_output = find_output (rr_screen, device);
+	if (rr_screen == NULL)
+		return GSD_WACOM_ROTATION_NONE;
+
+	rr_output = find_output_by_display (rr_screen, device);
+
 	if (rr_output) {
 		GnomeRRCrtc *crtc = gnome_rr_output_get_crtc (rr_output);
 		if (crtc)
 			rotation = gnome_rr_crtc_get_current_rotation (crtc);
 	}
+
 	g_object_unref (rr_screen);
 
 	return get_rotation_wacom (rotation);
@@ -1248,7 +1216,6 @@ static GList *
 gsd_wacom_device_add_buttons_dir (WacomDevice      *wacom_device,
 				  const char       *settings_path,
 				  WacomButtonFlags  direction,
-				  const char       *button_str,
 				  const char       *button_str_id)
 {
 	GList *l;
@@ -1269,7 +1236,23 @@ gsd_wacom_device_add_buttons_dir (WacomDevice      *wacom_device,
 		if (flags & WACOM_BUTTON_MODESWITCH)
 			continue;
 
-		name = g_strdup_printf (button_str, button_num++);
+		switch (direction) {
+		case WACOM_BUTTON_POSITION_LEFT:
+			name = g_strdup_printf (_("Left Button #%d"), button_num++);
+			break;
+		case WACOM_BUTTON_POSITION_RIGHT:
+			name = g_strdup_printf (_("Right Button #%d"), button_num++);
+			break;
+		case WACOM_BUTTON_POSITION_TOP:
+			name = g_strdup_printf (_("Top Button #%d"), button_num++);
+			break;
+		case WACOM_BUTTON_POSITION_BOTTOM:
+			name = g_strdup_printf (_("Bottom Button #%d"), button_num++);
+			break;
+		default:
+			g_assert_not_reached ();
+		}
+
 		id = g_strdup_printf ("%s%c", button_str_id, i);
 		has_oled = (libwacom_get_button_flag (wacom_device, i) & WACOM_BUTTON_OLED) != 0;
 		l = g_list_append (l, gsd_wacom_tablet_button_new (name,
@@ -1332,16 +1315,16 @@ gsd_wacom_device_add_buttons (GsdWacomDevice *device,
 
 	ret = NULL;
 
-	l = gsd_wacom_device_add_buttons_dir (wacom_device, settings_path, WACOM_BUTTON_POSITION_LEFT, _("Left Button #%d"), "button");
+	l = gsd_wacom_device_add_buttons_dir (wacom_device, settings_path, WACOM_BUTTON_POSITION_LEFT, "button");
 	if (l)
 		ret = l;
-	l = gsd_wacom_device_add_buttons_dir (wacom_device, settings_path, WACOM_BUTTON_POSITION_RIGHT, _("Right Button #%d"), "button");
+	l = gsd_wacom_device_add_buttons_dir (wacom_device, settings_path, WACOM_BUTTON_POSITION_RIGHT, "button");
 	if (l)
 		ret = g_list_concat (ret, l);
-	l = gsd_wacom_device_add_buttons_dir (wacom_device, settings_path, WACOM_BUTTON_POSITION_TOP, _("Top Button #%d"), "button");
+	l = gsd_wacom_device_add_buttons_dir (wacom_device, settings_path, WACOM_BUTTON_POSITION_TOP, "button");
 	if (l)
 		ret = g_list_concat (ret, l);
-	l = gsd_wacom_device_add_buttons_dir (wacom_device, settings_path, WACOM_BUTTON_POSITION_BOTTOM, _("Bottom Button #%d"), "button");
+	l = gsd_wacom_device_add_buttons_dir (wacom_device, settings_path, WACOM_BUTTON_POSITION_BOTTOM, "button");
 	if (l)
 		ret = g_list_concat (ret, l);
 
@@ -1463,7 +1446,8 @@ gsd_wacom_device_constructor (GType                     type,
 												n_construct_properties,
 												construct_properties));
 
-	if (device->priv->gdk_device == NULL)
+	if (device->priv->gdk_device == NULL ||
+	    !GDK_IS_X11_DISPLAY (gdk_display_get_default ()))
 		return G_OBJECT (device);
 
 	device_manager = gdk_display_get_device_manager (gdk_display_get_default ());
@@ -1520,6 +1504,7 @@ gsd_wacom_device_constructor (GType                     type,
 			device->priv->type = WACOM_TYPE_INVALID;
 			goto end;
 		}
+		libwacom_error_free (&wacom_error);
 	}
 
 	gsd_wacom_device_update_from_db (device, wacom_device, device->priv->path);
@@ -1975,6 +1960,9 @@ gsd_wacom_device_get_default_area (GsdWacomDevice *device)
 
 	g_return_val_if_fail (GSD_IS_WACOM_DEVICE (device), NULL);
 
+	if (!device->priv->gdk_device)
+		return NULL;
+
 	g_object_get (device->priv->gdk_device, "device-id", &id, NULL);
 
 	device_area = g_new0 (int, 4);
@@ -2139,6 +2127,12 @@ gsd_wacom_device_rotation_type_to_name (GsdWacomRotation type)
 	return "none";
 }
 
+GdkDevice *
+gsd_wacom_device_get_gdk_device (GsdWacomDevice *device)
+{
+	return device->priv->gdk_device;
+}
+
 GsdWacomDevice *
 gsd_wacom_device_create_fake (GsdWacomDeviceType  type,
 			      const char         *name,
@@ -2262,6 +2256,30 @@ gsd_wacom_device_create_fake_intuos4 (void)
 	device = gsd_wacom_device_create_fake (WACOM_TYPE_CURSOR,
 					       "Wacom Intuos4 6x9",
 					       "Wacom Intuos4 6x9 cursor");
+	devices = g_list_prepend (devices, device);
+
+	return devices;
+}
+
+GList *
+gsd_wacom_device_create_fake_h610pro (void)
+{
+	GsdWacomDevice *device;
+	GList *devices;
+
+	device = gsd_wacom_device_create_fake (WACOM_TYPE_STYLUS,
+					       "Huion H610 Pro",
+					       "Huion H610 Pro stylus");
+	if (!device) {
+		g_warning ("Not appending Huion H610 Pro, libwacom is not new enough");
+		return NULL;
+	}
+
+	devices = g_list_prepend (NULL, device);
+
+	device = gsd_wacom_device_create_fake (WACOM_TYPE_PAD,
+					       "Huion H610 Pro",
+					       "Huion H610 Pro pad");
 	devices = g_list_prepend (devices, device);
 
 	return devices;

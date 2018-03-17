@@ -45,15 +45,13 @@
 #include "gsd-keyboard-manager.h"
 #include "gsd-input-helper.h"
 #include "gsd-enums.h"
+#include "gsd-settings-migrate.h"
 
 #define GSD_KEYBOARD_MANAGER_GET_PRIVATE(o) (G_TYPE_INSTANCE_GET_PRIVATE ((o), GSD_TYPE_KEYBOARD_MANAGER, GsdKeyboardManagerPrivate))
 
 #define GSD_KEYBOARD_DIR "org.gnome.settings-daemon.peripherals.keyboard"
 
-#define KEY_REPEAT         "repeat"
 #define KEY_CLICK          "click"
-#define KEY_INTERVAL       "repeat-interval"
-#define KEY_DELAY          "delay"
 #define KEY_CLICK_VOLUME   "click-volume"
 #define KEY_REMEMBER_NUMLOCK_STATE "remember-numlock-state"
 #define KEY_NUMLOCK_STATE  "numlock-state"
@@ -92,7 +90,6 @@ struct GsdKeyboardManagerPrivate
         GsdNumLockState old_state;
         GdkDeviceManager *device_manager;
         guint device_added_id;
-        guint device_removed_id;
 };
 
 static void     gsd_keyboard_manager_class_init  (GsdKeyboardManagerClass *klass);
@@ -124,24 +121,12 @@ init_builder_with_sources (GVariantBuilder *builder,
 }
 
 static gboolean
-contained (char       **items,
-           const char  *item)
-{
-        while (*items) {
-                if (g_strcmp0 (*items++, item) == 0) {
-                        return TRUE;
-                }
-        }
-
-        return FALSE;
-}
-
-static gboolean
 schema_is_installed (const char *schema)
 {
         GSettingsSchemaSource *source = NULL;
         gchar **non_relocatable = NULL;
         gchar **relocatable = NULL;
+        gboolean installed = FALSE;
 
         source = g_settings_schema_source_get_default ();
         if (!source)
@@ -149,17 +134,13 @@ schema_is_installed (const char *schema)
 
         g_settings_schema_source_list_schemas (source, TRUE, &non_relocatable, &relocatable);
 
-        return (contained (non_relocatable, schema) ||
-                contained (relocatable, schema));
-}
+        if (g_strv_contains ((const gchar * const *)non_relocatable, schema) ||
+            g_strv_contains ((const gchar * const *)relocatable, schema))
+                installed = TRUE;
 
-static gboolean
-xkb_set_keyboard_autorepeat_rate (guint delay, guint interval)
-{
-        return XkbSetAutoRepeatRate (GDK_DISPLAY_XDISPLAY (gdk_display_get_default ()),
-                                     XkbUseCoreKbd,
-                                     delay,
-                                     interval);
+        g_strfreev (non_relocatable);
+        g_strfreev (relocatable);
+        return installed;
 }
 
 static gboolean
@@ -340,42 +321,8 @@ apply_numlock (GsdKeyboardManager *manager)
 }
 
 static void
-apply_repeat (GsdKeyboardManager *manager)
-{
-	GSettings       *settings;
-        gboolean         repeat;
-        guint            interval;
-        guint            delay;
-
-        g_debug ("Applying the repeat settings");
-        settings      = manager->priv->settings;
-        repeat        = g_settings_get_boolean  (settings, KEY_REPEAT);
-        interval      = g_settings_get_uint  (settings, KEY_INTERVAL);
-        delay         = g_settings_get_uint  (settings, KEY_DELAY);
-
-        gdk_error_trap_push ();
-        if (repeat) {
-                gboolean rate_set = FALSE;
-
-                XAutoRepeatOn (GDK_DISPLAY_XDISPLAY (gdk_display_get_default ()));
-                /* Use XKB in preference */
-                rate_set = xkb_set_keyboard_autorepeat_rate (delay, interval);
-
-                if (!rate_set)
-                        g_warning ("Neither XKeyboard not Xfree86's keyboard extensions are available,\n"
-                                   "no way to support keyboard autorepeat rate settings");
-        } else {
-                XAutoRepeatOff (GDK_DISPLAY_XDISPLAY (gdk_display_get_default ()));
-        }
-
-        XSync (GDK_DISPLAY_XDISPLAY (gdk_display_get_default ()), FALSE);
-        gdk_error_trap_pop_ignored ();
-}
-
-static void
 apply_all_settings (GsdKeyboardManager *manager)
 {
-	apply_repeat (manager);
 	apply_bell (manager);
 	apply_numlock (manager);
 }
@@ -397,11 +344,6 @@ settings_changed (GSettings          *settings,
 		apply_numlock (manager);
 	} else if (g_strcmp0 (key, KEY_NUMLOCK_STATE) == 0) {
 		g_debug ("Num-Lock state '%s' changed, will apply at next startup", key);
-	} else if (g_strcmp0 (key, KEY_REPEAT) == 0 ||
-		 g_strcmp0 (key, KEY_INTERVAL) == 0 ||
-		 g_strcmp0 (key, KEY_DELAY) == 0) {
-		g_debug ("Key repeat setting '%s' changed, applying key repeat settings", key);
-		apply_repeat (manager);
 	} else if (g_strcmp0 (key, KEY_BELL_CUSTOM_FILE) == 0){
 		g_debug ("Ignoring '%s' setting change", KEY_BELL_CUSTOM_FILE);
 	} else {
@@ -421,20 +363,6 @@ device_added_cb (GdkDeviceManager   *device_manager,
         if (source == GDK_SOURCE_KEYBOARD) {
                 g_debug ("New keyboard plugged in, applying all settings");
                 apply_numlock (manager);
-                run_custom_command (device, COMMAND_DEVICE_ADDED);
-        }
-}
-
-static void
-device_removed_cb (GdkDeviceManager   *device_manager,
-                   GdkDevice          *device,
-                   GsdKeyboardManager *manager)
-{
-        GdkInputSource source;
-
-        source = gdk_device_get_source (device);
-        if (source == GDK_SOURCE_KEYBOARD) {
-                run_custom_command (device, COMMAND_DEVICE_REMOVED);
         }
 }
 
@@ -443,12 +371,13 @@ set_devicepresence_handler (GsdKeyboardManager *manager)
 {
         GdkDeviceManager *device_manager;
 
+        if (gnome_settings_is_wayland ())
+                return;
+
         device_manager = gdk_display_get_device_manager (gdk_display_get_default ());
 
         manager->priv->device_added_id = g_signal_connect (G_OBJECT (device_manager), "device-added",
                                                            G_CALLBACK (device_added_cb), manager);
-        manager->priv->device_removed_id = g_signal_connect (G_OBJECT (device_manager), "device-removed",
-                                                             G_CALLBACK (device_removed_cb), manager);
         manager->priv->device_manager = device_manager;
 }
 
@@ -707,17 +636,8 @@ maybe_create_initial_settings (GsdKeyboardManager *manager)
 
         settings = manager->priv->input_sources_settings;
 
-        if (g_getenv ("RUNNING_UNDER_GDM")) {
-                GVariantBuilder builder;
-                /* clean the settings and get them from the "system" */
-                g_variant_builder_init (&builder, G_VARIANT_TYPE ("a(ss)"));
-                g_settings_set_value (settings, KEY_INPUT_SOURCES, g_variant_builder_end (&builder));
-                get_sources_from_xkb_config (manager);
-
-                g_settings_set_strv (settings, KEY_KEYBOARD_OPTIONS, NULL);
-                get_options_from_xkb_config (manager);
+        if (g_getenv ("RUNNING_UNDER_GDM"))
                 return;
-        }
 
         maybe_convert_old_settings (settings);
 
@@ -785,12 +705,14 @@ start_keyboard_idle_cb (GsdKeyboardManager *manager)
                                   localed_proxy_ready,
                                   manager);
 
-        /* apply current settings before we install the callback */
-        g_debug ("Started the keyboard plugin, applying all settings");
-        apply_all_settings (manager);
+        if (!gnome_settings_is_wayland ()) {
+                /* apply current settings before we install the callback */
+                g_debug ("Started the keyboard plugin, applying all settings");
+                apply_all_settings (manager);
 
-        g_signal_connect (G_OBJECT (manager->priv->settings), "changed",
-                          G_CALLBACK (settings_changed), manager);
+                g_signal_connect (G_OBJECT (manager->priv->settings), "changed",
+                                  G_CALLBACK (settings_changed), manager);
+        }
 
 	install_xkb_filter (manager);
 
@@ -836,7 +758,6 @@ gsd_keyboard_manager_stop (GsdKeyboardManager *manager)
 
         if (p->device_manager != NULL) {
                 g_signal_handler_disconnect (p->device_manager, p->device_added_id);
-                g_signal_handler_disconnect (p->device_manager, p->device_removed_id);
                 p->device_manager = NULL;
         }
 
@@ -879,12 +800,29 @@ gsd_keyboard_manager_finalize (GObject *object)
         G_OBJECT_CLASS (gsd_keyboard_manager_parent_class)->finalize (object);
 }
 
+static void
+migrate_keyboard_settings (void)
+{
+        GsdSettingsMigrateEntry entries[] = {
+                { "repeat",          "repeat",          NULL },
+                { "repeat-interval", "repeat-interval", NULL },
+                { "delay",           "delay",           NULL }
+        };
+
+        gsd_settings_migrate_check ("org.gnome.settings-daemon.peripherals.keyboard.deprecated",
+                                    "/org/gnome/settings-daemon/peripherals/keyboard/",
+                                    "org.gnome.desktop.peripherals.keyboard",
+                                    "/org/gnome/desktop/peripherals/keyboard/",
+                                    entries, G_N_ELEMENTS (entries));
+}
+
 GsdKeyboardManager *
 gsd_keyboard_manager_new (void)
 {
         if (manager_object != NULL) {
                 g_object_ref (manager_object);
         } else {
+                migrate_keyboard_settings ();
                 manager_object = g_object_new (GSD_TYPE_KEYBOARD_MANAGER, NULL);
                 g_object_add_weak_pointer (manager_object,
                                            (gpointer *) &manager_object);

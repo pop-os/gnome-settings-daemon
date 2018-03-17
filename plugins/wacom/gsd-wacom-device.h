@@ -26,8 +26,6 @@
 
 G_BEGIN_DECLS
 
-#define NUM_ELEMS_MATRIX 9
-
 #define GSD_TYPE_WACOM_DEVICE         (gsd_wacom_device_get_type ())
 #define GSD_WACOM_DEVICE(o)           (G_TYPE_CHECK_INSTANCE_CAST ((o), GSD_TYPE_WACOM_DEVICE, GsdWacomDevice))
 #define GSD_WACOM_DEVICE_CLASS(k)     (G_TYPE_CHECK_CLASS_CAST((k), GSD_TYPE_WACOM_DEVICE, GsdWacomDeviceClass))
@@ -147,8 +145,6 @@ GType gsd_wacom_device_get_type     (void);
 void     gsd_wacom_device_set_display         (GsdWacomDevice    *device,
                                                int                monitor);
 gint     gsd_wacom_device_get_display_monitor (GsdWacomDevice *device);
-gboolean gsd_wacom_device_get_display_matrix  (GsdWacomDevice *device,
-                                               float           matrix[NUM_ELEMS_MATRIX]);
 GsdWacomRotation gsd_wacom_device_get_display_rotation (GsdWacomDevice *device);
 
 GsdWacomDevice * gsd_wacom_device_new              (GdkDevice *device);
@@ -184,6 +180,8 @@ int gsd_wacom_device_get_current_mode               (GsdWacomDevice   *device,
 						     int               group_id);
 int gsd_wacom_device_set_next_mode                  (GsdWacomDevice       *device,
 						     GsdWacomTabletButton *button);
+GdkDevice      * gsd_wacom_device_get_gdk_device    (GsdWacomDevice   *device);
+
 GsdWacomRotation gsd_wacom_device_rotation_name_to_type (const char *rotation);
 const char     * gsd_wacom_device_rotation_type_to_name (GsdWacomRotation type);
 
@@ -197,6 +195,7 @@ GList * gsd_wacom_device_create_fake_cintiq   (void);
 GList * gsd_wacom_device_create_fake_bt       (void);
 GList * gsd_wacom_device_create_fake_x201     (void);
 GList * gsd_wacom_device_create_fake_intuos4  (void);
+GList * gsd_wacom_device_create_fake_h610pro  (void);
 
 G_END_DECLS
 
