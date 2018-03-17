@@ -1,6 +1,7 @@
 gnome-settings-daemon (3.27.92-2) UNRELEASED; urgency=medium
 
   * Remove empty debian/patches/
+  * Vcs-*: Update for move from Alioth svn to salsa.debian.org git
 
  -- Simon McVittie <smcv@debian.org>  Sat, 17 Mar 2018 14:17:59 +0000
 
