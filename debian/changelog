@@ -1,10 +1,15 @@
 gnome-settings-daemon (3.28.0-1) UNRELEASED; urgency=medium
 
+  [ Simon McVittie ]
   * Remove empty debian/patches/
   * Vcs-*: Update for move from Alioth svn to salsa.debian.org git
   * d/gbp.conf: Add
   * New upstream release
   * d/copyright: Update
+
+  [ Jeremy Bicha ]
+  * Update Breaks for removal of the A11yKeyboard plugin
+  * Upload to unstable
 
  -- Simon McVittie <smcv@debian.org>  Sat, 17 Mar 2018 14:17:59 +0000
 
