@@ -168,6 +168,29 @@ device_is_blacklisted (GsdMouseManager *manager,
         return FALSE;
 }
 
+static gboolean
+device_is_ignored (GsdMouseManager *manager,
+		   GdkDevice       *device)
+{
+	GdkInputSource source;
+	const char *name;
+
+	if (device_is_blacklisted (manager, device))
+		return TRUE;
+
+	source = gdk_device_get_source (device);
+	if (source != GDK_SOURCE_MOUSE &&
+	    source != GDK_SOURCE_TOUCHPAD &&
+	    source != GDK_SOURCE_CURSOR)
+		return TRUE;
+
+	name = gdk_device_get_name (device);
+	if (name != NULL && g_str_equal ("Virtual core XTEST pointer", name))
+		return TRUE;
+
+	return FALSE;
+}
+
 static void
 configure_button_layout (guchar   *buttons,
                          gint      n_buttons,
@@ -315,17 +338,15 @@ set_left_handed (GsdMouseManager *manager,
         gsize buttons_capacity = 16;
         gboolean left_handed;
         gint n_buttons;
-        const char *name;
 
-        name = gdk_device_get_name (device);
-        if (name != NULL && g_str_equal ("Virtual core XTEST pointer", name))
-                return;
         if (!xinput_device_has_buttons (device))
                 return;
 
         xdevice = open_gdk_device (device);
         if (xdevice == NULL)
                 return;
+
+	g_debug ("setting handedness on %s", gdk_device_get_name (device));
 
         buttons = g_new (guchar, buttons_capacity);
 
@@ -388,6 +409,8 @@ set_motion (GsdMouseManager *manager,
         xdevice = open_gdk_device (device);
         if (xdevice == NULL)
                 return;
+
+	g_debug ("setting motion on %s", gdk_device_get_name (device));
 
         if (device_is_touchpad (xdevice))
                 settings = manager->priv->touchpad_settings;
@@ -483,6 +506,8 @@ set_middle_button (GsdMouseManager *manager,
         if (xdevice == NULL)
                 return;
 
+	g_debug ("setting middle button on %s", gdk_device_get_name (device));
+
         gdk_error_trap_push ();
 
         rc = XGetDeviceProperty (GDK_DISPLAY_XDISPLAY (gdk_display_get_default ()),
@@ -549,7 +574,7 @@ set_disable_w_typing (GsdMouseManager *manager, gboolean state)
 
                 args[0] = "syndaemon";
                 args[1] = "-i";
-                args[2] = "2.0";
+                args[2] = "1.0";
                 args[3] = "-K";
                 args[4] = "-R";
                 args[5] = NULL;
@@ -607,6 +632,8 @@ set_tap_to_click (GdkDevice *device,
                 return;
         }
 
+	g_debug ("setting tap to click on %s", gdk_device_get_name (device));
+
         gdk_error_trap_push ();
         rc = XGetDeviceProperty (GDK_DISPLAY_XDISPLAY (gdk_display_get_default ()), xdevice, prop, 0, 2,
                                  False, XA_INTEGER, &type, &format, &nitems,
@@ -655,6 +682,8 @@ set_horiz_scroll (GdkDevice *device,
                 XCloseDevice (GDK_DISPLAY_XDISPLAY (gdk_display_get_default ()), xdevice);
                 return;
         }
+
+	g_debug ("setting horiz scroll on %s", gdk_device_get_name (device));
 
         gdk_error_trap_push ();
         rc = XGetDeviceProperty (GDK_DISPLAY_XDISPLAY (gdk_display_get_default ()), xdevice,
@@ -718,6 +747,8 @@ set_edge_scroll (GdkDevice               *device,
                 XCloseDevice (GDK_DISPLAY_XDISPLAY (gdk_display_get_default ()), xdevice);
                 return;
         }
+
+	g_debug ("setting edge scroll on %s", gdk_device_get_name (device));
 
         gdk_error_trap_push ();
         rc = XGetDeviceProperty (GDK_DISPLAY_XDISPLAY (gdk_display_get_default ()), xdevice,
@@ -945,8 +976,8 @@ mouse_callback (GSettings       *settings,
         for (l = devices; l != NULL; l = l->next) {
                 GdkDevice *device = l->data;
 
-                if (device_is_blacklisted (manager, device))
-                        return;
+                if (device_is_ignored (manager, device))
+                        continue;
 
                 if (g_str_equal (key, KEY_LEFT_HANDED)) {
                         gboolean mouse_left_handed;
@@ -979,10 +1010,8 @@ touchpad_callback (GSettings       *settings,
         for (l = devices; l != NULL; l = l->next) {
                 GdkDevice *device = l->data;
 
-                g_message ("checking on device %s", gdk_device_get_name (device));
-
-                if (device_is_blacklisted (manager, device))
-                        return;
+                if (device_is_ignored (manager, device))
+                        continue;
 
                 if (g_str_equal (key, KEY_TAP_TO_CLICK)) {
                         set_tap_to_click (device, g_settings_get_boolean (settings, key),
@@ -1026,10 +1055,7 @@ device_added_cb (GdkDeviceManager *device_manager,
                  GdkDevice        *device,
                  GsdMouseManager  *manager)
 {
-        GdkInputSource source;
-
-        source = gdk_device_get_source (device);
-        if (source == GDK_SOURCE_MOUSE || source == GDK_SOURCE_TOUCHPAD) {
+        if (device_is_ignored (manager, device) == FALSE) {
                 if (run_custom_command (device, COMMAND_DEVICE_ADDED) == FALSE) {
                         set_mouse_settings (manager, device);
                 } else {
@@ -1049,17 +1075,16 @@ device_removed_cb (GdkDeviceManager *device_manager,
                    GdkDevice        *device,
                    GsdMouseManager  *manager)
 {
-        GdkInputSource source;
+	int id;
 
-        source = gdk_device_get_source (device);
-        if (source == GDK_SOURCE_MOUSE || source == GDK_SOURCE_TOUCHPAD) {
-                int id;
+	/* Remove the device from the hash table so that
+	 * device_is_ignored () doesn't check for blacklisted devices */
+	g_object_get (G_OBJECT (device), "device-id", &id, NULL);
+	g_hash_table_remove (manager->priv->blacklist,
+			     GINT_TO_POINTER (id));
 
+        if (device_is_ignored (manager, device) == FALSE) {
                 run_custom_command (device, COMMAND_DEVICE_REMOVED);
-
-                g_object_get (G_OBJECT (device), "device-id", &id, NULL);
-                g_hash_table_remove (manager->priv->blacklist,
-                                     GINT_TO_POINTER (id));
 
                 /* If a touchpad was to disappear... */
                 set_disable_w_typing (manager, g_settings_get_boolean (manager->priv->touchpad_settings, KEY_TOUCHPAD_DISABLE_W_TYPING));
@@ -1119,6 +1144,9 @@ gsd_mouse_manager_idle_cb (GsdMouseManager *manager)
         devices = gdk_device_manager_list_devices (manager->priv->device_manager, GDK_DEVICE_TYPE_SLAVE);
         for (l = devices; l != NULL; l = l->next) {
                 GdkDevice *device = l->data;
+
+                if (device_is_ignored (manager, device))
+                        continue;
 
                 if (run_custom_command (device, COMMAND_DEVICE_PRESENT) == FALSE) {
                         set_mouse_settings (manager, device);

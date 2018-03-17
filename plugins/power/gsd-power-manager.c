@@ -73,7 +73,7 @@
 #define GSD_POWER_DBUS_INTERFACE_KEYBOARD       "org.gnome.SettingsDaemon.Power.Keyboard"
 
 #define GS_DBUS_NAME                            "org.gnome.ScreenSaver"
-#define GS_DBUS_PATH                            "/"
+#define GS_DBUS_PATH                            "/org/gnome/ScreenSaver"
 #define GS_DBUS_INTERFACE                       "org.gnome.ScreenSaver"
 
 #define GSD_POWER_MANAGER_NOTIFY_TIMEOUT_NEVER          0 /* ms */
@@ -711,6 +711,10 @@ engine_recalculate_state_icon (GsdPowerManager *manager)
 
         /* icon before, now different */
         if (!g_icon_equal (manager->priv->previous_icon, icon)) {
+
+                /* set fallback icon */
+                gtk_status_icon_set_from_gicon (manager->priv->status_icon, icon);
+
                 g_object_unref (manager->priv->previous_icon);
                 manager->priv->previous_icon = icon;
                 return TRUE;
@@ -1193,6 +1197,28 @@ engine_device_removed_cb (UpClient *client, UpDevice *device, GsdPowerManager *m
 }
 
 static void
+on_notification_closed (NotifyNotification *notification, gpointer data)
+{
+    g_object_unref (notification);
+}
+
+static void
+create_notification (const char *summary,
+                     const char *body,
+                     const char *icon,
+                     NotifyNotification **weak_pointer_location)
+{
+        NotifyNotification *notification;
+
+        notification = notify_notification_new (summary, body, icon);
+        *weak_pointer_location = notification;
+        g_object_add_weak_pointer (G_OBJECT (notification),
+                                   (gpointer *) weak_pointer_location);
+        g_signal_connect (notification, "closed",
+                          G_CALLBACK (on_notification_closed), NULL);
+}
+
+static void
 engine_ups_discharging (GsdPowerManager *manager, UpDevice *device)
 {
         const gchar *title;
@@ -1238,9 +1264,9 @@ engine_ups_discharging (GsdPowerManager *manager, UpDevice *device)
         notify_close_if_showing (manager->priv->notification_discharging);
 
         /* create a new notification */
-        manager->priv->notification_discharging = notify_notification_new (title,
-                                                                           message->str,
-                                                                           get_first_themed_icon_name (icon));
+        create_notification (title, message->str,
+                             get_first_themed_icon_name (icon),
+                             &manager->priv->notification_discharging);
         notify_notification_set_timeout (manager->priv->notification_discharging,
                                          GSD_POWER_MANAGER_NOTIFY_TIMEOUT_LONG);
         notify_notification_set_urgency (manager->priv->notification_discharging,
@@ -1249,8 +1275,6 @@ engine_ups_discharging (GsdPowerManager *manager, UpDevice *device)
         notify_notification_set_app_name (manager->priv->notification_discharging, _("Power"));
         notify_notification_set_hint (manager->priv->notification_discharging,
                                       "transient", g_variant_new_boolean (TRUE));
-        g_object_add_weak_pointer (G_OBJECT (manager->priv->notification_discharging),
-                                   (gpointer) &manager->priv->notification_discharging);
 
         /* try to show */
         ret = notify_notification_show (manager->priv->notification_discharging,
@@ -1417,9 +1441,9 @@ engine_charge_low (GsdPowerManager *manager, UpDevice *device)
         notify_close_if_showing (manager->priv->notification_low);
 
         /* create a new notification */
-        manager->priv->notification_low = notify_notification_new (title,
-                                                                   message,
-                                                                   get_first_themed_icon_name (icon));
+        create_notification (title, message,
+                             get_first_themed_icon_name (icon),
+                             &manager->priv->notification_low);
         notify_notification_set_timeout (manager->priv->notification_low,
                                          GSD_POWER_MANAGER_NOTIFY_TIMEOUT_LONG);
         notify_notification_set_urgency (manager->priv->notification_low,
@@ -1427,8 +1451,6 @@ engine_charge_low (GsdPowerManager *manager, UpDevice *device)
         notify_notification_set_app_name (manager->priv->notification_low, _("Power"));
         notify_notification_set_hint (manager->priv->notification_low,
                                       "transient", g_variant_new_boolean (TRUE));
-        g_object_add_weak_pointer (G_OBJECT (manager->priv->notification_low),
-                                   (gpointer) &manager->priv->notification_low);
 
         /* try to show */
         ret = notify_notification_show (manager->priv->notification_low,
@@ -1598,16 +1620,14 @@ engine_charge_critical (GsdPowerManager *manager, UpDevice *device)
         notify_close_if_showing (manager->priv->notification_low);
 
         /* create a new notification */
-        manager->priv->notification_low = notify_notification_new (title,
-                                                                   message,
-                                                                   get_first_themed_icon_name (icon));
+        create_notification (title, message,
+                             get_first_themed_icon_name (icon),
+                             &manager->priv->notification_low);
         notify_notification_set_timeout (manager->priv->notification_low,
                                          GSD_POWER_MANAGER_NOTIFY_TIMEOUT_NEVER);
         notify_notification_set_urgency (manager->priv->notification_low,
                                          NOTIFY_URGENCY_CRITICAL);
         notify_notification_set_app_name (manager->priv->notification_low, _("Power"));
-        g_object_add_weak_pointer (G_OBJECT (manager->priv->notification_low),
-                                   (gpointer) &manager->priv->notification_low);
 
         /* try to show */
         ret = notify_notification_show (manager->priv->notification_low,
@@ -1747,16 +1767,14 @@ engine_charge_action (GsdPowerManager *manager, UpDevice *device)
         notify_close_if_showing (manager->priv->notification_low);
 
         /* create a new notification */
-        manager->priv->notification_low = notify_notification_new (title,
-                                                                   message,
-                                                                   get_first_themed_icon_name (icon));
+        create_notification (title, message,
+                             get_first_themed_icon_name (icon),
+                             &manager->priv->notification_low);
         notify_notification_set_timeout (manager->priv->notification_low,
                                          GSD_POWER_MANAGER_NOTIFY_TIMEOUT_NEVER);
         notify_notification_set_urgency (manager->priv->notification_low,
                                          NOTIFY_URGENCY_CRITICAL);
         notify_notification_set_app_name (manager->priv->notification_low, _("Power"));
-        g_object_add_weak_pointer (G_OBJECT (manager->priv->notification_low),
-                                   (gpointer) &manager->priv->notification_low);
 
         /* try to show */
         ret = notify_notification_show (manager->priv->notification_low,
@@ -2330,7 +2348,7 @@ do_lid_closed_action (GsdPowerManager *manager)
         if (!ret) {
                 g_warning ("failed to turn the panel off after lid close: %s",
                            error->message);
-                g_error_free (error);
+                g_clear_error (&error);
         }
 
         /* only toggle keyboard if present and not already toggled */
@@ -2993,7 +3011,7 @@ idle_set_mode (GsdPowerManager *manager, GsdPowerIdleMode mode)
                 if (!ret) {
                         g_warning ("failed to turn the panel off: %s",
                                    error->message);
-                        g_error_free (error);
+                        g_clear_error (&error);
                 }
 
                 /* only toggle keyboard if present and not already toggled */
@@ -3041,7 +3059,7 @@ idle_set_mode (GsdPowerManager *manager, GsdPowerIdleMode mode)
                                 g_warning ("failed to restore backlight to %i: %s",
                                            manager->priv->pre_dim_brightness,
                                            error->message);
-                                g_error_free (error);
+                                g_clear_error (&error);
                         } else {
                                 manager->priv->pre_dim_brightness = -1;
                         }
@@ -3054,7 +3072,7 @@ idle_set_mode (GsdPowerManager *manager, GsdPowerIdleMode mode)
                         if (!ret) {
                                 g_warning ("failed to turn the kbd backlight on: %s",
                                            error->message);
-                                g_error_free (error);
+                                g_clear_error (&error);
                         }
                 }
 
@@ -3654,6 +3672,11 @@ gsd_power_manager_start (GsdPowerManager *manager,
         g_debug ("Starting power manager");
         gnome_settings_profile_start (NULL);
 
+        /* coldplug the list of screens */
+        manager->priv->x11_screen = gnome_rr_screen_new (gdk_screen_get_default (), error);
+        if (manager->priv->x11_screen == NULL)
+                return FALSE;
+
         /* track the active session */
         manager->priv->session = gnome_settings_session_new ();
         g_signal_connect (manager->priv->session, "notify::state",
@@ -3780,11 +3803,6 @@ gsd_power_manager_start (GsdPowerManager *manager,
                           G_CALLBACK (idle_idletime_reset_cb), manager);
         g_signal_connect (manager->priv->idletime, "alarm-expired",
                           G_CALLBACK (idle_idletime_alarm_expired_cb), manager);
-
-        /* coldplug the list of screens */
-        manager->priv->x11_screen = gnome_rr_screen_new (gdk_screen_get_default (), error);
-        if (manager->priv->x11_screen == NULL)
-                return FALSE;
 
         /* ensure the default dpms timeouts are cleared */
         ret = gnome_rr_screen_set_dpms_mode (manager->priv->x11_screen,

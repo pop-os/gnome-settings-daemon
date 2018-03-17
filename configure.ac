@@ -51,7 +51,7 @@ GNOME_DESKTOP_REQUIRED_VERSION=3.3.92
 LIBNOTIFY_REQUIRED_VERSION=0.7.3
 UPOWER_GLIB_REQUIRED_VERSION=0.9.1
 PA_REQUIRED_VERSION=0.9.16
-LIBWACOM_REQUIRED_VERSION=0.3
+LIBWACOM_REQUIRED_VERSION=0.6
 UPOWER_REQUIRED_VERSION=0.9.11
 
 EXTRA_COMPILE_WARNINGS(yes)
@@ -197,10 +197,23 @@ dnl ---------------------------------------------------------------------------
 PKG_CHECK_MODULES(COLOR, [colord >= 0.1.9 gnome-desktop-3.0 >= $GNOME_DESKTOP_REQUIRED_VERSION libcanberra-gtk3])
 
 dnl ---------------------------------------------------------------------------
-dnl - wacom
+dnl - wacom (disabled for s390/s390x and non Linux platforms)
 dnl ---------------------------------------------------------------------------
 
-PKG_CHECK_MODULES(WACOM, [libwacom >= $LIBWACOM_REQUIRED_VERSION x11 xi xtst $GUDEV_PKG gnome-desktop-3.0 >= $GNOME_DESKTOP_REQUIRED_VERSION xorg-wacom])
+case $host_os in
+  linux*)
+    if test "$host_cpu" = s390 -o "$host_cpu" = s390x; then
+      have_wacom=no
+    else
+      PKG_CHECK_MODULES(WACOM, [libwacom >= $LIBWACOM_REQUIRED_VERSION x11 xi xtst $GUDEV_PKG gnome-desktop-3.0 >= $GNOME_DESKTOP_REQUIRED_VERSION xorg-wacom])
+      have_wacom=yes
+    fi
+    ;;
+  *)
+    have_wacom=no
+    ;;
+esac
+AM_CONDITIONAL(HAVE_WACOM, test x$have_wacom = xyes)
 
 dnl ==============================================
 dnl PackageKit section
@@ -507,7 +520,8 @@ echo "
         Libnotify support:        ${have_libnotify}
         PackageKit support:       ${have_packagekit}
         Smartcard support:        ${have_smartcard_support}
-        Cups support:             ${have_cups}
+        Cups support:             ${enable_cups}
+        Wacom support:            ${have_wacom}
 ${NSS_DATABASE:+\
         System nssdb:             ${NSS_DATABASE}
 }\

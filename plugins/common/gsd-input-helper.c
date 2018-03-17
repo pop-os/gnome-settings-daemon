@@ -83,6 +83,8 @@ device_set_property (XDevice        *xdevice,
                                xdevice, prop, realtype, realformat,
                                PropModeReplace, data, nitems);
 
+        XFree (data);
+
         if (gdk_error_trap_pop ()) {
                 g_warning ("Error in setting \"%s\" for \"%s\"", property->name, device_name);
                 return FALSE;
@@ -129,7 +131,14 @@ supports_xinput2_devices (int *opcode)
 
         if (XIQueryVersion (GDK_DISPLAY_XDISPLAY (gdk_display_get_default ()), &major, &minor) != Success) {
                 gdk_error_trap_pop_ignored ();
-                return FALSE;
+                /* try for 2.2, maybe gtk has already announced 2.2 support */
+                gdk_error_trap_push ();
+                major = 2;
+                minor = 2;
+                if (XIQueryVersion (GDK_DISPLAY_XDISPLAY (gdk_display_get_default ()), &major, &minor) != Success) {
+                    gdk_error_trap_pop_ignored ();
+                    return FALSE;
+                }
         }
         gdk_error_trap_pop_ignored ();
 
@@ -328,14 +337,16 @@ xdevice_get_last_tool_id (int  deviceid)
         if (!prop)
                 return -1;
 
+        data = NULL;
+
         gdk_error_trap_push ();
 
-        if (!XIGetProperty (GDK_DISPLAY_XDISPLAY (gdk_display_get_default ()),
+        if (XIGetProperty (GDK_DISPLAY_XDISPLAY (gdk_display_get_default ()),
                             deviceid, prop, 0, 1000, False,
                             AnyPropertyType, &act_type, &act_format,
-                            &nitems, &bytes_after, &data) == Success) {
+                            &nitems, &bytes_after, &data) != Success) {
                 gdk_error_trap_pop_ignored ();
-                return -1;
+                goto out;
         }
 
         if (gdk_error_trap_pop ())
@@ -366,10 +377,11 @@ xdevice_get_last_tool_id (int  deviceid)
 	/* That means that no tool was set down yet */
 	if (id == STYLUS_DEVICE_ID ||
 	    id == ERASER_DEVICE_ID)
-		return 0x0;
+		id = 0x0;
 
 out:
-        XFree (data);
+        if (data != NULL)
+                XFree (data);
         return id;
 }
 

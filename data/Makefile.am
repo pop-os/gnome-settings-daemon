@@ -16,7 +16,6 @@ gsettings_SCHEMAS =							\
 	org.gnome.settings-daemon.plugins.xsettings.gschema.xml		\
 	org.gnome.settings-daemon.plugins.housekeeping.gschema.xml	\
 	org.gnome.settings-daemon.plugins.print-notifications.gschema.xml	\
-	org.gnome.settings-daemon.peripherals.wacom.gschema.xml		\
 	org.gnome.settings-daemon.plugins.xrandr.gschema.xml
 
 all_schemas = $(gsettings_SCHEMAS)
@@ -31,6 +30,12 @@ if HAVE_GUDEV
 gsettings_SCHEMAS += org.gnome.settings-daemon.plugins.orientation.gschema.xml
 else
 all_schemas += org.gnome.settings-daemon.plugins.orientation.gschema.xml
+endif
+
+if HAVE_WACOM
+gsettings_SCHEMAS += org.gnome.settings-daemon.peripherals.wacom.gschema.xml
+else
+all_schemas += org.gnome.settings-daemon.peripherals.wacom.gschema.xml
 endif
 
 @INTLTOOL_XML_NOMERGE_RULE@
@@ -48,13 +53,6 @@ desktop_DATA = $(desktop_in_files:.desktop.in.in=.desktop)
 gnome-settings-daemon.desktop.in: gnome-settings-daemon.desktop.in.in
 	$(AM_V_GEN) sed -e "s|\@libexecdir\@|$(libexecdir)|" $< > $@.tmp && mv $@.tmp $@
 
-servicedir = $(datadir)/dbus-1/services
-service_in_files = org.gnome.SettingsDaemon.service.in
-service_DATA = $(service_in_files:.service.in=.service)
-
-org.gnome.SettingsDaemon.service: org.gnome.SettingsDaemon.service.in Makefile
-	$(AM_V_GEN) sed -e "s|\@libexecdir\@|$(libexecdir)|" $< > $@
-
 pkgconfigdir = $(libdir)/pkgconfig
 pkgconfig_DATA = gnome-settings-daemon.pc
 
@@ -66,7 +64,6 @@ EXTRA_DIST = 					\
 	$(man_MANS)				\
 	$(convert_DATA)				\
 	$(all_schemas:.xml=.xml.in.in)		\
-	$(service_in_files)			\
 	$(desktop_in_files)			\
 	$(gsettings_ENUM_FILES)			\
 	gnome-settings-daemon.pc.in		\
@@ -75,7 +72,6 @@ EXTRA_DIST = 					\
 
 DISTCLEANFILES = 			\
 	$(all_schemas)			\
-	$(service_DATA)			\
 	$(desktop_DATA)			\
 	gnome-settings-daemon.desktop.in \
 	$(NULL)
