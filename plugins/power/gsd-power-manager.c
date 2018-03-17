@@ -219,6 +219,7 @@ static gboolean  idle_is_session_inhibited (GsdPowerManager *manager, guint mask
 static void      idle_triggered_idle_cb (GnomeIdleMonitor *monitor, guint watch_id, gpointer user_data);
 static void      idle_became_active_cb (GnomeIdleMonitor *monitor, guint watch_id, gpointer user_data);
 static void      iio_proxy_changed (GsdPowerManager *manager);
+static void      iio_proxy_changed_cb (GDBusProxy *proxy, GVariant *changed_properties, GStrv invalidated_properties, gpointer user_data);
 
 G_DEFINE_TYPE (GsdPowerManager, gsd_power_manager, G_TYPE_OBJECT)
 
@@ -996,6 +997,18 @@ iio_proxy_claim_light (GsdPowerManager *manager, gboolean active)
 	if (active && !manager->priv->session_is_active)
 		return;
 
+        /* FIXME:
+         * Remove when iio-sensor-proxy sends events only to clients instead
+         * of all listeners:
+         * https://github.com/hadess/iio-sensor-proxy/issues/210 */
+        if (active)
+                g_signal_connect (manager->priv->iio_proxy, "g-properties-changed",
+                                  G_CALLBACK (iio_proxy_changed_cb), manager);
+        else
+                g_signal_handlers_disconnect_by_func (manager->priv->iio_proxy,
+                                                      G_CALLBACK (iio_proxy_changed_cb),
+                                                      manager);
+
         if (!g_dbus_proxy_call_sync (manager->priv->iio_proxy,
                                      active ? "ClaimLight" : "ReleaseLight",
                                      NULL,
@@ -1720,9 +1733,10 @@ idle_configure (GsdPowerManager *manager)
         }
 
         /* are we inhibited from going idle */
-        if (!manager->priv->session_is_active || is_idle_inhibited) {
-                if (is_idle_inhibited)
-                        g_debug ("inhibited, so using normal state");
+        if (!manager->priv->session_is_active ||
+            (is_idle_inhibited && !manager->priv->screensaver_active)) {
+                if (is_idle_inhibited && !manager->priv->screensaver_active)
+                        g_debug ("inhibited and screensaver not active, so using normal state");
                 else
                         g_debug ("inactive, so using normal state");
                 idle_set_mode (manager, GSD_POWER_IDLE_MODE_NORMAL);
@@ -1767,17 +1781,19 @@ idle_configure (GsdPowerManager *manager)
                 if (action_type == GSD_POWER_ACTION_LOGOUT ||
                     action_type == GSD_POWER_ACTION_SUSPEND ||
                     action_type == GSD_POWER_ACTION_HIBERNATE) {
-                        guint timeout_sleep_warning;
+                        guint timeout_sleep_warning_msec;
 
                         manager->priv->sleep_action_type = action_type;
-                        timeout_sleep_warning = timeout_sleep * IDLE_DELAY_TO_IDLE_DIM_MULTIPLIER;
-                        if (timeout_sleep_warning < MINIMUM_IDLE_DIM_DELAY)
-                                timeout_sleep_warning = 0;
+                        timeout_sleep_warning_msec = timeout_sleep * IDLE_DELAY_TO_IDLE_DIM_MULTIPLIER * 1000;
+                        if (timeout_sleep_warning_msec * 1000 < MINIMUM_IDLE_DIM_DELAY) {
+                                /* 0 is not a valid idle timeout */
+                                timeout_sleep_warning_msec = 1;
+                        }
 
-                        g_debug ("setting up sleep warning callback %is", timeout_sleep_warning);
+                        g_debug ("setting up sleep warning callback %i msec", timeout_sleep_warning_msec);
 
                         manager->priv->idle_sleep_warning_id = gnome_idle_monitor_add_idle_watch (manager->priv->idle_monitor,
-                                                                                                  timeout_sleep_warning * 1000,
+                                                                                                  timeout_sleep_warning_msec,
                                                                                                   idle_triggered_idle_cb, manager, NULL);
                 }
         }
@@ -2613,8 +2629,6 @@ iio_proxy_appeared_cb (GDBusConnection *connection,
                                                "net.hadess.SensorProxy",
                                                NULL,
                                                NULL);
-        g_signal_connect (manager->priv->iio_proxy, "g-properties-changed",
-                          G_CALLBACK (iio_proxy_changed_cb), manager);
         iio_proxy_claim_light (manager, TRUE);
 }
 
@@ -2908,7 +2922,8 @@ handle_get_property_other (GsdPowerManager *manager,
         if (g_strcmp0 (interface_name, GSD_POWER_DBUS_INTERFACE_SCREEN) == 0) {
                 value = backlight_get_percentage (manager->priv->rr_screen, NULL);
                 retval = g_variant_new_int32 (value);
-        } else if (g_strcmp0 (interface_name, GSD_POWER_DBUS_INTERFACE_KEYBOARD) == 0) {
+        } else if (manager->priv->upower_kbd_proxy &&
+                   g_strcmp0 (interface_name, GSD_POWER_DBUS_INTERFACE_KEYBOARD) == 0) {
                 value = ABS_TO_PERCENTAGE (0,
                                            manager->priv->kbd_brightness_max,
                                            manager->priv->kbd_brightness_now);
@@ -2917,7 +2932,8 @@ handle_get_property_other (GsdPowerManager *manager,
 
         if (retval == NULL) {
                 g_set_error (error, G_DBUS_ERROR, G_DBUS_ERROR_FAILED,
-                             "Failed to get property: %s", property_name);
+                             "Failed to get property %s on interface %s",
+                             property_name, interface_name);
         }
         return retval;
 }

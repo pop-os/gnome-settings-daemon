@@ -1,15 +1,14 @@
 # Files with translatable strings.
 # Please keep this file in alphabetical order.
-data/org.gnome.settings-daemon.peripherals.gschema.xml.in.in
-data/org.gnome.settings-daemon.peripherals.wacom.gschema.xml.in.in
-data/org.gnome.settings-daemon.plugins.color.gschema.xml.in.in
-data/org.gnome.settings-daemon.plugins.gschema.xml.in.in
-data/org.gnome.settings-daemon.plugins.housekeeping.gschema.xml.in.in
-data/org.gnome.settings-daemon.plugins.media-keys.gschema.xml.in.in
-data/org.gnome.settings-daemon.plugins.power.gschema.xml.in.in
-data/org.gnome.settings-daemon.plugins.sharing.gschema.xml.in.in
-data/org.gnome.settings-daemon.plugins.xsettings.gschema.xml.in.in
-plugins/a11y-keyboard/gsd-a11y-keyboard-manager.c
+data/org.gnome.settings-daemon.peripherals.gschema.xml.in
+data/org.gnome.settings-daemon.peripherals.wacom.gschema.xml.in
+data/org.gnome.settings-daemon.plugins.color.gschema.xml.in
+data/org.gnome.settings-daemon.plugins.gschema.xml.in
+data/org.gnome.settings-daemon.plugins.housekeeping.gschema.xml.in
+data/org.gnome.settings-daemon.plugins.media-keys.gschema.xml.in
+data/org.gnome.settings-daemon.plugins.power.gschema.xml.in
+data/org.gnome.settings-daemon.plugins.sharing.gschema.xml.in
+data/org.gnome.settings-daemon.plugins.xsettings.gschema.xml.in
 plugins/color/gsd-color-calibrate.c
 plugins/color/gsd-color-manager.c
 plugins/datetime/gsd-datetime-manager.c
@@ -17,8 +16,6 @@ plugins/housekeeping/gsd-disk-space.c
 plugins/keyboard/gsd-keyboard-manager.c
 plugins/media-keys/gsd-media-keys-manager.c
 plugins/media-keys/gsd-screenshot-utils.c
-# Please do not remove this file from POTFILES.in. Run "git submodule init && git submodule update" to get it.
-plugins/media-keys/gvc/gvc-mixer-control.c
 plugins/media-keys/shortcuts-list.h
 plugins/mouse/gsd-mouse-manager.c
 plugins/power/gpm-common.c
