@@ -12,11 +12,9 @@ enabled_plugins =	\
 	keyboard	\
 	media-keys	\
 	mouse		\
-	orientation	\
 	screensaver-proxy \
 	sharing		\
 	sound		\
-	xrandr		\
 	xsettings	\
 	$(NULL)
 

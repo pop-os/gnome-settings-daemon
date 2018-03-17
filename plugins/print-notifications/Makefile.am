@@ -1,37 +1,11 @@
 plugin_name = print-notifications
 
-plugin_LTLIBRARIES = \
-	libprint-notifications.la
+desktopdir = $(sysconfdir)/xdg/autostart
+desktop_in_files = org.gnome.SettingsDaemon.PrintNotifications.desktop.in
+desktop_DATA = $(desktop_in_files:.desktop.in=.desktop)
 
-libprint_notifications_la_SOURCES = 		\
-	gsd-print-notifications-manager.c	\
-	gsd-print-notifications-manager.h	\
-	gsd-print-notifications-plugin.c
-
-libprint_notifications_la_CPPFLAGS = \
-	-I$(top_srcdir)/gnome-settings-daemon		\
-	-I$(top_builddir)/gnome-settings-daemon		\
-	-DGNOME_SETTINGS_LOCALEDIR=\""$(datadir)/locale"\" \
-	-DLIBEXECDIR=\""$(libexecdir)"\" \
-	$(AM_CPPFLAGS)			\
-	$(CUPS_CPPFLAGS)
-
-libprint_notifications_la_CFLAGS = \
-	$(PLUGIN_CFLAGS)		\
-	$(SETTINGS_PLUGIN_CFLAGS)	\
-	$(AM_CFLAGS)
-
-libprint_notifications_la_LDFLAGS = 		\
-	$(GSD_PLUGIN_LDFLAGS)
-
-libprint_notifications_la_LIBADD  = 		\
-	$(CUPS_LIBS)			\
-	$(SETTINGS_PLUGIN_LIBS)
-
-plugin_in_files = 		\
-	print-notifications.gnome-settings-plugin.in
-
-plugin_DATA = $(plugin_in_files:.gnome-settings-plugin.in=.gnome-settings-plugin)
+org.gnome.SettingsDaemon.PrintNotifications.desktop: $(desktop_in_files) Makefile
+	$(AM_V_GEN) sed -e "s|\@libexecdir\@|$(libexecdir)|" $< > $@
 
 libexec_PROGRAMS = gsd-printer
 
@@ -39,24 +13,22 @@ gsd_printer_SOURCES = 	\
 	gsd-printer.c
 
 gsd_printer_CFLAGS = \
-	$(SETTINGS_PLUGIN_CFLAGS)				\
-	$(LIBNOTIFY_CFLAGS)					\
 	-DGNOME_SETTINGS_LOCALEDIR=\""$(datadir)/locale"\"	\
+	$(PRINT_NOTIFICATIONS_CFLAGS)				\
 	$(AM_CFLAGS)
 
-gsd_printer_LDADD  = 		\
-	$(SETTINGS_PLUGIN_LIBS)	\
-	$(CUPS_LIBS)		\
-	$(LIBNOTIFY_LIBS)
+gsd_printer_LDADD  =			\
+	$(PRINT_NOTIFICATIONS_LIBS)	\
+	$(CUPS_LIBS)
 
-libexec_PROGRAMS += gsd-test-print-notifications
+libexec_PROGRAMS += gsd-print-notifications
 
-gsd_test_print_notifications_SOURCES =		\
+gsd_print_notifications_SOURCES =		\
 	gsd-print-notifications-manager.c	\
 	gsd-print-notifications-manager.h	\
-	test-print-notifications.c
+	main.c
 
-gsd_test_print_notifications_CPPFLAGS =				\
+gsd_print_notifications_CPPFLAGS =				\
 	-I$(top_srcdir)/gnome-settings-daemon			\
 	-I$(top_builddir)/gnome-settings-daemon			\
 	-I$(top_srcdir)/plugins/common				\
@@ -65,25 +37,20 @@ gsd_test_print_notifications_CPPFLAGS =				\
 	$(AM_CPPFLAGS)						\
 	$(CUPS_CPPFLAGS)
 
-gsd_test_print_notifications_CFLAGS =	\
-	$(PLUGIN_CFLAGS)		\
-	$(SETTINGS_PLUGIN_CFLAGS)	\
-	$(AM_CFLAGS)
+gsd_print_notifications_CFLAGS =			\
+	$(PLUGIN_CFLAGS)				\
+	$(PRINT_NOTIFICATIONS_CFLAGS)
 
-gsd_test_print_notifications_LDADD =				\
+gsd_print_notifications_LDADD =				\
 	$(top_builddir)/gnome-settings-daemon/libgsd.la		\
-	$(SETTINGS_DAEMON_LIBS)					\
-	$(SETTINGS_PLUGIN_LIBS)					\
 	$(CUPS_LIBS)						\
-	$(LIBNOTIFY_LIBS)
+	$(PRINT_NOTIFICATIONS_LIBS)
 
 EXTRA_DIST = 			\
-	$(plugin_in_files)
+	$(desktop_in_files)
 
 CLEANFILES = 			\
-	$(plugin_DATA)
+	$(desktop_DATA)
 
 DISTCLEANFILES =		\
-	$(plugin_DATA)
-
-@GSD_INTLTOOL_PLUGIN_RULE@
+	$(desktop_DATA)

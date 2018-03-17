@@ -2,52 +2,12 @@ BUILT_SOURCES =
 
 plugin_name = power
 
-plugin_LTLIBRARIES =					\
-	libpower.la
+desktopdir = $(sysconfdir)/xdg/autostart
+desktop_in_files = org.gnome.SettingsDaemon.Power.desktop.in
+desktop_DATA = $(desktop_in_files:.desktop.in=.desktop)
 
-libpower_la_SOURCES = 					\
-	gpm-common.c					\
-	gpm-common.h					\
-	gsd-backlight-linux.c				\
-	gsd-backlight-linux.h				\
-	gsd-power-manager.c				\
-	gsd-power-manager.h				\
-	gsm-inhibitor-flag.h				\
-	gsm-presence-flag.h				\
-	gsm-manager-logout-mode.h			\
-	gsd-power-constants.h				\
-	gsd-power-plugin.c
-
-libpower_la_CPPFLAGS = \
-	-I$(top_srcdir)/data/				\
-	-I$(top_srcdir)/gnome-settings-daemon		\
-	-I$(top_builddir)/gnome-settings-daemon		\
-	-I$(top_srcdir)/plugins/common			\
-	-DGNOME_SETTINGS_LOCALEDIR=\""$(datadir)/locale"\" \
-	-DGTKBUILDERDIR=\""$(pkgdatadir)"\"		\
-	-DSBINDIR=\"$(sbindir)\"			\
-	-DLIBEXECDIR=\"$(libexecdir)\"			\
-	$(AM_CPPFLAGS)
-
-libpower_la_CFLAGS = \
-	$(PLUGIN_CFLAGS)				\
-	$(POWER_CFLAGS)					\
-	$(SETTINGS_PLUGIN_CFLAGS)			\
-	$(AM_CFLAGS)
-
-libpower_la_LDFLAGS = 					\
-	$(GSD_PLUGIN_LDFLAGS)
-
-libpower_la_LIBADD  = 					\
-	$(top_builddir)/plugins/common/libcommon.la	\
-	$(top_builddir)/gnome-settings-daemon/libgsd.la \
-	$(POWER_LIBS)					\
-	$(SETTINGS_PLUGIN_LIBS)
-
-plugin_in_files = 					\
-	power.gnome-settings-plugin.in
-
-plugin_DATA = $(plugin_in_files:.gnome-settings-plugin.in=.gnome-settings-plugin)
+org.gnome.SettingsDaemon.Power.desktop: $(desktop_in_files) Makefile
+	$(AM_V_GEN) sed -e "s|\@libexecdir\@|$(libexecdir)|" $< > $@
 
 org.gnome.settings-daemon.plugins.power.policy.in: org.gnome.settings-daemon.plugins.power.policy.in.in Makefile
 	$(AM_V_GEN) sed -e "s|\@libexecdir\@|$(libexecdir)|" $< > $@
@@ -63,8 +23,8 @@ gsd_backlight_helper_SOURCES =				\
 	gsd-backlight-linux.h				\
 	gsd-backlight-helper.c
 
-noinst_PROGRAMS = gsd-test-power
-gsd_test_power_SOURCES =				\
+libexec_PROGRAMS = gsd-power
+gsd_power_SOURCES =				\
 	gpm-common.c					\
 	gpm-common.h					\
 	gsd-backlight-linux.c				\
@@ -75,28 +35,40 @@ gsd_test_power_SOURCES =				\
 	gsm-presence-flag.h				\
 	gsm-manager-logout-mode.h			\
 	gsd-power-constants.h				\
-	test-power.c
+	main.c
 
-gsd_test_power_CFLAGS = $(libpower_la_CFLAGS)
-gsd_test_power_CPPFLAGS = $(libpower_la_CPPFLAGS) -DGSD_MOCK=1
-gsd_test_power_LDADD =					\
-	-lm						\
+gsd_power_CFLAGS =					\
+	$(PLUGIN_CFLAGS)				\
+	$(POWER_CFLAGS)
+
+gsd_power_CPPFLAGS =					\
+	-I$(top_srcdir)/data/				\
+	-I$(top_srcdir)/gnome-settings-daemon		\
+	-I$(top_builddir)/gnome-settings-daemon		\
+	-I$(top_srcdir)/plugins/common			\
+	-DGNOME_SETTINGS_LOCALEDIR=\""$(datadir)/locale"\" \
+	-DGTKBUILDERDIR=\""$(pkgdatadir)"\"		\
+	-DSBINDIR=\"$(sbindir)\"			\
+	-DLIBEXECDIR=\"$(libexecdir)\"			\
+	$(AM_CPPFLAGS)
+
+gsd_power_LDADD =					\
 	$(top_builddir)/plugins/common/libcommon.la	\
 	$(top_builddir)/gnome-settings-daemon/libgsd.la \
 	$(POWER_LIBS)					\
-	$(SETTINGS_PLUGIN_LIBS)
+	$(LIBM)
 
 EXTRA_DIST = 						\
-	$(plugin_in_files)				\
+	$(desktop_in_files)				\
 	$(gsd_backlight_helper_SOURCES)			\
 	$(NULL)
 
 if HAVE_GUDEV
-libexec_PROGRAMS = gsd-backlight-helper
+libexec_PROGRAMS += gsd-backlight-helper
 
 gsd_backlight_helper_LDFLAGS =				\
 	$(BACKLIGHT_HELPER_LIBS)			\
-	-lm
+	$(LIBM)
 
 gsd_backlight_helper_CFLAGS =				\
 	$(BACKLIGHT_HELPER_CFLAGS)
@@ -132,18 +104,18 @@ gsdpowerconstants.py: gsd-power-constants-update.pl gsd-power-constants.h
 gsdpowerenums.py: gsd-power-enums-update gsd-power-enums.h gsd-power-enums.c
 	$(AM_V_GEN) $(builddir)/gsd-power-enums-update > $@
 
-noinst_PROGRAMS += gsd-power-enums-update
+noinst_PROGRAMS = gsd-power-enums-update
 gsd_power_enums_update_SOURCES =		\
 	gsd-power-enums-update.c		\
 	gsd-power-enums.h			\
 	gsd-power-enums.c
-gsd_power_enums_update_CFLAGS = $(libpower_la_CFLAGS)
-gsd_power_enums_update_CPPFLAGS = $(libpower_la_CPPFLAGS) -I$(top_builddir)/plugins/power
+gsd_power_enums_update_CFLAGS = $(gsd_power_CFLAGS)
+gsd_power_enums_update_CPPFLAGS = $(gsd_power_CPPFLAGS) -I$(top_builddir)/plugins/power
 gsd_power_enums_update_LDFLAGS = $(POWER_LIBS)
 
 EXTRA_DIST += gsd-power-constants-update.pl gsdpowerconstants.py gsdpowerenums.py test.py
 
-check-local: $(top_builddir)/tests/shiftkey gsd-test-power test.py gsdpowerconstants.py gsdpowerenums.py
+check-local: $(top_builddir)/tests/shiftkey gsd-power test.py gsdpowerconstants.py gsdpowerenums.py
 # This is how you run a single test
 #	BUILDDIR=$(builddir) TOP_BUILDDIR=$(top_builddir) ${PYTHON} $(srcdir)/test.py PowerPluginTest.test_sleep_inactive_blank
 	BUILDDIR=$(builddir) TOP_BUILDDIR=$(top_builddir) ${PYTHON} $(srcdir)/test.py
@@ -152,10 +124,8 @@ clean-local:
 	rm -f *~
 
 CLEANFILES = 							\
-	$(plugin_DATA)						\
+	$(desktop_DATA)						\
 	org.gnome.settings-daemon.plugins.power.policy		\
 	org.gnome.settings-daemon.plugins.power.policy.in	\
 	$(GSD_POWER_ENUM_FILES)					\
 	gsdpowerenums.pyc gsdpowerenums.py
-
-@GSD_INTLTOOL_PLUGIN_RULE@

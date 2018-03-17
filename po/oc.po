@@ -12,7 +12,7 @@ msgstr ""
 "Report-Msgid-Bugs-To: http://bugzilla.gnome.org/enter_bug.cgi?product=gnome-"
 "settings-daemon&keywords=I18N+L10N&component=general\n"
 "POT-Creation-Date: 2016-10-06 11:52+0000\n"
-"PO-Revision-Date: 2016-10-10 11:35+0200\n"
+"PO-Revision-Date: 2016-10-10 14:29+0200\n"
 "Last-Translator: Cédric VALMARY <cvalmary@yahoo.fr>\n"
 "Language-Team: Tot en òc (totenoc.eu)\n"
 "Language: oc\n"
@@ -284,11 +284,11 @@ msgstr ""
 #. http://eu.shop.wacom.eu/images/articles/d9abd9f2d4d88aa0649cda97a8077e2b_8.jpg
 #: ../data/org.gnome.settings-daemon.peripherals.wacom.gschema.xml.in.in.h:34
 msgid "Button label for OLED display."
-msgstr "Vesent luminós correspondant al bouton."
+msgstr "Vesent luminós correspondant al boton."
 
 #: ../data/org.gnome.settings-daemon.peripherals.wacom.gschema.xml.in.in.h:35
 msgid "Label will be rendered to OLED display belonging to the button"
-msgstr "Lo vesent luminós alucat correspond al bouton qu'i es associat"
+msgstr "Lo vesent luminós alucat correspond al boton qu'i es associat"
 
 #: ../data/org.gnome.settings-daemon.plugins.color.gschema.xml.in.in.h:5
 msgid "The duration a display profile is valid"
@@ -2232,7 +2232,7 @@ msgstr "Gestion dels paramètres X"
 #~ "\"edge-scrolling\", \"two-finger-scrolling\"."
 #~ msgstr ""
 #~ "Selecciona lo metòde de desfilament amb lo pavat tactil. Las valors "
-#~ "admesas sont : « disabled » (desactivat), « edge-scrolling » (desfilament "
+#~ "admesas son : « disabled » (desactivat), « edge-scrolling » (desfilament "
 #~ "suls bòrds), « two-finger-scrolling » (desfilament amb dos dets)."
 
 #~ msgid "Enable mouse clicks with touchpad"

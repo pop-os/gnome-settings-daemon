@@ -7,10 +7,10 @@
 #include <glib-object.h>
 
 G_BEGIN_DECLS
-/* enumerations from "/home/hadess/Projects/jhbuild/gnome-settings-daemon/plugins/power/gsm-inhibitor-flag.h" */
+/* enumerations from "./gsm-inhibitor-flag.h" */
 GType gsm_inhibitor_flag_get_type (void) G_GNUC_CONST;
 #define GSD_POWER_TYPE_INHIBITOR_FLAG (gsm_inhibitor_flag_get_type())
-/* enumerations from "/home/hadess/Projects/jhbuild/gnome-settings-daemon/plugins/power/gsm-presence-flag.h" */
+/* enumerations from "./gsm-presence-flag.h" */
 GType gsm_presence_status_get_type (void) G_GNUC_CONST;
 #define GSD_POWER_TYPE_PRESENCE_STATUS (gsm_presence_status_get_type())
 G_END_DECLS

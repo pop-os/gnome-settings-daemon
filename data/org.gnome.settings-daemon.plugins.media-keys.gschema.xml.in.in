@@ -1,10 +1,5 @@
 <schemalist>
   <schema gettext-domain="@GETTEXT_PACKAGE@" id="org.gnome.settings-daemon.plugins.media-keys" path="/org/gnome/settings-daemon/plugins/media-keys/">
-     <key name="active" type="b">
-      <default>true</default>
-      <_summary>Activation of this plugin</_summary>
-      <_description>Whether this plugin would be activated by gnome-settings-daemon or not</_description>
-    </key>
     <key name="custom-keybindings" type="as">
       <default>[]</default>
       <_summary>Custom keybindings</_summary>
@@ -70,11 +65,6 @@
       <_summary>Previous track</_summary>
       <_description>Binding to skip to previous track.</_description>
     </key>
-    <key name="priority" type="i">
-      <default>0</default>
-      <_summary>Priority to use for this plugin</_summary>
-      <_description>Priority to use for this plugin in gnome-settings-daemon startup queue</_description>
-    </key>
     <key name="screensaver" type="s">
       <default>'&lt;Super&gt;l'</default>
       <_summary>Lock screen</_summary>
@@ -138,7 +128,7 @@
     <key name="screencast" type="s">
       <default>'&lt;Ctrl&gt;&lt;Shift&gt;&lt;Alt&gt;R'</default>
       <_summary>Record a short video of the screen</_summary>
-      <description>Binding to record a short video of the screen</description>
+      <_description>Binding to record a short video of the screen</_description>
     </key>
     <key name="www" type="s">
       <default>'XF86WWW'</default>
@@ -187,8 +177,8 @@
     </key>
     <key name="max-screencast-length" type="u">
       <default>30</default>
-      <summary>Maximum length of screen recordings</summary>
-      <description>The maximum length of single screen cast recordings in seconds or 0 for unlimited</description>
+      <_summary>Maximum length of screen recordings</_summary>
+      <_description>The maximum length of single screen cast recordings in seconds or 0 for unlimited</_description>
     </key>
   </schema>
 

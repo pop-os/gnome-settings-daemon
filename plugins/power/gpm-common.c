@@ -61,6 +61,25 @@ gsd_power_backlight_abs_to_percentage (int min, int max, int value)
         return (((value - min) * 100) / (max - min));
 }
 
+/* take a percentage and convert to a discrete value with offset */
+int
+gsd_power_backlight_percentage_to_abs (int min, int max, int value)
+{
+        int steps, step_size;
+
+        g_return_val_if_fail (max > min, -1);
+        g_return_val_if_fail (value >= 0, -1);
+        g_return_val_if_fail (value <= 100, -1);
+
+        steps = max - min;
+        step_size = 100 / steps;
+
+        /* Round for better precision when steps is small */
+        value += step_size / 2;
+
+        return min + (steps * value) / 100;
+}
+
 #define GPM_UP_TIME_PRECISION                   5*60
 #define GPM_UP_TEXT_MIN_TIME                    120
 
@@ -326,7 +345,24 @@ out:
         return output;
 }
 
-#ifdef GSD_MOCK
+static gpointer
+parse_mocked (gpointer data)
+{
+	const char *mocked;
+	mocked = g_getenv ("GSD_MOCKED");
+	if (!mocked)
+		return GINT_TO_POINTER (FALSE);
+	return GINT_TO_POINTER (TRUE);
+}
+
+static gboolean
+is_mocked (void)
+{
+	  static GOnce mocked_once = G_ONCE_INIT;
+	  g_once (&mocked_once, parse_mocked, NULL);
+	  return GPOINTER_TO_INT (mocked_once.retval);
+}
+
 static void
 backlight_set_mock_value (gint value)
 {
@@ -369,16 +405,14 @@ backlight_get_mock_value (enum BacklightHelperCommand command)
 
 	return ret;
 }
-#endif /* GSD_MOCK */
 
 gboolean
 backlight_available (GnomeRRScreen *rr_screen)
 {
         char *path;
 
-#ifdef GSD_MOCK
-	return TRUE;
-#endif
+	if (is_mocked ())
+		return TRUE;
 
 #ifndef __linux__
         return (get_primary_output (rr_screen) != NULL);
@@ -452,9 +486,8 @@ backlight_helper_get_value (enum BacklightHelperCommand command, GError **error)
         gint64 value = -1;
         gchar *endptr = NULL;
 
-#ifdef GSD_MOCK
-        return backlight_get_mock_value (command);
-#endif
+	if (is_mocked ())
+		return backlight_get_mock_value (command);
 
 #ifndef __linux__
         /* non-Linux platforms won't have /sys/class/backlight */
@@ -535,10 +568,10 @@ backlight_helper_set_value (gint value,
         gint exit_status = 0;
         gchar *vstr = NULL;
 
-#ifdef GSD_MOCK
-	backlight_set_mock_value (value);
-	return TRUE;
-#endif
+	if (is_mocked ()) {
+		backlight_set_mock_value (value);
+		return TRUE;
+	}
 
 #ifndef __linux__
         /* non-Linux platforms won't have /sys/class/backlight */
@@ -825,7 +858,6 @@ randr_output_is_on (GnomeRROutput *output)
         return gnome_rr_crtc_get_current_mode (crtc) != NULL;
 }
 
-#ifdef GSD_MOCK
 static void
 mock_monitor_changed (GFileMonitor     *monitor,
 		      GFile            *file,
@@ -845,14 +877,15 @@ screen_destroyed (gpointer  user_data,
 {
 	g_object_unref (G_OBJECT (user_data));
 }
-#endif /* GSD_MOCK */
 
 void
 watch_external_monitor (GnomeRRScreen *screen)
 {
-#ifdef GSD_MOCK
 	GFile *file;
 	GFileMonitor *monitor;
+
+	if (!is_mocked ())
+		return;
 
 	file = g_file_new_for_commandline_arg ("GSD_MOCK_EXTERNAL_MONITOR");
 	monitor = g_file_monitor (file, G_FILE_MONITOR_NONE, NULL, NULL);
@@ -860,16 +893,11 @@ watch_external_monitor (GnomeRRScreen *screen)
 	g_signal_connect (monitor, "changed",
 			  G_CALLBACK (mock_monitor_changed), screen);
 	g_object_weak_ref (G_OBJECT (screen), screen_destroyed, monitor);
-#endif /* GSD_MOCK */
 }
 
-gboolean
-external_monitor_is_connected (GnomeRRScreen *screen)
+static gboolean
+mock_external_monitor_is_connected (GnomeRRScreen *screen)
 {
-        GnomeRROutput **outputs;
-        guint i;
-
-#ifdef GSD_MOCK
 	char *mock_external_monitor_contents;
 
 	if (g_file_get_contents ("GSD_MOCK_EXTERNAL_MONITOR", &mock_external_monitor_contents, NULL, NULL)) {
@@ -886,7 +914,18 @@ external_monitor_is_connected (GnomeRRScreen *screen)
 		g_error ("Unhandled value for GSD_MOCK_EXTERNAL_MONITOR contents: %s", mock_external_monitor_contents);
 		g_free (mock_external_monitor_contents);
 	}
-#endif /* GSD_MOCK */
+
+	return FALSE;
+}
+
+gboolean
+external_monitor_is_connected (GnomeRRScreen *screen)
+{
+        GnomeRROutput **outputs;
+        guint i;
+
+        if (is_mocked ())
+                return mock_external_monitor_is_connected (screen);
 
 	g_assert (screen != NULL);
 

@@ -31,10 +31,10 @@ libcommon_la_SOURCES = \
 	gsd-device-manager-x11.h  \
 	gsd-device-mapper.c	\
 	gsd-device-mapper.h	\
-	gsd-keygrab.c		\
-	gsd-keygrab.h		\
 	gsd-input-helper.c	\
 	gsd-input-helper.h	\
+	gsd-resources.c		\
+	gsd-resources.h		\
 	gsd-settings-migrate.c	\
 	gsd-settings-migrate.h	\
 	gsd-shell-helper.c	\
@@ -49,25 +49,15 @@ endif
 libcommon_la_CPPFLAGS = \
 	-I$(top_srcdir)/gnome-settings-daemon	\
 	-I$(top_builddir)/gnome-settings-daemon	\
-	-I$(top_srcdir)/data/				\
-	$(AM_CPPFLAGS)
+	-I$(top_srcdir)/data/
 
-libcommon_la_CFLAGS = \
-	$(PLUGIN_CFLAGS)		\
-	$(SETTINGS_PLUGIN_CFLAGS)	\
-	$(COMMON_CFLAGS)		\
-	$(GNOME_DESKTOP_CFLAGS)		\
-	$(LIBWACOM_CFLAGS)		\
-	$(AM_CFLAGS)
+libcommon_la_CFLAGS = $(COMMON_CFLAGS)
 
 libcommon_la_LDFLAGS = \
 	$(GSD_PLUGIN_LDFLAGS)
 
 libcommon_la_LIBADD  = \
 	$(top_builddir)/gnome-settings-daemon/libgsd.la \
-	$(SETTINGS_PLUGIN_LIBS)		\
-	$(GNOME_DESKTOP_LIBS)		\
-	$(LIBWACOM_LIBS)		\
 	$(COMMON_LIBS)
 
 libexec_PROGRAMS = gsd-test-input-helper
@@ -76,13 +66,15 @@ gsd_test_input_helper_SOURCES = test-input-helper.c
 gsd_test_input_helper_LDADD = libcommon.la
 gsd_test_input_helper_CFLAGS = $(libcommon_la_CFLAGS)
 
-noinst_PROGRAMS = test-egg-key-parsing
-
-test_egg_key_parsing_SOURCES = test-egg-key-parsing.c
-test_egg_key_parsing_LDADD = libcommon.la $(COMMON_LIBS)
-test_egg_key_parsing_CFLAGS = $(libcommon_la_CFLAGS)
-
-EXTRA_DIST = $(scripts_DATA) test-plugin.h
+EXTRA_DIST = $(scripts_DATA) daemon-skeleton.h daemon-skeleton-gtk.h
 
 CLEANFILES = \
 	$(GSD_COMMON_ENUM_FILES)
+
+DISTCLEANFILES =
+
+glib_resources_c = gsd-resources.c
+glib_resources_h = gsd-resources.h
+glib_resources_xml = gsd.gresources.xml
+glib_resources_namespace = gsd
+include Makefile.am.gresources

@@ -35,13 +35,18 @@
 #endif
 
 #include "gnome-settings-bus.h"
-#include "gnome-settings-plugin.h"
 
 #include "gsd-color-manager.h"
 #include "gsd-color-state.h"
 #include "gcm-edid.h"
 
 #define GSD_COLOR_STATE_GET_PRIVATE(o) (G_TYPE_INSTANCE_GET_PRIVATE ((o), GSD_TYPE_COLOR_STATE, GsdColorStatePrivate))
+
+#define GSD_DBUS_NAME "org.gnome.SettingsDaemon"
+#define GSD_DBUS_PATH "/org/gnome/SettingsDaemon"
+#define GSD_DBUS_BASE_INTERFACE "org.gnome.SettingsDaemon"
+
+static void gcm_session_set_gamma_for_all_devices (GsdColorState *state);
 
 struct GsdColorStatePrivate
 {
@@ -53,6 +58,7 @@ struct GsdColorStatePrivate
         GdkWindow       *gdk_window;
         gboolean         session_is_active;
         GHashTable      *device_assign_hash;
+        guint            color_temperature;
 };
 
 static void     gsd_color_state_class_init  (GsdColorStateClass *klass);
@@ -93,7 +99,7 @@ gcm_session_get_output_edid (GsdColorState *state, GnomeRROutput *output, GError
                                     gnome_rr_output_get_name (output));
         if (edid != NULL) {
                 g_object_ref (edid);
-                goto out;
+                return edid;
         }
 
         /* parse edid */
@@ -103,21 +109,20 @@ gcm_session_get_output_edid (GsdColorState *state, GnomeRROutput *output, GError
                                      GNOME_RR_ERROR,
                                      GNOME_RR_ERROR_UNKNOWN,
                                      "unable to get EDID for output");
-                goto out;
+                return NULL;
         }
         edid = gcm_edid_new ();
         ret = gcm_edid_parse (edid, data, size, error);
         if (!ret) {
                 g_object_unref (edid);
-                edid = NULL;
-                goto out;
+                return NULL;
         }
 
         /* add to cache */
         g_hash_table_insert (state->priv->edid_cache,
                              g_strdup (gnome_rr_output_get_name (output)),
                              g_object_ref (edid));
-out:
+
         return edid;
 }
 
@@ -126,7 +131,6 @@ gcm_session_screen_set_icc_profile (GsdColorState *state,
                                     const gchar *filename,
                                     GError **error)
 {
-        gboolean ret = TRUE;
         gchar *data = NULL;
         gsize length;
         guint version_data;
@@ -137,15 +141,14 @@ gcm_session_screen_set_icc_profile (GsdColorState *state,
         /* wayland */
         if (priv->gdk_window == NULL) {
                 g_debug ("not setting atom as running under wayland");
-                goto out;
+                return TRUE;
         }
 
         g_debug ("setting root window ICC profile atom from %s", filename);
 
         /* get contents of file */
-        ret = g_file_get_contents (filename, &data, &length, error);
-        if (!ret)
-                goto out;
+        if (!g_file_get_contents (filename, &data, &length, error))
+                return FALSE;
 
         /* set profile property */
         gdk_property_change (priv->gdk_window,
@@ -164,9 +167,30 @@ gcm_session_screen_set_icc_profile (GsdColorState *state,
                              8,
                              GDK_PROP_MODE_REPLACE,
                              (const guchar *) &version_data, 1);
-out:
+
         g_free (data);
-        return ret;
+        return TRUE;
+}
+
+void
+gsd_color_state_set_temperature (GsdColorState *state, guint temperature)
+{
+        GsdColorStatePrivate *priv = state->priv;
+        g_return_if_fail (GSD_IS_COLOR_STATE (state));
+
+        if (priv->color_temperature == temperature)
+                return;
+
+        priv->color_temperature = temperature;
+        gcm_session_set_gamma_for_all_devices (state);
+}
+
+guint
+gsd_color_state_get_temperature (GsdColorState *state)
+{
+        GsdColorStatePrivate *priv = state->priv;
+        g_return_val_if_fail (GSD_IS_COLOR_STATE (state), 0);
+        return priv->color_temperature;
 }
 
 static gchar *
@@ -360,7 +384,7 @@ out:
 }
 
 static GPtrArray *
-gcm_session_generate_vcgt (CdProfile *profile, guint size)
+gcm_session_generate_vcgt (CdProfile *profile, guint color_temperature, guint size)
 {
         GnomeRROutputClutItem *tmp;
         GPtrArray *array = NULL;
@@ -369,6 +393,7 @@ gcm_session_generate_vcgt (CdProfile *profile, guint size)
         guint i;
         cmsHPROFILE lcms_profile;
         CdIcc *icc = NULL;
+        CdColorRGB temp;
 
         /* invalid size */
         if (size == 0)
@@ -387,14 +412,29 @@ gcm_session_generate_vcgt (CdProfile *profile, guint size)
                 goto out;
         }
 
+        /* get the color temperature */
+#if CD_CHECK_VERSION(1,3,5)
+        if (!cd_color_get_blackbody_rgb_full (color_temperature,
+                                              &temp,
+                                              CD_COLOR_BLACKBODY_FLAG_USE_PLANCKIAN)) {
+#else
+        if (!cd_color_get_blackbody_rgb (color_temperature, &temp)) {
+#endif
+                g_warning ("failed to get blackbody for %uK", color_temperature);
+                cd_color_rgb_set (&temp, 1.0, 1.0, 1.0);
+        } else {
+                g_debug ("using VCGT gamma of %uK = %.1f,%.1f,%.1f",
+                         color_temperature, temp.R, temp.G, temp.B);
+        }
+
         /* create array */
         array = g_ptr_array_new_with_free_func (g_free);
         for (i = 0; i < size; i++) {
                 in = (gdouble) i / (gdouble) (size - 1);
                 tmp = g_new0 (GnomeRROutputClutItem, 1);
-                tmp->red = cmsEvalToneCurveFloat(vcgt[0], in) * (gdouble) 0xffff;
-                tmp->green = cmsEvalToneCurveFloat(vcgt[1], in) * (gdouble) 0xffff;
-                tmp->blue = cmsEvalToneCurveFloat(vcgt[2], in) * (gdouble) 0xffff;
+                tmp->red = cmsEvalToneCurveFloat(vcgt[0], in) * temp.R * (gdouble) 0xffff;
+                tmp->green = cmsEvalToneCurveFloat(vcgt[1], in) * temp.G * (gdouble) 0xffff;
+                tmp->blue = cmsEvalToneCurveFloat(vcgt[2], in) * temp.B * (gdouble) 0xffff;
                 g_ptr_array_add (array, tmp);
         }
 out:
@@ -475,6 +515,7 @@ out:
 static gboolean
 gcm_session_device_set_gamma (GnomeRROutput *output,
                               CdProfile *profile,
+                              guint color_temperature,
                               GError **error)
 {
         gboolean ret = FALSE;
@@ -487,7 +528,7 @@ gcm_session_device_set_gamma (GnomeRROutput *output,
                 ret = TRUE;
                 goto out;
         }
-        clut = gcm_session_generate_vcgt (profile, size);
+        clut = gcm_session_generate_vcgt (profile, color_temperature, size);
         if (clut == NULL) {
                 g_set_error_literal (error,
                                      GSD_COLOR_MANAGER_ERROR,
@@ -508,6 +549,7 @@ out:
 
 static gboolean
 gcm_session_device_reset_gamma (GnomeRROutput *output,
+                                guint color_temperature,
                                 GError **error)
 {
         gboolean ret;
@@ -516,6 +558,7 @@ gcm_session_device_reset_gamma (GnomeRROutput *output,
         guint32 value;
         GPtrArray *clut;
         GnomeRROutputClutItem *data;
+        CdColorRGB temp;
 
         /* create a linear ramp */
         g_debug ("falling back to dummy ramp");
@@ -525,12 +568,22 @@ gcm_session_device_reset_gamma (GnomeRROutput *output,
                 ret = TRUE;
                 goto out;
         }
+
+        /* get the color temperature */
+        if (!cd_color_get_blackbody_rgb (color_temperature, &temp)) {
+                g_warning ("failed to get blackbody for %uK", color_temperature);
+                cd_color_rgb_set (&temp, 1.0, 1.0, 1.0);
+        } else {
+                g_debug ("using reset gamma of %uK = %.1f,%.1f,%.1f",
+                         color_temperature, temp.R, temp.G, temp.B);
+        }
+
         for (i = 0; i < size; i++) {
                 value = (i * 0xffff) / (size - 1);
                 data = g_new0 (GnomeRROutputClutItem, 1);
-                data->red = value;
-                data->green = value;
-                data->blue = value;
+                data->red = value * temp.R;
+                data->green = value * temp.G;
+                data->blue = value * temp.B;
                 g_ptr_array_add (clut, data);
         }
 
@@ -669,6 +722,7 @@ gcm_session_device_assign_profile_connect_cb (GObject *object,
         guint brightness_percentage;
         GcmSessionAsyncHelper *helper = (GcmSessionAsyncHelper *) user_data;
         GsdColorState *state = GSD_COLOR_STATE (helper->state);
+        GsdColorStatePrivate *priv = state->priv;
 
         /* get properties */
         ret = cd_profile_connect_finish (profile, res, &error);
@@ -720,6 +774,7 @@ gcm_session_device_assign_profile_connect_cb (GObject *object,
         if (ret) {
                 ret = gcm_session_device_set_gamma (output,
                                                     profile,
+                                                    priv->color_temperature,
                                                     &error);
                 if (!ret) {
                         g_warning ("failed to set %s gamma tables: %s",
@@ -730,6 +785,7 @@ gcm_session_device_assign_profile_connect_cb (GObject *object,
                 }
         } else {
                 ret = gcm_session_device_reset_gamma (output,
+                                                      priv->color_temperature,
                                                       &error);
                 if (!ret) {
                         g_warning ("failed to reset %s gamma tables: %s",
@@ -874,6 +930,7 @@ gcm_session_device_assign_connect_cb (GObject *object,
 
                 /* reset, as we want linear profiles for profiling */
                 ret = gcm_session_device_reset_gamma (output,
+                                                      priv->color_temperature,
                                                       &error);
                 if (!ret) {
                         g_warning ("failed to reset %s gamma tables: %s",
@@ -1160,13 +1217,13 @@ gcm_session_get_devices_cb (GObject *object, GAsyncResult *res, gpointer user_da
                 if (!g_error_matches (error, G_IO_ERROR, G_IO_ERROR_CANCELLED))
                         g_warning ("failed to get devices: %s", error->message);
                 g_error_free (error);
-                goto out;
+                return;
         }
         for (i = 0; i < array->len; i++) {
                 device = g_ptr_array_index (array, i);
                 gcm_session_device_assign (state, device);
         }
-out:
+
         if (array != NULL)
                 g_ptr_array_unref (array);
 }
@@ -1188,7 +1245,7 @@ gcm_session_profile_gamma_find_device_cb (GObject *object,
                 if (!g_error_matches (error, G_IO_ERROR, G_IO_ERROR_CANCELLED))
                         g_warning ("could not find device: %s", error->message);
                 g_error_free (error);
-                goto out;
+                return;
         }
 
         /* get properties */
@@ -1196,21 +1253,22 @@ gcm_session_profile_gamma_find_device_cb (GObject *object,
                            state->priv->cancellable,
                            gcm_session_device_assign_connect_cb,
                            state);
-out:
+
         if (device != NULL)
                 g_object_unref (device);
 }
 
-/* We have to reset the gamma tables each time as if the primary output
- * has changed then different crtcs are going to be used.
- * See https://bugzilla.gnome.org/show_bug.cgi?id=660164 for an example */
 static void
-gnome_rr_screen_output_changed_cb (GnomeRRScreen *screen,
-                                   GsdColorState *state)
+gcm_session_set_gamma_for_all_devices (GsdColorState *state)
 {
         GnomeRROutput **outputs;
         GsdColorStatePrivate *priv = state->priv;
         guint i;
+
+        /* setting the temperature before we get the list of devices is fine,
+         * as we use the temperature in the calculation */
+        if (priv->state_screen == NULL)
+                return;
 
         /* get STATE outputs */
         outputs = gnome_rr_screen_list_outputs (priv->state_screen);
@@ -1227,7 +1285,16 @@ gnome_rr_screen_output_changed_cb (GnomeRRScreen *screen,
                                                    gcm_session_profile_gamma_find_device_cb,
                                                    state);
         }
+}
 
+/* We have to reset the gamma tables each time as if the primary output
+ * has changed then different crtcs are going to be used.
+ * See https://bugzilla.gnome.org/show_bug.cgi?id=660164 for an example */
+static void
+gnome_rr_screen_output_changed_cb (GnomeRRScreen *screen,
+                                   GsdColorState *state)
+{
+        gcm_session_set_gamma_for_all_devices (state);
 }
 
 static gboolean
@@ -1306,7 +1373,7 @@ gcm_session_client_connect_cb (GObject *source_object,
         ret = cd_client_get_has_server (state->priv->client);
         if (!ret) {
                 g_warning ("There is no colord server available");
-                goto out;
+                return;
         }
 
         /* watch if sessions change */
@@ -1318,14 +1385,14 @@ gcm_session_client_connect_cb (GObject *source_object,
         if (error != NULL) {
                 g_warning ("failed to refresh: %s", error->message);
                 g_error_free (error);
-                goto out;
+                return;
         }
 
         /* get STATE outputs */
         outputs = gnome_rr_screen_list_outputs (priv->state_screen);
         if (outputs == NULL) {
                 g_warning ("failed to get outputs");
-                goto out;
+                return;
         }
         for (i = 0; outputs[i] != NULL; i++) {
                 gcm_session_add_state_output (state, outputs[i]);
@@ -1354,8 +1421,6 @@ gcm_session_client_connect_cb (GObject *source_object,
                                priv->cancellable,
                                gcm_session_get_devices_cb,
                                state);
-out:
-        return;
 }
 
 static void
@@ -1449,6 +1514,9 @@ gsd_color_state_init (GsdColorState *state)
                                                           g_str_equal,
                                                           g_free,
                                                           NULL);
+
+        /* default color temperature */
+        priv->color_temperature = GSD_COLOR_TEMPERATURE_DEFAULT;
 
         priv->client = cd_client_new ();
 }

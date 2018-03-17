@@ -1,10 +1,4 @@
-
-#ifndef __gsd_marshal_MARSHAL_H__
-#define __gsd_marshal_MARSHAL_H__
-
-#include	<glib-object.h>
-
-G_BEGIN_DECLS
+#include <glib-object.h>
 
 #ifdef G_ENABLE_DEBUG
 #define g_marshal_value_peek_boolean(v)  g_value_get_boolean (v)
@@ -52,14 +46,17 @@ G_BEGIN_DECLS
 #define g_marshal_value_peek_variant(v)  (v)->data[0].v_pointer
 #endif /* !G_ENABLE_DEBUG */
 
-
-/* VOID:STRING,STRING (/home/hadess/Projects/jhbuild/gnome-settings-daemon/plugins/media-keys/gsd-marshal.list:1) */
-G_GNUC_INTERNAL void gsd_marshal_VOID__STRING_STRING (GClosure     *closure,
-                                                      GValue       *return_value,
-                                                      guint         n_param_values,
-                                                      const GValue *param_values,
-                                                      gpointer      invocation_hint,
-                                                      gpointer      marshal_data);
+/* VOID:STRING,STRING (gsd-marshal.list:1) */
+/* Prototype for -Wmissing-prototypes */
+G_BEGIN_DECLS
+G_GNUC_INTERNAL
+void gsd_marshal_VOID__STRING_STRING (GClosure     *closure,
+                                      GValue       *return_value,
+                                      guint         n_param_values,
+                                      const GValue *param_values,
+                                      gpointer      invocation_hint,
+                                      gpointer      marshal_data);
+G_END_DECLS
 void
 gsd_marshal_VOID__STRING_STRING (GClosure     *closure,
                                  GValue       *return_value G_GNUC_UNUSED,
@@ -68,13 +65,13 @@ gsd_marshal_VOID__STRING_STRING (GClosure     *closure,
                                  gpointer      invocation_hint G_GNUC_UNUSED,
                                  gpointer      marshal_data)
 {
-  typedef void (*GMarshalFunc_VOID__STRING_STRING) (gpointer     data1,
-                                                    gpointer     arg_1,
-                                                    gpointer     arg_2,
-                                                    gpointer     data2);
-  GMarshalFunc_VOID__STRING_STRING callback;
-  GCClosure *cc = (GCClosure*) closure;
+  typedef void (*GMarshalFunc_VOID__STRING_STRING) (gpointer data1,
+                                                    gpointer arg1,
+                                                    gpointer arg2,
+                                                    gpointer data2);
+  GCClosure *cc = (GCClosure *) closure;
   gpointer data1, data2;
+  GMarshalFunc_VOID__STRING_STRING callback;
 
   g_return_if_fail (n_param_values == 3);
 
@@ -95,8 +92,4 @@ gsd_marshal_VOID__STRING_STRING (GClosure     *closure,
             g_marshal_value_peek_string (param_values + 2),
             data2);
 }
-
-G_END_DECLS
-
-#endif /* __gsd_marshal_MARSHAL_H__ */
 

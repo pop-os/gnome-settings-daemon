@@ -37,18 +37,12 @@
 #include <gdk/gdkx.h>
 #include <gtk/gtk.h>
 
-#define GNOME_DESKTOP_USE_UNSTABLE_API
-
-#include <libgnome-desktop/gnome-rr-config.h>
-#include <libgnome-desktop/gnome-rr.h>
-#include <libgnome-desktop/gnome-pnp-ids.h>
-
 #include "gnome-settings-profile.h"
 #include "gsd-enums.h"
 #include "gsd-xsettings-manager.h"
 #include "gsd-xsettings-gtk.h"
 #include "xsettings-manager.h"
-#include "fontconfig-monitor.h"
+#include "fc-monitor.h"
 #include "gsd-remote-display-manager.h"
 #include "wm-button-layout-translation.h"
 
@@ -70,13 +64,17 @@
 #define GTK_MODULES_ENABLED_KEY  "enabled-gtk-modules"
 
 #define TEXT_SCALING_FACTOR_KEY "text-scaling-factor"
-#define SCALING_FACTOR_KEY "scaling-factor"
 #define CURSOR_SIZE_KEY "cursor-size"
 #define CURSOR_THEME_KEY "cursor-theme"
 
 #define FONT_ANTIALIASING_KEY "antialiasing"
 #define FONT_HINTING_KEY      "hinting"
 #define FONT_RGBA_ORDER_KEY   "rgba-order"
+
+typedef enum _DisplayLayoutMode {
+        DISPLAY_LAYOUT_MODE_LOGICAL = 1,
+        DISPLAY_LAYOUT_MODE_PHYSICAL = 2
+} DisplayLayoutMode;
 
 /* As we cannot rely on the X server giving us good DPI information, and
  * that we don't want multi-monitor screens to have different DPIs (thus
@@ -271,18 +269,21 @@ struct GnomeXSettingsManagerPrivate
         GHashTable        *settings;
 
         GSettings         *plugin_settings;
-        fontconfig_monitor_handle_t *fontconfig_handle;
+        FcMonitor         *fontconfig_monitor;
 
         GsdXSettingsGtk   *gtk;
 
         GsdRemoteDisplayManager *remote_display;
 
-        GnomeRRScreen     *rr_screen;
+        guint              display_config_watch_id;
+        guint              monitors_changed_id;
 
         guint              shell_name_watch_id;
         gboolean           have_shell;
 
         guint              notify_idle_id;
+
+        GDBusConnection   *dbus_connection;
 };
 
 #define GSD_XSETTINGS_ERROR gsd_xsettings_error_quark ()
@@ -417,7 +418,6 @@ static FixedEntry fixed_entries [] = {
         { "Gtk/ShowInputMethodMenu", fixed_false_int },
         { "Gtk/ShowUnicodeMenu",     fixed_false_int },
         { "Gtk/AutoMnemonics",       fixed_true_int },
-        { "Gtk/EnablePrimaryPaste",  fixed_true_int },
         { "Gtk/DialogsUseHeader",    fixed_true_int },
         { "Gtk/SessionBusId",        fixed_bus_id },
 };
@@ -447,6 +447,7 @@ static TranslationEntry translations [] = {
         { "org.gnome.desktop.interface", "icon-theme",             "Net/IconThemeName",       translate_string_string },
         { "org.gnome.desktop.interface", "menubar-accel",          "Gtk/MenuBarAccel",        translate_string_string },
         { "org.gnome.desktop.interface", "cursor-theme",           "Gtk/CursorThemeName",     translate_string_string },
+        { "org.gnome.desktop.interface", "gtk-enable-primary-paste", "Gtk/EnablePrimaryPaste", translate_bool_int },
         /* cursor-size is handled via the Xft side as it needs the scaling factor */
 
         { "org.gnome.desktop.sound", "theme-name",                 "Net/SoundThemeName",            translate_string_string },
@@ -496,166 +497,114 @@ get_dpi_from_gsettings (GnomeXSettingsManager *manager)
         return dpi * factor;
 }
 
-static GnomeRROutput *
-get_primary_output (GnomeRRScreen *screen)
+static gboolean
+is_layout_mode_logical (GVariantIter *properties)
 {
-        GnomeRROutput *primary = NULL;
-        GnomeRROutput **outputs;
-        guint i;
+        DisplayLayoutMode layout_mode = DISPLAY_LAYOUT_MODE_LOGICAL;
+        const char *key;
+        GVariant *value;
 
-        outputs = gnome_rr_screen_list_outputs (screen);
-        if (outputs == NULL || outputs[0] == NULL)
-                return NULL;
-        for (i = 0; outputs[i] != NULL; i++) {
-                if (gnome_rr_output_get_is_primary (outputs[i])) {
-                        primary = outputs[i];
-                        break;
+        while (g_variant_iter_next (properties, "{&sv}", &key, &value)) {
+                DisplayLayoutMode layout_mode_value;
+
+                if (!g_str_equal (key, "layout-mode")) {
+                        g_variant_unref (value);
+                        continue;
                 }
+
+                layout_mode_value = g_variant_get_uint32 (value);
+                g_variant_unref (value);
+
+                if (layout_mode_value < DISPLAY_LAYOUT_MODE_LOGICAL ||
+                    layout_mode_value > DISPLAY_LAYOUT_MODE_PHYSICAL)
+                        g_warning ("Unknown layout mode %u", layout_mode_value);
+                else
+                        layout_mode = layout_mode_value;
+
+                break;
         }
-        if (primary == NULL)
-                primary = outputs[0];
 
-        return primary;
+        return layout_mode == DISPLAY_LAYOUT_MODE_LOGICAL;
 }
 
-static gboolean
-primary_monitor_is_4k (GnomeRROutput *primary)
-{
-        GnomeRRMode *mode;
+#define MODE_FORMAT "(siiddada{sv})"
+#define MODES_FORMAT "a" MODE_FORMAT
 
-        mode = gnome_rr_output_get_current_mode (primary);
-        if (gnome_rr_mode_get_width (mode) >= SMALLEST_4K_WIDTH)
-                return TRUE;
-        return FALSE;
-}
+#define MONITOR_SPEC_FORMAT "(ssss)"
+#define MONITOR_FORMAT "(" MONITOR_SPEC_FORMAT MODES_FORMAT "a{sv})"
+#define MONITORS_FORMAT "a" MONITOR_FORMAT
 
-static gboolean
-primary_monitor_on_hdmi (GnomeRROutput *primary)
-{
-        const char *name;
+#define LOGICAL_MONITOR_FORMAT "(iiduba" MONITOR_SPEC_FORMAT "a{sv})"
+#define LOGICAL_MONITORS_FORMAT "a" LOGICAL_MONITOR_FORMAT
 
-        name = gnome_rr_output_get_name (primary);
-        if (name == NULL ||
-            strstr (name, "HDMI") == NULL)
-                return FALSE;
-        return TRUE;
-}
-
-static gboolean
-primary_monitor_should_skip_resolution_check (GnomeRROutput *primary)
-{
-        if (!primary_monitor_is_4k (primary) && primary_monitor_on_hdmi (primary))
-                return TRUE;
-
-        return FALSE;
-}
-
-static void
-get_dimensions_xrandr (GnomeRROutput *primary,
-                       int           *width,
-                       int           *height,
-                       int           *width_mm,
-                       int           *height_mm)
-{
-        GnomeRRMode *mode;
-
-        mode = gnome_rr_output_get_current_mode (primary);
-        *width = gnome_rr_mode_get_width (mode);
-        *height = gnome_rr_mode_get_height (mode);
-
-        gnome_rr_output_get_physical_size (primary,
-                                           width_mm,
-                                           height_mm);
-}
-
-static void
-get_dimensions_gdk (int *width,
-                    int *height,
-                    int *width_mm,
-                    int *height_mm)
-{
-        GdkDisplay *display;
-        GdkScreen *screen;
-        GdkRectangle rect;
-        int primary;
-        int monitor_scale;
-
-        display = gdk_display_get_default ();
-        screen = gdk_display_get_default_screen (display);
-        primary = gdk_screen_get_primary_monitor (screen);
-        gdk_screen_get_monitor_geometry (screen, primary, &rect);
-        monitor_scale = gdk_screen_get_monitor_scale_factor (screen, primary);
-
-        *width = rect.width * monitor_scale;
-        *height = rect.height * monitor_scale;
-
-        *width_mm = gdk_screen_get_monitor_width_mm (screen, primary);
-        *height_mm = gdk_screen_get_monitor_height_mm (screen, primary);
-}
+#define CURRENT_STATE_FORMAT "(u" MONITORS_FORMAT LOGICAL_MONITORS_FORMAT "a{sv})"
 
 static int
 get_window_scale (GnomeXSettingsManager *manager)
 {
-	GSettings  *interface_settings;
-        int window_scale;
-        int width, height;
-        int width_mm, height_mm;
-        double dpi_x, dpi_y;
+        GError *error = NULL;
+        GVariant *current_state;
+        GVariantIter *logical_monitors;
+        GVariant *logical_monitor_variant;
+        GVariantIter *properties;
+        int scale = 1;
 
-	interface_settings = g_hash_table_lookup (manager->priv->settings, INTERFACE_SETTINGS_SCHEMA);
-        window_scale =
-                g_settings_get_uint (interface_settings, SCALING_FACTOR_KEY);
-        if (window_scale == 0) {
-                GnomeRROutput *output = NULL;
+        current_state =
+                g_dbus_connection_call_sync (manager->priv->dbus_connection,
+                                             "org.gnome.Mutter.DisplayConfig",
+                                             "/org/gnome/Mutter/DisplayConfig",
+                                             "org.gnome.Mutter.DisplayConfig",
+                                             "GetCurrentState",
+                                             NULL,
+                                             NULL,
+                                             G_DBUS_CALL_FLAGS_NO_AUTO_START,
+                                             -1,
+                                             NULL,
+                                             &error);
+        if (!current_state) {
+                g_warning ("Failed to get current display configuration state: %s",
+                           error->message);
+                g_error_free (error);
+                return 1;
+        }
 
-                window_scale = 1;
+        g_variant_get (current_state,
+                       CURRENT_STATE_FORMAT,
+                       NULL,
+                       NULL,
+                       &logical_monitors,
+                       &properties);
 
-                if (manager->priv->rr_screen)
-                        output = get_primary_output (manager->priv->rr_screen);
+        if (is_layout_mode_logical (properties))
+                goto out;
 
-                if (output) {
-                        if (primary_monitor_should_skip_resolution_check (output))
-                                goto out;
+        while (g_variant_iter_next (logical_monitors, "@"LOGICAL_MONITOR_FORMAT,
+                                    &logical_monitor_variant)) {
+                gboolean is_primary;
+                double logical_monitor_scale;
 
-                        get_dimensions_xrandr (output,
-                                               &width, &height,
-                                               &width_mm, &height_mm);
-                } else {
-                        /* Before the D-Bus DisplayConfig service exported by
-                         * Mutter becomes available, use the current information
-                         * that GDK has from the X server; in simple cases, this
-                         * will hopefully keep us from switching the window_scale
-                         * during startup.
-                         */
-                        get_dimensions_gdk (&width, &height,
-                                            &width_mm, &height_mm);
+                g_variant_get (logical_monitor_variant,
+                               LOGICAL_MONITOR_FORMAT,
+                               NULL, NULL,
+                               &logical_monitor_scale,
+                               NULL,
+                               &is_primary,
+                               NULL, NULL);
+
+                if (is_primary) {
+                        scale = (int) logical_monitor_scale;
+                        break;
                 }
 
-                if (height < HIDPI_MIN_HEIGHT)
-                        goto out;
-
-                /* Somebody encoded the aspect ratio (16/9 or 16/10)
-                 * instead of the physical size */
-                if ((width_mm == 160 && height_mm == 90) ||
-                    (width_mm == 160 && height_mm == 100) ||
-                    (width_mm == 16 && height_mm == 9) ||
-                    (width_mm == 16 && height_mm == 10))
-                        goto out;
-
-                window_scale = 1;
-                if (width_mm > 0 && height_mm > 0) {
-                        dpi_x = (double)width / (width_mm / 25.4);
-                        dpi_y = (double)height / (height_mm / 25.4);
-                        /* We don't completely trust these values so both
-                           must be high, and never pick higher ratio than
-                           2 automatically */
-                        if (dpi_x > HIDPI_LIMIT && dpi_y > HIDPI_LIMIT)
-                                window_scale = 2;
-                }
+                g_variant_unref (logical_monitor_variant);
         }
 
 out:
-        return window_scale;
+        g_variant_unref (current_state);
+        g_variant_iter_free (properties);
+        g_variant_iter_free (logical_monitors);
+
+        return scale;
 }
 
 typedef struct {
@@ -898,8 +847,7 @@ plugin_callback (GSettings             *settings,
                  GnomeXSettingsManager *manager)
 {
         if (g_str_equal (key, GTK_MODULES_DISABLED_KEY) ||
-            g_str_equal (key, GTK_MODULES_ENABLED_KEY) ||
-            g_str_equal (key, "active")) {
+            g_str_equal (key, GTK_MODULES_ENABLED_KEY)) {
                 /* Do nothing, as GsdXsettingsGtk will handle it */
         } else if (g_str_equal (key, XSETTINGS_OVERRIDE_KEY)) {
                 override_callback (settings, key, manager);
@@ -928,8 +876,8 @@ gtk_modules_callback (GsdXSettingsGtk       *gtk,
 }
 
 static void
-fontconfig_callback (fontconfig_monitor_handle_t *handle,
-                     GnomeXSettingsManager       *manager)
+fontconfig_callback (FcMonitor              *monitor,
+                     GnomeXSettingsManager  *manager)
 {
         int timestamp = time (NULL);
 
@@ -945,7 +893,7 @@ start_fontconfig_monitor_idle_cb (GnomeXSettingsManager *manager)
 {
         gnome_settings_profile_start (NULL);
 
-        manager->priv->fontconfig_handle = fontconfig_monitor_start ((GFunc) fontconfig_callback, manager);
+        fc_monitor_start (manager->priv->fontconfig_monitor);
 
         gnome_settings_profile_end (NULL);
 
@@ -959,21 +907,13 @@ start_fontconfig_monitor (GnomeXSettingsManager  *manager)
 {
         gnome_settings_profile_start (NULL);
 
-        fontconfig_cache_init ();
+        manager->priv->fontconfig_monitor = fc_monitor_new ();
+        g_signal_connect (manager->priv->fontconfig_monitor, "updated", G_CALLBACK (fontconfig_callback), manager);
 
         manager->priv->start_idle_id = g_idle_add ((GSourceFunc) start_fontconfig_monitor_idle_cb, manager);
         g_source_set_name_by_id (manager->priv->start_idle_id, "[gnome-settings-daemon] start_fontconfig_monitor_idle_cb");
 
         gnome_settings_profile_end (NULL);
-}
-
-static void
-stop_fontconfig_monitor (GnomeXSettingsManager  *manager)
-{
-        if (manager->priv->fontconfig_handle) {
-                fontconfig_monitor_stop (manager->priv->fontconfig_handle);
-                manager->priv->fontconfig_handle = NULL;
-        }
 }
 
 static void
@@ -1049,7 +989,6 @@ xsettings_callback (GSettings             *settings,
         GVariant         *value;
 
         if (g_str_equal (key, TEXT_SCALING_FACTOR_KEY) ||
-            g_str_equal (key, SCALING_FACTOR_KEY) ||
             g_str_equal (key, CURSOR_SIZE_KEY) ||
             g_str_equal (key, CURSOR_THEME_KEY)) {
         	xft_callback (NULL, key, manager);
@@ -1162,30 +1101,33 @@ enable_animations_changed_cb (GSettings             *settings,
 }
 
 static void
-on_rr_screen_changed (GnomeRRScreen         *screen,
-                      GnomeXSettingsManager *manager)
+monitors_changed (GnomeXSettingsManager *manager)
 {
         update_xft_settings (manager);
         queue_notify (manager);
 }
 
 static void
-on_rr_screen_acquired (GObject      *object,
-                       GAsyncResult *result,
-                       gpointer      data)
+on_monitors_changed (GDBusConnection *connection,
+                     const gchar     *sender_name,
+                     const gchar     *object_path,
+                     const gchar     *interface_name,
+                     const gchar     *signal_name,
+                     GVariant        *parameters,
+                     gpointer         data)
 {
         GnomeXSettingsManager *manager = data;
-        GnomeRRScreen *rr_screen;
+        monitors_changed (manager);
+}
 
-        rr_screen = gnome_rr_screen_new_finish (result, NULL);
-        if (!rr_screen)
-                return;
-
-        manager->priv->rr_screen = rr_screen;
-        g_signal_connect (rr_screen, "changed",
-                          G_CALLBACK (on_rr_screen_changed), manager);
-
-        on_rr_screen_changed (rr_screen, manager);
+static void
+on_display_config_name_appeared_handler (GDBusConnection *connection,
+                                         const gchar     *name,
+                                         const gchar     *name_owner,
+                                         gpointer         data)
+{
+        GnomeXSettingsManager *manager = data;
+        monitors_changed (manager);
 }
 
 gboolean
@@ -1211,9 +1153,25 @@ gnome_xsettings_manager_start (GnomeXSettingsManager *manager,
         g_signal_connect (G_OBJECT (manager->priv->remote_display), "notify::force-disable-animations",
                           G_CALLBACK (force_disable_animation_changed), manager);
 
-        gnome_rr_screen_new_async (gdk_screen_get_default (),
-                                   on_rr_screen_acquired,
-                                   manager);
+        manager->priv->monitors_changed_id =
+                g_dbus_connection_signal_subscribe (manager->priv->dbus_connection,
+                                                    "org.gnome.Mutter.DisplayConfig",
+                                                    "org.gnome.Mutter.DisplayConfig",
+                                                    "MonitorsChanged",
+                                                    "/org/gnome/Mutter/DisplayConfig",
+                                                    NULL,
+                                                    G_DBUS_SIGNAL_FLAGS_NONE,
+                                                    on_monitors_changed,
+                                                    manager,
+                                                    NULL);
+        manager->priv->display_config_watch_id =
+                g_bus_watch_name_on_connection (manager->priv->dbus_connection,
+                                                "org.gnome.Mutter.DisplayConfig",
+                                                G_BUS_NAME_WATCHER_FLAGS_NONE,
+                                                on_display_config_name_appeared_handler,
+                                                NULL,
+                                                manager,
+                                                NULL);
 
         manager->priv->settings = g_hash_table_new_full (g_str_hash, g_str_equal,
                                                          NULL, (GDestroyNotify) g_object_unref);
@@ -1321,11 +1279,15 @@ gnome_xsettings_manager_stop (GnomeXSettingsManager *manager)
 
         g_clear_object (&manager->priv->remote_display);
 
-        if (manager->priv->rr_screen != NULL) {
-                g_signal_handlers_disconnect_by_func (manager->priv->rr_screen,
-                                                      (gpointer) on_rr_screen_changed,
-                                                      manager);
-                g_clear_object (&manager->priv->rr_screen);
+        if (p->monitors_changed_id) {
+                g_dbus_connection_signal_unsubscribe (p->dbus_connection,
+                                                      p->monitors_changed_id);
+                p->monitors_changed_id = 0;
+        }
+
+        if (p->display_config_watch_id) {
+                g_bus_unwatch_name (p->display_config_watch_id);
+                p->display_config_watch_id = 0;
         }
 
         if (p->shell_name_watch_id > 0) {
@@ -1344,7 +1306,12 @@ gnome_xsettings_manager_stop (GnomeXSettingsManager *manager)
                 p->plugin_settings = NULL;
         }
 
-        stop_fontconfig_monitor (manager);
+        if (p->fontconfig_monitor != NULL) {
+                g_signal_handlers_disconnect_by_data (p->fontconfig_monitor, manager);
+                fc_monitor_stop (p->fontconfig_monitor);
+                g_object_unref (p->fontconfig_monitor);
+                p->fontconfig_monitor = NULL;
+        }
 
         if (p->settings != NULL) {
                 g_hash_table_destroy (p->settings);
@@ -1370,7 +1337,14 @@ gnome_xsettings_manager_class_init (GnomeXSettingsManagerClass *klass)
 static void
 gnome_xsettings_manager_init (GnomeXSettingsManager *manager)
 {
+        GError *error = NULL;
+
         manager->priv = GNOME_XSETTINGS_MANAGER_GET_PRIVATE (manager);
+
+        manager->priv->dbus_connection = g_bus_get_sync (G_BUS_TYPE_SESSION,
+                                                         NULL, &error);
+        if (!manager->priv->dbus_connection)
+                g_error ("Failed to get session bus: %s", error->message);
 }
 
 static void
@@ -1389,6 +1363,8 @@ gnome_xsettings_manager_finalize (GObject *object)
 
         if (xsettings_manager->priv->start_idle_id != 0)
                 g_source_remove (xsettings_manager->priv->start_idle_id);
+
+        g_clear_object (&xsettings_manager->priv->dbus_connection);
 
         G_OBJECT_CLASS (gnome_xsettings_manager_parent_class)->finalize (object);
 }

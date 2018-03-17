@@ -21,6 +21,7 @@
 #include <gio/gio.h>
 #include <glib/gstdio.h>
 #include <string.h>
+#include <libnotify/notify.h>
 
 #include "gnome-settings-profile.h"
 #include "gsd-housekeeping-manager.h"
@@ -55,6 +56,7 @@ struct GsdHousekeepingManagerPrivate {
         GDBusNodeInfo   *introspection_data;
         GDBusConnection *connection;
         GCancellable    *bus_cancellable;
+        guint            name_id;
 };
 
 #define GSD_HOUSEKEEPING_MANAGER_GET_PRIVATE(o) (G_TYPE_INSTANCE_GET_PRIVATE ((o), GSD_TYPE_HOUSEKEEPING_MANAGER, GsdHousekeepingManagerPrivate))
@@ -353,6 +355,14 @@ on_bus_gotten (GObject                *source_object,
                                                    NULL,
                                                    NULL);
         }
+
+        manager->priv->name_id = g_bus_own_name_on_connection (connection,
+                                                               "org.gnome.SettingsDaemon.Housekeeping",
+                                                               G_BUS_NAME_OWNER_FLAGS_NONE,
+                                                               NULL,
+                                                               NULL,
+                                                               NULL,
+                                                               NULL);
 }
 
 static void
@@ -378,12 +388,12 @@ gsd_housekeeping_manager_start (GsdHousekeepingManager *manager,
         gnome_settings_profile_start (NULL);
 
         /* Create ~/.local/ as early as possible */
-        g_mkdir_with_parents(g_get_user_data_dir (), 0700);
+        (void) g_mkdir_with_parents(g_get_user_data_dir (), 0700);
 
         /* Create ~/.local/share/applications/, see
          * https://bugzilla.gnome.org/show_bug.cgi?id=703048 */
         dir = g_build_filename (g_get_user_data_dir (), "applications", NULL);
-        g_mkdir (dir, 0700);
+        (void) g_mkdir (dir, 0700);
         g_free (dir);
 
         gsd_ldsm_setup (FALSE);
@@ -412,6 +422,11 @@ gsd_housekeeping_manager_stop (GsdHousekeepingManager *manager)
         GsdHousekeepingManagerPrivate *p = manager->priv;
 
         g_debug ("Stopping housekeeping manager");
+
+        if (manager->priv->name_id != 0) {
+                g_bus_unown_name (manager->priv->name_id);
+                manager->priv->name_id = 0;
+        }
 
         g_clear_object (&p->bus_cancellable);
         g_clear_pointer (&p->introspection_data, g_dbus_node_info_unref);
@@ -453,6 +468,8 @@ gsd_housekeeping_manager_class_init (GsdHousekeepingManagerClass *klass)
         GObjectClass *object_class = G_OBJECT_CLASS (klass);
 
         object_class->finalize = gsd_housekeeping_manager_finalize;
+
+        notify_init ("gnome-settings-daemon");
 
         g_type_class_add_private (klass, sizeof (GsdHousekeepingManagerPrivate));
 }

@@ -5,7 +5,7 @@
 #include "gsm-presence-flag.h"
 #include "gsd-power-enums.h"
 
-/* enumerations from "/home/hadess/Projects/jhbuild/gnome-settings-daemon/plugins/power/gsm-inhibitor-flag.h" */
+/* enumerations from "./gsm-inhibitor-flag.h" */
 GType
 gsm_inhibitor_flag_get_type (void)
 {
@@ -24,7 +24,7 @@ gsm_inhibitor_flag_get_type (void)
   return etype;
 }
 
-/* enumerations from "/home/hadess/Projects/jhbuild/gnome-settings-daemon/plugins/power/gsm-presence-flag.h" */
+/* enumerations from "./gsm-presence-flag.h" */
 GType
 gsm_presence_status_get_type (void)
 {

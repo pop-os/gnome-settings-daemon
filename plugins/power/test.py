@@ -31,6 +31,7 @@ class PowerPluginTest(gsdtestcase.GSDTestCase):
     '''Test the power plugin'''
 
     def setUp(self):
+        os.environ['GSD_MOCK']='1'
         self.check_logind_gnome_session()
         self.start_logind()
         self.daemon_death_expected = False
@@ -58,7 +59,7 @@ class PowerPluginTest(gsdtestcase.GSDTestCase):
 
         # start mock upowerd
         (self.upowerd, self.obj_upower) = self.spawn_server_template(
-            'upower', {'OnBattery': True, 'LidIsClosed': False}, stdout=subprocess.PIPE)
+            'upower', {'DaemonVersion': '0.99', 'OnBattery': True, 'LidIsClosed': False}, stdout=subprocess.PIPE)
         gsdtestcase.set_nonblock(self.upowerd.stdout)
 
         # start mock gnome-shell screensaver
@@ -83,11 +84,6 @@ class PowerPluginTest(gsdtestcase.GSDTestCase):
 
         self.settings_gsd_power = Gio.Settings('org.gnome.settings-daemon.plugins.power')
 
-        # start power plugin
-        self.settings_gsd_power['active'] = False
-        # As hibernate is not available, suspend by default on critical
-        # FIXME
-        self.settings_gsd_power['critical-battery-action'] = 'suspend'
         Gio.Settings.sync()
         self.plugin_log_write = open(os.path.join(self.workdir, 'plugin_power.log'), 'wb')
         # avoid painfully long delays of actions for tests
@@ -98,7 +94,7 @@ class PowerPluginTest(gsdtestcase.GSDTestCase):
         env['CANBERRA_DRIVER'] = 'null'
 
         self.daemon = subprocess.Popen(
-            [os.path.join(builddir, 'gsd-test-power')],
+            [os.path.join(builddir, 'gsd-power')],
             # comment out this line if you want to see the logs in real time
             stdout=self.plugin_log_write,
             stderr=subprocess.STDOUT,
@@ -179,9 +175,19 @@ class PowerPluginTest(gsdtestcase.GSDTestCase):
 
         path = GLib.find_program_in_path ('gnome-session')
         assert(path)
+        (success, data) = GLib.file_get_contents (path)
+        lines = data.split('\n')
+        new_path = None
+        for line in lines:
+            items = line.split()
+            if items and items[0] == 'exec':
+                new_path = items[1]
+        if not new_path:
+            self.fail("could not get gnome-session's real path from %s" % path)
+        path = new_path
         ldd = subprocess.Popen(['ldd', path], stdout=subprocess.PIPE)
         out = ldd.communicate()[0]
-        if not 'libsystemd-login.so.0' in out:
+        if not 'libsystemd.so.0' in out:
             self.fail('gnome-session is not built with logind support')
 
     def get_status(self):
@@ -410,7 +416,8 @@ class PowerPluginTest(gsdtestcase.GSDTestCase):
         # create suspend inhibitor which should have no effect on the idle
         inhibit_id = self.obj_session_mgr.Inhibit(
             'testsuite', dbus.UInt32(0), 'for testing',
-            dbus.UInt32(gsdpowerenums.GSM_INHIBITOR_FLAG_SUSPEND))
+            dbus.UInt32(gsdpowerenums.GSM_INHIBITOR_FLAG_SUSPEND),
+            dbus_interface='org.gnome.SessionManager')
 
         self.obj_screensaver.SetActive(True)
         self.assertTrue(self.obj_screensaver.GetActive(), 'screensaver not turned on')
@@ -432,7 +439,8 @@ class PowerPluginTest(gsdtestcase.GSDTestCase):
         self.check_blank(10)
 
         # Drop inhibitor
-        self.obj_session_mgr.Uninhibit(dbus.UInt32(inhibit_id))
+        self.obj_session_mgr.Uninhibit(dbus.UInt32(inhibit_id),
+                dbus_interface='org.gnome.SessionManager')
 
     def test_session_idle_delay(self):
         '''verify that session idle delay works as expected when changed'''
@@ -496,7 +504,7 @@ class PowerPluginTest(gsdtestcase.GSDTestCase):
         # delay + 1 s error margin
         self.check_for_suspend(7)
 
-    def test_suspend_no_hibernate(self):
+    def _test_suspend_no_hibernate(self):
         '''suspend-no-hibernate'''
 
         self.settings_session['idle-delay'] = 2
@@ -524,14 +532,16 @@ class PowerPluginTest(gsdtestcase.GSDTestCase):
         # create inhibitor
         inhibit_id = self.obj_session_mgr.Inhibit(
             'testsuite', dbus.UInt32(0), 'for testing',
-            dbus.UInt32(gsdpowerenums.GSM_INHIBITOR_FLAG_IDLE | gsdpowerenums.GSM_INHIBITOR_FLAG_SUSPEND))
+            dbus.UInt32(gsdpowerenums.GSM_INHIBITOR_FLAG_IDLE | gsdpowerenums.GSM_INHIBITOR_FLAG_SUSPEND),
+            dbus_interface='org.gnome.SessionManager')
         self.check_no_suspend(idle_delay + 2)
         self.check_no_dim(0)
 
         # Check that we didn't go to idle either
         self.assertEqual(self.get_status(), gsdpowerenums.GSM_PRESENCE_STATUS_AVAILABLE)
 
-        self.obj_session_mgr.Uninhibit(dbus.UInt32(inhibit_id))
+        self.obj_session_mgr.Uninhibit(dbus.UInt32(inhibit_id),
+                dbus_interface='org.gnome.SessionManager')
 
     def test_lock_on_lid_close(self):
         '''Check that we do lock on lid closing, if the machine will not suspend'''
@@ -541,7 +551,8 @@ class PowerPluginTest(gsdtestcase.GSDTestCase):
         # create inhibitor
         inhibit_id = self.obj_session_mgr.Inhibit(
             'testsuite', dbus.UInt32(0), 'for testing',
-            dbus.UInt32(gsdpowerenums.GSM_INHIBITOR_FLAG_SUSPEND))
+            dbus.UInt32(gsdpowerenums.GSM_INHIBITOR_FLAG_SUSPEND),
+            dbus_interface='org.gnome.SessionManager')
 
         # Close the lid
         self.obj_upower.Set('org.freedesktop.UPower', 'LidIsClosed', True)
@@ -553,7 +564,8 @@ class PowerPluginTest(gsdtestcase.GSDTestCase):
         self.check_blank(2)
 
         # Drop the inhibit and see whether we suspend
-        self.obj_session_mgr.Uninhibit(dbus.UInt32(inhibit_id))
+        self.obj_session_mgr.Uninhibit(dbus.UInt32(inhibit_id),
+                dbus_interface='org.gnome.SessionManager')
         # At this point logind should suspend for us
         self.settings_screensaver['lock-enabled'] = False
 
@@ -563,7 +575,8 @@ class PowerPluginTest(gsdtestcase.GSDTestCase):
         # create inhibitor
         inhibit_id = self.obj_session_mgr.Inhibit(
             'testsuite', dbus.UInt32(0), 'for testing',
-            dbus.UInt32(gsdpowerenums.GSM_INHIBITOR_FLAG_SUSPEND))
+            dbus.UInt32(gsdpowerenums.GSM_INHIBITOR_FLAG_SUSPEND),
+            dbus_interface='org.gnome.SessionManager')
 
         # Close the lid
         self.obj_upower.Set('org.freedesktop.UPower', 'LidIsClosed', True)
@@ -573,7 +586,8 @@ class PowerPluginTest(gsdtestcase.GSDTestCase):
         self.check_blank(4)
 
         # Drop the inhibit and see whether we suspend
-        self.obj_session_mgr.Uninhibit(dbus.UInt32(inhibit_id))
+        self.obj_session_mgr.Uninhibit(dbus.UInt32(inhibit_id),
+                dbus_interface='org.gnome.SessionManager')
         # At this point logind should suspend for us
 
     def test_unblank_on_lid_open(self):
@@ -582,7 +596,8 @@ class PowerPluginTest(gsdtestcase.GSDTestCase):
         # create inhibitor
         inhibit_id = self.obj_session_mgr.Inhibit(
             'testsuite', dbus.UInt32(0), 'for testing',
-            dbus.UInt32(gsdpowerenums.GSM_INHIBITOR_FLAG_SUSPEND))
+            dbus.UInt32(gsdpowerenums.GSM_INHIBITOR_FLAG_SUSPEND),
+            dbus_interface='org.gnome.SessionManager')
 
         # Close the lid
         self.obj_upower.Set('org.freedesktop.UPower', 'LidIsClosed', True)
@@ -599,7 +614,8 @@ class PowerPluginTest(gsdtestcase.GSDTestCase):
         self.check_unblank(2)
 
         # Drop the inhibit
-        self.obj_session_mgr.Uninhibit(dbus.UInt32(inhibit_id))
+        self.obj_session_mgr.Uninhibit(dbus.UInt32(inhibit_id),
+                dbus_interface='org.gnome.SessionManager')
 
     def test_dim(self):
         '''Check that we do go to dim'''
@@ -841,12 +857,14 @@ class PowerPluginTest(gsdtestcase.GSDTestCase):
         # create suspend inhibitor which should stop us logging out
         inhibit_id = self.obj_session_mgr.Inhibit(
             'testsuite', dbus.UInt32(0), 'for testing',
-            dbus.UInt32(gsdpowerenums.GSM_INHIBITOR_FLAG_LOGOUT))
+            dbus.UInt32(gsdpowerenums.GSM_INHIBITOR_FLAG_LOGOUT),
+            dbus_interface='org.gnome.SessionManager')
 
         self.check_no_logout(idle_delay + 3)
 
         # Drop inhibitor
-        self.obj_session_mgr.Uninhibit(dbus.UInt32(inhibit_id))
+        self.obj_session_mgr.Uninhibit(dbus.UInt32(inhibit_id),
+                dbus_interface='org.gnome.SessionManager')
 
     def disabled_test_unindle_on_ac_plug(self):
         idle_delay = round(gsdpowerconstants.MINIMUM_IDLE_DIM_DELAY / gsdpowerconstants.IDLE_DELAY_TO_IDLE_DIM_MULTIPLIER)

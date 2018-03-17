@@ -7,7 +7,7 @@
 #include <glib-object.h>
 
 G_BEGIN_DECLS
-/* enumerations from "/home/hadess/Projects/jhbuild/gnome-settings-daemon/plugins/common/gsd-device-manager.h" */
+/* enumerations from "./gsd-device-manager.h" */
 GType gsd_device_type_get_type (void) G_GNUC_CONST;
 #define GSD_TYPE_DEVICE_TYPE (gsd_device_type_get_type())
 G_END_DECLS

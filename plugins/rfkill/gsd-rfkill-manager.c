@@ -20,12 +20,31 @@
  *
  */
 
+/* Test with:
+ *    gdbus call \
+ *        --session \
+ *        --dest org.gnome.SettingsDaemon.Rfkill \
+ *        --object-path /org/gnome/SettingsDaemon/Rfkill \
+ *        --method org.freedesktop.DBus.Properties.Set \
+ *        "org.gnome.SettingsDaemon.Rfkill" \
+ *        "AirplaneMode" \
+ *        "<true|false>"
+ * and
+ *    gdbus call \
+ *        --session \
+ *        --dest org.gnome.SettingsDaemon.Rfkill \
+ *        --object-path /org/gnome/SettingsDaemon/Rfkill \
+ *        --method org.freedesktop.DBus.Properties.Set \
+ *        "org.gnome.SettingsDaemon.Rfkill" \
+ *        "BluetoothAirplaneMode" \
+ *        "<true|false>"
+ */
+
 #include "config.h"
 
 #include <gio/gio.h>
 #include <string.h>
 
-#include "gnome-settings-plugin.h"
 #include "gnome-settings-profile.h"
 #include "gsd-rfkill-manager.h"
 #include "rfkill-glib.h"
@@ -57,8 +76,15 @@ struct GsdRfkillManagerPrivate
         GDBusObjectManager      *mm_client;
         gboolean                 wwan_interesting;
 
+        GsdSessionManager       *session;
+        GBinding                *rfkill_input_inhibit_binding;
+
         gchar                   *chassis_type;
 };
+
+#define GSD_DBUS_NAME "org.gnome.SettingsDaemon"
+#define GSD_DBUS_PATH "/org/gnome/SettingsDaemon"
+#define GSD_DBUS_BASE_INTERFACE "org.gnome.SettingsDaemon"
 
 #define GSD_RFKILL_DBUS_NAME GSD_DBUS_NAME ".Rfkill"
 #define GSD_RFKILL_DBUS_PATH GSD_DBUS_PATH "/Rfkill"
@@ -67,13 +93,13 @@ static const gchar introspection_xml[] =
 "<node>"
 "  <interface name='org.gnome.SettingsDaemon.Rfkill'>"
 "    <annotation name='org.freedesktop.DBus.GLib.CSymbol' value='gsd_rfkill_manager'/>"
-"      <property name='AirplaneMode' type='b' access='readwrite'/>"
-"      <property name='HardwareAirplaneMode' type='b' access='read'/>"
-"      <property name='HasAirplaneMode' type='b' access='read'/>"
-"      <property name='ShouldShowAirplaneMode' type='b' access='read'/>"
-"      <property name='BluetoothAirplaneMode' type='b' access='readwrite'/>"
-"      <property name='BluetoothHardwareAirplaneMode' type='b' access='read'/>"
-"      <property name='BluetoothHasAirplaneMode' type='b' access='read'/>"
+"    <property name='AirplaneMode' type='b' access='readwrite'/>"
+"    <property name='HardwareAirplaneMode' type='b' access='read'/>"
+"    <property name='HasAirplaneMode' type='b' access='read'/>"
+"    <property name='ShouldShowAirplaneMode' type='b' access='read'/>"
+"    <property name='BluetoothAirplaneMode' type='b' access='readwrite'/>"
+"    <property name='BluetoothHardwareAirplaneMode' type='b' access='read'/>"
+"    <property name='BluetoothHasAirplaneMode' type='b' access='read'/>"
 "  </interface>"
 "</node>";
 
@@ -499,6 +525,11 @@ on_bus_gotten (GObject               *source_object,
                                                                NULL,
                                                                NULL,
                                                                NULL);
+
+        manager->priv->session = gnome_settings_bus_get_session_proxy ();
+        manager->priv->rfkill_input_inhibit_binding = g_object_bind_property (manager->priv->session, "session-is-active",
+                                                                              manager->priv->rfkill, "rfkill-input-inhibited",
+                                                                              G_BINDING_SYNC_CREATE);
 }
 
 static void
@@ -629,6 +660,8 @@ gboolean
 gsd_rfkill_manager_start (GsdRfkillManager *manager,
                          GError         **error)
 {
+        g_autoptr(GError) local_error = NULL;
+
         gnome_settings_profile_start (NULL);
 
         manager->priv->introspection_data = g_dbus_node_info_new_for_xml (introspection_xml, NULL);
@@ -639,7 +672,11 @@ gsd_rfkill_manager_start (GsdRfkillManager *manager,
         manager->priv->rfkill = cc_rfkill_glib_new ();
         g_signal_connect (G_OBJECT (manager->priv->rfkill), "changed",
                           G_CALLBACK (rfkill_changed), manager);
-        cc_rfkill_glib_open (manager->priv->rfkill);
+
+        if (!cc_rfkill_glib_open (manager->priv->rfkill, &local_error)) {
+                g_warning ("Error setting up rfkill: %s", local_error->message);
+                g_clear_error (&local_error);
+        }
 
         manager->priv->cancellable = g_cancellable_new ();
 
@@ -687,6 +724,8 @@ gsd_rfkill_manager_stop (GsdRfkillManager *manager)
 
         g_clear_pointer (&p->introspection_data, g_dbus_node_info_unref);
         g_clear_object (&p->connection);
+        g_clear_object (&p->rfkill_input_inhibit_binding);
+        g_clear_object (&p->session);
         g_clear_object (&p->rfkill);
         g_clear_pointer (&p->killswitches, g_hash_table_destroy);
         g_clear_pointer (&p->bt_killswitches, g_hash_table_destroy);

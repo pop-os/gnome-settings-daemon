@@ -1,27 +1,222 @@
 ==============
-Version 3.22.2
+Version 3.26.2
 ==============
 
-Media keys:
-- Fix custom keyboard shortcuts not working in some hardware
-  combinations, including potential crashes
-- Fix shutdown dialog delay when using kbd shortcut
+- Translation updates
+- Minor cleanups
 
-Smartcard:
-- Fix plugin not working due to a conflict with the Sharing
-  plugin's use of NetworkManager client libraries
+Housekeeping:
+- Ignore more virtual file systems
+- Fix the Empty Trash button in Settings not working
+
+Media-keys:
+- Fix custom binding command changes not getting applied
 
 ==============
-Version 3.22.1
+Version 3.26.1
 ==============
 
 - Translation updates
 
+Wacom:
+- Ensure builtin touchscreens are properly mapped to outputs
+- Fix spotty touchscreen detection with those touchscreens that have a
+  capacitive menu/windows button
+- Fix touchscreen vs display orientation mismatch under gdm
+
+XSettings:
+- Reload the scale factor when mutter starts up
+
+==============
+Version 3.26.0
+==============
+
+- Translation updates
+
+===============
+Version 3.25.92
+===============
+
+- Ensure translatable strings are actually translated
+- Translation updates
+
+Housekeeping:
+- Ignore the Retrode's low-space
+
+Sharing:
+- Add gnome-remote-desktop as available service
+
+===============
+Version 3.25.91
+===============
+
+Color:
+- Prevent a potential crash on an uninitialized variable
+
+Power:
+- Fix automatic brightness adjustment being done inactive sessions
+- Don't use undefined ambient light readings
+
+XSettings:
+- Use the new mutter API exclusively
+- Drop the gnome-desktop requirement
+
+===============
+Version 3.25.90
+===============
+
+Color:
+- Honor location enabled setting
+- Request location updates with a larger time granularity
+
+Date & Time:
+- Honor location enabled setting
+
+Media-keys:
+- Restore interactive option for power button
+
+Wacom:
+- Exclude non-display attached devices from remapping
+
+XSettings:
+- Fix fontconfig cache updates causing desktop freezes
+
+==============
+Version 3.25.4
+==============
+
+- Fix GConf->GSettings convert script
+
+Color:
+- Fix smearing out of Night Light effect
+
+Keyboard:
+- Only add the "us" layout if the system config cannot be determined
+
+Media-keys:
+- Add a precise volume change shortcut
+- Moved video-out and rotate-video bindings to mutter
+- Fix grabbing of previously disabled shortcuts
+
+Orientation:
+- Removed - functionality migrated to mutter
+
+Wacom:
+- Fix touchscreens being assigned the wrong output
+
+XRandR:
+- Removed - functionality migrated to mutter
+
+XSettings:
+- Calculate window scale from configuration state
+
+==============
+Version 3.25.2
+==============
+
+- Avoid initializing gtk+ on plugins that don't need it
+- Avoid loading gtk+ css theme since we don't have UI
+- Several correctness fixes pointed by Coverity
+- Fix for no plugins getting loaded under GDM
+- Mark forgotten strings in gschema files for translation
+- Translation updates
+
+Housekeeping:
+- Ignore GPFS and rootfs mounts
+
+Media-keys:
+- Make calculator key work again
+- Fix a few memory leaks
+- Changed MediaKeys D-Bus API to match API docs
+- Add support for new XF86RFKill keysym
+- Show OSD on hardware keyboard brightness changes
+
+Power:
+- Choose correct backlight device on laptops with hybrid graphics
+- Handle hardware keyboard brightness changes
+
+RFKill:
+- Disable the kernel's handling of rfkill events when the session is active
+
+==============
+Version 3.24.0
+==============
+
+- Work-around possible deadlocks on startup
+- Translation updates
+
+===============
+Version 3.23.92
+===============
+
+Color:
+- Smooth the transition between different temperature values
+- Translation updates
+
+===============
+Version 3.23.90
+===============
+
+Color:
+- Add interface to support "Night Light" functionality
+
+Media-keys:
+- Fix a number of race conditions in shortcuts grabbing
+
+Power:
+- Free leaked UPower keyboard backlight
+- Fix keyboard backlight problems on some systems
+
+Rfkill:
+- Fix a number of possible race conditions and crashes with
+  slow rfkill devices
+
+Smartcard:
+- Fix a possible crash in smartcard plugin
+
+Wacom:
+- Move most of the Wacom support to mutter, including the OSD
+
+==============
+Version 3.23.3
+==============
+
+Plugins:
+- Fix crash when X is not available
+- Fix compilation failure on some setups
+- Fix warnings on exit
+
+Media-keys:
+- Fix shutdown dialog delay when using kbd shortcut
+
+XSettings:
+- Make Gtk/EnablePrimaryPaste configurable through GSettings
+- Fix large fonts being scanned before they're fully copied
+
+==============
+Version 3.23.2
+==============
+
+- This update requires gnome-session 3.23.2. It splits up
+  gnome-settings-daemon into separate helper daemons, making it
+  easier to root cause possible problems, and paving the way
+  to using systemd to handle the session
+- Remove localeexec wrapper now that gnome-session implements
+  that work-around
+- Loads of build fixes
+
+Color:
+- Require lcms2 2.2
+
 Power:
 - Ensure we blank the screen when locked
+- Make power plugin "mock" support a run-time check
 
 Sharing:
 - Fix crash on exit
+
+Sound:
+- Rename the sound plugin for PulseAudio
 
 Wacom:
 - Avoid warnings when switching VTs

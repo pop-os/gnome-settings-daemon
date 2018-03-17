@@ -37,18 +37,20 @@
 #include <libgnome-desktop/gnome-idle-monitor.h>
 
 #include <gsd-input-helper.h>
-#include <gsd-device-mapper.h>
 
 #include "gsd-power-constants.h"
 #include "gsm-inhibitor-flag.h"
 #include "gsm-presence-flag.h"
 #include "gsm-manager-logout-mode.h"
 #include "gpm-common.h"
-#include "gnome-settings-plugin.h"
 #include "gnome-settings-profile.h"
 #include "gnome-settings-bus.h"
 #include "gsd-enums.h"
 #include "gsd-power-manager.h"
+
+#define GSD_DBUS_NAME "org.gnome.SettingsDaemon"
+#define GSD_DBUS_PATH "/org/gnome/SettingsDaemon"
+#define GSD_DBUS_BASE_INTERFACE "org.gnome.SettingsDaemon"
 
 #define UPOWER_DBUS_NAME                        "org.freedesktop.UPower"
 #define UPOWER_DBUS_PATH                        "/org/freedesktop/UPower"
@@ -57,7 +59,6 @@
 #define UPOWER_DBUS_INTERFACE_KBDBACKLIGHT      "org.freedesktop.UPower.KbdBacklight"
 
 #define GSD_POWER_SETTINGS_SCHEMA               "org.gnome.settings-daemon.plugins.power"
-#define GSD_XRANDR_SETTINGS_SCHEMA              "org.gnome.settings-daemon.plugins.xrandr"
 
 #define GSD_POWER_DBUS_NAME                     GSD_DBUS_NAME ".Power"
 #define GSD_POWER_DBUS_PATH                     GSD_DBUS_PATH "/Power"
@@ -106,6 +107,10 @@ static const gchar introspection_xml[] =
 "    <method name='Toggle'>"
 "      <arg type='i' name='new_percentage' direction='out'/>"
 "    </method>"
+"    <signal name='BrightnessChanged'>"
+"      <arg name='brightness' type='i'/>"
+"      <arg name='source' type='s'/>"
+"    </signal>"
 "  </interface>"
 "</node>";
 
@@ -125,13 +130,12 @@ struct GsdPowerManagerPrivate
         guint                    name_id;
         GDBusNodeInfo           *introspection_data;
         GDBusConnection         *connection;
-        GCancellable            *bus_cancellable;
+        GCancellable            *cancellable;
 
         /* Settings */
         GSettings               *settings;
         GSettings               *settings_bus;
         GSettings               *settings_screensaver;
-        GSettings               *settings_xrandr;
 
         /* Screensaver */
         GsdScreenSaver          *screensaver_proxy;
@@ -157,7 +161,7 @@ struct GsdPowerManagerPrivate
         gint                     pre_dim_brightness; /* level, not percentage */
 
         /* Keyboard */
-        GDBusProxy              *upower_kdb_proxy;
+        GDBusProxy              *upower_kbd_proxy;
         gint                     kbd_brightness_now;
         gint                     kbd_brightness_max;
         gint                     kbd_brightness_old;
@@ -989,7 +993,7 @@ iio_proxy_claim_light (GsdPowerManager *manager, gboolean active)
                 return;
         if (!manager->priv->backlight_available)
                 return;
-	if (active != manager->priv->session_is_active)
+	if (active && !manager->priv->session_is_active)
 		return;
 
         if (!g_dbus_proxy_call_sync (manager->priv->iio_proxy,
@@ -1125,16 +1129,16 @@ upower_kbd_set_brightness (GsdPowerManager *manager, guint value, GError **error
         /* same as before */
         if (manager->priv->kbd_brightness_now == value)
                 return TRUE;
-        if (manager->priv->upower_kdb_proxy == NULL)
+        if (manager->priv->upower_kbd_proxy == NULL)
                 return TRUE;
 
         /* update h/w value */
-        retval = g_dbus_proxy_call_sync (manager->priv->upower_kdb_proxy,
+        retval = g_dbus_proxy_call_sync (manager->priv->upower_kbd_proxy,
                                          "SetBrightness",
                                          g_variant_new ("(i)", (gint) value),
                                          G_DBUS_CALL_FLAGS_NONE,
                                          -1,
-                                         NULL,
+                                         manager->priv->cancellable,
                                          error);
         if (retval == NULL)
                 return FALSE;
@@ -1183,13 +1187,7 @@ upower_kbd_toggle (GsdPowerManager *manager,
 static gboolean
 suspend_on_lid_close (GsdPowerManager *manager)
 {
-        GsdXrandrBootBehaviour val;
-
-        if (!external_monitor_is_connected (manager->priv->rr_screen))
-                return TRUE;
-
-        val = g_settings_get_enum (manager->priv->settings_xrandr, "default-monitors-setup");
-        return val == GSD_XRANDR_BOOT_BEHAVIOUR_DO_NOTHING;
+        return !external_monitor_is_connected (manager->priv->rr_screen);
 }
 
 static gboolean
@@ -1361,7 +1359,8 @@ idle_watch_id_to_string (GsdPowerManager *manager, guint id)
 static void
 backlight_iface_emit_changed (GsdPowerManager *manager,
                               const char      *interface_name,
-                              gint32           value)
+                              gint32           value,
+                              const char      *source)
 {
         GVariant *params;
 
@@ -1377,6 +1376,17 @@ backlight_iface_emit_changed (GsdPowerManager *manager,
                                        "org.freedesktop.DBus.Properties",
                                        "PropertiesChanged",
                                        params, NULL);
+
+        if (!source)
+                return;
+
+        g_dbus_connection_emit_signal (manager->priv->connection,
+                                       NULL,
+                                       GSD_POWER_DBUS_PATH,
+                                       GSD_POWER_DBUS_INTERFACE_KEYBOARD,
+                                       "BrightnessChanged",
+                                       g_variant_new ("(is)", value, source),
+                                       NULL);
 }
 
 static gboolean
@@ -1437,7 +1447,7 @@ kbd_backlight_dim (GsdPowerManager *manager,
         gint max;
         gint now;
 
-        if (manager->priv->upower_kdb_proxy == NULL)
+        if (manager->priv->upower_kbd_proxy == NULL)
                 return TRUE;
 
         now = manager->priv->kbd_brightness_now;
@@ -1456,6 +1466,35 @@ kbd_backlight_dim (GsdPowerManager *manager,
         /* save for undim */
         manager->priv->kbd_brightness_pre_dim = now;
         return TRUE;
+}
+
+static void
+upower_kbd_proxy_signal_cb (GDBusProxy  *proxy,
+                            const gchar *sender_name,
+                            const gchar *signal_name,
+                            GVariant    *parameters,
+                            gpointer     user_data)
+{
+        GsdPowerManager *manager = GSD_POWER_MANAGER (user_data);
+        gint brightness, percentage;
+        const gchar *source;
+
+        if (g_strcmp0 (signal_name, "BrightnessChangedWithSource") != 0)
+                return;
+
+        g_variant_get (parameters, "(i&s)", &brightness, &source);
+
+        /* Ignore changes caused by us calling UPower's SetBrightness method,
+         * we already call backlight_iface_emit_changed for these after the
+         * SetBrightness method call completes. */
+        if (g_strcmp0 (source, "external") == 0)
+                return;
+
+        manager->priv->kbd_brightness_now = brightness;
+        percentage = ABS_TO_PERCENTAGE (0,
+                                        manager->priv->kbd_brightness_max,
+                                        manager->priv->kbd_brightness_now);
+        backlight_iface_emit_changed (manager, GSD_POWER_DBUS_INTERFACE_KEYBOARD, percentage, source);
 }
 
 static gboolean
@@ -1545,7 +1584,7 @@ idle_set_mode (GsdPowerManager *manager, GsdPowerIdleMode mode)
                 backlight_disable (manager);
 
                 /* only toggle keyboard if present and not already toggled */
-                if (manager->priv->upower_kdb_proxy &&
+                if (manager->priv->upower_kbd_proxy &&
                     manager->priv->kbd_brightness_old == -1) {
                         if (upower_kbd_toggle (manager, &error) < 0) {
                                 g_warning ("failed to turn the kbd backlight off: %s",
@@ -1587,7 +1626,7 @@ idle_set_mode (GsdPowerManager *manager, GsdPowerIdleMode mode)
                 }
 
                 /* only toggle keyboard if present and already toggled off */
-                if (manager->priv->upower_kdb_proxy &&
+                if (manager->priv->upower_kbd_proxy &&
                     manager->priv->kbd_brightness_old != -1) {
                         if (upower_kbd_toggle (manager, &error) < 0) {
                                 g_warning ("failed to turn the kbd backlight on: %s",
@@ -1705,9 +1744,10 @@ idle_configure (GsdPowerManager *manager)
                                            "sleep-inactive-battery-type" : "sleep-inactive-ac-type");
         timeout_sleep = 0;
         if (!is_action_inhibited (manager, action_type)) {
-                timeout_sleep = g_settings_get_int (manager->priv->settings, on_battery ?
-                                                    "sleep-inactive-battery-timeout" : "sleep-inactive-ac-timeout");
-                timeout_sleep = CLAMP(timeout_sleep, 0, G_MAXINT);
+                gint timeout_sleep_;
+                timeout_sleep_ = g_settings_get_int (manager->priv->settings, on_battery ?
+                                                     "sleep-inactive-battery-timeout" : "sleep-inactive-ac-timeout");
+                timeout_sleep = CLAMP (timeout_sleep_, 0, G_MAXINT);
         }
 
         clear_idle_watch (manager->priv->idle_monitor,
@@ -1894,6 +1934,8 @@ gsd_power_manager_class_init (GsdPowerManagerClass *klass)
 
         object_class->finalize = gsd_power_manager_finalize;
 
+        notify_init ("gnome-settings-daemon");
+
         g_type_class_add_private (klass, sizeof (GsdPowerManagerPrivate));
 }
 
@@ -1946,21 +1988,26 @@ power_keyboard_proxy_ready_cb (GObject             *source_object,
         GVariant *k_max = NULL;
         GError *error = NULL;
         GsdPowerManager *manager = GSD_POWER_MANAGER (user_data);
+        gint percentage;
 
-        manager->priv->upower_kdb_proxy = g_dbus_proxy_new_for_bus_finish (res, &error);
-        if (manager->priv->upower_kdb_proxy == NULL) {
+        manager->priv->upower_kbd_proxy = g_dbus_proxy_new_for_bus_finish (res, &error);
+        if (manager->priv->upower_kbd_proxy == NULL) {
                 g_warning ("Could not connect to UPower: %s",
                            error->message);
                 g_error_free (error);
                 goto out;
         }
 
-        k_now = g_dbus_proxy_call_sync (manager->priv->upower_kdb_proxy,
+        g_signal_connect (manager->priv->upower_kbd_proxy, "g-signal",
+                          G_CALLBACK (upower_kbd_proxy_signal_cb),
+                          manager);
+
+        k_now = g_dbus_proxy_call_sync (manager->priv->upower_kbd_proxy,
                                         "GetBrightness",
                                         NULL,
                                         G_DBUS_CALL_FLAGS_NONE,
                                         -1,
-                                        NULL,
+                                        manager->priv->cancellable,
                                         &error);
         if (k_now == NULL) {
                 if (error->domain != G_DBUS_ERROR ||
@@ -1969,18 +2016,18 @@ power_keyboard_proxy_ready_cb (GObject             *source_object,
                                    error->message);
                 } else {
                         /* Keyboard brightness is not available */
-                        g_clear_object (&manager->priv->upower_kdb_proxy);
+                        g_clear_object (&manager->priv->upower_kbd_proxy);
                 }
                 g_error_free (error);
                 goto out;
         }
 
-        k_max = g_dbus_proxy_call_sync (manager->priv->upower_kdb_proxy,
+        k_max = g_dbus_proxy_call_sync (manager->priv->upower_kbd_proxy,
                                         "GetMaxBrightness",
                                         NULL,
                                         G_DBUS_CALL_FLAGS_NONE,
                                         -1,
-                                        NULL,
+                                        manager->priv->cancellable,
                                         &error);
         if (k_max == NULL) {
                 g_warning ("Failed to get max brightness: %s", error->message);
@@ -2008,7 +2055,10 @@ power_keyboard_proxy_ready_cb (GObject             *source_object,
 
         /* Tell the front-end that the brightness changed from
          * its default "-1/no keyboard backlight available" default */
-        backlight_iface_emit_changed (manager, GSD_POWER_DBUS_INTERFACE_KEYBOARD, manager->priv->kbd_brightness_now);
+        percentage = ABS_TO_PERCENTAGE (0,
+                                        manager->priv->kbd_brightness_max,
+                                        manager->priv->kbd_brightness_now);
+        backlight_iface_emit_changed (manager, GSD_POWER_DBUS_INTERFACE_KEYBOARD, percentage, "initial value");
 
 out:
         if (k_now != NULL)
@@ -2393,13 +2443,10 @@ on_rr_screen_acquired (GObject      *object,
         /* check whether a backlight is available */
         manager->priv->backlight_available = backlight_available (manager->priv->rr_screen);
 
-        /* ensure the default dpms timeouts are cleared */
-        backlight_enable (manager);
-
+        /* Set up a delay inhibitor to be informed about suspend attempts */
         g_signal_connect (manager->priv->logind_proxy, "g-signal",
                           G_CALLBACK (logind_proxy_signal_cb),
                           manager);
-        /* Set up a delay inhibitor to be informed about suspend attempts */
         inhibit_suspend (manager);
 
         /* track the active session */
@@ -2456,6 +2503,9 @@ on_rr_screen_acquired (GObject      *object,
         engine_coldplug (manager);
         idle_configure (manager);
 
+        /* ensure the default dpms timeouts are cleared */
+        backlight_enable (manager);
+
         manager->priv->xscreensaver_watchdog_timer_id = gsd_power_enable_screensaver_watchdog ();
 
         /* don't blank inside a VM */
@@ -2470,9 +2520,9 @@ on_rr_screen_acquired (GObject      *object,
         if (manager->priv->backlight_available) {
                 manager->priv->ambient_percentage_old = backlight_get_percentage (manager->priv->rr_screen, NULL);
                 backlight_iface_emit_changed (manager, GSD_POWER_DBUS_INTERFACE_SCREEN,
-                                              manager->priv->ambient_percentage_old);
+                                              manager->priv->ambient_percentage_old, NULL);
         } else {
-                backlight_iface_emit_changed (manager, GSD_POWER_DBUS_INTERFACE_SCREEN, -1);
+                backlight_iface_emit_changed (manager, GSD_POWER_DBUS_INTERFACE_SCREEN, -1, NULL);
         }
 
         gnome_settings_profile_end (NULL);
@@ -2500,7 +2550,7 @@ iio_proxy_changed (GsdPowerManager *manager)
         if (val_has == NULL || !g_variant_get_boolean (val_has))
                 goto out;
         val_als = g_dbus_proxy_get_cached_property (manager->priv->iio_proxy, "LightLevel");
-        if (val_als == NULL)
+        if (val_als == NULL || g_variant_get_double (val_als) == 0.0)
                 goto out;
         manager->priv->ambient_last_absolute = g_variant_get_double (val_als);
         g_debug ("Read last absolute light level: %f", manager->priv->ambient_last_absolute);
@@ -2618,7 +2668,6 @@ gsd_power_manager_start (GsdPowerManager *manager,
         manager->priv->settings = g_settings_new (GSD_POWER_SETTINGS_SCHEMA);
         manager->priv->settings_screensaver = g_settings_new ("org.gnome.desktop.screensaver");
         manager->priv->settings_bus = g_settings_new ("org.gnome.desktop.session");
-        manager->priv->settings_xrandr = g_settings_new (GSD_XRANDR_SETTINGS_SCHEMA);
 
         /* setup ambient light support */
         manager->priv->iio_proxy_watch_id =
@@ -2650,16 +2699,12 @@ gsd_power_manager_stop (GsdPowerManager *manager)
                 manager->priv->inhibit_lid_switch_timer_id = 0;
         }
 
-        if (manager->priv->bus_cancellable != NULL) {
-                g_cancellable_cancel (manager->priv->bus_cancellable);
-                g_object_unref (manager->priv->bus_cancellable);
-                manager->priv->bus_cancellable = NULL;
+        if (manager->priv->cancellable != NULL) {
+                g_cancellable_cancel (manager->priv->cancellable);
+                g_clear_object (&manager->priv->cancellable);
         }
 
-        if (manager->priv->introspection_data) {
-                g_dbus_node_info_unref (manager->priv->introspection_data);
-                manager->priv->introspection_data = NULL;
-        }
+        g_clear_pointer (&manager->priv->introspection_data, g_dbus_node_info_unref);
 
         if (manager->priv->up_client)
                 g_signal_handlers_disconnect_by_data (manager->priv->up_client, manager);
@@ -2687,10 +2732,7 @@ gsd_power_manager_stop (GsdPowerManager *manager)
         g_clear_object (&manager->priv->logind_proxy);
         g_clear_object (&manager->priv->rr_screen);
 
-        if (manager->priv->devices_array != NULL) {
-                g_ptr_array_unref (manager->priv->devices_array);
-                manager->priv->devices_array = NULL;
-        }
+        g_clear_pointer (&manager->priv->devices_array, g_ptr_array_unref);
         g_clear_object (&manager->priv->device_composite);
 
         g_clear_object (&manager->priv->screensaver_proxy);
@@ -2698,6 +2740,7 @@ gsd_power_manager_stop (GsdPowerManager *manager)
         play_loop_stop (&manager->priv->critical_alert_timeout_id);
 
         g_clear_object (&manager->priv->idle_monitor);
+        g_clear_object (&manager->priv->upower_kbd_proxy);
 
         if (manager->priv->xscreensaver_watchdog_timer_id > 0) {
                 g_source_remove (manager->priv->xscreensaver_watchdog_timer_id);
@@ -2711,7 +2754,7 @@ gsd_power_manager_init (GsdPowerManager *manager)
         manager->priv = GSD_POWER_MANAGER_GET_PRIVATE (manager);
         manager->priv->inhibit_lid_switch_fd = -1;
         manager->priv->inhibit_suspend_fd = -1;
-        manager->priv->bus_cancellable = g_cancellable_new ();
+        manager->priv->cancellable = g_cancellable_new ();
         manager->priv->disabled_devices = g_hash_table_new (g_direct_hash, g_direct_equal);
 }
 
@@ -2753,7 +2796,7 @@ handle_method_call_keyboard (GsdPowerManager *manager,
         if (!ret) {
                 g_dbus_method_invocation_take_error (invocation,
                                                      error);
-                backlight_iface_emit_changed (manager, GSD_POWER_DBUS_INTERFACE_KEYBOARD, -1);
+                backlight_iface_emit_changed (manager, GSD_POWER_DBUS_INTERFACE_KEYBOARD, -1, method_name);
         } else {
                 percentage = ABS_TO_PERCENTAGE (0,
                                                 manager->priv->kbd_brightness_max,
@@ -2761,7 +2804,7 @@ handle_method_call_keyboard (GsdPowerManager *manager,
                 g_dbus_method_invocation_return_value (invocation,
                                                        g_variant_new ("(i)",
                                                                       percentage));
-                backlight_iface_emit_changed (manager, GSD_POWER_DBUS_INTERFACE_KEYBOARD, percentage);
+                backlight_iface_emit_changed (manager, GSD_POWER_DBUS_INTERFACE_KEYBOARD, percentage, method_name);
         }
 }
 
@@ -2785,11 +2828,11 @@ handle_method_call_screen (GsdPowerManager *manager,
         if (g_strcmp0 (method_name, "StepUp") == 0) {
                 g_debug ("screen step up");
                 value = backlight_step_up (manager->priv->rr_screen, &error);
-                backlight_iface_emit_changed (manager, GSD_POWER_DBUS_INTERFACE_SCREEN, value);
+                backlight_iface_emit_changed (manager, GSD_POWER_DBUS_INTERFACE_SCREEN, value, NULL);
         } else if (g_strcmp0 (method_name, "StepDown") == 0) {
                 g_debug ("screen step down");
                 value = backlight_step_down (manager->priv->rr_screen, &error);
-                backlight_iface_emit_changed (manager, GSD_POWER_DBUS_INTERFACE_SCREEN, value);
+                backlight_iface_emit_changed (manager, GSD_POWER_DBUS_INTERFACE_SCREEN, value, NULL);
         } else {
                 g_assert_not_reached ();
         }
@@ -2866,7 +2909,9 @@ handle_get_property_other (GsdPowerManager *manager,
                 value = backlight_get_percentage (manager->priv->rr_screen, NULL);
                 retval = g_variant_new_int32 (value);
         } else if (g_strcmp0 (interface_name, GSD_POWER_DBUS_INTERFACE_KEYBOARD) == 0) {
-                value = manager->priv->kbd_brightness_now;
+                value = ABS_TO_PERCENTAGE (0,
+                                           manager->priv->kbd_brightness_max,
+                                           manager->priv->kbd_brightness_now);
                 retval =  g_variant_new_int32 (value);
         }
 
@@ -2923,7 +2968,7 @@ handle_set_property_other (GsdPowerManager *manager,
         if (g_strcmp0 (interface_name, GSD_POWER_DBUS_INTERFACE_SCREEN) == 0) {
                 g_variant_get (value, "i", &brightness_value);
                 if (backlight_set_percentage (manager->priv->rr_screen, &brightness_value, error)) {
-                        backlight_iface_emit_changed (manager, GSD_POWER_DBUS_INTERFACE_SCREEN, brightness_value);
+                        backlight_iface_emit_changed (manager, GSD_POWER_DBUS_INTERFACE_SCREEN, brightness_value, NULL);
 
                         /* ambient brightness no longer valid */
                         manager->priv->ambient_percentage_old = brightness_value;
@@ -2939,7 +2984,10 @@ handle_set_property_other (GsdPowerManager *manager,
                 brightness_value = PERCENTAGE_TO_ABS (0, manager->priv->kbd_brightness_max,
                                                       brightness_value);
                 if (upower_kbd_set_brightness (manager, brightness_value, error)) {
-                        backlight_iface_emit_changed (manager, GSD_POWER_DBUS_INTERFACE_KEYBOARD, brightness_value);
+                        brightness_value = ABS_TO_PERCENTAGE (0,
+                                                              manager->priv->kbd_brightness_max,
+                                                              manager->priv->kbd_brightness_now);
+                        backlight_iface_emit_changed (manager, GSD_POWER_DBUS_INTERFACE_KEYBOARD, brightness_value, "set property");
                         return TRUE;
                 } else {
                         g_set_error (error, G_DBUS_ERROR, G_DBUS_ERROR_FAILED,
@@ -3036,7 +3084,7 @@ register_manager_dbus (GsdPowerManager *manager)
         g_assert (manager->priv->introspection_data != NULL);
 
         g_bus_get (G_BUS_TYPE_SESSION,
-                   manager->priv->bus_cancellable,
+                   manager->priv->cancellable,
                    (GAsyncReadyCallback) on_bus_gotten,
                    manager);
 }

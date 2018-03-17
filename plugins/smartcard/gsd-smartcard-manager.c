@@ -23,7 +23,6 @@
 #include <glib.h>
 #include <gio/gio.h>
 
-#include "gnome-settings-plugin.h"
 #include "gnome-settings-profile.h"
 #include "gnome-settings-bus.h"
 #include "gsd-smartcard-manager.h"
@@ -190,7 +189,7 @@ watch_one_event_from_driver (GsdSmartcardManager       *self,
 
         g_cancellable_disconnect (cancellable, handler_id);
 
-        if (g_cancellable_is_cancelled (cancellable)) {
+        if (g_cancellable_set_error_if_cancelled (cancellable, error)) {
                 g_warning ("smartcard event function cancelled");
                 return FALSE;
         }
@@ -512,7 +511,9 @@ try_to_complete_all_drivers_activation (GTask *task)
         if (operation->activated_drivers_count > 0)
                 g_task_return_boolean (task, TRUE);
         else
-                g_task_return_boolean (task, FALSE);
+                g_task_return_new_error (task, GSD_SMARTCARD_MANAGER_ERROR,
+                                         GSD_SMARTCARD_MANAGER_ERROR_NO_DRIVERS,
+                                         "No smartcards exist to be activated.");
 
         g_object_unref (task);
 }
@@ -582,6 +583,8 @@ activate_all_drivers_async (GsdSmartcardManager *self,
         try_to_complete_all_drivers_activation (task);
 }
 
+/* Will error with %GSD_SMARTCARD_MANAGER_ERROR_NO_DRIVERS if there were no
+ * drivers to activate.. */
 static gboolean
 activate_all_drivers_async_finish (GsdSmartcardManager  *self,
                                    GAsyncResult         *result,

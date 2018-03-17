@@ -1561,9 +1561,9 @@ update_sink (GvcMixerControl    *control,
                         if (gvc_mixer_ui_device_get_stream_id (dev) == gvc_mixer_stream_get_id (stream)) {
                                 g_debug ("Looks like we profile swapped on a non server default sink");
                                 gvc_mixer_control_set_default_sink (control, stream);
+                                control->priv->profile_swapping_device_id = GVC_MIXER_UI_DEVICE_INVALID;
                         }
                 }
-                control->priv->profile_swapping_device_id = GVC_MIXER_UI_DEVICE_INVALID;
         }
 
         if (control->priv->default_sink_name != NULL
@@ -1679,11 +1679,11 @@ update_source (GvcMixerControl      *control,
                 if (dev != NULL) {
                         /* now check to make sure this new stream is the same stream just matched and set on the device object */
                         if (gvc_mixer_ui_device_get_stream_id (dev) == gvc_mixer_stream_get_id (stream)) {
-                                g_debug ("Looks like we profile swapped on a non server default sink");
+                                g_debug ("Looks like we profile swapped on a non server default source");
                                 gvc_mixer_control_set_default_source (control, stream);
+                                control->priv->profile_swapping_device_id = GVC_MIXER_UI_DEVICE_INVALID;
                         }
                 }
-                control->priv->profile_swapping_device_id = GVC_MIXER_UI_DEVICE_INVALID;
         }
         if (control->priv->default_source_name != NULL
             && info->name != NULL
@@ -1955,7 +1955,7 @@ create_ui_device_from_port (GvcMixerControl* control,
 
         g_hash_table_insert (is_card_port_an_output (port) ? control->priv->ui_outputs : control->priv->ui_inputs,
                              GUINT_TO_POINTER (gvc_mixer_ui_device_get_id (uidevice)),
-                             g_object_ref (uidevice));
+                             uidevice);
 
 
         if (available) {
@@ -2478,7 +2478,7 @@ update_card (GvcMixerControl      *control,
         if (is_new) {
                 g_hash_table_insert (control->priv->cards,
                                      GUINT_TO_POINTER (info->index),
-                                     g_object_ref (card));
+                                     card);
         }
 
         card_ports = gvc_mixer_card_get_ports (card);
