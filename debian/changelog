@@ -1,3 +1,10 @@
+gnome-settings-daemon (3.28.0-0ubuntu2) UNRELEASED; urgency=medium
+
+  * debian/patches/ubuntu_ibus_configs.patch:
+    - libpinyin instead of sunpinyin for zh_CN (LP: #1756205)
+
+ -- Gunnar Hjalmarsson <gunnarhj@ubuntu.com>  Sun, 25 Mar 2018 05:16:00 +0100
+
 gnome-settings-daemon (3.28.0-0ubuntu1) bionic; urgency=medium
 
   * New upstream release
