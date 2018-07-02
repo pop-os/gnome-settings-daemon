@@ -1,3 +1,352 @@
+gnome-settings-daemon (3.28.0-0ubuntu2) bionic; urgency=medium
+
+  * debian/patches/ubuntu_ibus_configs.patch:
+    - libpinyin instead of sunpinyin for zh_CN (LP: #1756205)
+
+ -- Gunnar Hjalmarsson <gunnarhj@ubuntu.com>  Sun, 25 Mar 2018 05:16:00 +0100
+
+gnome-settings-daemon (3.28.0-0ubuntu1) bionic; urgency=medium
+
+  * New upstream release
+
+ -- Jeremy Bicha <jbicha@ubuntu.com>  Tue, 13 Mar 2018 21:28:18 -0400
+
+gnome-settings-daemon (3.27.92-0ubuntu1) bionic; urgency=medium
+
+  * New upstream release candidate
+  * Drop git-power-fix-divide-by-0.patch: Applied in new release
+
+ -- Jeremy Bicha <jbicha@ubuntu.com>  Mon, 05 Mar 2018 11:31:47 -0500
+
+gnome-settings-daemon (3.27.91-0ubuntu1) bionic; urgency=medium
+
+  [ Jeremy Bicha ]
+  * New upstream development release
+  * Update Breaks for dropped plugin in new release
+  * Build with meson
+  * Bump minimum libglib2.0-dev to 2.53.0
+  * Build-Depend on policykit-1 for its files
+  * maintscript: rm obsolete org.gnome.SettingsDaemon.A11yKeyboard autostart
+    file
+  * Refresh patches
+  * Disable build tests since they require installed gsettings schemas
+
+  [ Tim Lunn]
+  * d/p/git-power-fix-divide-by-0.patch:
+    Cherry-pick patch which should fix the gsd-power crash for systems
+    with no backlit keyboard. (LP: #1751956)
+
+ -- Tim Lunn <tim@feathertop.org>  Mon, 05 Mar 2018 23:19:43 +1100
+
+gnome-settings-daemon (3.26.2-0ubuntu3) bionic; urgency=medium
+
+  * No-change rebuild against latest gnome-desktop3
+
+ -- Jeremy Bicha <jbicha@ubuntu.com>  Fri, 16 Feb 2018 06:54:07 -0500
+
+gnome-settings-daemon (3.26.2-0ubuntu2) bionic; urgency=medium
+
+  * No-change rebuild against latest libgweather
+
+ -- Jeremy Bicha <jbicha@ubuntu.com>  Thu, 15 Feb 2018 06:58:03 -0500
+
+gnome-settings-daemon (3.26.2-0ubuntu1) bionic; urgency=medium
+
+  * New upstream release (LP: #1731099)
+    - Fix Empty Trash button in Setting > Privacy (LP: #1721927)
+
+ -- Jeremy Bicha <jbicha@ubuntu.com>  Wed, 08 Nov 2017 21:16:10 -0500
+
+gnome-settings-daemon (3.26.1-0ubuntu5) artful; urgency=medium
+
+  * debian/patches/ubuntu_ibus_configs.patch:
+     - configure sources only when there is none, that code is meant to be
+       used on first login only, the issue was due to a merge error in the 
+       recent changes, thanks Mitsuya Shibata for pointing the error
+       (lp: #1723358)
+
+ -- Sebastien Bacher <seb128@ubuntu.com>  Fri, 13 Oct 2017 13:07:31 +0200
+
+gnome-settings-daemon (3.26.1-0ubuntu4) artful; urgency=medium
+
+  * debian/patches/ubuntu-lid-close-suspend.patch:
+    - restore the patch for the schemas part (and delete the code), 
+      those keys are used by unity-settings-daemon (lp: #1722920)
+
+ -- Sebastien Bacher <seb128@ubuntu.com>  Thu, 12 Oct 2017 16:45:31 +0200
+
+gnome-settings-daemon (3.26.1-0ubuntu3) artful; urgency=medium
+
+  * debian/patches/ubuntu-lid-close-suspend.patch:
+    - comment that old Ubuntu patch, it's buggy and creating issues like
+      laptops suspending when logging in while docked with the lid closed
+      (lp: #1716160)
+  * debian/patches/ubuntu_ibus_configs.patch:
+    - use sunpinyin instead of pinyin for zh_CN since that's the ibus
+      component which is preinstall nowadays
+
+  [ Ikuya Awashiro ]
+  * debian/patches/ubuntu_ibus_configs.patch: use mozc-jp instead of anthy
+    for Japanese. ibus-anthy is not installed by default anymore.
+    (lp: #1722681)
+
+ -- Sebastien Bacher <seb128@ubuntu.com>  Wed, 11 Oct 2017 13:57:31 +0200
+
+gnome-settings-daemon (3.26.1-0ubuntu2) artful; urgency=medium
+
+  * debian/patches/ubuntu_ibus_configs.patch: restore the code that 
+    configure the input method according to the locale, upstream removed it 
+    because they use gnome-intial-setup but we don't
+
+ -- Sebastien Bacher <seb128@ubuntu.com>  Mon, 09 Oct 2017 11:27:09 +0200
+
+gnome-settings-daemon (3.26.1-0ubuntu1) artful; urgency=medium
+
+  * New upstream release
+    - Fix a regression in HiDPI support for Xorg session, thanks
+      Andrea Azzarone (LP: #1720150)
+
+ -- Jeremy Bicha <jbicha@ubuntu.com>  Tue, 03 Oct 2017 10:37:26 -0400
+
+gnome-settings-daemon (3.26.0-0ubuntu1) artful; urgency=medium
+
+  * New upstream translations release
+
+ -- Jeremy Bicha <jbicha@ubuntu.com>  Wed, 13 Sep 2017 22:06:20 -0400
+
+gnome-settings-daemon (3.25.92-0ubuntu1) artful; urgency=medium
+
+  * New upstream release
+    - Fix translation of notifications, thanks Sebastien Bacher
+
+ -- Jeremy Bicha <jbicha@ubuntu.com>  Fri, 01 Sep 2017 08:59:29 -0400
+
+gnome-settings-daemon (3.25.91-0ubuntu2) artful; urgency=medium
+
+  * debian/gnome-settings-daemon.maintscript:
+    - Remove obsolete autostart files for Orientation and XRANDR plugins.
+
+ -- Jeremy Bicha <jbicha@ubuntu.com>  Wed, 23 Aug 2017 09:01:04 -0400
+
+gnome-settings-daemon (3.25.91-0ubuntu1) artful; urgency=medium
+
+  [ Jeremy Bicha ]
+  * New upstream release
+    - Orientation and xrandr plugins have been moved to mutter
+    - Bump Breaks for packages that shipped gnome-session files
+      with those plugins as RequiredComponents
+  * debian/gnome-settings-daemon.install:
+    - Don't try to install icons that were used by xrandr plugin
+  * Refresh patches
+  * Drop 04_superP.patch (it was a patch for the xrandr plugin), but move
+    old gsettings key to revert-gsettings-removals.patch for Unity
+  * Add revert-mediakeys-dbus-interface-drop.patch:
+    - Keep old MediaKeys D-Bus interface around since too much stuff
+      still uses it.
+
+  [ Laurent Bigonville ]
+  * debian/rules: Make tests failures fatal on s390x again, the tests were
+    failing because hwdb files included in udev package were not installed,
+    adding a build-dependency against udev fixed the failure.
+
+ -- Jeremy Bicha <jbicha@ubuntu.com>  Tue, 22 Aug 2017 20:28:36 -0400
+
+gnome-settings-daemon (3.24.3-0ubuntu3) artful; urgency=medium
+
+  * Add patch to allow setting volume above 100%:
+    - debian/patches/70_allow_sound_above_100.patch, adapt the patch from
+      ubuntu-settings-daemon to latest g-s-d. (LP: #1706524)
+
+ -- Didier Roche <didrocks@ubuntu.com>  Wed, 16 Aug 2017 08:29:43 +0200
+
+gnome-settings-daemon (3.24.3-0ubuntu2) artful; urgency=medium
+
+  * Make dh_auto_test non-fatal on s390x
+
+ -- Jeremy Bicha <jbicha@ubuntu.com>  Sun, 23 Jul 2017 08:51:45 -0400
+
+gnome-settings-daemon (3.24.3-0ubuntu1) artful; urgency=medium
+
+  * New upstream release
+    - Do Night Light transition more gradually, as intended (LP: #1702722)
+
+ -- Jeremy Bicha <jbicha@ubuntu.com>  Sun, 23 Jul 2017 08:17:51 -0400
+
+gnome-settings-daemon (3.24.2-0ubuntu2) artful; urgency=medium
+
+  * debian/control.in:
+    - Build-Depend on python-dbusmock, python-gi, xauth & xfvb
+  * debian/rules:
+    - Enable build tests using dh_auto_test
+  * Add disable-color-build-test.patch:
+    - Disable the color tests which require compiled gsettings schemas,
+      until they are fixed to work in a clean build environment
+  * Drop the autopkgtest which just ran dh_auto_test
+
+ -- Jeremy Bicha <jbicha@ubuntu.com>  Wed, 17 May 2017 10:33:30 -0400
+
+gnome-settings-daemon (3.24.2-0ubuntu1) artful; urgency=medium
+
+  * New upstream release (LP: #1689610)
+    - Fix brightness control in some dual-GPU computers (LP: #1683445)
+    - Disable GNOME's rfkill handling which basically reverts this to
+      how it worked or didn't in 16.04 LTS. Hopefully, a more thorough
+      rework will be done in time for 3.26.
+  * Drop patches applied in new release:
+    - git_fix-gdm-plugins.patch
+    - media-keys-Fix-mmkeys-D-Bus-API-to-match-API-docs.patch
+
+ -- Jeremy Bicha <jbicha@ubuntu.com>  Tue, 09 May 2017 13:17:44 -0400
+
+gnome-settings-daemon (3.24.1-0ubuntu4) artful; urgency=medium
+
+  * Add autopkgtest to run upstream tests
+
+ -- Jeremy Bicha <jbicha@ubuntu.com>  Thu, 04 May 2017 11:41:54 -0400
+
+gnome-settings-daemon (3.24.1-0ubuntu3) artful; urgency=medium
+
+  * Really add git_fix-gdm-plugins.patch
+  * Add media-keys-Fix-mmkeys-D-Bus-API-to-match-API-docs.patch:
+    Own the D-Bus name that the API documentation tells users of the
+    multimedia keys API they should use (org.gnome.SettingsDaemon.MediaKeys),
+    in addition to the D-Bus name that they actually use in practice
+    (org.gnome.SettingsDaemon). (LP: #1686077)
+
+ -- Jeremy Bicha <jbicha@ubuntu.com>  Tue, 25 Apr 2017 07:55:13 -0400
+
+gnome-settings-daemon (3.24.1-0ubuntu2) artful; urgency=medium
+
+  * Add git_fix-gdm-plugins.patch:
+    - Fix gdm starting with no plugins which broke Hi-DPI support
+      on the login screen (LP: #1685035)
+
+ -- Jeremy Bicha <jbicha@ubuntu.com>  Sat, 22 Apr 2017 09:22:33 -0400
+
+gnome-settings-daemon (3.24.1-0ubuntu1) zesty; urgency=medium
+
+  * New upstream release (LP: #1682132)
+  * Drop git_fix-calculator-key.patch, applied in new release
+
+ -- Jeremy Bicha <jbicha@ubuntu.com>  Wed, 12 Apr 2017 09:34:03 -0400
+
+gnome-settings-daemon (3.24.0-0ubuntu2) zesty; urgency=medium
+
+  * Add git_fix-calculator-key.patch:
+    - Fix Calculator keyboard key with gnome-calculator 3.24
+
+ -- Jeremy Bicha <jbicha@ubuntu.com>  Fri, 24 Mar 2017 19:55:10 -0400
+
+gnome-settings-daemon (3.24.0-0ubuntu1) zesty; urgency=medium
+
+  * New upstream release.
+  * Drop git-workaround-startup-deadlock.patch:
+    - Applied in new release
+
+ -- Jeremy Bicha <jbicha@ubuntu.com>  Mon, 20 Mar 2017 11:01:05 -0400
+
+gnome-settings-daemon (3.23.92-0ubuntu2) zesty; urgency=medium
+
+  * Add git-workaround-startup-deadlock.patch:
+    - Try to fix some some plugins failing to start
+
+ -- Jeremy Bicha <jbicha@ubuntu.com>  Thu, 16 Mar 2017 09:36:47 -0400
+
+gnome-settings-daemon (3.23.92-0ubuntu1) zesty; urgency=medium
+
+  * New upstream release
+
+ -- Jeremy Bicha <jbicha@ubuntu.com>  Wed, 15 Mar 2017 08:58:42 -0400
+
+gnome-settings-daemon (3.23.90-0ubuntu1) zesty; urgency=medium
+
+  * New upstream release
+  * debian/control.in:
+    - Bump minimum glib2.0
+  * Drop upstart scripts
+  * Refresh patches
+  * Add revert-wacom-migration.patch:
+    - Revert migrating wacom schemas to gsettings-desktop-schemas
+      since the old schemas are still used by Unity.
+
+ -- Jeremy Bicha <jbicha@ubuntu.com>  Tue, 14 Feb 2017 15:04:17 -0500
+
+gnome-settings-daemon (3.23.3-0ubuntu1) zesty; urgency=medium
+
+  * New upstream release (LP: #1662647)
+    - gnome-settings-daemon has been split into separate helper daemons
+  * debian/control.in:
+    - Bump minimum gsettings-desktop-schemas
+    - Break old versions of budgie-desktop and gnome-session
+  * debian/gnome-settings-daemon.install
+    - manpage was dropped since there is no g-s-d binary any more
+  * debian/gnome-settings-daemon.links:
+    - Drop because there is no g-s-d binary any more
+  * Drop 43_disable_locale_settings.patch since that code was dropped
+    in new release
+  * Update revert-gsettings-removals.patch:
+    - Restore "active" and "priority" keys still used by Unity
+    - Merge revert_background_dropping.patch into this patch
+    - Don't bother patching the obsolete gconf conversion file any more
+  * Refresh patches
+
+ -- Jeremy Bicha <jbicha@ubuntu.com>  Tue, 07 Feb 2017 18:20:50 -0500
+
+gnome-settings-daemon (3.22.1-0ubuntu2) zesty; urgency=medium
+
+  * debian/gnome-settings-daemon.user-session.upstart:
+    Properly check the value of XDG_CURRENT_DESKTOP, and start for
+    all GNOME-based sessions (not only GNOME Shell).
+    The logic is copied from unity-settings-daemon.
+
+ -- Dmitry Shachnev <mitya57@ubuntu.com>  Sat, 05 Nov 2016 11:23:03 +0300
+
+gnome-settings-daemon (3.22.1-0ubuntu1) yakkety; urgency=medium
+
+  * New upstream bugfix release (LP: #1632428)
+    - Fix crash when sharing plugin exits (LP: #1630853)
+    - Make sure screensaver blanking works when locked while screensaver
+      is inhibited
+
+ -- Jeremy Bicha <jbicha@ubuntu.com>  Tue, 11 Oct 2016 14:31:32 -0400
+
+gnome-settings-daemon (3.22.0-1ubuntu1) yakkety; urgency=medium
+
+  * Merge with Debian (LP: #1620177). Remaining changes:
+    + Split out schemas into gnome-settings-daemon-schemas so
+      unity-settings-daemon can use them
+    + Provide upstart user-session
+    + debian/control.in:
+      - Build-depend on accountsservice
+      - Bump breaks/replaces for moving files to the -schemas pkg
+    + debian/patches:
+       - 05_disable_corner_tapping.patch:
+          Disable corner tapping when disabling tap to click
+       - 43_disable_locale_settings.patch:
+          Don't set locales after sourcing .profile
+       - 45_suppress-printer-may-not-be-connected-notification.patch
+       - 53_sync_input_sources_to_accountsservice.patch
+       - 64_restore_terminal_keyboard_shortcut_schema.patch
+       - correct_logout_action.patch
+          display the logout action on ctrl-alt-del
+       - ubuntu-lid-close-suspend.patch
+          Reimplement support for setting lid close suspend actions
+       - revert_background_dropping.patch
+          Keep gsettings keys background u-s-d needs them
+       - revert-gsettings-removals.patch
+          Revert gsettings keys that were dropped since 3.8, for u-s-d
+    + debian/gnome-settings-daemon.install:
+      - Install apport hook and upstart scripts
+    + debian/gnome-settings-daemon-schemas.install:
+      - Install schemas, translations and the rfkill rule
+    + Don't install gnome-settings-daemon.gsettings-override
+    + debian/rules: 
+      - Dont link with "-Wl,-Bsymbolic-functions",
+        this was causing GType mismatches between plugins using
+        gsd-device-manager (LP: #1427877)
+
+ -- Jeremy Bicha <jbicha@ubuntu.com>  Tue, 27 Sep 2016 02:01:59 -0400
+
 gnome-settings-daemon (3.22.0-1) unstable; urgency=medium
 
   * New upstream release.
