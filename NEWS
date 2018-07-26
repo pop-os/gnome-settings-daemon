@@ -1,13 +1,23 @@
 ==============
-Version 3.28.1
+Version 3.29.0
 ==============
 - Translation updates
+
+Media-keys:
+- Make mic mute key configurable
+- Handle Ctrl+Shift+TouchpadToggle
+- Wait forever for GrabAccelerators to succeed
 
 Datetime:
 - Debugging improvements
 
-Media-keys:
-- Wait forever for GrabAccelerators() to succeed
+Power:
+- Add SuspendAndHibernate
+- Drop X11-specific code to handle idle times
+
+Color:
+- Cancel smooth transitions on color temperature changes
+- Define "disabled until tomorrow" as moving past sunrise
 
 ==============
 Version 3.28.0

@@ -1,6 +1,6 @@
 project(
   'gnome-settings-daemon', 'c',
-  version: '3.28.1',
+  version: '3.29.0',
   license: [ 'GPL2+', 'LGPLv2+' ],
   meson_version: '>= 0.44.0'
 )
@@ -201,7 +201,6 @@ po_dir = join_paths(meson.source_root(), 'po')
 
 top_inc = include_directories('.')
 
-subdir('tests')
 subdir('gnome-settings-daemon')
 subdir('data')
 subdir('plugins')

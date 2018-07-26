@@ -21,14 +21,16 @@
 
 #include "config.h"
 
+#include <glib.h>
 #include <glib-object.h>
 #include <stdlib.h>
-#include <gtk/gtk.h>
 
 #include "gcm-edid.h"
 #include "gsd-color-state.h"
 #include "gsd-night-light.h"
 #include "gsd-night-light-common.h"
+
+GMainLoop *mainloop;
 
 static void
 on_notify (GsdNightLight *nlight,
@@ -37,6 +39,14 @@ on_notify (GsdNightLight *nlight,
 {
         guint *cnt = (guint *) user_data;
         (*cnt)++;
+}
+
+static gboolean
+quit_mainloop (gpointer user_data)
+{
+    g_main_loop_quit (mainloop);
+
+    return FALSE;
 }
 
 static void
@@ -79,6 +89,7 @@ gcm_test_night_light (void)
         /* switch off */
         settings = g_settings_new ("org.gnome.settings-daemon.plugins.color");
         g_settings_set_boolean (settings, "night-light-enabled", FALSE);
+        g_settings_set_uint (settings, "night-light-temperature", 4000);
 
         /* check default values */
         g_assert (!gsd_night_light_get_active (nlight));
@@ -147,7 +158,7 @@ gcm_test_night_light (void)
         g_assert_cmpint (gsd_night_light_get_temperature (nlight), ==, GSD_COLOR_TEMPERATURE_DEFAULT);
         g_assert (!gsd_night_light_get_disabled_until_tmw (nlight));
 
-        /* finally disable, with no changes */
+        /* disable, with no changes */
         g_settings_set_boolean (settings, "night-light-enabled", FALSE);
         g_assert (!gsd_night_light_get_active (nlight));
         g_assert_cmpint (active_cnt, ==, 2);
@@ -155,6 +166,56 @@ gcm_test_night_light (void)
         g_assert_cmpint (sunrise_cnt, ==, 1);
         g_assert_cmpint (temperature_cnt, ==, 4);
         g_assert_cmpint (disabled_until_tmw_cnt, ==, 2);
+
+
+        /* Finally, check that cancelling a smooth transition works */
+        gsd_night_light_set_smooth_enabled (nlight, TRUE);
+        /* Enable night light and automatic scheduling */
+        g_settings_set_boolean (settings, "night-light-schedule-automatic", TRUE);
+        g_settings_set_boolean (settings, "night-light-enabled", TRUE);
+        /* It should be active again, and a smooth transition is being done,
+         * so the color temperature is still the default at this point. */
+        g_assert (gsd_night_light_get_active (nlight));
+        g_assert_cmpint (gsd_night_light_get_temperature (nlight), ==, GSD_COLOR_TEMPERATURE_DEFAULT);
+
+        /* Turn off immediately, before the first timeout event is fired. */
+        g_settings_set_boolean (settings, "night-light-schedule-automatic", FALSE);
+        g_settings_set_boolean (settings, "night-light-enabled", FALSE);
+        g_assert (!gsd_night_light_get_active (nlight));
+
+        /* Now, sleep for a bit (the smooth transition time is 5 seconds) */
+        g_timeout_add (5000, quit_mainloop, NULL);
+        g_main_loop_run (mainloop);
+
+        /* Ensure that the color temperature is still the default one.*/
+        g_assert_cmpint (gsd_night_light_get_temperature (nlight), ==, GSD_COLOR_TEMPERATURE_DEFAULT);
+
+
+        /* Check that disabled until tomorrow resets again correctly. */
+        g_settings_set_double (settings, "night-light-schedule-from", 17.0);
+        g_settings_set_double (settings, "night-light-schedule-to", 7.f);
+        g_settings_set_boolean (settings, "night-light-enabled", TRUE);
+        gsd_night_light_set_disabled_until_tmw (nlight, TRUE);
+
+        /* Move time past midnight */
+        g_clear_pointer (&datetime_override, g_date_time_unref);
+        datetime_override = g_date_time_new_utc (2017, 2, 9, 1, 0, 0);
+        gsd_night_light_set_date_time_now (nlight, datetime_override);
+        g_assert_true (gsd_night_light_get_disabled_until_tmw (nlight));
+
+        /* Move past sunrise */
+        g_clear_pointer (&datetime_override, g_date_time_unref);
+        datetime_override = g_date_time_new_utc (2017, 2, 9, 8, 0, 0);
+        gsd_night_light_set_date_time_now (nlight, datetime_override);
+        g_assert_false (gsd_night_light_get_disabled_until_tmw (nlight));
+
+        gsd_night_light_set_disabled_until_tmw (nlight, TRUE);
+
+        /* Move into night more than 24h in the future */
+        g_clear_pointer (&datetime_override, g_date_time_unref);
+        datetime_override = g_date_time_new_utc (2017, 2, 10, 20, 0, 0);
+        gsd_night_light_set_date_time_now (nlight, datetime_override);
+        g_assert_false (gsd_night_light_get_disabled_until_tmw (nlight));
 }
 
 static void
@@ -281,16 +342,11 @@ gcm_test_frac_day (void)
 int
 main (int argc, char **argv)
 {
-        char *schema_dir;
-
         g_setenv ("GSETTINGS_BACKEND", "memory", TRUE);
 
-        gtk_init (&argc, &argv);
         g_test_init (&argc, &argv, NULL);
 
-        schema_dir = g_test_build_filename (G_TEST_BUILT, "", NULL);
-        g_setenv("GSETTINGS_SCHEMA_DIR", schema_dir, TRUE);
-        g_free (schema_dir);
+        mainloop = g_main_loop_new (g_main_context_default (), FALSE);
 
         g_test_add_func ("/color/edid", gcm_test_edid_func);
         g_test_add_func ("/color/sunset-sunrise", gcm_test_sunset_sunrise);
