@@ -34,6 +34,8 @@ from gi.repository import UPowerGlib
 class PowerPluginTest(gsdtestcase.GSDTestCase):
     '''Test the power plugin'''
 
+    COMMON_SUSPEND_METHODS=['Suspend', 'Hibernate', 'SuspendThenHibernate']
+
     def setUp(self):
         os.environ['GSD_MOCKED']='1'
         self.check_logind_gnome_session()
@@ -50,7 +52,7 @@ class PowerPluginTest(gsdtestcase.GSDTestCase):
             'gnome_screensaver', stdout=subprocess.PIPE)
         gsdtestcase.set_nonblock(self.screensaver.stdout)
 
-        self.session_log_write = open(os.path.join(self.workdir, 'gnome-session.log'), 'wb')
+        self.session_log_write = open(os.path.join(self.workdir, 'gnome-session.log'), 'wb', buffering=0)
         self.session = subprocess.Popen(['gnome-session', '-f',
                                          '-a', os.path.join(self.workdir, 'autostart'),
                                          '--session=dummy', '--debug'],
@@ -67,7 +69,7 @@ class PowerPluginTest(gsdtestcase.GSDTestCase):
                 print('----- session log -----\n%s\n------' % f.read())
             raise
 
-        self.session_log = open(self.session_log_write.name)
+        self.session_log = open(self.session_log_write.name, buffering=0)
 
         self.obj_session_mgr = self.session_bus_con.get_object(
             'org.gnome.SessionManager', '/org/gnome/SessionManager')
@@ -90,7 +92,7 @@ class PowerPluginTest(gsdtestcase.GSDTestCase):
         self.settings_gsd_power = Gio.Settings('org.gnome.settings-daemon.plugins.power')
 
         Gio.Settings.sync()
-        self.plugin_log_write = open(os.path.join(self.workdir, 'plugin_power.log'), 'wb')
+        self.plugin_log_write = open(os.path.join(self.workdir, 'plugin_power.log'), 'wb', buffering=0)
         # avoid painfully long delays of actions for tests
         env = os.environ.copy()
         # Disable the use of the PolicyKit helper for brightness
@@ -106,7 +108,7 @@ class PowerPluginTest(gsdtestcase.GSDTestCase):
             env=env)
 
         # you can use this for reading the current daemon log in tests
-        self.plugin_log = open(self.plugin_log_write.name)
+        self.plugin_log = open(self.plugin_log_write.name, buffering=0)
 
         # wait until plugin is ready
         timeout = 100
@@ -262,11 +264,19 @@ class PowerPluginTest(gsdtestcase.GSDTestCase):
         if log:
             self.assertFalse(b'GsmManager: requesting logout' in log, 'unexpected logout request')
 
-    def check_for_suspend(self, timeout):
-        '''Check that Suspend() or Hibernate() is requested.
+    def check_for_suspend(self, timeout, methods=COMMON_SUSPEND_METHODS):
+        '''Check that one of the given suspend methods are requested. Default
+        methods are Suspend() or Hibernate() but also HibernateThenSuspend()
+        is valid.
 
         Fail after the given timeout.
         '''
+
+        # Create a list of byte string needles to search for
+        needles = [b' {} '.format(m) for m in methods]
+
+        suspended = False
+
         # check that it request suspend
         while timeout > 0:
             time.sleep(1)
@@ -277,10 +287,16 @@ class PowerPluginTest(gsdtestcase.GSDTestCase):
             except IOError:
                 continue
 
-            if log and (b' Suspend ' in log or b' Hibernate ' in log):
+            for n in needles:
+                if n in log:
+                    suspended = True
+                    break
+
+            if suspended:
                 break
-        else:
-            self.fail('timed out waiting for logind Suspend() call')
+
+        if not suspended:
+            self.fail('timed out waiting for logind suspend call, methods: %s' % ', '.join(methods))
 
     def check_for_lid_inhibited(self, timeout=0):
         '''Check that the lid inhibitor has been added.
@@ -310,16 +326,21 @@ class PowerPluginTest(gsdtestcase.GSDTestCase):
         if 'uninhibiting lid close' in log:
             self.fail('lid uninhibit should not have happened')
 
-    def check_no_suspend(self, seconds):
+    def check_no_suspend(self, seconds, methods=COMMON_SUSPEND_METHODS):
         '''Check that no Suspend or Hibernate is requested in the given time'''
 
         # wait for specified time to ensure it didn't do anything
         time.sleep(seconds)
         # check that it did not suspend or hibernate
-        log = self.logind.stdout.read()
-        if log:
-            self.assertFalse(b' Suspend' in log, 'unexpected Suspend request')
-            self.assertFalse(b' Hibernate' in log, 'unexpected Hibernate request')
+        try:
+            log = self.logind.stdout.read()
+        except IOError:
+            return
+
+        for m in methods:
+            needle = b' {} '.format(m)
+
+            self.assertFalse(needle in log, 'unexpected %s request' % m)
 
     def check_suspend_no_hibernate(self, seconds):
         '''Check that Suspend was requested and not Hibernate, in the given time'''
@@ -524,6 +545,8 @@ class PowerPluginTest(gsdtestcase.GSDTestCase):
         # Raise the idle delay, and see that we stop being idle
         # and get idle again after the timeout
         self.settings_session['idle-delay'] = 10
+        # Resolve possible race condition, see also https://gitlab.gnome.org/GNOME/mutter/issues/113
+        time.sleep(0.2)
         self.reset_idle_timer()
         time.sleep(5)
         self.assertEqual(self.get_status(), gsdpowerenums.GSM_PRESENCE_STATUS_AVAILABLE)
@@ -532,6 +555,8 @@ class PowerPluginTest(gsdtestcase.GSDTestCase):
 
         # Lower the delay again, and see that we get idle as we should
         self.settings_session['idle-delay'] = 5
+        # Resolve possible race condition, see also https://gitlab.gnome.org/GNOME/mutter/issues/113
+        time.sleep(0.2)
         self.reset_idle_timer()
         time.sleep(2)
         self.assertEqual(self.get_status(), gsdpowerenums.GSM_PRESENCE_STATUS_AVAILABLE)
@@ -560,8 +585,9 @@ class PowerPluginTest(gsdtestcase.GSDTestCase):
         # And check we're not idle
         self.assertEqual(self.get_status(), gsdpowerenums.GSM_PRESENCE_STATUS_AVAILABLE)
 
-    def test_sleep_inactive_battery(self):
-        '''sleep-inactive-battery-timeout'''
+    def test_sleep_inactive_battery_hibernate_then_suspend(self):
+        '''Verify we SuspendThenHibernate on sleep-inactive-battery-timeout when SuspendThenHibernate is available'''
+        # Hibernate then suspend is the default
 
         self.settings_session['idle-delay'] = 2
         self.settings_gsd_power['sleep-inactive-battery-timeout'] = 5
@@ -572,7 +598,24 @@ class PowerPluginTest(gsdtestcase.GSDTestCase):
 
         # suspend should happen after inactive sleep timeout + 1 s notification
         # delay + 1 s error margin
-        self.check_for_suspend(7)
+        self.check_for_suspend(7, methods=['SuspendThenHibernate'])
+
+    def test_sleep_inactive_battery_no_hibernate_then_suspend(self):
+        '''Verify we Suspend on sleep-inactive-battery-timeout when SuspendThenHibernate is unavailable'''
+
+        # Patch up logind_ctl to not return "yes" for CanSuspendThenHibernate
+        self.logind_obj.AddMethod('org.freedesktop.login1.Manager', 'CanSuspendThenHibernate', '', 's', 'ret = "no"')
+
+        self.settings_session['idle-delay'] = 2
+        self.settings_gsd_power['sleep-inactive-battery-timeout'] = 5
+        self.settings_gsd_power['sleep-inactive-battery-type'] = 'suspend'
+
+        # wait for idle delay; should not yet suspend
+        self.check_no_suspend(2)
+
+        # suspend should happen after inactive sleep timeout + 1 s notification
+        # delay + 1 s error margin
+        self.check_for_suspend(7, methods=["Suspend"])
 
     def _test_suspend_no_hibernate(self):
         '''suspend-no-hibernate'''
@@ -900,6 +943,36 @@ class PowerPluginTest(gsdtestcase.GSDTestCase):
             print('Got keyboard brightness: {}'.format(kbd_brightness))
 
         self.assertEqual(exc.exception.get_dbus_message(), 'Failed to get property Brightness on interface org.gnome.SettingsDaemon.Power.Keyboard')
+
+    def test_inhibitor_idletime(self):
+        ''' https://bugzilla.gnome.org/show_bug.cgi?id=705942 '''
+
+        idle_delay = round(gsdpowerconstants.MINIMUM_IDLE_DIM_DELAY / gsdpowerconstants.IDLE_DELAY_TO_IDLE_DIM_MULTIPLIER)
+
+        self.settings_session['idle-delay'] = idle_delay
+        self.settings_gsd_power['sleep-inactive-battery-timeout'] = 5
+        self.settings_gsd_power['sleep-inactive-battery-type'] = 'suspend'
+
+        # create inhibitor
+        inhibit_id = self.obj_session_mgr.Inhibit(
+            'testsuite', dbus.UInt32(0), 'for testing',
+            dbus.UInt32(gsdpowerenums.GSM_INHIBITOR_FLAG_IDLE),
+            dbus_interface='org.gnome.SessionManager')
+        self.check_no_suspend(idle_delay + 2)
+        self.check_no_dim(0)
+
+        # Check that we didn't go to idle either
+        self.assertEqual(self.get_status(), gsdpowerenums.GSM_PRESENCE_STATUS_AVAILABLE)
+
+        self.obj_session_mgr.Uninhibit(dbus.UInt32(inhibit_id),
+                dbus_interface='org.gnome.SessionManager')
+
+        self.check_no_suspend(2)
+        self.check_no_dim(0)
+
+        time.sleep(5)
+
+        self.check_suspend_no_hibernate(7)
 
     def disabled_test_unindle_on_ac_plug(self):
         idle_delay = round(gsdpowerconstants.MINIMUM_IDLE_DIM_DELAY / gsdpowerconstants.IDLE_DELAY_TO_IDLE_DIM_MULTIPLIER)
