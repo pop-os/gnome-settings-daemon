@@ -13,6 +13,8 @@ gnome-settings-daemon (3.29.0-1) UNRELEASED; urgency=medium
     - Define "disabled until tomorrow" as moving past sunrise
   * debian/patches/0001-power-Make-power-test-more-robust.patch: Cherry-pick
     from upstream master branch - make the tests more robust.
+  * debian/rules, debian/control*: Run the tests fatally again and add a BD on
+    mutter which is now a requirement.
 
  -- Iain Lane <laney@debian.org>  Thu, 26 Jul 2018 13:57:45 +0100
 
