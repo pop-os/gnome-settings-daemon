@@ -1,7 +1,7 @@
 This package was debianized by Sebastien Bacher <seb128@canonical.com> on
 Wed, 16 Jan 2008 11:12:19 +0100.
 
-It was downloaded from http://ftp.acc.umu.se/pub/GNOME/sources/gnome-settings-daemon
+It was downloaded from https://download.gnome.org/sources/gnome-settings-daemon
 
 Upstream Authors: 
 
@@ -27,6 +27,49 @@ Copyright:
     Copyright (C) 2001, 2002, 2003 Bastien Nocera
     Copyright (C) 2003 Ross Burton <ross@burtonini.com>
     Copyright © 2001 Jonathan Blandford <jrb@gnome.org>
+    Copyright © 1998-2000 Kenneth Christiansen
+    Copyright © Birger Langkjer
+    Copyright © 2000 Keld Simonsen
+    Copyright © 2001-2006 Ole Laursen
+    Copyright © 2000-2005 Martin Willemoes Hansen
+    Copyright © 2006 Lasse Bang Mikkelsen
+    Copyright © 2011 flemming christensen
+    Copyright © 2012 Kenneth Nielsen
+    Copyright © 2007-2018 Ask Hjorth Larsen
+    Copyright © 2016 scootergrisen
+    Copyright © 1999-2018 Free Software Foundation, Inc.
+    Copyright © 1998-2001 Pablo Saratxaga
+    Copyright © 2001 Carlos Perelló Marín
+    Copyright © 2001 Héctor García Álvarez
+    Copyright © 2002 Germán Poo Caamaño
+    Copyright © 2002 Lucas Di Pentima
+    Copyright © 2002-2003 Pablo Gonzalo del Campo
+    Copyright © 2003-2006 Francisco Javier F. Serrador
+    Copyright © 2007 Claudio Saavedra
+    Copyright © 2011 Sebi Kul
+    Copyright © 2007-2011 Jorge González
+    Copyright © 2011-2018 Daniel Mustieles
+    Copyright © Bas Wagter
+    Copyright © Hein-Jan Leliveld
+    Copyright © 2000 Dennis Smit
+    Copyright © 2001 Almer S. Tigelaar
+    Copyright © 2002 Jan-Willem Harmanny
+    Copyright © 2002 Huib Kleinhout
+    Copyright © 2002 Ronald Hummelink
+    Copyright © 2002-2013 Reinout van Schouwen
+    Copyright © 2004-2008 Tino Meinen
+    Copyright © 2010 Rob van den Berg
+    Copyright © 2006-2011 Wouter Bolsterlee
+    Copyright © 2011 Redmar
+    Copyright © 2010-2017 Hannie Dumoleyn
+    Copyright © 2015-2016 Nathan Follens
+    Copyright © 2016-2018 Justin van Steijn
+    Copyright © 2003-2017 Prevod.org team
+    Copyright © Вељко М. Станојевић (Veljko M. Stanojević)
+    Copyright © 2005 Данило Шеган (Danilo Šegan)
+    Copyright © 2006 Слободан Д. Средојевић (Slobodan D. Sredojević)
+    Copyright © 2011-2017 Мирослав Николић (Miroslav Nikolić)
+    Copyright © 2010-2015 Милош Поповић (Miloš Popović)
 
 License:
 

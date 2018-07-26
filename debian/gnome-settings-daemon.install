@@ -1,10 +1,14 @@
 #!/usr/bin/dh-exec
 etc/xdg/autostart
 usr/lib/gnome-settings-daemon*
+# in gnome-settings-daemon-schemas
 #usr/share/locale
 usr/share/gnome-settings-daemon
+# in gnome-settings-daemon-schemas
 #usr/share/GConf
+# in gnome-settings-daemon-schemas
 #usr/share/glib-2.0
 usr/share/polkit-1
-#[linux-any] usr/lib/udev/rules.d/ lib/udev
+# in gnome-settings-daemon-schemas
+#[linux-any] lib/udev
 debian/source_gnome-settings-daemon.py usr/share/apport/package-hooks
