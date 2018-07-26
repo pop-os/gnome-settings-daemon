@@ -4,6 +4,13 @@ gnome-settings-daemon (3.29.0-1) UNRELEASED; urgency=medium
     creates errors - you currently need to pass this manually.
   * debian/*: Update for experimental
   * New upstream release 3.29.0
+    - Make mic mute key configurable
+    - Handle Ctrl+Shift+TouchpadToggle
+    - Wait forever for GrabAccelerators to succeed
+    - Add SuspendAndHibernate
+    - Drop X11-specific code to handle idle times
+    - Cancel smooth transitions on color temperature changes
+    - Define "disabled until tomorrow" as moving past sunrise
   * debian/patches/0001-power-Make-power-test-more-robust.patch: Cherry-pick
     from upstream master branch - make the tests more robust.
 
