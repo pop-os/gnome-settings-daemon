@@ -4,6 +4,8 @@ gnome-settings-daemon (3.29.0-1) UNRELEASED; urgency=medium
     creates errors - you currently need to pass this manually.
   * debian/*: Update for experimental
   * New upstream release 3.29.0
+  * debian/patches/0001-power-Make-power-test-more-robust.patch: Cherry-pick
+    from upstream master branch - make the tests more robust.
 
  -- Iain Lane <laney@debian.org>  Thu, 26 Jul 2018 13:57:45 +0100
 

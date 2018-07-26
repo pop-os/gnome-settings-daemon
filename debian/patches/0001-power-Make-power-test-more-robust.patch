@@ -1,0 +1,41 @@
+From: Benjamin Berg <bberg@redhat.com>
+Date: Mon, 30 Apr 2018 12:27:24 +0200
+Subject: power: Make power test more robust
+
+Reset the idle time and wait for lid inhibition to be removed.
+
+This should make the test more reliable avoiding some potential race
+conditions.
+
+Origin: upstream, commit:da20498b6244a8f897f5dead08ee816d7870dbbd
+Applied-Upstream: 3.29.1
+---
+ plugins/power/test.py | 7 ++++++-
+ 1 file changed, 6 insertions(+), 1 deletion(-)
+
+diff --git a/plugins/power/test.py b/plugins/power/test.py
+index eaa5341..82f46c5 100755
+--- a/plugins/power/test.py
++++ b/plugins/power/test.py
+@@ -739,7 +739,12 @@ class PowerPluginTest(gsdtestcase.GSDTestCase):
+     def test_dim(self):
+         '''Check that we do go to dim'''
+ 
++        # Wait and flush log
++        time.sleep (gsdpowerconstants.LID_CLOSE_SAFETY_TIMEOUT + 1)
++        self.plugin_log.read()
++
+         idle_delay = round(gsdpowerconstants.MINIMUM_IDLE_DIM_DELAY / gsdpowerconstants.IDLE_DELAY_TO_IDLE_DIM_MULTIPLIER)
++        self.reset_idle_timer()
+ 
+         self.settings_session['idle-delay'] = idle_delay
+         self.settings_gsd_power['sleep-inactive-battery-timeout'] = idle_delay + 1
+@@ -751,7 +756,7 @@ class PowerPluginTest(gsdtestcase.GSDTestCase):
+         self.assertEqual(self.get_status(), gsdpowerenums.GSM_PRESENCE_STATUS_AVAILABLE)
+ 
+         # Wait and check we're not idle, but dimmed
+-        self.check_dim(gsdpowerconstants.MINIMUM_IDLE_DIM_DELAY)
++        self.check_dim(gsdpowerconstants.MINIMUM_IDLE_DIM_DELAY + 1)
+         # Give time for the brightness to change
+         time.sleep(2)
+         level = self.get_brightness();
