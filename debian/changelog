@@ -15,6 +15,8 @@ gnome-settings-daemon (3.29.0-1) UNRELEASED; urgency=medium
     from upstream master branch - make the tests more robust.
   * debian/rules, debian/control*: Run the tests fatally again and add a BD on
     mutter which is now a requirement.
+  * debian/control*: Set Rules-Requires-Root to no, since we don't need root
+    for any part of building the package.
 
  -- Iain Lane <laney@debian.org>  Thu, 26 Jul 2018 13:57:45 +0100
 
