@@ -1,6 +1,6 @@
 gnome-settings-daemon (3.29.0-1ubuntu1) UNRELEASED; urgency=medium
 
-  * Merge with Debian. Remaining changes:
+  * Merge with Debian (LP: #1783763). Remaining changes:
     + Split out schemas into gnome-settings-daemon-schemas so
       unity-settings-daemon can use them
     + debian/control.in:
