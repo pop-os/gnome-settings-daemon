@@ -25,6 +25,8 @@ gnome-settings-daemon (3.28.1-0ubuntu2) UNRELEASED; urgency=medium
     + debian/gnome-settings-daemon-schemas.install:
       - Install schemas, translations and the rfkill rule
     + Don't install gnome-settings-daemon.gsettings-override
+  * debian/gbp.conf: Call the upstream tag pattern 'invalid' so that it
+    creates errors - you currently need to pass this manually.
 
  -- Iain Lane <laney@debian.org>  Thu, 26 Jul 2018 13:18:40 +0100
 
