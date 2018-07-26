@@ -30,7 +30,7 @@ gnome-settings-daemon (3.29.0-1ubuntu1) UNRELEASED; urgency=medium
 
  -- Iain Lane <iain@orangesquash.org.uk>  Thu, 26 Jul 2018 16:13:58 +0100
 
-gnome-settings-daemon (3.29.0-1) UNRELEASED; urgency=medium
+gnome-settings-daemon (3.29.0-1) experimental; urgency=medium
 
   * debian/gbp.conf: Call the upstream tag pattern 'invalid' so that it
     creates errors - you currently need to pass this manually.
@@ -51,7 +51,7 @@ gnome-settings-daemon (3.29.0-1) UNRELEASED; urgency=medium
     for any part of building the package.
   * Standards-Version → 4.1.5
 
- -- Iain Lane <laney@debian.org>  Thu, 26 Jul 2018 13:57:45 +0100
+ -- Iain Lane <laney@debian.org>  Thu, 26 Jul 2018 17:23:34 +0100
 
 gnome-settings-daemon (3.28.1-1) unstable; urgency=medium
 
