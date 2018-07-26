@@ -17,6 +17,7 @@ gnome-settings-daemon (3.29.0-1) UNRELEASED; urgency=medium
     mutter which is now a requirement.
   * debian/control*: Set Rules-Requires-Root to no, since we don't need root
     for any part of building the package.
+  * Standards-Version → 4.1.5
 
  -- Iain Lane <laney@debian.org>  Thu, 26 Jul 2018 13:57:45 +0100
 

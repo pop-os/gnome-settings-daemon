@@ -47,7 +47,7 @@ Build-Depends: debhelper (>= 11.1.3),
                xvfb <!nocheck>,
                mutter (>= 3.27.90) <!nocheck>,
                xkb-data
-Standards-Version: 4.1.1
+Standards-Version: 4.1.5
 Vcs-Git: https://salsa.debian.org/gnome-team/gnome-settings-daemon.git -b debian/experimental
 Vcs-Browser: https://salsa.debian.org/gnome-team/gnome-settings-daemon
 Rules-Requires-Root: no
