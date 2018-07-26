@@ -881,6 +881,22 @@ gnome_session_logout (GsdPowerManager *manager,
 }
 
 static void
+dbus_call_log_error (GObject *source_object,
+                     GAsyncResult *res,
+                     gpointer user_data)
+{
+        g_autoptr(GVariant) result;
+        g_autoptr(GError) error = NULL;
+        const gchar *msg = user_data;
+
+        result = g_dbus_proxy_call_finish (G_DBUS_PROXY (source_object),
+                                           res,
+                                           &error);
+        if (result == NULL)
+                g_warning ("%s: %s", msg, error->message);
+}
+
+static void
 action_poweroff (GsdPowerManager *manager)
 {
         if (manager->priv->logind_proxy == NULL) {
@@ -893,25 +909,48 @@ action_poweroff (GsdPowerManager *manager)
                            G_DBUS_CALL_FLAGS_NONE,
                            G_MAXINT,
                            NULL,
-                           NULL,
-                           NULL);
+                           dbus_call_log_error,
+                           "Error calling PowerOff");
 }
 
 static void
 action_suspend (GsdPowerManager *manager)
 {
+        const gchar *action = "Suspend";
+        g_autoptr(GVariant) retval = NULL;
+        g_autoptr(GError) error = NULL;
+
         if (manager->priv->logind_proxy == NULL) {
                 g_warning ("no systemd support");
                 return;
         }
+
+        retval = g_dbus_proxy_call_sync (manager->priv->logind_proxy,
+                                         "CanSuspendThenHibernate",
+                                         NULL,
+                                         G_DBUS_CALL_FLAGS_NONE,
+                                         -1,
+                                         manager->priv->cancellable,
+                                         &error);
+        if (retval == NULL) {
+                g_warning ("Failed to query CanSuspendThenHibernate: %s", error->message);
+        } else {
+                const gchar *s2h = NULL;
+
+                g_variant_get (retval, "(s)", &s2h);
+                if (g_strcmp0 (s2h, "yes") == 0)
+                        action = "SuspendThenHibernate";
+        }
+        g_debug ("Choosing suspend action: %s", action);
+
         g_dbus_proxy_call (manager->priv->logind_proxy,
-                           "Suspend",
+                           action,
                            g_variant_new ("(b)", FALSE),
                            G_DBUS_CALL_FLAGS_NONE,
                            G_MAXINT,
                            NULL,
-                           NULL,
-                           NULL);
+                           dbus_call_log_error,
+                           "Error calling suspend action");
 }
 
 static void
@@ -927,8 +966,8 @@ action_hibernate (GsdPowerManager *manager)
                            G_DBUS_CALL_FLAGS_NONE,
                            G_MAXINT,
                            NULL,
-                           NULL,
-                           NULL);
+                           dbus_call_log_error,
+                           "Error calling Hibernate");
 }
 
 static void
@@ -1061,6 +1100,7 @@ backlight_disable (GsdPowerManager *manager)
                 g_error_free (error);
         }
 
+        g_debug("Is tablet: %d", manager->priv->is_tablet);
         if (manager->priv->is_tablet)
                 action_suspend (manager);
         else
@@ -1073,6 +1113,7 @@ static void
 do_power_action_type (GsdPowerManager *manager,
                       GsdPowerActionType action_type)
 {
+        g_debug("Running power action type %d", action_type);
         switch (action_type) {
         case GSD_POWER_ACTION_SUSPEND:
                 action_suspend (manager);
@@ -1263,10 +1304,6 @@ do_lid_open_action (GsdPowerManager *manager)
                          /* TRANSLATORS: this is the sound description */
                          CA_PROP_EVENT_DESCRIPTION, _("Lid has been opened"),
                          NULL);
-
-        /* This might already have happened when resuming, but
-         * if we didn't sleep, we'll need to wake it up */
-        reset_idletime ();
 }
 
 static void
@@ -2400,10 +2437,6 @@ handle_resume_actions (GsdPowerManager *manager)
 {
         /* ensure we turn the panel back on after resume */
         backlight_enable (manager);
-
-        /* And work-around Xorg bug:
-         * https://bugs.freedesktop.org/show_bug.cgi?id=59576 */
-        reset_idletime ();
 
         /* set up the delay again */
         inhibit_suspend (manager);

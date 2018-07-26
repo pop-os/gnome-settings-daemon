@@ -1,4 +1,4 @@
-gnome-settings-daemon (3.28.1-0ubuntu2) UNRELEASED; urgency=medium
+gnome-settings-daemon (3.29.0-1ubuntu1) UNRELEASED; urgency=medium
 
   * Merge with Debian. Remaining changes:
     + Split out schemas into gnome-settings-daemon-schemas so
@@ -28,7 +28,36 @@ gnome-settings-daemon (3.28.1-0ubuntu2) UNRELEASED; urgency=medium
   * debian/gbp.conf: Call the upstream tag pattern 'invalid' so that it
     creates errors - you currently need to pass this manually.
 
- -- Iain Lane <laney@debian.org>  Thu, 26 Jul 2018 13:18:40 +0100
+ -- Iain Lane <iain@orangesquash.org.uk>  Thu, 26 Jul 2018 16:13:58 +0100
+
+gnome-settings-daemon (3.29.0-1) UNRELEASED; urgency=medium
+
+  * debian/gbp.conf: Call the upstream tag pattern 'invalid' so that it
+    creates errors - you currently need to pass this manually.
+  * debian/*: Update for experimental
+  * New upstream release 3.29.0
+    - Make mic mute key configurable
+    - Handle Ctrl+Shift+TouchpadToggle
+    - Wait forever for GrabAccelerators to succeed
+    - Add SuspendAndHibernate
+    - Drop X11-specific code to handle idle times
+    - Cancel smooth transitions on color temperature changes
+    - Define "disabled until tomorrow" as moving past sunrise
+  * debian/patches/0001-power-Make-power-test-more-robust.patch: Cherry-pick
+    from upstream master branch - make the tests more robust.
+  * debian/rules, debian/control*: Run the tests fatally again and add a BD on
+    mutter which is now a requirement.
+  * debian/control*: Set Rules-Requires-Root to no, since we don't need root
+    for any part of building the package.
+  * Standards-Version → 4.1.5
+
+ -- Iain Lane <laney@debian.org>  Thu, 26 Jul 2018 13:57:45 +0100
+
+gnome-settings-daemon (3.28.1-1) unstable; urgency=medium
+
+  * New upstream release 
+
+ -- Tim Lunn <tim@feathertop.org>  Fri, 13 Apr 2018 18:19:32 +1000
 
 gnome-settings-daemon (3.28.1-0ubuntu1) bionic; urgency=medium
 
