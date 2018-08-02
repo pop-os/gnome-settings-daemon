@@ -5,8 +5,10 @@ gnome-settings-daemon (3.29.90.1-1) UNRELEASED; urgency=medium
     - Fix improper notify_notification_close() usage
     - Make power test more robust
     - Update test suite to python3
-  * debian/control{,.in}: Bump gsettings-desktop-schemas dep to 3.27.90, so we
-    have the key for the volume-above-100 stuff.
+  * debian/control{,.in}:
+    + Bump gsettings-desktop-schemas dep to 3.27.90, so we have the key for
+      the volume-above-100 stuff.
+    + Change python deps to python3, as the testsuite has been ported.
 
  -- Iain Lane <laney@debian.org>  Thu, 02 Aug 2018 08:42:36 +0100
 
