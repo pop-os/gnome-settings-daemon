@@ -1,13 +1,19 @@
+From: Ubuntu Desktop Team <ubuntu-desktop@lists.ubuntu.com>
+Date: Thu, 26 Jul 2018 16:19:06 +0100
+Subject: _restore_terminal_keyboard_shortcut_schema
+
 ---
- data/org.gnome.settings-daemon.plugins.media-keys.gschema.xml.in |    5 ++
- plugins/media-keys/gsd-media-keys-manager.c                      |   19 ++++++++++
- plugins/media-keys/media-keys.h                                  |    1 
- plugins/media-keys/shortcuts-list.h                              |    1 
+ ....settings-daemon.plugins.media-keys.gschema.xml.in |  5 +++++
+ plugins/media-keys/gsd-media-keys-manager.c           | 19 +++++++++++++++++++
+ plugins/media-keys/media-keys.h                       |  1 +
+ plugins/media-keys/shortcuts-list.h                   |  1 +
  4 files changed, 26 insertions(+)
 
+diff --git a/data/org.gnome.settings-daemon.plugins.media-keys.gschema.xml.in b/data/org.gnome.settings-daemon.plugins.media-keys.gschema.xml.in
+index 089b861..7f101cb 100644
 --- a/data/org.gnome.settings-daemon.plugins.media-keys.gschema.xml.in
 +++ b/data/org.gnome.settings-daemon.plugins.media-keys.gschema.xml.in
-@@ -131,6 +131,11 @@
+@@ -136,6 +136,11 @@
        <summary>Record a short video of the screen</summary>
        <description>Binding to record a short video of the screen</description>
      </key>
@@ -19,12 +25,15 @@
      <key name="www" type="s">
        <default>'XF86WWW'</default>
        <summary>Launch web browser</summary>
+diff --git a/plugins/media-keys/gsd-media-keys-manager.c b/plugins/media-keys/gsd-media-keys-manager.c
+index ee6ecbf..1e5ecda 100644
 --- a/plugins/media-keys/gsd-media-keys-manager.c
 +++ b/plugins/media-keys/gsd-media-keys-manager.c
-@@ -936,6 +936,22 @@ gnome_session_shutdown_cb (GObject *sour
+@@ -941,6 +941,22 @@ gnome_session_shutdown_cb (GObject *source_object,
+         }
  }
  
- static void
++static void
 +do_terminal_action (GsdMediaKeysManager *manager)
 +{
 +        GSettings *settings;
@@ -40,11 +49,10 @@
 +        g_object_unref (settings);
 +}
 +
-+static void
+ static void
  gnome_session_shutdown (GsdMediaKeysManager *manager)
  {
-         GDBusProxy *proxy;
-@@ -2391,6 +2407,9 @@ do_action (GsdMediaKeysManager *manager,
+@@ -2427,6 +2443,9 @@ do_action (GsdMediaKeysManager *manager,
          case SCREENCAST_KEY:
                  do_screencast_action (manager);
                  break;
@@ -54,6 +62,8 @@
          case WWW_KEY:
                  do_url_action (manager, "http", timestamp);
                  break;
+diff --git a/plugins/media-keys/media-keys.h b/plugins/media-keys/media-keys.h
+index 85af02b..a1183da 100644
 --- a/plugins/media-keys/media-keys.h
 +++ b/plugins/media-keys/media-keys.h
 @@ -49,6 +49,7 @@ typedef enum {
@@ -64,6 +74,8 @@
          WWW_KEY,
          PLAY_KEY,
          PAUSE_KEY,
+diff --git a/plugins/media-keys/shortcuts-list.h b/plugins/media-keys/shortcuts-list.h
+index 29f5194..6b97fae 100644
 --- a/plugins/media-keys/shortcuts-list.h
 +++ b/plugins/media-keys/shortcuts-list.h
 @@ -74,6 +74,7 @@ static struct {

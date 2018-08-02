@@ -1,14 +1,18 @@
-Description: Keep old MediaKeys D-Bus interface since a lot of stuff
- still uses it. Consider dropping this patch after 18.04 LTS.
- https://mail.gnome.org/archives/distributor-list/2017-April/msg00009.html
-Author: Jeremy Bicha <jbicha@ubuntu.com>
+From: Jeremy Bicha <jbicha@ubuntu.com>
+Date: Thu, 26 Jul 2018 16:19:06 +0100
+Subject: Keep old MediaKeys D-Bus interface since a lot of stuff
+
+still uses it. Consider dropping this patch after 18.04 LTS.
+https://mail.gnome.org/archives/distributor-list/2017-April/msg00009.html
 ---
- plugins/media-keys/gsd-media-keys-manager.c |   11 +++++++++++
+ plugins/media-keys/gsd-media-keys-manager.c | 11 +++++++++++
  1 file changed, 11 insertions(+)
 
+diff --git a/plugins/media-keys/gsd-media-keys-manager.c b/plugins/media-keys/gsd-media-keys-manager.c
+index fa6c0b2..19ed1c4 100644
 --- a/plugins/media-keys/gsd-media-keys-manager.c
 +++ b/plugins/media-keys/gsd-media-keys-manager.c
-@@ -223,6 +223,7 @@ struct GsdMediaKeysManagerPrivate
+@@ -233,6 +233,7 @@ struct GsdMediaKeysManagerPrivate
  
          /* Multimedia keys */
          guint            mmkeys_name_id;
@@ -16,7 +20,7 @@ Author: Jeremy Bicha <jbicha@ubuntu.com>
          MprisController *mpris_controller;
  };
  
-@@ -2929,6 +2930,11 @@ gsd_media_keys_manager_stop (GsdMediaKey
+@@ -3023,6 +3024,11 @@ gsd_media_keys_manager_stop (GsdMediaKeysManager *manager)
                  priv->mmkeys_name_id = 0;
          }
  
@@ -28,7 +32,7 @@ Author: Jeremy Bicha <jbicha@ubuntu.com>
          if (priv->bus_cancellable != NULL) {
                  g_cancellable_cancel (priv->bus_cancellable);
                  g_object_unref (priv->bus_cancellable);
-@@ -3243,6 +3249,11 @@ on_bus_gotten (GObject             *sour
+@@ -3485,6 +3491,11 @@ on_bus_gotten (GObject             *source_object,
                                                                        G_BUS_NAME_OWNER_FLAGS_NONE,
                                                                        NULL, NULL, NULL, NULL);
  

@@ -1,9 +1,18 @@
+From: Ubuntu Desktop Team <ubuntu-desktop@lists.ubuntu.com>
+Date: Thu, 26 Jul 2018 16:19:06 +0100
+Subject: _suppress-printer-may-not-be-connected-notification
+
 # Ubuntu: https://launchpad.net/bugs/842768
-Index: gnome-settings-daemon/plugins/print-notifications/gsd-print-notifications-manager.c
-===================================================================
---- gnome-settings-daemon.orig/plugins/print-notifications/gsd-print-notifications-manager.c
-+++ gnome-settings-daemon/plugins/print-notifications/gsd-print-notifications-manager.c
-@@ -355,7 +355,7 @@ get_statuses_second (guint i,
+# Ubuntu: https://launchpad.net/bugs/842768
+---
+ plugins/print-notifications/gsd-print-notifications-manager.c | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/plugins/print-notifications/gsd-print-notifications-manager.c b/plugins/print-notifications/gsd-print-notifications-manager.c
+index b8bfa8a..4f5a555 100644
+--- a/plugins/print-notifications/gsd-print-notifications-manager.c
++++ b/plugins/print-notifications/gsd-print-notifications-manager.c
+@@ -371,7 +371,7 @@ get_statuses_second (guint i,
                          break;
                  case 2:
                          /* Translators: The printer is in the process of connecting to a shared network output device (same as in system-config-printer) */
@@ -12,7 +21,7 @@ Index: gnome-settings-daemon/plugins/print-notifications/gsd-print-notifications
                          break;
                  case 3:
                          /* Translators: One or more covers on the printer are open (same as in system-config-printer) */
-@@ -427,7 +427,7 @@ process_cups_notification (GsdPrintNotif
+@@ -575,7 +575,7 @@ process_cups_notification (GsdPrintNotificationsManager *manager,
          static const char * const reasons[] = {
                  "toner-low",
                  "toner-empty",
@@ -21,7 +30,7 @@ Index: gnome-settings-daemon/plugins/print-notifications/gsd-print-notifications
                  "cover-open",
                  "cups-missing-filter",
                  "door-open",
-@@ -444,7 +444,7 @@ process_cups_notification (GsdPrintNotif
+@@ -592,7 +592,7 @@ process_cups_notification (GsdPrintNotificationsManager *manager,
                  /* Translators: The printer has no toner left (same as in system-config-printer) */
                  N_("Toner empty"),
                  /* Translators: The printer is in the process of connecting to a shared network output device (same as in system-config-printer) */

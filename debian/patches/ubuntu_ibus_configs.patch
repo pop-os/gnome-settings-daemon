@@ -1,16 +1,19 @@
-Description: restore the code that configure the input method according to 
- the locale, upstream removed it because they use an intial setup but we don't
+From: Ubuntu Desktop Team <ubuntu-desktop@lists.ubuntu.com>
+Date: Thu, 26 Jul 2018 16:19:06 +0100
+Subject: restore the code that configure the input method according to
+
+the locale, upstream removed it because they use an intial setup but we don't
 Bug: https://bugs.launchpad.net/bugs/1719938
 Forwarded: not-needed
 ---
- plugins/keyboard/gsd-keyboard-manager.c | 53 +++++++++++++++++++++++++++++++++
- 1 file changed, 53 insertions(+)
+ plugins/keyboard/gsd-keyboard-manager.c | 56 ++++++++++++++++++++++++++++++++-
+ 1 file changed, 55 insertions(+), 1 deletion(-)
 
-Index: gnome-settings-daemon-3.26.1/plugins/keyboard/gsd-keyboard-manager.c
-===================================================================
---- gnome-settings-daemon-3.26.1.orig/plugins/keyboard/gsd-keyboard-manager.c
-+++ gnome-settings-daemon-3.26.1/plugins/keyboard/gsd-keyboard-manager.c
-@@ -161,6 +161,58 @@ check_xkb_extension (GsdKeyboardManager
+diff --git a/plugins/keyboard/gsd-keyboard-manager.c b/plugins/keyboard/gsd-keyboard-manager.c
+index 8003a3a..343b049 100644
+--- a/plugins/keyboard/gsd-keyboard-manager.c
++++ b/plugins/keyboard/gsd-keyboard-manager.c
+@@ -161,6 +161,58 @@ check_xkb_extension (GsdKeyboardManager *manager)
          return have_xkb;
  }
  
@@ -69,7 +72,7 @@ Index: gnome-settings-daemon-3.26.1/plugins/keyboard/gsd-keyboard-manager.c
  static void
  xkb_init (GsdKeyboardManager *manager)
  {
-@@ -711,8 +763,10 @@ maybe_create_initial_settings (GsdKeyboa
+@@ -711,8 +763,10 @@ maybe_create_initial_settings (GsdKeyboardManager *manager)
  
          /* if we still don't have anything do some educated guesses */
          sources = g_settings_get_value (settings, KEY_INPUT_SOURCES);

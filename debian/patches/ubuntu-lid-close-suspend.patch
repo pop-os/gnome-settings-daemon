@@ -1,18 +1,18 @@
-From 59d0751fd18a8e75cb15ad80df85975e71324016 Mon Sep 17 00:00:00 2001
 From: Tim Lunn <tim@feathertop.org>
 Date: Sun, 14 Jul 2013 10:30:08 +1000
-Subject: [PATCH] Revert "Remove unused settings" and add a 'handle-lid-switch'
-  inhibitor based on lid-close-*-action settings.
+Subject: [PATCH] Revert "Remove unused settings" and add a
+ 'handle-lid-switch'  inhibitor based on lid-close-*-action settings.
 
 This reverts commit 58cb4eee64bbd8ca43111b1f80fdaacde8ad5f12.
 ---
- data/org.gnome.settings-daemon.plugins.power.gschema.xml.in.in |   22 ++++++
- plugins/power/gsd-power-manager.c                              |   34 ++++++++++
- 2 files changed, 56 insertions(+)
+ ...me.settings-daemon.plugins.power.gschema.xml.in | 22 ++++++++++++++++++++++
+ 1 file changed, 22 insertions(+)
 
+diff --git a/data/org.gnome.settings-daemon.plugins.power.gschema.xml.in b/data/org.gnome.settings-daemon.plugins.power.gschema.xml.in
+index 93c704e..7984f16 100644
 --- a/data/org.gnome.settings-daemon.plugins.power.gschema.xml.in
 +++ b/data/org.gnome.settings-daemon.plugins.power.gschema.xml.in
-@@ -30,6 +30,28 @@
+@@ -31,6 +31,28 @@
        <summary>Whether to hibernate, suspend or do nothing when inactive</summary>
        <description>The type of sleeping that should be performed when the computer is inactive.</description>
      </key>
