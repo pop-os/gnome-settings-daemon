@@ -9,6 +9,8 @@ gnome-settings-daemon (3.29.90.1-1) UNRELEASED; urgency=medium
     + Bump gsettings-desktop-schemas dep to 3.27.90, so we have the key for
       the volume-above-100 stuff.
     + Change python deps to python3, as the testsuite has been ported.
+  * debian/patches/0001-power-Make-power-test-more-robust.patch: Drop, applied
+    upstream.
 
  -- Iain Lane <laney@debian.org>  Thu, 02 Aug 2018 08:42:36 +0100
 
