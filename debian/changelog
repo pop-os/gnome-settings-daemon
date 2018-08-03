@@ -1,4 +1,4 @@
-gnome-settings-daemon (3.29.90.1-1~ubuntu1) UNRELEASED; urgency=medium
+gnome-settings-daemon (3.29.90.1-1~ubuntu1) cosmic; urgency=medium
 
   * Merge with unreleased Debian version (LP: #1783763). Remaining changes:
     + Split out schemas into gnome-settings-daemon-schemas so
@@ -30,7 +30,7 @@ gnome-settings-daemon (3.29.90.1-1~ubuntu1) UNRELEASED; urgency=medium
   * debian/patches/70_allow_sound_above_100.patch: Drop - this has been
     implemented upstream now.
 
- -- Iain Lane <iain@orangesquash.org.uk>  Thu, 26 Jul 2018 16:13:58 +0100
+ -- Iain Lane <laney@ubuntu.com>  Fri, 03 Aug 2018 11:33:04 +0100
 
 gnome-settings-daemon (3.29.90.1-1) UNRELEASED; urgency=medium
 
