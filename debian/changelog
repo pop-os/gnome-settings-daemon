@@ -1,5 +1,8 @@
-gnome-settings-daemon (3.29.90.1-1) UNRELEASED; urgency=medium
+gnome-settings-daemon (3.29.90.1-1) experimental; urgency=medium
 
+  * Team upload
+
+  [ Iain Lane ]
   * New upstream release 3.29.90.1
     - Allow volume above 100%
     - Fix improper notify_notification_close() usage
@@ -12,7 +15,7 @@ gnome-settings-daemon (3.29.90.1-1) UNRELEASED; urgency=medium
   * debian/patches/0001-power-Make-power-test-more-robust.patch: Drop, applied
     upstream.
 
- -- Iain Lane <laney@debian.org>  Thu, 02 Aug 2018 08:42:36 +0100
+ -- Simon McVittie <smcv@debian.org>  Sun, 05 Aug 2018 17:24:18 +0100
 
 gnome-settings-daemon (3.29.0-1) experimental; urgency=medium
 
