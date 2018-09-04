@@ -1,3 +1,16 @@
+gnome-settings-daemon (3.30.0-0ubuntu1) UNRELEASED; urgency=medium
+
+  * Update to 3.30.0:
+    - Translation updates
+    - Media-keys:
+      Escape custom command for execution
+    - Rfkill:
+      Create nested cancellable for rfkill setting
+    - Build:
+      Fix undeclared dependency on gio-unix-2.0
+
+ -- Didier Roche <didrocks@ubuntu.com>  Tue, 04 Sep 2018 11:53:35 +0200
+
 gnome-settings-daemon (3.29.90.1-1~ubuntu1) cosmic; urgency=medium
 
   * Merge with unreleased Debian version (LP: #1783763). Remaining changes:
