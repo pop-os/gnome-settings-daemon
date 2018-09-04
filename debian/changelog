@@ -1,4 +1,4 @@
-gnome-settings-daemon (3.30.0-0ubuntu1) UNRELEASED; urgency=medium
+gnome-settings-daemon (3.30.0-0ubuntu1) cosmic; urgency=medium
 
   * Update to 3.30.0:
     - Translation updates
@@ -9,7 +9,7 @@ gnome-settings-daemon (3.30.0-0ubuntu1) UNRELEASED; urgency=medium
     - Build:
       Fix undeclared dependency on gio-unix-2.0
 
- -- Didier Roche <didrocks@ubuntu.com>  Tue, 04 Sep 2018 11:53:35 +0200
+ -- Didier Roche <didrocks@ubuntu.com>  Tue, 04 Sep 2018 12:22:13 +0200
 
 gnome-settings-daemon (3.29.90.1-1~ubuntu1) cosmic; urgency=medium
 
