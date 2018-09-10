@@ -1,10 +1,14 @@
-gnome-settings-daemon (3.30.0-1) UNRELEASED; urgency=medium
+gnome-settings-daemon (3.30.0-1) unstable; urgency=medium
 
   * New upstream release
   * debian/gbp.conf: use version-mangling for upstream-vcs-tag
     and other updates for Debian GNOME conventions
+  * Bump debhelper compat to 11
+  * Bump Standards-Version to 4.2.1
+  * Enable all hardening flags
+  * Release to unstable
 
- -- Jeremy Bicha <jbicha@debian.org>  Mon, 10 Sep 2018 08:17:25 -0400
+ -- Jeremy Bicha <jbicha@debian.org>  Mon, 10 Sep 2018 08:28:39 -0400
 
 gnome-settings-daemon (3.29.90.1-1) experimental; urgency=medium
 
