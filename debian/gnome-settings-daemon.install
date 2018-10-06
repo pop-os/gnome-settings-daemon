@@ -1,9 +1,10 @@
 #!/usr/bin/dh-exec
 etc/xdg/autostart
-usr/lib/gnome-settings-daemon*
-usr/share/locale
-usr/share/gnome-settings-daemon
+usr/lib/*/gnome-settings-daemon*
+usr/lib/gnome-settings-daemon
 usr/share/GConf
 usr/share/glib-2.0
+usr/share/gnome-settings-daemon
+usr/share/locale
 usr/share/polkit-1
 [linux-any] lib/udev
