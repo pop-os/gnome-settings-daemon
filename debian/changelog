@@ -1,11 +1,10 @@
-gnome-settings-daemon (3.30.1.1-1) UNRELEASED; urgency=medium
+gnome-settings-daemon (3.30.1.2-1) UNRELEASED; urgency=medium
 
   * New upstream release
-  * d/p/power-Disable-use-of-suspend-then-hibernate-by-default.patch:
-    Add proposed patch from upstream to disable suspend-then-hibernate,
-    which is not yet ready to be the default behaviour (Closes: #908930)
+    - Disable suspend-then-hibernate, which is not yet ready to be the
+      default behaviour (Closes: #908930)
 
- -- Simon McVittie <smcv@debian.org>  Thu, 27 Sep 2018 12:15:05 +0100
+ -- Simon McVittie <smcv@debian.org>  Sat, 06 Oct 2018 17:53:20 +0100
 
 gnome-settings-daemon (3.30.0-1) unstable; urgency=medium
 
