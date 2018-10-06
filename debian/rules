@@ -32,3 +32,6 @@ else
 	xvfb-run dh_auto_test || true
 endif
 endif
+
+override_dh_installchangelogs:
+	dh_installchangelogs -XChangeLog
