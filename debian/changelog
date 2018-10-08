@@ -1,3 +1,60 @@
+gnome-settings-daemon (3.30.1.2-1ubuntu1) UNRELEASED; urgency=medium
+
+  * Merge with unreleased Debian version. Remaining changes:
+    + Split out schemas into gnome-settings-daemon-schemas so
+      unity-settings-daemon can use them
+    + debian/control.in:
+      - Build-depend on accountsservice
+      - Bump breaks/replaces for moving files to the -schemas pkg
+    + debian/patches:
+       - 45_suppress-printer-may-not-be-connected-notification.patch
+       - 53_sync_input_sources_to_accountsservice.patch
+       - 64_restore_terminal_keyboard_shortcut_schema.patch
+       - 70_allow_sound_above_100.patch
+       - correct_logout_action.patch
+          display the logout action on ctrl-alt-del
+       - ubuntu-lid-close-suspend.patch
+          Reimplement support for setting lid close suspend actions
+       - revert-wacom-migration.patch
+       - revert-gsettings-removals.patch
+          Revert gsettings keys that were dropped since 3.8, for u-s-d
+       - revert-mediakeys-dbus-interface-drop.patch
+       - ubuntu_ibus_configs.patch
+    + debian/gnome-settings-daemon.install:
+      - Install apport hook and upstart scripts
+    + debian/gnome-settings-daemon-schemas.install:
+      - Install schemas, translations and the rfkill rule
+    + Don't install gnome-settings-daemon.gsettings-override
+
+ -- Iain Lane <iain.lane@canonical.com>  Mon, 08 Oct 2018 09:55:15 +0100
+
+gnome-settings-daemon (3.30.1.2-1) unstable; urgency=medium
+
+  * Team upload
+  * New upstream release
+    - Disable suspend-then-hibernate, which is not yet ready to be the
+      default behaviour (Closes: #908930)
+  * Make pkg-config file available for cross-compilation by using default
+    ${libdir}
+  * Normalize (build-)dependency lists with wrap-and-sort -a
+  * Normalize list of maintscript operations with wrap-and-sort -a
+  * d/copyright: Remove trailing whitespace
+  * Don't install pre-2010 ChangeLog
+
+ -- Simon McVittie <smcv@debian.org>  Sat, 06 Oct 2018 18:58:25 +0100
+
+gnome-settings-daemon (3.30.0-1) unstable; urgency=medium
+
+  * New upstream release
+  * debian/gbp.conf: use version-mangling for upstream-vcs-tag
+    and other updates for Debian GNOME conventions
+  * Bump debhelper compat to 11
+  * Bump Standards-Version to 4.2.1
+  * Enable all hardening flags
+  * Release to unstable
+
+ -- Jeremy Bicha <jbicha@debian.org>  Mon, 10 Sep 2018 08:28:39 -0400
+
 gnome-settings-daemon (3.30.0-0ubuntu1) cosmic; urgency=medium
 
   * Update to 3.30.0:
@@ -45,8 +102,11 @@ gnome-settings-daemon (3.29.90.1-1~ubuntu1) cosmic; urgency=medium
 
  -- Iain Lane <laney@ubuntu.com>  Fri, 03 Aug 2018 11:33:04 +0100
 
-gnome-settings-daemon (3.29.90.1-1) UNRELEASED; urgency=medium
+gnome-settings-daemon (3.29.90.1-1) experimental; urgency=medium
 
+  * Team upload
+
+  [ Iain Lane ]
   * New upstream release 3.29.90.1
     - Allow volume above 100%
     - Fix improper notify_notification_close() usage
@@ -59,7 +119,7 @@ gnome-settings-daemon (3.29.90.1-1) UNRELEASED; urgency=medium
   * debian/patches/0001-power-Make-power-test-more-robust.patch: Drop, applied
     upstream.
 
- -- Iain Lane <laney@debian.org>  Thu, 02 Aug 2018 08:42:36 +0100
+ -- Simon McVittie <smcv@debian.org>  Sun, 05 Aug 2018 17:24:18 +0100
 
 gnome-settings-daemon (3.29.0-1) experimental; urgency=medium
 

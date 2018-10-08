@@ -340,13 +340,18 @@ engine_ups_discharging (GsdPowerManager *manager, UpDevice *device)
         char *icon_name;
         gint64 time_to_empty;
         GString *message;
+        UpDeviceKind kind;
 
         /* get device properties */
         g_object_get (device,
+                      "kind", &kind,
                       "percentage", &percentage,
                       "time-to-empty", &time_to_empty,
                       "icon-name", &icon_name,
                       NULL);
+
+        if (kind != UP_DEVICE_KIND_UPS)
+                return;
 
         /* only show text if there is a valid time */
         if (time_to_empty > 0)
@@ -790,8 +795,12 @@ static void
 engine_device_warning_changed_cb (UpDevice *device, GParamSpec *pspec, GsdPowerManager *manager)
 {
         UpDeviceLevel warning;
+        UpDeviceKind kind;
 
-        g_object_get (device, "warning-level", &warning, NULL);
+        g_object_get (device,
+                      "warning-level", &warning,
+                      "kind", &kind,
+                      NULL);
 
         if (warning == UP_DEVICE_LEVEL_DISCHARGING) {
                 g_debug ("** EMIT: discharging");
@@ -810,11 +819,15 @@ engine_device_warning_changed_cb (UpDevice *device, GParamSpec *pspec, GsdPowerM
                  * for the whole system, instead of one per device */
                 g_debug ("fully charged or charging, hiding notifications if any");
                 play_loop_stop (&manager->priv->critical_alert_timeout_id);
-                notify_close_if_showing (&manager->priv->notification_low);
-                notify_close_if_showing (&manager->priv->notification_ups_discharging);
+                if (kind != UP_DEVICE_KIND_UPS)
+                        notify_close_if_showing (&manager->priv->notification_low);
+                else
+                        notify_close_if_showing (&manager->priv->notification_ups_discharging);
         }
 
-        main_battery_or_ups_low_changed (manager, (warning != UP_DEVICE_LEVEL_NONE));
+        if (kind == UP_DEVICE_KIND_BATTERY ||
+            kind == UP_DEVICE_KIND_UPS)
+                main_battery_or_ups_low_changed (manager, (warning != UP_DEVICE_LEVEL_NONE));
 }
 
 static void
@@ -925,6 +938,7 @@ action_suspend (GsdPowerManager *manager)
                 return;
         }
 
+#if USE_SUSPEND_THEN_HIBERNATE
         retval = g_dbus_proxy_call_sync (manager->priv->logind_proxy,
                                          "CanSuspendThenHibernate",
                                          NULL,
@@ -941,6 +955,7 @@ action_suspend (GsdPowerManager *manager)
                 if (g_strcmp0 (s2h, "yes") == 0)
                         action = "SuspendThenHibernate";
         }
+#endif /* USE_SUSPEND_THEN_HIBERNATE */
         g_debug ("Choosing suspend action: %s", action);
 
         g_dbus_proxy_call (manager->priv->logind_proxy,

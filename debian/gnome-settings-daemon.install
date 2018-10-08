@@ -1,5 +1,6 @@
 #!/usr/bin/dh-exec
 etc/xdg/autostart
+usr/lib/*/gnome-settings-daemon*
 usr/lib/gnome-settings-daemon*
 # in gnome-settings-daemon-schemas
 #usr/share/locale

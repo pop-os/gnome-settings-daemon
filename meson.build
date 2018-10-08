@@ -1,6 +1,6 @@
 project(
   'gnome-settings-daemon', 'c',
-  version: '3.30.0',
+  version: '3.30.1.2',
   license: [ 'GPL2+', 'LGPLv2+' ],
   meson_version: '>= 0.44.0'
 )
@@ -117,19 +117,27 @@ libgvc = subproject(
 )
 libgvc_dep = libgvc.get_variable('libgvc_dep')
 
+# Suspend-then-hibernate kill switch
+use_suspend_then_hibernate = get_option('experimental_suspend_then_hibernate')
+config_h.set10('USE_SUSPEND_THEN_HIBERNATE', use_suspend_then_hibernate)
+
 # GUdev integration (default enabled)
 enable_gudev = get_option('gudev')
 if enable_gudev
   assert(enable_gudev, 'GUdev is not optional on Linux platforms')
   gudev_dep = dependency('gudev-1.0')
 endif
-config_h.set('HAVE_GUDEV', enable_gudev)
+config_h.set10('HAVE_GUDEV', enable_gudev)
 
-# Check for libwayland-client
+has_timerfd_create = cc.has_function('timerfd_create')
+config_h.set10('HAVE_TIMERFD', has_timerfd_create)
+
+# Check for wayland dependencies
 enable_wayland = get_option('wayland')
 if enable_wayland
   assert(enable_gudev, 'GUDev support is required for wayland support.')
   wayland_client_dep = dependency('wayland-client')
+  wayland_gdk_dep = dependency('gdk-wayland-3.0')
 endif
 config_h.set10('HAVE_WAYLAND', enable_wayland)
 
@@ -191,7 +199,7 @@ if enable_network_manager
   # network manager
   libnm_dep = dependency('libnm', version: '>= 1.0')
 endif
-config_h.set('HAVE_NETWORK_MANAGER', enable_network_manager)
+config_h.set10('HAVE_NETWORK_MANAGER', enable_network_manager)
 
 gnome = import('gnome')
 i18n = import('i18n')
@@ -235,6 +243,7 @@ output += '        Cups support:             ' + enable_cups.to_string() + '\n'
 output += '        Wayland support:          ' + enable_wayland.to_string() + '\n'
 output += '        Wacom support:            ' + enable_wacom.to_string() + '\n'
 output += '        RFKill support:           ' + enable_rfkill.to_string() + '\n'
+output += '        Suspend-then-hibernate:   ' + use_suspend_then_hibernate.to_string() + '\n'
 if enable_smartcard
   output += '        System nssdb:             ' + system_nssdb_dir + '\n'
 endif
