@@ -56,7 +56,6 @@ Package: gnome-settings-daemon
 Architecture: any
 Depends: gsettings-desktop-schemas (>= 3.27.90),
          libpam-systemd [!hurd-any !kfreebsd-any],
-         nautilus-data (>= 2.91.3-1),
          ${misc:Depends},
          ${shlibs:Depends}
 Recommends: iio-sensor-proxy,
