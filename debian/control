@@ -58,7 +58,8 @@ Rules-Requires-Root: no
 
 Package: gnome-settings-daemon
 Architecture: any
-Depends: gsettings-desktop-schemas (>= 3.27.90),
+Depends: gnome-settings-daemon-common (= ${source:Version}),
+         gsettings-desktop-schemas (>= 3.27.90),
          libpam-systemd [!hurd-any !kfreebsd-any],
          ${misc:Depends},
          ${shlibs:Depends}
@@ -90,6 +91,21 @@ Description: daemon handling the GNOME session settings
  .
  It also sets various application settings through X resources and
  freedesktop.org XSETTINGS.
+
+Package: gnome-settings-daemon-common
+Architecture: all
+Depends: ${misc:Depends}
+Replaces: gnome-settings-daemon (<< 3.30.1.2-2~),
+          gnome-settings-daemon-schemas (<< 3.30.1.2-2~)
+Breaks: gnome-settings-daemon (<< 3.30.1.2-2~),
+        gnome-settings-daemon-schemas (<< 3.30.1.2-2~)
+Provides: gnome-settings-daemon-schemas (= ${source:Version})
+Description: daemon handling the GNOME session settings - common files
+ This package contains GSettings schemas and other architecture-independent
+ files for GNOME Settings Daemon. It is probably not interesting on its own for
+ end users, but packages may depend on this if they only need to read and write
+ settings & don't themselves care if the settings daemon is actually running or
+ not.
 
 Package: gnome-settings-daemon-dev
 Section: libdevel
