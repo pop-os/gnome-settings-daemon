@@ -1,3 +1,27 @@
+gnome-settings-daemon (3.30.1.2-2ubuntu1) UNRELEASED; urgency=medium
+
+  * Merge
+
+ -- Iain Lane <iain.lane@canonical.com>  Mon, 10 Dec 2018 15:55:02 +0000
+
+gnome-settings-daemon (3.30.1.2-2) UNRELEASED; urgency=medium
+
+  * Add a gnome-settings-daemon-common package.
+    This contains the GSettings schemas and other arch-independent files.
+    Packages can depend or build-depend on this if they want the schemas but
+    not the actual running gnome-settings-daemon.
+    In particular, we currently have a circular BD/D chain between mutter
+    and g-s-d, and this can be mostly broken if mutter depends on the
+    schemas (which it needs) rather than the daemon (which it doesn't).
+    The references to gnome-settings-daemon-schemas are because Ubuntu
+    provides this package under that name - this is to help with
+    transitioning to gnome-settings-daemon-common.
+  * debian/copyright:
+    + Fix a broken copyright symbol
+    + Add some more copyright holders, thanks grep
+
+ -- Iain Lane <laney@debian.org>  Mon, 10 Dec 2018 15:55:02 +0000
+
 gnome-settings-daemon (3.30.1.2-1ubuntu4) disco; urgency=medium
 
   * Upload the previous change to disco too
