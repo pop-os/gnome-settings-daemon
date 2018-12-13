@@ -1,5 +1,0 @@
-#!/usr/bin/dh-exec
-usr/share/GConf
-usr/share/glib-2.0
-usr/share/locale
-[linux-any] lib/udev
