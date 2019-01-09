@@ -1,0 +1,28 @@
+From: Hans de Goede <hdegoede@redhat.com>
+Date: Tue, 16 Oct 2018 17:13:24 +0200
+Subject: media-keys: Increase GSD_REENABLE_POWER_BUTTON_DELAY to 3 seconds
+
+On some slow tablets 1 second is not enough for the power-button press
+which wakes the tablet from suspend to get processed by g-s-d. This
+causes the tablet to immediately resuspend when woken using the
+power-button and on tablets the power-button often is the only way to
+wake the device.
+---
+ plugins/media-keys/gsd-media-keys-manager.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/plugins/media-keys/gsd-media-keys-manager.c b/plugins/media-keys/gsd-media-keys-manager.c
+index b171a3b..87dc488 100644
+--- a/plugins/media-keys/gsd-media-keys-manager.c
++++ b/plugins/media-keys/gsd-media-keys-manager.c
+@@ -88,8 +88,8 @@
+ #define OSD_ALL_OUTPUTS -1
+ 
+ /* How long to suppress power-button presses after resume,
+- * 1 second is the minimum necessary to make resume reliable */
+-#define GSD_REENABLE_POWER_BUTTON_DELAY                 1000 /* ms */
++ * 3 seconds is the minimum necessary to make resume reliable */
++#define GSD_REENABLE_POWER_BUTTON_DELAY                 3000 /* ms */
+ 
+ static const gchar introspection_xml[] =
+ "<node name='/org/gnome/SettingsDaemon/MediaKeys'>"
