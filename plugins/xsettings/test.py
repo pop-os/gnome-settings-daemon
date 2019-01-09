@@ -81,7 +81,7 @@ class XsettingsPluginTest(gsdtestcase.GSDTestCase):
         shutil.copy(os.path.join(os.path.dirname(__file__), 'gtk-modules-test/pk-gtk-module.desktop'),
                 os.path.join(modules_dir, 'pk-gtk-module.desktop'))
 
-        self.settings_sound = Gio.Settings('org.gnome.desktop.sound')
+        self.settings_sound = Gio.Settings.new('org.gnome.desktop.sound')
 
         env = os.environ.copy()
         self.daemon = subprocess.Popen(
@@ -153,8 +153,10 @@ class XsettingsPluginTest(gsdtestcase.GSDTestCase):
         time.sleep(1)
 
         # Check that both PK and canberra plugin are enabled
-        self.assertEqual(self.obj_xsettings_props.Get('org.gtk.Settings', 'Modules'),
-                dbus.String('pk-gtk-module:canberra-gtk-module', variant_level=1))
+        retval = self.obj_xsettings_props.Get('org.gtk.Settings', 'Modules')
+        values = sorted(str(retval).split(':'))
+        self.assertEqual(values[0], 'canberra-gtk-module')
+        self.assertEqual(values[1], 'pk-gtk-module')
 
     def test_enable_animations(self):
         # Check that "Enable animations" is off
