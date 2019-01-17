@@ -12,24 +12,24 @@ Subject: correct_logout_action
  plugins/media-keys/gsd-media-keys-manager.c | 8 +++++++-
  1 file changed, 7 insertions(+), 1 deletion(-)
 
-Index: gnome-settings-daemon-3.30.2/plugins/media-keys/gsd-media-keys-manager.c
-===================================================================
---- gnome-settings-daemon-3.30.2.orig/plugins/media-keys/gsd-media-keys-manager.c
-+++ gnome-settings-daemon-3.30.2/plugins/media-keys/gsd-media-keys-manager.c
-@@ -1014,6 +1014,12 @@ gnome_session_shutdown (GsdMediaKeysMana
+diff --git a/plugins/media-keys/gsd-media-keys-manager.c b/plugins/media-keys/gsd-media-keys-manager.c
+index ac313ae..fa6c0b2 100644
+--- a/plugins/media-keys/gsd-media-keys-manager.c
++++ b/plugins/media-keys/gsd-media-keys-manager.c
+@@ -977,6 +977,12 @@ gnome_session_shutdown (GsdMediaKeysManager *manager)
+         g_object_unref (proxy);
  }
  
- static void
++static void
 +do_logout_action (GsdMediaKeysManager *manager)
 +{
 +        execute (manager, "gnome-session-quit --logout", FALSE);
 +}
 +
-+static void
+ static void
  do_eject_action_cb (GDrive              *drive,
                      GAsyncResult        *res,
-                     GsdMediaKeysManager *manager)
-@@ -2521,7 +2527,7 @@ do_action (GsdMediaKeysManager *manager,
+@@ -2432,7 +2438,7 @@ do_action (GsdMediaKeysManager *manager,
                                   SOUND_ACTION_FLAG_IS_OUTPUT | SOUND_ACTION_FLAG_IS_PRECISE);
                  break;
          case LOGOUT_KEY:

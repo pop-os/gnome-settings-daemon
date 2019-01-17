@@ -1,11 +1,11 @@
 # Description: teach gsd about the gnome-calculator snap .desktop name
 # Ubuntu: https://launchpad.net/bugs/1796499
 # Upstream: needs a better solution for snaps
-Index: gnome-settings-daemon-3.30.2/plugins/media-keys/gsd-media-keys-manager.c
+Index: gnome-settings-daemon-3.30.1.2/plugins/media-keys/gsd-media-keys-manager.c
 ===================================================================
---- gnome-settings-daemon-3.30.2.orig/plugins/media-keys/gsd-media-keys-manager.c
-+++ gnome-settings-daemon-3.30.2/plugins/media-keys/gsd-media-keys-manager.c
-@@ -2569,7 +2569,7 @@ do_action (GsdMediaKeysManager *manager,
+--- gnome-settings-daemon-3.30.1.2.orig/plugins/media-keys/gsd-media-keys-manager.c
++++ gnome-settings-daemon-3.30.1.2/plugins/media-keys/gsd-media-keys-manager.c
+@@ -2516,7 +2516,7 @@ do_action (GsdMediaKeysManager *manager,
                  do_media_action (manager, timestamp);
                  break;
          case CALCULATOR_KEY:
