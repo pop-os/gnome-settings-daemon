@@ -366,7 +366,8 @@ delete_subdir (GObject      *source,
         enumerator = g_file_enumerate_children_finish (file, res, &error);
         if (error) {
                 if (!g_error_matches (error, G_IO_ERROR, G_IO_ERROR_NOT_DIRECTORY) &&
-                    !g_error_matches (error, G_IO_ERROR, G_IO_ERROR_CANCELLED))
+                    !g_error_matches (error, G_IO_ERROR, G_IO_ERROR_CANCELLED) &&
+                    !g_error_matches (error, G_IO_ERROR, G_IO_ERROR_PERMISSION_DENIED))
                         g_warning ("Failed to enumerate children of %s: %s\n", data->name, error->message);
         }
         if (enumerator) {
@@ -571,10 +572,11 @@ ldsm_notify (const char *summary,
                           G_CALLBACK (on_notification_closed),
                           NULL);
 
-        notify_notification_set_app_name (notification, _("Disk space"));
+        notify_notification_set_app_name (notification, _("Disk Space"));
         notify_notification_set_hint (notification, "transient", g_variant_new_boolean (TRUE));
         notify_notification_set_urgency (notification, NOTIFY_URGENCY_CRITICAL);
         notify_notification_set_timeout (notification, NOTIFY_EXPIRES_DEFAULT);
+        notify_notification_set_hint_string (notification, "desktop-entry", "org.gnome.baobab");
 
         program = g_find_program_in_path (DISK_SPACE_ANALYZER);
         has_disk_analyzer = (program != NULL);

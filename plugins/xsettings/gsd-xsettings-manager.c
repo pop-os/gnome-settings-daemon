@@ -83,11 +83,6 @@ static const gchar introspection_xml[] =
 "  </interface>"
 "</node>";
 
-typedef enum _DisplayLayoutMode {
-        DISPLAY_LAYOUT_MODE_LOGICAL = 1,
-        DISPLAY_LAYOUT_MODE_PHYSICAL = 2
-} DisplayLayoutMode;
-
 /* As we cannot rely on the X server giving us good DPI information, and
  * that we don't want multi-monitor screens to have different DPIs (thus
  * different text sizes), we'll hard-code the value of the DPI
@@ -453,6 +448,7 @@ static FixedEntry fixed_entries [] = {
         { "Gtk/AutoMnemonics",       fixed_true_int },
         { "Gtk/DialogsUseHeader",    fixed_true_int },
         { "Gtk/SessionBusId",        fixed_bus_id },
+        { "Gtk/ShellShowsAppMenu",   fixed_false_int },
         { "Gtk/ColorPalette",        fixed_string,      { .str = DEFAULT_COLOR_PALETTE } },
         { "Net/FallbackIconTheme",   fixed_string,      { .str = "gnome" } },
         { "Gtk/ToolbarStyle",        fixed_string,      { .str =  "both-horiz" } },
@@ -577,33 +573,29 @@ get_dpi_from_gsettings (GnomeXSettingsManager *manager)
 }
 
 static gboolean
-is_layout_mode_logical (GVariantIter *properties)
+get_legacy_ui_scale (GVariantIter *properties,
+                     int          *scale)
 {
-        DisplayLayoutMode layout_mode = DISPLAY_LAYOUT_MODE_LOGICAL;
         const char *key;
         GVariant *value;
 
-        while (g_variant_iter_next (properties, "{&sv}", &key, &value)) {
-                DisplayLayoutMode layout_mode_value;
+        *scale = 0;
 
-                if (!g_str_equal (key, "layout-mode")) {
-                        g_variant_unref (value);
+        while (g_variant_iter_loop (properties, "{&sv}", &key, &value)) {
+                if (!g_str_equal (key, "legacy-ui-scaling-factor"))
                         continue;
-                }
 
-                layout_mode_value = g_variant_get_uint32 (value);
-                g_variant_unref (value);
-
-                if (layout_mode_value < DISPLAY_LAYOUT_MODE_LOGICAL ||
-                    layout_mode_value > DISPLAY_LAYOUT_MODE_PHYSICAL)
-                        g_warning ("Unknown layout mode %u", layout_mode_value);
-                else
-                        layout_mode = layout_mode_value;
-
+                *scale = g_variant_get_int32 (value);
                 break;
         }
 
-        return layout_mode == DISPLAY_LAYOUT_MODE_LOGICAL;
+        if (*scale < 1) {
+                g_warning ("Failed to get current UI legacy scaling factor");
+                *scale = 1;
+                return FALSE;
+        }
+
+        return TRUE;
 }
 
 #define MODE_FORMAT "(siiddada{sv})"
@@ -621,11 +613,9 @@ is_layout_mode_logical (GVariantIter *properties)
 static int
 get_window_scale (GnomeXSettingsManager *manager)
 {
-        GError *error = NULL;
-        GVariant *current_state;
-        GVariantIter *logical_monitors;
-        GVariant *logical_monitor_variant;
-        GVariantIter *properties;
+        g_autoptr(GError) error = NULL;
+        g_autoptr(GVariant) current_state = NULL;
+        g_autoptr(GVariantIter) properties = NULL;
         int scale = 1;
 
         current_state =
@@ -643,7 +633,6 @@ get_window_scale (GnomeXSettingsManager *manager)
         if (!current_state) {
                 g_warning ("Failed to get current display configuration state: %s",
                            error->message);
-                g_error_free (error);
                 return 1;
         }
 
@@ -651,37 +640,11 @@ get_window_scale (GnomeXSettingsManager *manager)
                        CURRENT_STATE_FORMAT,
                        NULL,
                        NULL,
-                       &logical_monitors,
+                       NULL,
                        &properties);
 
-        if (is_layout_mode_logical (properties))
-                goto out;
-
-        while (g_variant_iter_next (logical_monitors, "@"LOGICAL_MONITOR_FORMAT,
-                                    &logical_monitor_variant)) {
-                gboolean is_primary;
-                double logical_monitor_scale;
-
-                g_variant_get (logical_monitor_variant,
-                               LOGICAL_MONITOR_FORMAT,
-                               NULL, NULL,
-                               &logical_monitor_scale,
-                               NULL,
-                               &is_primary,
-                               NULL, NULL);
-
-                if (is_primary) {
-                        scale = (int) logical_monitor_scale;
-                        break;
-                }
-
-                g_variant_unref (logical_monitor_variant);
-        }
-
-out:
-        g_variant_unref (current_state);
-        g_variant_iter_free (properties);
-        g_variant_iter_free (logical_monitors);
+        if (!get_legacy_ui_scale (properties, &scale))
+                g_warning ("Failed to get current UI legacy scaling factor");
 
         return scale;
 }
@@ -1002,36 +965,6 @@ start_fontconfig_monitor (GnomeXSettingsManager  *manager)
 }
 
 static void
-notify_have_shell (GnomeXSettingsManager   *manager,
-                   gboolean                 have_shell)
-{
-        gnome_settings_profile_start (NULL);
-        if (manager->priv->have_shell == have_shell)
-                return;
-        manager->priv->have_shell = have_shell;
-        xsettings_manager_set_int (manager->priv->manager, "Gtk/ShellShowsAppMenu", have_shell);
-        queue_notify (manager);
-        gnome_settings_profile_end (NULL);
-}
-
-static void
-on_shell_appeared (GDBusConnection *connection,
-                   const gchar     *name,
-                   const gchar     *name_owner,
-                   gpointer         user_data)
-{
-        notify_have_shell (user_data, TRUE);
-}
-
-static void
-on_shell_disappeared (GDBusConnection *connection,
-                      const gchar     *name,
-                      gpointer         user_data)
-{
-        notify_have_shell (user_data, FALSE);
-}
-
-static void
 process_value (GnomeXSettingsManager *manager,
                TranslationEntry      *trans,
                GVariant              *value)
@@ -1136,20 +1069,6 @@ setup_xsettings_managers (GnomeXSettingsManager *manager)
         }
 
         return TRUE;
-}
-
-static void
-start_shell_monitor (GnomeXSettingsManager *manager)
-{
-        notify_have_shell (manager, TRUE);
-        manager->priv->have_shell = TRUE;
-        manager->priv->shell_name_watch_id = g_bus_watch_name (G_BUS_TYPE_SESSION,
-                                                               "org.gnome.Shell",
-                                                               0,
-                                                               on_shell_appeared,
-                                                               on_shell_disappeared,
-                                                               manager,
-                                                               NULL);
 }
 
 static void
@@ -1338,8 +1257,6 @@ gnome_xsettings_manager_start (GnomeXSettingsManager *manager,
         register_manager_dbus (manager);
 
         start_fontconfig_monitor (manager);
-
-        start_shell_monitor (manager);
 
         overrides = g_settings_get_value (manager->priv->plugin_settings, XSETTINGS_OVERRIDE_KEY);
         xsettings_manager_set_overrides (manager->priv->manager, overrides);

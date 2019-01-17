@@ -1,12 +1,50 @@
 ==============
-Version 3.30.2
+Version 3.31.2
 ==============
 - Translation updates
-- Fixes for build tests
+
+Color:
+- Add DBus API to preview Night Light for a few seconds
 
 Media-keys:
 - Default to interactive shutdown action for power button if
   the action is not supported.
+
+Power:
+- Avoid setting GError twice
+- Speed up tests by splitting into chunks
+
+Print-notification:
+- Ignore Server* messages from CUPS not meant to us
+
+Rfkill:
+- Use GUdev to monitor rfkill device pressence
+
+==============
+Version 3.31.1
+==============
+- Translation updates
+
+Xsettings:
+- always use mutter-computed UI scaling value
+
+Wacom:
+- Drop tablet/touchscreen mapping to outputs. Mutter now
+  handles this entirely.
+
+
+==============
+Version 3.31.0
+==============
+- Translation updates
+- Build improvements
+- Add desktop-entry hints to notifications
+
+Power:
+- Guard against events from the wrong device type
+- Hide suspend-then-hibernate behind a meson option
+
+Media-keys:
 - Increase GSD_REENABLE_POWER_BUTTON_DELAY to 3 seconds
 - Add mapping for Ctrl + media-key for some media-keys
 
@@ -14,57 +52,8 @@ Rfkill:
 - Fix GIOChannel encoding
 
 Color:
-- Correct temperature interpolation corner cases
-
-================
-Version 3.30.1.2
-================
-
-This release by default *removes* the new feature that was added in 3.29.0 to
-use SuspendAndHibernate when available. You can re-enable the feature using the
-"experimental_suspend_then_hibernate" meson option again.
-
-There are two major issues with the new feature in the current form, and fixing
-it will require more changes that are not feasible in the stable release cycle.
-
-The two main issues are:
- * Hibernation is often not properly supported. The reasons range from it being
-   simply impossible (secure boot), to driver and firmware issues when resuming
-   and also distribution issues where the system is not correctly set-up and
-   we cannot detect the issue.
- * It was missed that the support added into g-s-d is incomplete and therefore
-   creates an inconsistent user experience. In particular, we have four major
-   methods to suspend the machine, but only two are affected:
-    - hardware power button: will use suspend-then-hibernate if enabled and available
-    - idle suspend: will use suspend-then-hibernate if enabled and available
-    - suspend in gnome-shell: always suspends
-    - lid closing: always suspends (systemd)
-
-Also relevant in this discussion is the proposed change in upstream systemd to
-allow disabling hibernation even if it is detected to work:
-  https://github.com/systemd/systemd/pull/10262
-
-================
-Version 3.30.1.1
-================
-
-Color:
-- Do not leak GSource
-
-==============
-Version 3.30.1
-==============
-- Translation updates
-
-Power:
-- Guard against events from the wrong device type
-
-Color:
 - Fix check for timerfd
-
-General:
-- Use set10 consistently in build
-- Fix build with wayland disabled
+- Correct temperature interpolation corner cases
 
 ==============
 Version 3.30.0
