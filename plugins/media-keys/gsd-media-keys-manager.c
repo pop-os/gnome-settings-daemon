@@ -1128,11 +1128,6 @@ do_touchpad_action (GsdMediaKeysManager *manager)
         GSettings *settings;
         gboolean state;
 
-        if (touchpad_is_present () == FALSE) {
-                do_touchpad_osd_action (manager, FALSE);
-                return;
-        }
-
         settings = g_settings_new (SETTINGS_TOUCHPAD_DIR);
         state = (g_settings_get_enum (settings, TOUCHPAD_ENABLED_KEY) ==
                  G_DESKTOP_DEVICE_SEND_EVENTS_ENABLED);
@@ -2001,45 +1996,13 @@ power_action (GsdMediaKeysManager *manager,
 }
 
 static void
-suspend_action (GsdMediaKeysManager *manager,
-                gboolean             allow_interaction)
-{
-        const gchar *action = "Suspend";
-        g_autoptr(GVariant) retval = NULL;
-        g_autoptr(GError) error = NULL;
-
-#if USE_SUSPEND_THEN_HIBERNATE
-        retval = g_dbus_proxy_call_sync (manager->priv->logind_proxy,
-                                         "CanSuspendThenHibernate",
-                                         NULL,
-                                         G_DBUS_CALL_FLAGS_NONE,
-                                         -1,
-                                         NULL,
-                                         &error);
-        if (retval == NULL) {
-                g_warning ("Failed to query CanSuspendThenHibernate: %s", error->message);
-                g_error_free (error);
-        } else {
-                const gchar *s2h = NULL;
-
-                g_variant_get (retval, "(s)", &s2h);
-                if (g_strcmp0 (s2h, "yes") == 0)
-                        action = "SuspendThenHibernate";
-        }
-#endif /* USE_SUSPEND_THEN_HIBERNATE */
-        g_debug ("Choosing suspend action: %s", action);
-
-        power_action (manager, action, allow_interaction);
-}
-
-static void
 do_config_power_action (GsdMediaKeysManager *manager,
                         GsdPowerActionType   action_type,
                         gboolean             in_lock_screen)
 {
         switch (action_type) {
         case GSD_POWER_ACTION_SUSPEND:
-                suspend_action (manager, !in_lock_screen);
+                power_action (manager, "Suspend", !in_lock_screen);
                 break;
         case GSD_POWER_ACTION_INTERACTIVE:
                 if (!in_lock_screen)
@@ -2125,7 +2088,7 @@ do_config_power_button_action (GsdMediaKeysManager *manager,
 
         /* Always suspend tablets */
         if (g_strcmp0 (manager->priv->chassis_type, "tablet") == 0) {
-                suspend_action (manager, !in_lock_screen);
+                power_action (manager, "Suspend", !in_lock_screen);
                 return;
         }
 

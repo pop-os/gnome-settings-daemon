@@ -24,24 +24,41 @@ import gsdpowerconstants
 import gsdpowerenums
 
 import dbus
+from dbus.mainloop.glib import DBusGMainLoop
+
+DBusGMainLoop(set_as_default=True)
 
 import gi
 gi.require_version('UPowerGlib', '1.0')
+gi.require_version('UMockdev', '1.0')
 
 from gi.repository import Gio
 from gi.repository import GLib
 from gi.repository import UPowerGlib
+from gi.repository import UMockdev
 
-class PowerPluginTest(gsdtestcase.GSDTestCase):
+class PowerPluginBase(gsdtestcase.GSDTestCase):
     '''Test the power plugin'''
 
     COMMON_SUSPEND_METHODS=['Suspend', 'Hibernate', 'SuspendThenHibernate']
 
     def setUp(self):
-        os.environ['GSD_MOCKED']='1'
+        self.mock_external_monitor_file = os.path.join(self.workdir, 'GSD_MOCK_EXTERNAL_MONITOR')
+        os.environ['GSD_MOCK_EXTERNAL_MONITOR_FILE'] = self.mock_external_monitor_file
+
         self.check_logind_gnome_session()
         self.start_logind()
         self.daemon_death_expected = False
+
+
+        # Setup umockdev testbed
+        self.testbed = UMockdev.Testbed.new()
+        os.environ['UMOCKDEV_DIR'] = self.testbed.get_root_dir()
+
+        # Create a mock backlight device
+        # Note that this function creates a different or even no backlight
+        # device based on the name of the test.
+        self.add_backlight()
 
         # start mock upowerd
         (self.upowerd, self.obj_upower) = self.spawn_server_template(
@@ -96,10 +113,11 @@ class PowerPluginTest(gsdtestcase.GSDTestCase):
         self.plugin_log_write = open(os.path.join(self.workdir, 'plugin_power.log'), 'wb', buffering=0)
         # avoid painfully long delays of actions for tests
         env = os.environ.copy()
-        # Disable the use of the PolicyKit helper for brightness
-        env['GSD_DISABLE_BACKLIGHT_HELPER'] = '1'
         # Disable PulseAudio output from libcanberra
         env['CANBERRA_DRIVER'] = 'null'
+
+        # Use dummy script as testing backlight helper
+        env['GSD_BACKLIGHT_HELPER'] = os.path.join (project_root, 'plugins', 'power', 'test-backlight-helper')
 
         self.daemon = subprocess.Popen(
             [os.path.join(builddir, 'gsd-power'), '--verbose'],
@@ -152,14 +170,11 @@ class PowerPluginTest(gsdtestcase.GSDTestCase):
         Gio.Settings.sync()
 
         try:
-            os.unlink('GSD_MOCK_EXTERNAL_MONITOR')
+            os.unlink(self.mock_external_monitor_file)
         except OSError:
             pass
 
-        try:
-            os.unlink('GSD_MOCK_brightness')
-        except OSError:
-            pass
+        del self.testbed
 
         # we check this at the end so that the other cleanup always happens
         self.assertTrue(daemon_running or self.daemon_death_expected, 'daemon died during the test')
@@ -198,19 +213,51 @@ class PowerPluginTest(gsdtestcase.GSDTestCase):
     def get_status(self):
         return self.obj_session_presence_props.Get('org.gnome.SessionManager.Presence', 'status')
 
+    def backlight_defaults(self):
+        # Hack to modify the brightness defaults before starting gsd-power.
+        # The alternative would be to create two separate test files.
+        if 'no_backlight' in self.id():
+            return None, None
+        elif 'legacy_brightness' in self.id():
+            return 15, 15
+        else:
+            return 100, 50
+
+    def add_backlight(self, _type="raw"):
+        max_brightness, brightness = self.backlight_defaults()
+
+        if max_brightness is None:
+            self.backlight = None
+            return
+
+        # Undo mangling done in GSD
+        if max_brightness >= 99:
+            max_brightness += 1
+            brightness += 1
+
+        # This needs to be done before starting gsd-power!
+        self.backlight = self.testbed.add_device('backlight', 'mock_backlight', None,
+                                                 ['type', _type,
+                                                  'max_brightness', str(max_brightness),
+                                                  'brightness', str(brightness)],
+                                                 [])
+
     def get_brightness(self):
-        try:
-            (success, ret) = GLib.file_get_contents ('GSD_MOCK_brightness')
-        except:
-            return gsdpowerconstants.GSD_MOCK_DEFAULT_BRIGHTNESS
-        return int(ret)
+        max_brightness = int(open(os.path.join(self.testbed.get_root_dir() + self.backlight, 'max_brightness')).read())
+
+        # self.backlight contains the leading slash, so os.path.join doesn't quite work
+        res = int(open(os.path.join(self.testbed.get_root_dir() + self.backlight, 'brightness')).read())
+        # Undo mangling done in GSD
+        if max_brightness >= 99:
+            res -= 1
+        return res
 
     def set_has_external_monitor(self, external):
         if external:
             val = b'1'
         else:
             val = b'0'
-        GLib.file_set_contents ('GSD_MOCK_EXTERNAL_MONITOR', val)
+        GLib.file_set_contents (self.mock_external_monitor_file, val)
 
     def set_composite_battery_discharging(self, icon='battery-good-symbolic'):
         self.obj_upower.SetupDisplayDevice(
@@ -433,6 +480,7 @@ class PowerPluginTest(gsdtestcase.GSDTestCase):
         log = self.plugin_log.read()
         self.assertFalse(b'TESTSUITE: Unblanked screen' in log, 'unexpected unblank request')
 
+class PowerPluginTest1(PowerPluginBase):
     def test_screensaver(self):
         # Note that the screensaver mock object
         # doesn't know how to get out of being active,
@@ -503,6 +551,7 @@ class PowerPluginTest(gsdtestcase.GSDTestCase):
         self.obj_session_mgr.Uninhibit(dbus.UInt32(inhibit_id),
                 dbus_interface='org.gnome.SessionManager')
 
+class PowerPluginTest2(PowerPluginBase):
     def test_screensaver_no_unblank(self):
         '''Ensure the screensaver is not unblanked for new inhibitors.'''
 
@@ -582,10 +631,9 @@ class PowerPluginTest(gsdtestcase.GSDTestCase):
         # And check we're not idle
         self.assertEqual(self.get_status(), gsdpowerenums.GSM_PRESENCE_STATUS_AVAILABLE)
 
-    @unittest.skipIf(os.getenv('USE_SUSPEND_THEN_HIBERNATE') is None, "Please set USE_SUSPEND_THEN_HIBERNATE to indicate how g-s-d was compiled")
-    def test_sleep_inactive_battery_hibernate_then_suspend(self):
-        '''Verify we SuspendThenHibernate on sleep-inactive-battery-timeout when SuspendThenHibernate is available'''
-        # Hibernate then suspend is the default
+class PowerPluginTest3(PowerPluginBase):
+    def test_sleep_inactive_battery(self):
+        '''sleep-inactive-battery-timeout'''
 
         self.settings_session['idle-delay'] = 2
         self.settings_gsd_power['sleep-inactive-battery-timeout'] = 5
@@ -596,27 +644,7 @@ class PowerPluginTest(gsdtestcase.GSDTestCase):
 
         # suspend should happen after inactive sleep timeout + 1 s notification
         # delay + 1 s error margin
-        if os.getenv('USE_SUSPEND_THEN_HIBERNATE') == '1':
-            self.check_for_suspend(7, methods=['SuspendThenHibernate'])
-        else:
-            self.check_for_suspend(7, methods=['Suspend'])
-
-    def test_sleep_inactive_battery_no_hibernate_then_suspend(self):
-        '''Verify we Suspend on sleep-inactive-battery-timeout when SuspendThenHibernate is unavailable'''
-
-        # Patch up logind_ctl to not return "yes" for CanSuspendThenHibernate
-        self.logind_obj.AddMethod('org.freedesktop.login1.Manager', 'CanSuspendThenHibernate', '', 's', 'ret = "no"')
-
-        self.settings_session['idle-delay'] = 2
-        self.settings_gsd_power['sleep-inactive-battery-timeout'] = 5
-        self.settings_gsd_power['sleep-inactive-battery-type'] = 'suspend'
-
-        # wait for idle delay; should not yet suspend
-        self.check_no_suspend(2)
-
-        # suspend should happen after inactive sleep timeout + 1 s notification
-        # delay + 1 s error margin
-        self.check_for_suspend(7, methods=["Suspend"])
+        self.check_for_suspend(7)
 
     def _test_suspend_no_hibernate(self):
         '''suspend-no-hibernate'''
@@ -657,6 +685,7 @@ class PowerPluginTest(gsdtestcase.GSDTestCase):
         self.obj_session_mgr.Uninhibit(dbus.UInt32(inhibit_id),
                 dbus_interface='org.gnome.SessionManager')
 
+class PowerPluginTest4(PowerPluginBase):
     def test_lock_on_lid_close(self):
         '''Check that we do lock on lid closing, if the machine will not suspend'''
 
@@ -737,6 +766,7 @@ class PowerPluginTest(gsdtestcase.GSDTestCase):
         self.obj_session_mgr.Uninhibit(dbus.UInt32(inhibit_id),
                 dbus_interface='org.gnome.SessionManager')
 
+class PowerPluginTest5(PowerPluginBase):
     def test_dim(self):
         '''Check that we do go to dim'''
 
@@ -810,6 +840,7 @@ class PowerPluginTest(gsdtestcase.GSDTestCase):
         # Check that we're uninhibited after the safety time
         self.check_for_lid_uninhibited(4)
 
+class PowerPluginTest6(PowerPluginBase):
     def test_notify_critical_battery(self):
         '''action on critical battery'''
 
@@ -934,6 +965,7 @@ class PowerPluginTest(gsdtestcase.GSDTestCase):
         self.obj_session_mgr.Uninhibit(dbus.UInt32(inhibit_id),
                 dbus_interface='org.gnome.SessionManager')
 
+class PowerPluginTest7(PowerPluginBase):
     def test_check_missing_kbd_brightness(self):
         ''' https://bugzilla.gnome.org/show_bug.cgi?id=793512 '''
 
@@ -1006,6 +1038,179 @@ class PowerPluginTest(gsdtestcase.GSDTestCase):
 
         # And wait a little more to see us dim again
         self.check_dim(idle_delay + 2)
+
+class PowerPluginTest8(PowerPluginBase):
+    def test_brightness_stepping(self):
+        '''Check that stepping the backlight works as expected'''
+
+        obj_gsd_power = self.session_bus_con.get_object(
+            'org.gnome.SettingsDaemon.Power', '/org/gnome/SettingsDaemon/Power')
+        obj_gsd_power_screen_iface = dbus.Interface(obj_gsd_power, 'org.gnome.SettingsDaemon.Power.Screen')
+
+        # Each of the step calls will only return when the value was written
+        start = time.time()
+        # We start at 50% and step by 5% each time
+        obj_gsd_power_screen_iface.StepUp()
+        self.assertEqual(self.get_brightness(), 55)
+        obj_gsd_power_screen_iface.StepUp()
+        self.assertEqual(self.get_brightness(), 60)
+        obj_gsd_power_screen_iface.StepUp()
+        self.assertEqual(self.get_brightness(), 65)
+        obj_gsd_power_screen_iface.StepUp()
+        self.assertEqual(self.get_brightness(), 70)
+        stop = time.time()
+        # This needs to take more than 0.8 seconds as each write is delayed by
+        # 0.2 seconds by the test backlight helper
+        self.assertGreater(stop - start, 0.8)
+
+        # Now, the same thing should work fine if we step multiple times,
+        # even if we are so quick that compression will happen.
+        # Use a list to keep rack of replies (as integer is immutable and would
+        # not be modified in the outer scope)
+        replies = [0]
+
+        def handle_reply(*args):
+            replies[0] += 1
+
+        def last_reply(*args):
+            replies[0] += 1
+            loop.quit()
+
+        def error_handler(*args):
+            loop.quit()
+
+        start = time.time()
+        obj_gsd_power_screen_iface.StepDown(reply_handler=handle_reply, error_handler=error_handler)
+        obj_gsd_power_screen_iface.StepDown(reply_handler=handle_reply, error_handler=error_handler)
+        obj_gsd_power_screen_iface.StepDown(reply_handler=handle_reply, error_handler=error_handler)
+        obj_gsd_power_screen_iface.StepDown(reply_handler=last_reply, error_handler=error_handler)
+        loop = GLib.MainLoop()
+        loop.run()
+        stop = time.time()
+
+        # The calls need to be returned in order. As we got the last reply, all
+        # others must have been received too.
+        self.assertEqual(replies[0], 4)
+        # Four steps down, so back at 50%
+        self.assertEqual(self.get_brightness(), 50)
+        # And compression must have happened, so it should take less than 0.8s
+        self.assertLess(stop - start, 0.8)
+
+    def test_brightness_compression(self):
+        '''Check that compression also happens when setting the property'''
+        # Now test that the compression works correctly.
+        # NOTE: Relies on the implementation detail, that the property setter
+        #       returns immediately rather than waiting for the brightness to
+        #       be updated.
+        # Should this ever be fixed, then this will need to be changed to use
+        # async dbus calls similar to the stepping code
+
+        obj_gsd_power = self.session_bus_con.get_object(
+            'org.gnome.SettingsDaemon.Power', '/org/gnome/SettingsDaemon/Power')
+        obj_gsd_power_prop_iface = dbus.Interface(obj_gsd_power, dbus.PROPERTIES_IFACE)
+
+        # Quickly ramp the brightness up
+        for brightness in range(70, 91):
+            obj_gsd_power_prop_iface.Set('org.gnome.SettingsDaemon.Power.Screen', 'Brightness', brightness)
+
+        # The brightness of 80 should be in effect after slightly more than
+        # 0.4 seconds. If compression does not work as expected, this would take
+        # more than 5 seconds for the 20 steps.
+        time.sleep(2.0)
+        self.assertEqual(self.get_brightness(), 90)
+
+    def test_brightness_uevent(self):
+        obj_gsd_power = self.session_bus_con.get_object(
+            'org.gnome.SettingsDaemon.Power', '/org/gnome/SettingsDaemon/Power')
+        obj_gsd_power_prop_iface = dbus.Interface(obj_gsd_power, dbus.PROPERTIES_IFACE)
+
+        brightness = obj_gsd_power_prop_iface.Get('org.gnome.SettingsDaemon.Power.Screen', 'Brightness')
+        self.assertEqual(50, brightness)
+
+        # Check that the brightness is updated if it was changed through some
+        # other mechanism (e.g. firmware).
+        # Set to 80+1 because of the GSD offset (see add_backlight).
+        self.testbed.set_attribute(self.backlight, 'brightness', '81')
+        self.testbed.uevent(self.backlight, 'change')
+
+        self.check_plugin_log('GsdBacklight: Got uevent', 1, 'gsd-power did not process uevent')
+        time.sleep(0.2)
+
+        brightness = obj_gsd_power_prop_iface.Get('org.gnome.SettingsDaemon.Power.Screen', 'Brightness')
+        self.assertEqual(80, brightness)
+
+    def test_brightness_step(self):
+        # We cannot use check_plugin_log here because the startup check already
+        # read the relevant message.
+        log = open(self.plugin_log_write.name, 'rb').read()
+        self.assertIn(b'Step size for backlight is 5.', log)
+
+    def test_legacy_brightness_step(self):
+        # We cannot use check_plugin_log here because the startup check already
+        # read the relevant message.
+        log = open(self.plugin_log_write.name, 'rb').read()
+        self.assertIn(b'Step size for backlight is 1.', log)
+
+    def test_legacy_brightness_rounding(self):
+        obj_gsd_power = self.session_bus_con.get_object(
+            'org.gnome.SettingsDaemon.Power', '/org/gnome/SettingsDaemon/Power')
+        obj_gsd_power_prop_iface = dbus.Interface(obj_gsd_power, dbus.PROPERTIES_IFACE)
+
+        obj_gsd_power_prop_iface.Set('org.gnome.SettingsDaemon.Power.Screen', 'Brightness', 0)
+        time.sleep(0.4)
+        self.assertEqual(self.get_brightness(), 0)
+        obj_gsd_power_prop_iface.Set('org.gnome.SettingsDaemon.Power.Screen', 'Brightness', 10)
+        time.sleep(0.4)
+        self.assertEqual(self.get_brightness(), 1)
+        obj_gsd_power_prop_iface.Set('org.gnome.SettingsDaemon.Power.Screen', 'Brightness', 20)
+        time.sleep(0.4)
+        self.assertEqual(self.get_brightness(), 3)
+        obj_gsd_power_prop_iface.Set('org.gnome.SettingsDaemon.Power.Screen', 'Brightness', 25)
+        time.sleep(0.4)
+        self.assertEqual(self.get_brightness(), 4)
+        obj_gsd_power_prop_iface.Set('org.gnome.SettingsDaemon.Power.Screen', 'Brightness', 50)
+        time.sleep(0.4)
+        self.assertEqual(self.get_brightness(), 7)
+        obj_gsd_power_prop_iface.Set('org.gnome.SettingsDaemon.Power.Screen', 'Brightness', 52)
+        time.sleep(0.4)
+        self.assertEqual(self.get_brightness(), 8)
+        obj_gsd_power_prop_iface.Set('org.gnome.SettingsDaemon.Power.Screen', 'Brightness', 56)
+        time.sleep(0.4)
+        self.assertEqual(self.get_brightness(), 8)
+        obj_gsd_power_prop_iface.Set('org.gnome.SettingsDaemon.Power.Screen', 'Brightness', 57)
+        time.sleep(0.4)
+        self.assertEqual(self.get_brightness(), 9)
+        obj_gsd_power_prop_iface.Set('org.gnome.SettingsDaemon.Power.Screen', 'Brightness', 98)
+        time.sleep(0.4)
+        self.assertEqual(self.get_brightness(), 15)
+
+    def test_no_backlight(self):
+        '''Check that backlight brightness DBus api without a backlight'''
+
+        obj_gsd_power = self.session_bus_con.get_object(
+            'org.gnome.SettingsDaemon.Power', '/org/gnome/SettingsDaemon/Power')
+        obj_gsd_power_props = dbus.Interface(obj_gsd_power, dbus.PROPERTIES_IFACE)
+        obj_gsd_power_screen = dbus.Interface(obj_gsd_power, 'org.gnome.SettingsDaemon.Power.Screen')
+
+        # We expect -1 to be returned
+        brightness = obj_gsd_power_props.Get('org.gnome.SettingsDaemon.Power.Screen', 'Brightness')
+        self.assertEqual(brightness, -1)
+
+        # Trying to set the brightness
+        with self.assertRaises(dbus.DBusException) as exc:
+            obj_gsd_power_props.Set('org.gnome.SettingsDaemon.Power.Screen', 'Brightness', 1)
+
+        self.assertEqual(exc.exception.get_dbus_message(), 'No usable backlight could be found!')
+
+        with self.assertRaises(dbus.DBusException) as exc:
+            obj_gsd_power_screen.StepUp()
+
+        self.assertEqual(exc.exception.get_dbus_message(), 'No usable backlight could be found!')
+
+        with self.assertRaises(dbus.DBusException) as exc:
+            obj_gsd_power_screen.StepDown()
+
+        self.assertEqual(exc.exception.get_dbus_message(), 'No usable backlight could be found!')
 
 # avoid writing to stderr
 unittest.main(testRunner=unittest.TextTestRunner(stream=sys.stdout, verbosity=2))

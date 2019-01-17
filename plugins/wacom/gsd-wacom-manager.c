@@ -30,18 +30,26 @@
 
 #include <locale.h>
 
-#include <glib.h>
-#include <glib/gi18n-lib.h>
+#include <gdk/gdk.h>
+
+#ifdef GDK_WINDOWING_WAYLAND
+#include <gdk/gdkwayland.h>
+#endif
+#ifdef GDK_WINDOWING_X11
+#include <gdk/gdkx.h>
+#endif
+
+#if HAVE_WACOM
+#include <libwacom/libwacom.h>
+#endif
 
 #include "gsd-enums.h"
 #include "gnome-settings-profile.h"
 #include "gnome-settings-bus.h"
 #include "gsd-wacom-manager.h"
 #include "gsd-wacom-oled.h"
-#include "gsd-shell-helper.h"
-#include "gsd-device-mapper.h"
-#include "gsd-device-manager.h"
 #include "gsd-settings-migrate.h"
+#include "gsd-input-helper.h"
 
 
 #define GSD_WACOM_MANAGER_GET_PRIVATE(o) (G_TYPE_INSTANCE_GET_PRIVATE ((o), GSD_TYPE_WACOM_MANAGER, GsdWacomManagerPrivate))
@@ -54,6 +62,8 @@
 
 #define GSD_WACOM_DBUS_PATH GSD_DBUS_PATH "/Wacom"
 #define GSD_WACOM_DBUS_NAME GSD_DBUS_NAME ".Wacom"
+
+#define LEFT_HANDED_KEY		"left-handed"
 
 static const gchar introspection_xml[] =
 "<node name='/org/gnome/SettingsDaemon/Wacom'>"
@@ -73,15 +83,16 @@ static const gchar introspection_xml[] =
 struct GsdWacomManagerPrivate
 {
         guint start_idle_id;
-        GsdDeviceManager *device_manager;
+        GdkSeat *seat;
         guint device_added_id;
-        guint device_removed_id;
 
         GsdShell *shell_proxy;
 
-        GsdDeviceMapper *device_mapper;
-
         gchar *machine_id;
+
+#if HAVE_WACOM
+        WacomDeviceDatabase *wacom_db;
+#endif
 
         /* DBus */
         GDBusNodeInfo   *introspection_data;
@@ -95,10 +106,12 @@ static void     gsd_wacom_manager_class_init  (GsdWacomManagerClass *klass);
 static void     gsd_wacom_manager_init        (GsdWacomManager      *wacom_manager);
 static void     gsd_wacom_manager_finalize    (GObject              *object);
 
-static gboolean set_led (GsdDevice  *device,
-                         guint       group,
-                         guint       index,
-                         GError    **error);
+static gboolean set_led (const gchar  *device_path,
+                         guint         group,
+                         guint         index,
+                         GError      **error);
+static gboolean is_opaque_tablet (GsdWacomManager *manager,
+                                  GdkDevice       *device);
 
 G_DEFINE_TYPE (GsdWacomManager, gsd_wacom_manager, G_TYPE_OBJECT)
 
@@ -123,7 +136,7 @@ map_tablet_left_handed (GVariant *value)
 
 static void
 migrate_tablet_settings (GsdWacomManager *manager,
-                         GsdDevice       *device)
+                         GdkDevice       *device)
 {
         GsdSettingsMigrateEntry tablet_settings[] = {
                 { "is-absolute", "mapping", map_tablet_mapping },
@@ -133,7 +146,8 @@ migrate_tablet_settings (GsdWacomManager *manager,
         gchar *old_path, *new_path;
         const gchar *vendor, *product;
 
-        gsd_device_get_device_ids (device, &vendor, &product);
+        vendor = gdk_device_get_vendor_id (device);
+        product = gdk_device_get_product_id (device);
 
         old_path = g_strdup_printf ("/org/gnome/settings-daemon/peripherals/wacom/%s-usb:%s:%s/",
                                     manager->priv->machine_id, vendor, product);
@@ -145,6 +159,22 @@ migrate_tablet_settings (GsdWacomManager *manager,
                                     "org.gnome.desktop.peripherals.tablet",
                                     new_path,
                                     tablet_settings, G_N_ELEMENTS (tablet_settings));
+
+        /* Opaque tablets' mapping may be modified by users, so only these
+         * need migration of settings.
+         */
+        if (is_opaque_tablet (manager, device)) {
+                GsdSettingsMigrateEntry display_setting[] = {
+                        { "display", "output", NULL },
+                };
+
+                gsd_settings_migrate_check ("org.gnome.desktop.peripherals.tablet.deprecated",
+                                            new_path,
+                                            "org.gnome.desktop.peripherals.tablet",
+                                            new_path,
+                                            display_setting, G_N_ELEMENTS (display_setting));
+        }
+
         g_free (old_path);
         g_free (new_path);
 }
@@ -159,22 +189,82 @@ gsd_wacom_manager_class_init (GsdWacomManagerClass *klass)
         g_type_class_add_private (klass, sizeof (GsdWacomManagerPrivate));
 }
 
-static GsdDevice *
+static gchar *
+get_device_path (GdkDevice *device)
+{
+#ifdef HAVE_WAYLAND
+        if (gnome_settings_is_wayland ())
+                return g_strdup (gdk_wayland_device_get_node_path (device));
+        else
+#endif
+                return xdevice_get_device_node (gdk_x11_device_get_id (device));
+}
+
+static gboolean
+is_opaque_tablet (GsdWacomManager *manager,
+                  GdkDevice       *device)
+{
+        gboolean is_opaque = FALSE;
+#if HAVE_WACOM
+        WacomDevice *wacom_device;
+        gchar *devpath;
+
+        devpath = get_device_path (device);
+        wacom_device = libwacom_new_from_path (manager->priv->wacom_db, devpath,
+                                               WFALLBACK_GENERIC, NULL);
+        if (wacom_device) {
+                WacomIntegrationFlags integration_flags;
+
+                integration_flags = libwacom_get_integration_flags (wacom_device);
+                is_opaque = (integration_flags &
+                             (WACOM_DEVICE_INTEGRATED_DISPLAY | WACOM_DEVICE_INTEGRATED_SYSTEM)) == 0;
+                libwacom_destroy (wacom_device);
+        }
+
+#endif
+        return is_opaque;
+}
+
+static GdkDevice *
 lookup_device_by_path (GsdWacomManager *manager,
                        const gchar     *path)
 {
         GList *devices, *l;
 
-        devices = gsd_device_manager_list_devices (manager->priv->device_manager,
-                                                   GSD_DEVICE_TYPE_TABLET);
+        devices = gdk_seat_get_slaves (manager->priv->seat,
+                                       GDK_SEAT_CAPABILITY_ALL);
 
         for (l = devices; l; l = l->next) {
-                if (g_strcmp0 (gsd_device_get_device_file (l->data),
-                               path) == 0)
-                        return l->data;
+                GdkDevice *device = l->data;
+                gchar *dev_path = get_device_path (device);
+
+                if (g_strcmp0 (dev_path, path) == 0) {
+                        g_free (dev_path);
+                        return device;
+                }
+
+                g_free (dev_path);
         }
 
+        g_list_free (devices);
+
         return NULL;
+}
+
+static GSettings *
+device_get_settings (GdkDevice *device)
+{
+        GSettings *settings;
+        gchar *path;
+
+        path = g_strdup_printf ("/org/gnome/desktop/peripherals/tablets/%s:%s/",
+                                gdk_device_get_vendor_id (device),
+                                gdk_device_get_product_id (device));
+        settings = g_settings_new_with_path ("org.gnome.desktop.peripherals.tablet",
+                                             path);
+        g_free (path);
+
+        return settings;
 }
 
 static void
@@ -189,7 +279,7 @@ handle_method_call (GDBusConnection       *connection,
 {
 	GsdWacomManager *self = GSD_WACOM_MANAGER (data);
         GError *error = NULL;
-        GsdDevice *device;
+        GdkDevice *device;
 
         if (g_strcmp0 (method_name, "SetGroupModeLED") == 0) {
                 gchar *device_path;
@@ -202,12 +292,14 @@ handle_method_call (GDBusConnection       *connection,
                         return;
                 }
 
-                if (set_led (device, group, mode, &error))
+                if (set_led (device_path, group, mode, &error))
                         g_dbus_method_invocation_return_value (invocation, NULL);
                 else
                         g_dbus_method_invocation_return_gerror (invocation, error);
         } else if (g_strcmp0 (method_name, "SetOLEDLabels") == 0) {
                 gchar *device_path, *label;
+                gboolean left_handed;
+                GSettings *settings;
                 GVariantIter *iter;
                 gint i = 0;
 
@@ -218,8 +310,12 @@ handle_method_call (GDBusConnection       *connection,
                         return;
                 }
 
+                settings = device_get_settings (device);
+                left_handed = g_settings_get_boolean (settings, LEFT_HANDED_KEY);
+                g_object_unref (settings);
+
                 while (g_variant_iter_loop (iter, "s", &label)) {
-                        if (!set_oled (device, i, label, &error)) {
+                        if (!set_oled (device_path, left_handed, i, label, &error)) {
                                 g_free (label);
                                 break;
                         }
@@ -243,12 +339,11 @@ static const GDBusInterfaceVTable interface_vtable =
 };
 
 static gboolean
-set_led (GsdDevice  *device,
-         guint       group,
-	 guint       index,
-         GError    **error)
+set_led (const gchar  *device_path,
+         guint         group,
+	 guint         index,
+         GError      **error)
 {
-	const char *path;
 	char *command;
 	gboolean ret;
 
@@ -256,12 +351,11 @@ set_led (GsdDevice  *device,
 	/* Not implemented on non-Linux systems */
 	return TRUE;
 #endif
-	path = gsd_device_get_device_file (device);
 
-	g_debug ("Switching group ID %d to index %d for device %s", group, index, path);
+	g_debug ("Switching group ID %d to index %d for device %s", group, index, device_path);
 
 	command = g_strdup_printf ("pkexec " LIBEXECDIR "/gsd-wacom-led-helper --path %s --group %d --led %d",
-				   path, group, index);
+				   device_path, group, index);
 	ret = g_spawn_command_line_sync (command,
 					 NULL,
 					 NULL,
@@ -273,66 +367,46 @@ set_led (GsdDevice  *device,
 }
 
 static void
-device_added_cb (GsdDeviceManager *device_manager,
-                 GsdDevice        *gsd_device,
-                 GsdWacomManager  *manager)
+device_added_cb (GdkSeat         *seat,
+                 GdkDevice       *device,
+                 GsdWacomManager *manager)
 {
-	GsdDeviceType device_type;
-
-	device_type = gsd_device_get_device_type (gsd_device);
-
-        if (device_type & GSD_DEVICE_TYPE_TABLET)
-                migrate_tablet_settings (manager, gsd_device);
-
-	if ((device_type & GSD_DEVICE_TYPE_TABLET) != 0 &&
-            (device_type & GSD_DEVICE_TYPE_TOUCHPAD) == 0) {
-		gsd_device_mapper_add_input (manager->priv->device_mapper,
-					     gsd_device);
-	} else if ((device_type & GSD_DEVICE_TYPE_TOUCHSCREEN) != 0) {
-		gsd_device_mapper_add_input (manager->priv->device_mapper,
-					     gsd_device);
-	}
+        if (gdk_device_get_source (device) == GDK_SOURCE_PEN &&
+            gdk_device_get_device_type (device) == GDK_DEVICE_TYPE_SLAVE) {
+                migrate_tablet_settings (manager, device);
+        }
 }
 
 static void
-device_removed_cb (GsdDeviceManager *device_manager,
-                   GsdDevice        *gsd_device,
-                   GsdWacomManager  *manager)
-{
-	gsd_device_mapper_remove_input (manager->priv->device_mapper,
-					gsd_device);
-}
-
-static void
-add_devices (GsdWacomManager *manager,
-             GsdDeviceType    device_type)
+add_devices (GsdWacomManager     *manager,
+             GdkSeatCapabilities  capabilities)
 {
         GList *devices, *l;
 
-        devices = gsd_device_manager_list_devices (manager->priv->device_manager,
-                                                   device_type);
+        devices = gdk_seat_get_slaves (manager->priv->seat, capabilities);
         for (l = devices; l ; l = l->next)
-		device_added_cb (manager->priv->device_manager, l->data, manager);
+		device_added_cb (manager->priv->seat, l->data, manager);
         g_list_free (devices);
 }
 
 static void
 set_devicepresence_handler (GsdWacomManager *manager)
 {
-        GsdDeviceManager *device_manager;
+        GdkSeat *seat;
 
-        device_manager = gsd_device_manager_get ();
-        manager->priv->device_added_id = g_signal_connect (G_OBJECT (device_manager), "device-added",
+        seat = gdk_display_get_default_seat (gdk_display_get_default ());
+        manager->priv->device_added_id = g_signal_connect (seat, "device-added",
                                                            G_CALLBACK (device_added_cb), manager);
-        manager->priv->device_removed_id = g_signal_connect (G_OBJECT (device_manager), "device-removed",
-                                                             G_CALLBACK (device_removed_cb), manager);
-        manager->priv->device_manager = device_manager;
+        manager->priv->seat = seat;
 }
 
 static void
 gsd_wacom_manager_init (GsdWacomManager *manager)
 {
         manager->priv = GSD_WACOM_MANAGER_GET_PRIVATE (manager);
+#if HAVE_WACOM
+        manager->priv->wacom_db = libwacom_database_new ();
+#endif
 }
 
 static gboolean
@@ -340,12 +414,9 @@ gsd_wacom_manager_idle_cb (GsdWacomManager *manager)
 {
         gnome_settings_profile_start (NULL);
 
-        manager->priv->device_mapper = gsd_device_mapper_get ();
-
         set_devicepresence_handler (manager);
 
-        add_devices (manager, GSD_DEVICE_TYPE_TABLET);
-        add_devices (manager, GSD_DEVICE_TYPE_TOUCHSCREEN);
+        add_devices (manager, GDK_SEAT_CAPABILITY_TABLET_STYLUS);
 
         gnome_settings_profile_end (NULL);
 
@@ -470,10 +541,9 @@ gsd_wacom_manager_stop (GsdWacomManager *manager)
                 p->dbus_register_object_id = 0;
         }
 
-        if (p->device_manager != NULL) {
-                g_signal_handler_disconnect (p->device_manager, p->device_added_id);
-                g_signal_handler_disconnect (p->device_manager, p->device_removed_id);
-                p->device_manager = NULL;
+        if (p->seat != NULL) {
+                g_signal_handler_disconnect (p->seat, p->device_added_id);
+                p->seat = NULL;
         }
 }
 
@@ -495,6 +565,10 @@ gsd_wacom_manager_finalize (GObject *object)
                 g_source_remove (wacom_manager->priv->start_idle_id);
 
         g_clear_object (&wacom_manager->priv->shell_proxy);
+
+#if HAVE_WACOM
+        libwacom_database_destroy (wacom_manager->priv->wacom_db);
+#endif
 
         G_OBJECT_CLASS (gsd_wacom_manager_parent_class)->finalize (object);
 }
