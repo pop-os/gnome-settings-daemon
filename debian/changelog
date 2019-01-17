@@ -1,3 +1,9 @@
+gnome-settings-daemon (3.31.2-1) UNRELEASED; urgency=medium
+
+  * New upstream release
+
+ -- Jeremy Bicha <jbicha@debian.org>  Thu, 17 Jan 2019 14:09:09 -0500
+
 gnome-settings-daemon (3.30.2-1) unstable; urgency=medium
 
   * New upstream release
