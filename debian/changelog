@@ -1,8 +1,10 @@
-gnome-settings-daemon (3.31.2-1) UNRELEASED; urgency=medium
+gnome-settings-daemon (3.31.2-1) experimental; urgency=medium
 
-  * New upstream release
+  * New upstream development release
+  * Bump minimum libglib2.0-dev to 2.56
+  * Cherry-pick keyboard-Enable-ibus-for-OSK-purposes.patch
 
- -- Jeremy Bicha <jbicha@debian.org>  Thu, 17 Jan 2019 14:09:09 -0500
+ -- Jeremy Bicha <jbicha@debian.org>  Fri, 18 Jan 2019 07:49:50 -0500
 
 gnome-settings-daemon (3.30.2-1) unstable; urgency=medium
 
