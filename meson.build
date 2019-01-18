@@ -1,6 +1,6 @@
 project(
   'gnome-settings-daemon', 'c',
-  version: '3.30.2',
+  version: '3.31.2',
   license: [ 'GPL2+', 'LGPLv2+' ],
   meson_version: '>= 0.44.0'
 )
@@ -82,6 +82,7 @@ endif
 
 add_project_arguments(common_flags + compiler_flags, language: 'c')
 
+glib_dep = dependency('glib-2.0', version: '>= 2.56')
 colord_dep = dependency('colord', version: '>= 1.0.2')
 geocode_glib_dep = dependency('geocode-glib-1.0', version: '>= 3.10.0')
 gio_dep = dependency('gio-2.0', version: '>= 2.53.0')
@@ -116,10 +117,6 @@ libgvc = subproject(
   ]
 )
 libgvc_dep = libgvc.get_variable('libgvc_dep')
-
-# Suspend-then-hibernate kill switch
-use_suspend_then_hibernate = get_option('experimental_suspend_then_hibernate')
-config_h.set10('USE_SUSPEND_THEN_HIBERNATE', use_suspend_then_hibernate)
 
 # GUdev integration (default enabled)
 enable_gudev = get_option('gudev')
@@ -185,6 +182,7 @@ enable_rfkill = get_option('rfkill')
 assert(enable_rfkill or not host_is_linux, 'rfkill is not optional on Linux platforms')
 if enable_rfkill
   assert(cc.has_header('linux/rfkill.h'), 'rfkill support requested but RFKill headers not found')
+  assert(enable_gudev, 'GUdev is required for rfkill support')
 
   udev_dir = get_option('udev_dir')
   if udev_dir == ''
@@ -243,7 +241,6 @@ output += '        Cups support:             ' + enable_cups.to_string() + '\n'
 output += '        Wayland support:          ' + enable_wayland.to_string() + '\n'
 output += '        Wacom support:            ' + enable_wacom.to_string() + '\n'
 output += '        RFKill support:           ' + enable_rfkill.to_string() + '\n'
-output += '        Suspend-then-hibernate:   ' + use_suspend_then_hibernate.to_string() + '\n'
 if enable_smartcard
   output += '        System nssdb:             ' + system_nssdb_dir + '\n'
 endif

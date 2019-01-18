@@ -1,6 +1,6 @@
 sources = files(
   'gpm-common.c',
-  'gsd-backlight-linux.c',
+  'gsd-backlight.c',
   'gsd-power-manager.c',
   'main.c'
 )
@@ -16,6 +16,13 @@ deps = plugins_deps + [
   x11_dep,
   xtst_dep,
   dependency('xext')
+]
+
+# required for gsd-power-enums-update, which we have
+# to compile natively
+native_deps = [
+  dependency('glib-2.0', native: true),
+  dependency('gio-2.0', native:true)
 ]
 
 if enable_gudev
@@ -55,8 +62,9 @@ gsd_power_enums_update = executable(
   'gsd-power-enums-update',
   sources,
   include_directories: top_inc,
-  dependencies: deps,
-  c_args: cflags
+  dependencies: native_deps,
+  c_args: cflags,
+  native: true
 )
 
 if enable_gudev
@@ -79,12 +87,9 @@ if enable_gudev
 
   sources = files(
     'gsd-backlight-helper.c',
-    'gsd-backlight-linux.c'
   )
 
   deps = [
-    gudev_dep,
-    m_dep
   ]
 
   executable(
@@ -124,14 +129,16 @@ envs = [
 #  'G_DEBUG=fatal_warnings',
   'BUILDDIR=' + meson.current_build_dir(),
   'TOP_BUILDDIR=' + meson.build_root(),
-  'USE_SUSPEND_THEN_HIBERNATE=' + (use_suspend_then_hibernate ? '1' : '0'),
+  'LD_PRELOAD=libumockdev-preload.so.0',
 ]
 
-test(
-  'test-power',
-  test_py,
-#  args: 'PowerPluginTest.test_sleep_inactive_blank',
-  env: envs,
-  timeout: 500
-)
+foreach i : [ 1, 2, 3, 4, 5, 6, 7, 8 ]
+  test(
+    'test-power @0@/8'.format(i),
+    test_py,
+    args: [ 'PowerPluginTest@0@'.format(i) ],
+    env: envs,
+    timeout: 100
+  )
+endforeach
 
