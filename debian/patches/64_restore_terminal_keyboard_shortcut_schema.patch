@@ -9,10 +9,10 @@ Subject: _restore_terminal_keyboard_shortcut_schema
  plugins/media-keys/shortcuts-list.h                   |  1 +
  4 files changed, 26 insertions(+)
 
-Index: gnome-settings-daemon-3.30.2/data/org.gnome.settings-daemon.plugins.media-keys.gschema.xml.in
-===================================================================
---- gnome-settings-daemon-3.30.2.orig/data/org.gnome.settings-daemon.plugins.media-keys.gschema.xml.in
-+++ gnome-settings-daemon-3.30.2/data/org.gnome.settings-daemon.plugins.media-keys.gschema.xml.in
+diff --git a/data/org.gnome.settings-daemon.plugins.media-keys.gschema.xml.in b/data/org.gnome.settings-daemon.plugins.media-keys.gschema.xml.in
+index 089b861..7f101cb 100644
+--- a/data/org.gnome.settings-daemon.plugins.media-keys.gschema.xml.in
++++ b/data/org.gnome.settings-daemon.plugins.media-keys.gschema.xml.in
 @@ -136,6 +136,11 @@
        <summary>Record a short video of the screen</summary>
        <description>Binding to record a short video of the screen</description>
@@ -25,14 +25,15 @@ Index: gnome-settings-daemon-3.30.2/data/org.gnome.settings-daemon.plugins.media
      <key name="www" type="s">
        <default>'XF86WWW'</default>
        <summary>Launch web browser</summary>
-Index: gnome-settings-daemon-3.30.2/plugins/media-keys/gsd-media-keys-manager.c
-===================================================================
---- gnome-settings-daemon-3.30.2.orig/plugins/media-keys/gsd-media-keys-manager.c
-+++ gnome-settings-daemon-3.30.2/plugins/media-keys/gsd-media-keys-manager.c
-@@ -979,6 +979,22 @@ gnome_session_shutdown_cb (GObject *sour
+diff --git a/plugins/media-keys/gsd-media-keys-manager.c b/plugins/media-keys/gsd-media-keys-manager.c
+index c3822af..937fd71 100644
+--- a/plugins/media-keys/gsd-media-keys-manager.c
++++ b/plugins/media-keys/gsd-media-keys-manager.c
+@@ -978,6 +978,22 @@ gnome_session_shutdown_cb (GObject *source_object,
+         }
  }
  
- static void
++static void
 +do_terminal_action (GsdMediaKeysManager *manager)
 +{
 +        GSettings *settings;
@@ -48,10 +49,9 @@ Index: gnome-settings-daemon-3.30.2/plugins/media-keys/gsd-media-keys-manager.c
 +        g_object_unref (settings);
 +}
 +
-+static void
+ static void
  gnome_session_shutdown (GsdMediaKeysManager *manager)
  {
-         GDBusProxy *proxy;
 @@ -2536,6 +2552,9 @@ do_action (GsdMediaKeysManager *manager,
          case SCREENCAST_KEY:
                  do_screencast_action (manager);
@@ -62,10 +62,10 @@ Index: gnome-settings-daemon-3.30.2/plugins/media-keys/gsd-media-keys-manager.c
          case WWW_KEY:
                  do_url_action (manager, "http", timestamp);
                  break;
-Index: gnome-settings-daemon-3.30.2/plugins/media-keys/media-keys.h
-===================================================================
---- gnome-settings-daemon-3.30.2.orig/plugins/media-keys/media-keys.h
-+++ gnome-settings-daemon-3.30.2/plugins/media-keys/media-keys.h
+diff --git a/plugins/media-keys/media-keys.h b/plugins/media-keys/media-keys.h
+index 85af02b..a1183da 100644
+--- a/plugins/media-keys/media-keys.h
++++ b/plugins/media-keys/media-keys.h
 @@ -49,6 +49,7 @@ typedef enum {
          WINDOW_SCREENSHOT_CLIP_KEY,
          AREA_SCREENSHOT_CLIP_KEY,
@@ -74,10 +74,10 @@ Index: gnome-settings-daemon-3.30.2/plugins/media-keys/media-keys.h
          WWW_KEY,
          PLAY_KEY,
          PAUSE_KEY,
-Index: gnome-settings-daemon-3.30.2/plugins/media-keys/shortcuts-list.h
-===================================================================
---- gnome-settings-daemon-3.30.2.orig/plugins/media-keys/shortcuts-list.h
-+++ gnome-settings-daemon-3.30.2/plugins/media-keys/shortcuts-list.h
+diff --git a/plugins/media-keys/shortcuts-list.h b/plugins/media-keys/shortcuts-list.h
+index 744352a..9d288f7 100644
+--- a/plugins/media-keys/shortcuts-list.h
++++ b/plugins/media-keys/shortcuts-list.h
 @@ -76,6 +76,7 @@ static struct {
          { WINDOW_SCREENSHOT_CLIP_KEY, "window-screenshot-clip", NULL, NULL, SHELL_ACTION_MODE_NORMAL },
          { AREA_SCREENSHOT_CLIP_KEY, "area-screenshot-clip", NULL, NULL, SHELL_ACTION_MODE_ALL },

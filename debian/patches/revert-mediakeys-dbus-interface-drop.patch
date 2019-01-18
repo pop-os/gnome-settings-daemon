@@ -8,10 +8,10 @@ https://mail.gnome.org/archives/distributor-list/2017-April/msg00009.html
  plugins/media-keys/gsd-media-keys-manager.c | 11 +++++++++++
  1 file changed, 11 insertions(+)
 
-Index: gnome-settings-daemon-3.30.2/plugins/media-keys/gsd-media-keys-manager.c
-===================================================================
---- gnome-settings-daemon-3.30.2.orig/plugins/media-keys/gsd-media-keys-manager.c
-+++ gnome-settings-daemon-3.30.2/plugins/media-keys/gsd-media-keys-manager.c
+diff --git a/plugins/media-keys/gsd-media-keys-manager.c b/plugins/media-keys/gsd-media-keys-manager.c
+index 4a2a499..ebf776f 100644
+--- a/plugins/media-keys/gsd-media-keys-manager.c
++++ b/plugins/media-keys/gsd-media-keys-manager.c
 @@ -237,6 +237,7 @@ struct GsdMediaKeysManagerPrivate
  
          /* Multimedia keys */
@@ -20,7 +20,7 @@ Index: gnome-settings-daemon-3.30.2/plugins/media-keys/gsd-media-keys-manager.c
          MprisController *mpris_controller;
  };
  
-@@ -3119,6 +3120,11 @@ gsd_media_keys_manager_stop (GsdMediaKey
+@@ -3119,6 +3120,11 @@ gsd_media_keys_manager_stop (GsdMediaKeysManager *manager)
                  priv->mmkeys_name_id = 0;
          }
  
@@ -32,7 +32,7 @@ Index: gnome-settings-daemon-3.30.2/plugins/media-keys/gsd-media-keys-manager.c
          if (priv->bus_cancellable != NULL) {
                  g_cancellable_cancel (priv->bus_cancellable);
                  g_object_unref (priv->bus_cancellable);
-@@ -3581,6 +3587,11 @@ on_bus_gotten (GObject             *sour
+@@ -3581,6 +3587,11 @@ on_bus_gotten (GObject             *source_object,
                                                                        G_BUS_NAME_OWNER_FLAGS_NONE,
                                                                        NULL, NULL, NULL, NULL);
  

@@ -1,10 +1,17 @@
-# Description: teach gsd about the gnome-calculator snap .desktop name
-# Ubuntu: https://launchpad.net/bugs/1796499
-# Upstream: needs a better solution for snaps
-Index: gnome-settings-daemon-3.30.2/plugins/media-keys/gsd-media-keys-manager.c
-===================================================================
---- gnome-settings-daemon-3.30.2.orig/plugins/media-keys/gsd-media-keys-manager.c
-+++ gnome-settings-daemon-3.30.2/plugins/media-keys/gsd-media-keys-manager.c
+From: Sebastien Bacher <seb128@ubuntu.com>
+Date: Tue, 30 Oct 2018 22:37:06 +0100
+Subject: teach gsd about the gnome-calculator snap .desktop name
+
+Ubuntu: https://launchpad.net/bugs/1796499
+Upstream: needs a better solution for snaps
+---
+ plugins/media-keys/gsd-media-keys-manager.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/plugins/media-keys/gsd-media-keys-manager.c b/plugins/media-keys/gsd-media-keys-manager.c
+index ebf776f..89fb58c 100644
+--- a/plugins/media-keys/gsd-media-keys-manager.c
++++ b/plugins/media-keys/gsd-media-keys-manager.c
 @@ -2569,7 +2569,7 @@ do_action (GsdMediaKeysManager *manager,
                  do_media_action (manager, timestamp);
                  break;

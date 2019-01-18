@@ -9,7 +9,7 @@ Subject: _sync_input_sources_to_accountsservice
  3 files changed, 74 insertions(+)
 
 diff --git a/meson.build b/meson.build
-index b09ac30..649b0e9 100644
+index 41e0b84..6387113 100644
 --- a/meson.build
 +++ b/meson.build
 @@ -82,6 +82,7 @@ endif
