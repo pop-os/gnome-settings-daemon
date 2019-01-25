@@ -1,3 +1,11 @@
+gnome-settings-daemon (3.30.2-2) UNRELEASED; urgency=medium
+
+  * keyboard-Enable-ibus-for-OSK-purposes.patch: Cherry-pick from master.
+    To fix enabling of the OSK in more circumstances. (LP: #1760399)
+  * gbp.conf: Use debian/unstable branch now we've branched for exp
+
+ -- Iain Lane <iain.lane@canonical.com>  Fri, 25 Jan 2019 19:57:15 +0000
+
 gnome-settings-daemon (3.30.2-1) unstable; urgency=medium
 
   * New upstream release
