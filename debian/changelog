@@ -1,4 +1,4 @@
-gnome-settings-daemon (3.30.2-2ubuntu1) UNRELEASED; urgency=medium
+gnome-settings-daemon (3.30.2-2ubuntu1) disco; urgency=medium
 
   * Merge with Debian. Remaining changes:
     + debian/control.in:
@@ -23,7 +23,7 @@ gnome-settings-daemon (3.30.2-2ubuntu1) UNRELEASED; urgency=medium
   * Use ubuntu/disco branch, master has 3.31 prepared and I don't want to
     upload it yet
 
- -- Iain Lane <iain.lane@canonical.com>  Fri, 25 Jan 2019 20:07:19 +0000
+ -- Iain Lane <iain.lane@canonical.com>  Fri, 25 Jan 2019 20:20:45 +0000
 
 gnome-settings-daemon (3.30.2-2) unstable; urgency=medium
 
