@@ -1,3 +1,10 @@
+gnome-settings-daemon (3.30.2-1ubuntu2) UNRELEASED; urgency=medium
+
+  * Use ubuntu/disco branch, master has 3.31 prepared and I don't want to
+    upload it yet
+
+ -- Iain Lane <iain.lane@canonical.com>  Fri, 25 Jan 2019 20:06:39 +0000
+
 gnome-settings-daemon (3.30.2-1ubuntu1) disco; urgency=medium
 
   * Merge with Debian. Remaining changes:
