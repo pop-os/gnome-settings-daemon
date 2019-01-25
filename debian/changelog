@@ -1,3 +1,30 @@
+gnome-settings-daemon (3.30.2-2ubuntu1) UNRELEASED; urgency=medium
+
+  * Merge with Debian. Remaining changes:
+    + debian/control.in:
+      - Build-depend on accountsservice
+    + debian/patches:
+       - 45_suppress-printer-may-not-be-connected-notification.patch
+       - 53_sync_input_sources_to_accountsservice.patch
+       - 64_restore_terminal_keyboard_shortcut_schema.patch
+       - correct_logout_action.patch
+          display the logout action on ctrl-alt-del
+       - ubuntu-lid-close-suspend.patch
+          Reimplement support for setting lid close suspend actions
+       - revert-wacom-migration.patch
+       - revert-gsettings-removals.patch
+          Revert gsettings keys that were dropped since 3.8, for u-s-d
+       - revert-mediakeys-dbus-interface-drop.patch
+       - ubuntu_ibus_configs.patch
+       - git_binary_encoding.patch
+       - ubuntu_calculator_snap.patch
+    + debian/gnome-settings-daemon.install:
+      - Install apport hook
+  * Use ubuntu/disco branch, master has 3.31 prepared and I don't want to
+    upload it yet
+
+ -- Iain Lane <iain.lane@canonical.com>  Fri, 25 Jan 2019 20:07:19 +0000
+
 gnome-settings-daemon (3.30.2-2) unstable; urgency=medium
 
   * keyboard-Enable-ibus-for-OSK-purposes.patch: Cherry-pick from master.
@@ -5,13 +32,6 @@ gnome-settings-daemon (3.30.2-2) unstable; urgency=medium
   * gbp.conf: Use debian/unstable branch now we've branched for exp
 
  -- Iain Lane <iain.lane@canonical.com>  Fri, 25 Jan 2019 20:03:26 +0000
-
-gnome-settings-daemon (3.30.2-1ubuntu2) UNRELEASED; urgency=medium
-
-  * Use ubuntu/disco branch, master has 3.31 prepared and I don't want to
-    upload it yet
-
- -- Iain Lane <iain.lane@canonical.com>  Fri, 25 Jan 2019 20:06:39 +0000
 
 gnome-settings-daemon (3.30.2-1ubuntu1) disco; urgency=medium
 
