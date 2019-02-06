@@ -1,8 +1,10 @@
-gnome-settings-daemon (3.31.90-1) UNRELEASED; urgency=medium
+gnome-settings-daemon (3.31.90-1) experimental; urgency=medium
 
-  * New upstream release
+  * New upstream development release 
+  * Drop Build-Depend on libxtst-dev
+  * Drop patch: applied in new release
 
- -- Jeremy Bicha <jbicha@debian.org>  Tue, 05 Feb 2019 20:35:00 -0500
+ -- Jeremy Bicha <jbicha@debian.org>  Tue, 05 Feb 2019 20:47:05 -0500
 
 gnome-settings-daemon (3.31.2-1) experimental; urgency=medium
 
