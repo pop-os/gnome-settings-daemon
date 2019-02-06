@@ -1,6 +1,6 @@
 project(
   'gnome-settings-daemon', 'c',
-  version: '3.31.2',
+  version: '3.31.90',
   license: [ 'GPL2+', 'LGPLv2+' ],
   meson_version: '>= 0.44.0'
 )
@@ -101,7 +101,6 @@ pango_dep = dependency('pango', version: '>= 1.20.0')
 polkit_gobject_dep = dependency('polkit-gobject-1', version: '>= 0.103')
 upower_glib_dep = dependency('upower-glib', version: '>= 0.99.0')
 x11_dep = dependency('x11')
-xtst_dep = dependency('xtst')
 
 m_dep = cc.find_library('m')
 
