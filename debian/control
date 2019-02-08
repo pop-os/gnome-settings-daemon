@@ -7,7 +7,7 @@ Section: gnome
 Priority: optional
 Maintainer: Ubuntu Desktop Team <ubuntu-desktop@lists.ubuntu.com>
 XSBC-Original-Maintainer: Debian GNOME Maintainers <pkg-gnome-maintainers@lists.alioth.debian.org>
-Uploaders: Iain Lane <laney@debian.org>, Jeremy Bicha <jbicha@debian.org>, Michael Biebl <biebl@debian.org>, Tim Lunn <tim@feathertop.org>
+Uploaders: Iain Lane <laney@debian.org>, Jeremy Bicha <jbicha@debian.org>, Tim Lunn <tim@feathertop.org>
 Build-Depends: debhelper (>= 11.1.3),
                dh-exec,
                gnome-pkg-tools,
@@ -42,7 +42,6 @@ Build-Depends: debhelper (>= 11.1.3),
                libxext-dev,
                libxi-dev,
                libxt-dev,
-               libxtst-dev,
                meson (>= 0.44.0),
                mutter (>= 3.27.90) <!nocheck>,
                policykit-1,
