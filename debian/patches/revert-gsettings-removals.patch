@@ -6,7 +6,7 @@ Subject: revert-gsettings-removals
  data/gsd-enums.h                                   |   8 ++
  data/meson.build                                   |   5 +
  ...nome.settings-daemon.peripherals.gschema.xml.in |  18 +++
- ...ettings-daemon.peripherals.wacom.gschema.xml.in |  22 +++
+ ...ettings-daemon.peripherals.wacom.gschema.xml.in | 106 +++++++++++++++
  ...me.settings-daemon.plugins.color.gschema.xml.in |  10 ++
  ...settings-daemon.plugins.datetime.gschema.xml.in |  15 +++
  ...rg.gnome.settings-daemon.plugins.gschema.xml.in | 149 +++++++++++++++++++++
@@ -20,7 +20,7 @@ Subject: revert-gsettings-removals
  ...e.settings-daemon.plugins.xrandr.gschema.xml.in |  25 ++++
  ...ettings-daemon.plugins.xsettings.gschema.xml.in |  10 ++
  po/POTFILES.in                                     |   5 +
- 17 files changed, 426 insertions(+)
+ 17 files changed, 510 insertions(+)
  create mode 100644 data/org.gnome.settings-daemon.plugins.datetime.gschema.xml.in
  create mode 100644 data/org.gnome.settings-daemon.plugins.keyboard.gschema.xml.in
  create mode 100644 data/org.gnome.settings-daemon.plugins.orientation.gschema.xml.in
@@ -107,12 +107,15 @@ index f1785ed..b9daaee 100644
    <!-- Deprecated schemas/keys -->
    <schema id="org.gnome.settings-daemon.peripherals.mouse.deprecated">
 diff --git a/data/org.gnome.settings-daemon.peripherals.wacom.gschema.xml.in b/data/org.gnome.settings-daemon.peripherals.wacom.gschema.xml.in
-index 81a2795..ba14c56 100644
+index f687496..09643af 100644
 --- a/data/org.gnome.settings-daemon.peripherals.wacom.gschema.xml.in
 +++ b/data/org.gnome.settings-daemon.peripherals.wacom.gschema.xml.in
-@@ -1,5 +1,17 @@
- <?xml version="1.0" encoding="UTF-8"?>
- <schemalist>
+@@ -94,4 +94,110 @@
+       <default>["", "", ""]</default>
+     </key>
+   </schema>
++
++  <!-- The rest of this file is used by unity-settings-daemon only -->
 +  <schema gettext-domain="@GETTEXT_PACKAGE@" id="org.gnome.settings-daemon.plugins.gsdwacom" path="/org/gnome/settings-daemon/plugins/gsdwacom/">
 +    <key name="priority" type="i">
 +      <default>0</default>
@@ -125,13 +128,36 @@ index 81a2795..ba14c56 100644
 +      <description>Whether this plugin would be activated by unity-settings-daemon or not</description>
 +    </key>
 +  </schema>
-   <schema gettext-domain="@GETTEXT_PACKAGE@" id="org.gnome.settings-daemon.peripherals.wacom">
-     <child name="stylus" schema="org.gnome.settings-daemon.peripherals.wacom.stylus"/>
-     <child name="eraser" schema="org.gnome.settings-daemon.peripherals.wacom.eraser"/>
-@@ -30,6 +42,16 @@
-       <summary>Wacom touch feature</summary>
-       <description>Enable this to move the cursor when the user touches the tablet.</description>
-     </key>
++  <schema gettext-domain="@GETTEXT_PACKAGE@" id="org.gnome.settings-daemon.peripherals.wacom">
++    <child name="stylus" schema="org.gnome.settings-daemon.peripherals.wacom.stylus"/>
++    <child name="eraser" schema="org.gnome.settings-daemon.peripherals.wacom.eraser"/>
++
++    <!-- is-absolute applies to all tools but PAD, CURSOR is hard-coded -->
++    <key name="is-absolute" type="b">
++      <default>true</default>
++      <summary>Wacom stylus absolute mode</summary>
++      <description>Enable this to set the tablet to absolute mode for unity-settings-daemon.</description>
++    </key>
++    <key name="area" type="ai">
++      <default>[-1, -1, -1, -1]</default>
++      <summary>Wacom tablet area</summary>
++      <description>Set this to x1, y1 and x2, y2 of the area usable by the tools.</description>
++    </key>
++    <key name="keep-aspect" type="b">
++      <default>false</default>
++      <summary>Wacom tablet aspect ratio</summary>
++      <description>Enable this to restrict the Wacom tablet area to match the aspect ratio of the output.</description>
++    </key>
++    <key name="rotation" enum="org.gnome.settings-daemon.GsdWacomRotation">
++      <default>'none'</default>
++      <summary>Wacom tablet rotation</summary>
++      <description>Set this to “none”, “cw” for 90 degree clockwise, “half” for 180 degree, and “ccw” for 90 degree counterclockwise.</description>
++    </key>
++    <key name="touch" type="b">
++      <default>true</default>
++      <summary>Wacom touch feature</summary>
++      <description>Enable this to move the cursor when the user touches the tablet.</description>
++    </key>
 +    <key name="tablet-pc-button" type="b">
 +      <default>false</default>
 +      <summary>Wacom tablet PC feature</summary>
@@ -142,9 +168,59 @@ index 81a2795..ba14c56 100644
 +      <summary>Wacom display mapping</summary>
 +      <description>EDID information of monitor to map tablet to. Must be in the format [vendor, product, serial]. ["","",""] disables mapping.</description>
 +    </key>
-   </schema>
-   <schema gettext-domain="@GETTEXT_PACKAGE@" id="org.gnome.settings-daemon.peripherals.wacom.stylus">
-     <key name="pressurecurve" type="ai">
++  </schema>
++  <schema gettext-domain="@GETTEXT_PACKAGE@" id="org.gnome.settings-daemon.peripherals.wacom.stylus">
++    <key name="pressurecurve" type="ai">
++      <default>[0, 0, 100, 100]</default>
++      <summary>Wacom stylus pressure curve</summary>
++      <description>Set this to x1, y1 and x2, y2 of the pressure curve applied to the stylus.</description>
++    </key>
++    <key name="buttonmapping" type="ai">
++      <default>[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16]</default>
++      <summary>Wacom stylus button mapping</summary>
++      <description>Set this to the logical button mapping.</description>
++    </key>
++    <key name="pressurethreshold" type="i">
++      <default>-1</default>
++      <summary>Wacom stylus pressure threshold</summary>
++      <description>Set this to the pressure value at which a stylus click event is generated.</description>
++    </key>
++  </schema>
++  <schema gettext-domain="@GETTEXT_PACKAGE@" id="org.gnome.settings-daemon.peripherals.wacom.eraser">
++    <key name="pressurecurve" type="ai">
++      <default>[0, 0, 100, 100]</default>
++      <summary>Wacom eraser pressure curve</summary>
++      <description>Set this to x1, y1 and x2, y2 of the pressure curve applied to the eraser.</description>
++    </key>
++    <key name="buttonmapping" type="ai">
++      <default>[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16]</default>
++      <summary>Wacom eraser button mapping</summary>
++      <description>Set this to the logical button mapping.</description>
++    </key>
++    <key name="pressurethreshold" type="i">
++      <default>-1</default>
++      <summary>Wacom eraser pressure threshold</summary>
++      <description>Set this to the pressure value at which an eraser click event is generated.</description>
++    </key>
++  </schema>
++  <schema gettext-domain="@GETTEXT_PACKAGE@" id="org.gnome.settings-daemon.peripherals.wacom.tablet-button">
++    <key name="action-type" enum="org.gnome.settings-daemon.GsdWacomActionType">
++      <default>'none'</default>
++      <summary>Wacom button action type</summary>
++      <description>The type of action triggered by the button being pressed.</description>
++    </key>
++    <key name="custom-action" type="s">
++      <default>''</default>
++      <summary>Key combination for the custom action</summary>
++      <description>The keyboard shortcut generated when the button is pressed for custom actions.</description>
++    </key>
++    <key name="custom-elevator-action" type="as">
++      <default>['', '']</default>
++      <summary>Key combinations for a touchring or touchstrip custom action</summary>
++      <description>The keyboard shortcuts generated when a touchring or touchstrip is used for custom actions (up followed by down).</description>
++    </key>
++  </schema>
+ </schemalist>
 diff --git a/data/org.gnome.settings-daemon.plugins.color.gschema.xml.in b/data/org.gnome.settings-daemon.plugins.color.gschema.xml.in
 index cb24e3c..1aff70f 100644
 --- a/data/org.gnome.settings-daemon.plugins.color.gschema.xml.in
