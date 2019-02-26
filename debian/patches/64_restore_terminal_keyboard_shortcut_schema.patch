@@ -26,7 +26,7 @@ index 089b861..7f101cb 100644
        <default>'XF86WWW'</default>
        <summary>Launch web browser</summary>
 diff --git a/plugins/media-keys/gsd-media-keys-manager.c b/plugins/media-keys/gsd-media-keys-manager.c
-index c3822af..937fd71 100644
+index 1576b61..f67e6ec 100644
 --- a/plugins/media-keys/gsd-media-keys-manager.c
 +++ b/plugins/media-keys/gsd-media-keys-manager.c
 @@ -978,6 +978,22 @@ gnome_session_shutdown_cb (GObject *source_object,
@@ -52,7 +52,7 @@ index c3822af..937fd71 100644
  static void
  gnome_session_shutdown (GsdMediaKeysManager *manager)
  {
-@@ -2536,6 +2552,9 @@ do_action (GsdMediaKeysManager *manager,
+@@ -2499,6 +2515,9 @@ do_action (GsdMediaKeysManager *manager,
          case SCREENCAST_KEY:
                  do_screencast_action (manager);
                  break;

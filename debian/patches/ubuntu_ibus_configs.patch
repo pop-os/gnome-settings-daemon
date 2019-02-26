@@ -10,10 +10,10 @@ Forwarded: not-needed
  1 file changed, 55 insertions(+), 1 deletion(-)
 
 diff --git a/plugins/keyboard/gsd-keyboard-manager.c b/plugins/keyboard/gsd-keyboard-manager.c
-index 8003a3a..343b049 100644
+index fadde34..3b35c69 100644
 --- a/plugins/keyboard/gsd-keyboard-manager.c
 +++ b/plugins/keyboard/gsd-keyboard-manager.c
-@@ -161,6 +161,58 @@ check_xkb_extension (GsdKeyboardManager *manager)
+@@ -168,6 +168,58 @@ check_xkb_extension (GsdKeyboardManager *manager)
          return have_xkb;
  }
  
@@ -72,7 +72,7 @@ index 8003a3a..343b049 100644
  static void
  xkb_init (GsdKeyboardManager *manager)
  {
-@@ -711,8 +763,10 @@ maybe_create_initial_settings (GsdKeyboardManager *manager)
+@@ -762,8 +814,10 @@ maybe_create_initial_settings (GsdKeyboardManager *manager)
  
          /* if we still don't have anything do some educated guesses */
          sources = g_settings_get_value (settings, KEY_INPUT_SOURCES);

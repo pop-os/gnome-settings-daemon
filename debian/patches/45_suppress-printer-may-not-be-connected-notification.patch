@@ -9,10 +9,10 @@ Subject: _suppress-printer-may-not-be-connected-notification
  1 file changed, 3 insertions(+), 3 deletions(-)
 
 diff --git a/plugins/print-notifications/gsd-print-notifications-manager.c b/plugins/print-notifications/gsd-print-notifications-manager.c
-index b8bfa8a..4f5a555 100644
+index 3578b96..cb8ccea 100644
 --- a/plugins/print-notifications/gsd-print-notifications-manager.c
 +++ b/plugins/print-notifications/gsd-print-notifications-manager.c
-@@ -371,7 +371,7 @@ get_statuses_second (guint i,
+@@ -379,7 +379,7 @@ get_statuses_second (guint i,
                          break;
                  case 2:
                          /* Translators: The printer is in the process of connecting to a shared network output device (same as in system-config-printer) */
@@ -21,7 +21,7 @@ index b8bfa8a..4f5a555 100644
                          break;
                  case 3:
                          /* Translators: One or more covers on the printer are open (same as in system-config-printer) */
-@@ -575,7 +575,7 @@ process_cups_notification (GsdPrintNotificationsManager *manager,
+@@ -584,7 +584,7 @@ process_cups_notification (GsdPrintNotificationsManager *manager,
          static const char * const reasons[] = {
                  "toner-low",
                  "toner-empty",
@@ -30,7 +30,7 @@ index b8bfa8a..4f5a555 100644
                  "cover-open",
                  "cups-missing-filter",
                  "door-open",
-@@ -592,7 +592,7 @@ process_cups_notification (GsdPrintNotificationsManager *manager,
+@@ -601,7 +601,7 @@ process_cups_notification (GsdPrintNotificationsManager *manager,
                  /* Translators: The printer has no toner left (same as in system-config-printer) */
                  N_("Toner empty"),
                  /* Translators: The printer is in the process of connecting to a shared network output device (same as in system-config-printer) */
