@@ -1,4 +1,4 @@
-gnome-settings-daemon (3.31.91-1ubuntu1) UNRELEASED; urgency=medium
+gnome-settings-daemon (3.31.91-1ubuntu1) disco; urgency=medium
 
   * Merge with Debian (LP: #1817900). Remaining changes:
     + debian/control.in:
@@ -22,7 +22,7 @@ gnome-settings-daemon (3.31.91-1ubuntu1) UNRELEASED; urgency=medium
       - Install apport hook
   * debian/patches/*: Refresh
 
- -- Iain Lane <iain.lane@canonical.com>  Wed, 06 Mar 2019 14:15:22 +0000
+ -- Iain Lane <iain.lane@canonical.com>  Wed, 06 Mar 2019 14:36:58 +0000
 
 gnome-settings-daemon (3.31.91-1) experimental; urgency=medium
 
