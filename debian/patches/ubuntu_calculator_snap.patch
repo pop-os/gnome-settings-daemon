@@ -14,10 +14,10 @@ Subject: ubuntu_calculator_snap
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/plugins/media-keys/gsd-media-keys-manager.c b/plugins/media-keys/gsd-media-keys-manager.c
-index fbbb8df..4c71e2c 100644
+index ffcf7a2..f08f02b 100644
 --- a/plugins/media-keys/gsd-media-keys-manager.c
 +++ b/plugins/media-keys/gsd-media-keys-manager.c
-@@ -2532,7 +2532,7 @@ do_action (GsdMediaKeysManager *manager,
+@@ -2535,7 +2535,7 @@ do_action (GsdMediaKeysManager *manager,
                  do_media_action (manager, timestamp);
                  break;
          case CALCULATOR_KEY:

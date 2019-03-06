@@ -9,10 +9,10 @@ https://mail.gnome.org/archives/distributor-list/2017-April/msg00009.html
  1 file changed, 11 insertions(+)
 
 diff --git a/plugins/media-keys/gsd-media-keys-manager.c b/plugins/media-keys/gsd-media-keys-manager.c
-index 8f9c9ac..fbbb8df 100644
+index ed9b462..ffcf7a2 100644
 --- a/plugins/media-keys/gsd-media-keys-manager.c
 +++ b/plugins/media-keys/gsd-media-keys-manager.c
-@@ -237,6 +237,7 @@ struct GsdMediaKeysManagerPrivate
+@@ -238,6 +238,7 @@ struct GsdMediaKeysManagerPrivate
  
          /* Multimedia keys */
          guint            mmkeys_name_id;
@@ -20,7 +20,7 @@ index 8f9c9ac..fbbb8df 100644
          MprisController *mpris_controller;
  };
  
-@@ -3082,6 +3083,11 @@ gsd_media_keys_manager_stop (GsdMediaKeysManager *manager)
+@@ -3085,6 +3086,11 @@ gsd_media_keys_manager_stop (GsdMediaKeysManager *manager)
                  priv->mmkeys_name_id = 0;
          }
  
@@ -32,7 +32,7 @@ index 8f9c9ac..fbbb8df 100644
          if (priv->bus_cancellable != NULL) {
                  g_cancellable_cancel (priv->bus_cancellable);
                  g_object_unref (priv->bus_cancellable);
-@@ -3544,6 +3550,11 @@ on_bus_gotten (GObject             *source_object,
+@@ -3547,6 +3553,11 @@ on_bus_gotten (GObject             *source_object,
                                                                        G_BUS_NAME_OWNER_FLAGS_NONE,
                                                                        NULL, NULL, NULL, NULL);
  

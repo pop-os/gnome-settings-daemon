@@ -13,10 +13,10 @@ Subject: correct_logout_action
  1 file changed, 7 insertions(+), 1 deletion(-)
 
 diff --git a/plugins/media-keys/gsd-media-keys-manager.c b/plugins/media-keys/gsd-media-keys-manager.c
-index f67e6ec..8f9c9ac 100644
+index c702a50..ed9b462 100644
 --- a/plugins/media-keys/gsd-media-keys-manager.c
 +++ b/plugins/media-keys/gsd-media-keys-manager.c
-@@ -1013,6 +1013,12 @@ gnome_session_shutdown (GsdMediaKeysManager *manager)
+@@ -1016,6 +1016,12 @@ gnome_session_shutdown (GsdMediaKeysManager *manager)
          g_object_unref (proxy);
  }
  
@@ -29,7 +29,7 @@ index f67e6ec..8f9c9ac 100644
  static void
  do_eject_action_cb (GDrive              *drive,
                      GAsyncResult        *res,
-@@ -2484,7 +2490,7 @@ do_action (GsdMediaKeysManager *manager,
+@@ -2487,7 +2493,7 @@ do_action (GsdMediaKeysManager *manager,
                                   SOUND_ACTION_FLAG_IS_OUTPUT | SOUND_ACTION_FLAG_IS_PRECISE);
                  break;
          case LOGOUT_KEY:
