@@ -1,3 +1,16 @@
+==============
+Version 3.32.0
+==============
+- No changes since 3.31.92
+
+===============
+Version 3.31.92
+===============
+- Translation updates
+
+Power:
+- Only test backlight on linux
+
 ===============
 Version 3.31.91
 ===============
