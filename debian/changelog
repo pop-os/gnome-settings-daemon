@@ -7,11 +7,16 @@ gnome-settings-daemon (3.32.0-1) experimental; urgency=medium
 
 gnome-settings-daemon (3.31.91-1) experimental; urgency=medium
 
+  [ Iain Lane ]
   * New upstream release
     - Ignore key repeat on certain shortcuts
   * control: Depend new mutter, Break old gnome-shell.
     Older versions of gnome-shell don't provide the flag on the
     GrabAccelerators API that we use in this version of g-s-d.
+
+  [ Laurent Bigonville ]
+  * debian/rules: Set libdir to /usr/lib, this is needed for the gtk-modules
+    (Closes: #922125)
 
  -- Iain Lane <laney@debian.org>  Wed, 06 Mar 2019 14:11:56 +0000
 
