@@ -9,7 +9,7 @@ export DEB_LDFLAGS_MAINT_STRIP = -Wl,-Bsymbolic-functions
 
 ifneq ($(DEB_HOST_ARCH_OS),linux)
 CONFFLAGS = \
-	-Drfkil=false \
+	-Drfkill=false \
 	-Dnetwork_manager=false \
 	-Dalsa=false
 endif

@@ -90,11 +90,11 @@ static const gchar introspection_xml[] =
 "    <property name='Brightness' type='i' access='readwrite'/>"
 "    <method name='StepUp'>"
 "      <arg type='i' name='new_percentage' direction='out'/>"
-"      <arg type='i' name='output_id' direction='out'/>"
+"      <arg type='s' name='connector' direction='out'/>"
 "    </method>"
 "    <method name='StepDown'>"
 "      <arg type='i' name='new_percentage' direction='out'/>"
-"      <arg type='i' name='output_id' direction='out'/>"
+"      <arg type='s' name='connector' direction='out'/>"
 "    </method>"
 "  </interface>"
 "  <interface name='org.gnome.SettingsDaemon.Power.Keyboard'>"
@@ -1520,13 +1520,6 @@ idle_set_mode (GsdPowerManager *manager, GsdPowerIdleMode mode)
                 return;
         }
 
-        /* don't do any power saving if we're a VM */
-        if (manager->priv->is_virtual_machine) {
-                g_debug ("ignoring state transition to %s as virtual machine",
-                         idle_mode_to_string (mode));
-                return;
-        }
-
         manager->priv->current_idle_mode = mode;
         g_debug ("Doing a state transition: %s", idle_mode_to_string (mode));
 
@@ -1726,6 +1719,14 @@ idle_configure (GsdPowerManager *manager)
                           &manager->priv->idle_sleep_id);
         clear_idle_watch (manager->priv->idle_monitor,
                           &manager->priv->idle_sleep_warning_id);
+
+        /* don't do any power saving if we're a VM */
+        if (manager->priv->is_virtual_machine &&
+            (action_type == GSD_POWER_ACTION_SUSPEND ||
+             action_type == GSD_POWER_ACTION_HIBERNATE)) {
+                g_debug ("Ignoring sleep timeout with suspend action inside VM");
+                timeout_sleep = 0;
+        }
 
         if (timeout_sleep != 0) {
                 g_debug ("setting up sleep callback %is", timeout_sleep);
@@ -2794,9 +2795,9 @@ backlight_brightness_step_cb (GObject *object,
                                                      error);
         } else {
                 g_dbus_method_invocation_return_value (invocation,
-                                                       g_variant_new ("(ii)",
+                                                       g_variant_new ("(is)",
                                                                       brightness,
-                                                                      gsd_backlight_get_output_id (backlight)));
+                                                                      gsd_backlight_get_connector (backlight)));
         }
 
         g_object_unref (manager);
