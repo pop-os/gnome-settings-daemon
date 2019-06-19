@@ -1,5 +1,8 @@
-gnome-settings-daemon (3.32.1-1ubuntu1) UNRELEASED; urgency=medium
+gnome-settings-daemon (3.32.1-1ubuntu1) eoan; urgency=medium
 
+  * New upstream version
+    Media-keys:
+    - Fix MPRIS issues with disconnecting clients (lp: #1832374)
   * Merge with Debian. Remaining changes:
     + debian/control.in:
       - Build-depend on accountsservice
@@ -22,7 +25,7 @@ gnome-settings-daemon (3.32.1-1ubuntu1) UNRELEASED; urgency=medium
       - Install apport hook
   * debian/patches/*: Refresh
 
- -- Sebastien Bacher <seb128@ubuntu.com>  Wed, 19 Jun 2019 15:46:29 +0200
+ -- Sebastien Bacher <seb128@ubuntu.com>  Wed, 19 Jun 2019 15:48:01 +0200
 
 gnome-settings-daemon (3.32.1-1) experimental; urgency=medium
 
