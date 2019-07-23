@@ -1,0 +1,332 @@
+Index: gnome-settings-daemon/plugins/color/gsd-color-state.c
+===================================================================
+--- gnome-settings-daemon.orig/plugins/color/gsd-color-state.c
++++ gnome-settings-daemon/plugins/color/gsd-color-state.c
+@@ -20,6 +20,7 @@
+ 
+ #include "config.h"
+ 
++#include <ctype.h>
+ #include <glib/gi18n.h>
+ #include <colord.h>
+ #include <gdk/gdk.h>
+@@ -48,6 +49,68 @@
+ 
+ static void gcm_session_set_gamma_for_all_devices (GsdColorState *state);
+ 
++static guint gcm_session_get_output_percentage (void);
++
++static char*
++freadln (char* path)
++{
++  FILE *product = fopen (path, "r");
++  if (product == NULL) {
++      return NULL;
++  }
++
++  char *line = NULL;
++  size_t len = 0;
++  ssize_t read = getline (&line, &len, product);
++  fclose (product);
++  return line;
++}
++
++static char*
++trim (char *str)
++{
++  char *end;
++
++  while (isspace ((unsigned char)*str)) str++;
++
++  if (*str == 0)
++    return str;
++
++  end = str + strlen (str) - 1;
++  while(end > str && isspace ((unsigned char)*end)) end--;
++
++  *(end+1) = 0;
++
++  return str;
++}
++
++static gboolean
++has_oled_builtin_display (void)
++{
++  gboolean oled_builtin_display = FALSE;
++
++  char *sys_vendor_raw = freadln ("/sys/class/dmi/id/sys_vendor");
++  if (sys_vendor_raw) {
++    const char* sys_vendor = trim (sys_vendor_raw);
++
++    char *product_version_raw = freadln ("/sys/class/dmi/id/product_version");
++    if (product_version_raw) {
++      const char* product_version = trim (product_version_raw);
++
++      if (strcmp(sys_vendor, "System76") == 0) {
++        oled_builtin_display =
++          strcmp(product_version, "addw1") == 0;
++      }
++
++      free (product_version_raw);
++    }
++
++    free(sys_vendor_raw);
++  }
++
++  return oled_builtin_display;
++}
++
+ struct GsdColorStatePrivate
+ {
+         GCancellable    *cancellable;
+@@ -59,6 +122,9 @@ struct GsdColorStatePrivate
+         gboolean         session_is_active;
+         GHashTable      *device_assign_hash;
+         guint            color_temperature;
++        gboolean         oled_builtin_display;
++        guint            power_watch_id;
++        GDBusProxy      *power_proxy;
+ };
+ 
+ static void     gsd_color_state_class_init  (GsdColorStateClass *klass);
+@@ -461,6 +527,7 @@ gnome_rr_output_get_gamma_size (GnomeRRO
+ static gboolean
+ gcm_session_output_set_gamma (GnomeRROutput *output,
+                               GPtrArray *array,
++                              gboolean oled_display,
+                               GError **error)
+ {
+         gboolean ret = TRUE;
+@@ -481,15 +548,22 @@ gcm_session_output_set_gamma (GnomeRROut
+                 goto out;
+         }
+ 
++        g_debug ("oled_display %d", oled_display);
++        guint32 oled_brightness = 100;
++        if (oled_display) {
++            oled_brightness = gcm_session_get_output_percentage();
++        }
++        g_debug ("oled_brightness %d", oled_brightness);
++
+         /* convert to a type X understands */
+         red = g_new (guint16, array->len);
+         green = g_new (guint16, array->len);
+         blue = g_new (guint16, array->len);
+         for (i = 0; i < array->len; i++) {
+                 data = g_ptr_array_index (array, i);
+-                red[i] = data->red;
+-                green[i] = data->green;
+-                blue[i] = data->blue;
++                red[i] = (data->red * oled_brightness) / 100;
++                green[i] = (data->green * oled_brightness) / 100;
++                blue[i] = (data->blue * oled_brightness) / 100;
+         }
+ 
+         /* send to LUT */
+@@ -516,6 +590,7 @@ static gboolean
+ gcm_session_device_set_gamma (GnomeRROutput *output,
+                               CdProfile *profile,
+                               guint color_temperature,
++                              gboolean oled_display,
+                               GError **error)
+ {
+         gboolean ret = FALSE;
+@@ -538,7 +613,7 @@ gcm_session_device_set_gamma (GnomeRROut
+         }
+ 
+         /* apply the vcgt to this output */
+-        ret = gcm_session_output_set_gamma (output, clut, error);
++        ret = gcm_session_output_set_gamma (output, clut, oled_display, error);
+         if (!ret)
+                 goto out;
+ out:
+@@ -550,6 +625,7 @@ out:
+ static gboolean
+ gcm_session_device_reset_gamma (GnomeRROutput *output,
+                                 guint color_temperature,
++                                gboolean oled_display,
+                                 GError **error)
+ {
+         gboolean ret;
+@@ -588,7 +664,7 @@ gcm_session_device_reset_gamma (GnomeRRO
+         }
+ 
+         /* apply the vcgt to this output */
+-        ret = gcm_session_output_set_gamma (output, clut, error);
++        ret = gcm_session_output_set_gamma (output, clut, oled_display, error);
+         if (!ret)
+                 goto out;
+ out:
+@@ -685,6 +761,41 @@ gcm_session_use_output_profile_for_scree
+ #define GSD_DBUS_INTERFACE_POWER_SCREEN	GSD_DBUS_BASE_INTERFACE ".Power.Screen"
+ #define GSD_DBUS_PATH_POWER		GSD_DBUS_PATH "/Power"
+ 
++static guint
++gcm_session_get_output_percentage (void) {
++    guint percentage = 100;
++
++    GDBusConnection * connection = g_bus_get_sync (G_BUS_TYPE_SESSION, NULL, NULL);
++    if (connection != NULL) {
++        GVariant * variant = g_dbus_connection_call_sync (connection,
++            GSD_DBUS_NAME_POWER,
++            GSD_DBUS_PATH_POWER,
++            "org.freedesktop.DBus.Properties",
++            "Get",
++            g_variant_new_parsed ("('" GSD_DBUS_INTERFACE_POWER_SCREEN "',"
++                                  "'Brightness')"),
++            NULL,
++            G_DBUS_CALL_FLAGS_NONE,
++            -1, NULL, NULL
++        );
++        if (variant != NULL) {
++            GVariant * inner = NULL;
++            g_variant_get (variant, "(v)", &inner);
++            if (inner != NULL) {
++                gint32 value = g_variant_get_int32(inner);
++                if (value >= 0) {
++                    percentage = (guint)value;
++                }
++                g_variant_unref (inner);
++            }
++            g_variant_unref(variant);
++        }
++        g_object_unref (connection);
++    }
++
++    return percentage;
++}
++
+ static void
+ gcm_session_set_output_percentage (guint percentage)
+ {
+@@ -748,12 +859,15 @@ gcm_session_device_assign_profile_connec
+          * calibration brightness then set this new brightness */
+         brightness_profile = cd_profile_get_metadata_item (profile,
+                                                            CD_PROFILE_METADATA_SCREEN_BRIGHTNESS);
+-        if (gnome_rr_output_is_builtin_display (output) &&
+-            brightness_profile != NULL) {
++        gboolean oled_display = FALSE;
++        if (gnome_rr_output_is_builtin_display (output)) {
++            if (brightness_profile != NULL) {
+                 /* the percentage is stored in the profile metadata as
+                  * a string, not ideal, but it's all we have... */
+                 brightness_percentage = atoi (brightness_profile);
+                 gcm_session_set_output_percentage (brightness_percentage);
++            }
++            oled_display = priv->oled_builtin_display;
+         }
+ 
+         /* set the _ICC_PROFILE atom */
+@@ -775,6 +889,7 @@ gcm_session_device_assign_profile_connec
+                 ret = gcm_session_device_set_gamma (output,
+                                                     profile,
+                                                     priv->color_temperature,
++                                                    oled_display,
+                                                     &error);
+                 if (!ret) {
+                         g_warning ("failed to set %s gamma tables: %s",
+@@ -786,6 +901,7 @@ gcm_session_device_assign_profile_connec
+         } else {
+                 ret = gcm_session_device_reset_gamma (output,
+                                                       priv->color_temperature,
++                                                      oled_display,
+                                                       &error);
+                 if (!ret) {
+                         g_warning ("failed to reset %s gamma tables: %s",
+@@ -928,9 +1044,15 @@ gcm_session_device_assign_connect_cb (GO
+                                              gdk_atom_intern_static_string ("_ICC_PROFILE_IN_X_VERSION"));
+                 }
+ 
++                gboolean oled_display = FALSE;
++                if (gnome_rr_output_is_builtin_display (output)) {
++                    oled_display = priv->oled_builtin_display;
++                }
++
+                 /* reset, as we want linear profiles for profiling */
+                 ret = gcm_session_device_reset_gamma (output,
+                                                       priv->color_temperature,
++                                                      oled_display,
+                                                       &error);
+                 if (!ret) {
+                         g_warning ("failed to reset %s gamma tables: %s",
+@@ -1489,6 +1611,52 @@ gsd_color_state_class_init (GsdColorStat
+ }
+ 
+ static void
++power_proxy_signal_cb (GDBusProxy  *proxy,
++                       const gchar *sender_name,
++                       const gchar *signal_name,
++                       GVariant    *parameters,
++                       gpointer     user_data)
++{
++        GsdColorState *state = user_data;
++
++        if (g_strcmp0 (signal_name, "PropertiesChanged") == 0) {
++            gcm_session_set_gamma_for_all_devices (state);
++        }
++}
++
++static void
++on_power_proxy_ready (GObject      *source,
++                       GAsyncResult *result,
++                       gpointer      data)
++{
++        GsdColorState *state = data;
++
++        state->priv->power_proxy =
++                g_dbus_proxy_new_for_bus_finish (result, NULL);
++
++        g_signal_connect (state->priv->power_proxy, "g-signal",
++                          G_CALLBACK (power_proxy_signal_cb),
++                          state);
++}
++
++static void
++power_appeared_cb (GDBusConnection *connection,
++                    const gchar     *name,
++                    const gchar     *name_owner,
++                    gpointer         user_data)
++{
++        GsdColorState *state = user_data;
++
++        g_dbus_proxy_new_for_bus (G_BUS_TYPE_SESSION,
++                                  0, NULL,
++                                  GSD_DBUS_NAME_POWER,
++                                  GSD_DBUS_PATH_POWER,
++                                  "org.freedesktop.DBus.Properties",
++                                  state->priv->cancellable,
++                                  on_power_proxy_ready, state);
++}
++
++static void
+ gsd_color_state_init (GsdColorState *state)
+ {
+         GsdColorStatePrivate *priv;
+@@ -1519,6 +1687,15 @@ gsd_color_state_init (GsdColorState *sta
+         priv->color_temperature = GSD_COLOR_TEMPERATURE_DEFAULT;
+ 
+         priv->client = cd_client_new ();
++
++        priv->oled_builtin_display = has_oled_builtin_display();
++
++        priv->power_watch_id = g_bus_watch_name (G_BUS_TYPE_SESSION,
++                                                 GSD_DBUS_NAME_POWER,
++                                                 G_BUS_NAME_WATCHER_FLAGS_NONE,
++                                                 power_appeared_cb,
++                                                 NULL,
++                                                 state, NULL);
+ }
+ 
+ static void
+@@ -1539,6 +1716,11 @@ gsd_color_state_finalize (GObject *objec
+         g_clear_pointer (&state->priv->device_assign_hash, g_hash_table_destroy);
+         g_clear_object (&state->priv->state_screen);
+ 
++        if (state->priv->power_watch_id > 0) {
++                g_bus_unwatch_name (state->priv->power_watch_id);
++                state->priv->power_watch_id = 0;
++        }
++
+         G_OBJECT_CLASS (gsd_color_state_parent_class)->finalize (object);
+ }
+ 
