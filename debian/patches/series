@@ -31,3 +31,6 @@ smartcard-service-Unown-the-name-on-dispose.patch
 smartcard-Use-autopointers.patch
 smartcard-manager-Use-mutex-auto-lockers-when-convenient.patch
 smarcard-Add-utility-function-to-get-the-login-token-name.patch
+
+# Pop!_OS patches
+oled_brightness.patch

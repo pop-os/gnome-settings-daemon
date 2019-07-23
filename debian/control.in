@@ -60,7 +60,7 @@ Vcs-Browser: https://salsa.debian.org/gnome-team/gnome-settings-daemon/tree/ubun
 Rules-Requires-Root: no
 
 Package: gnome-settings-daemon
-Architecture: any
+Architecture: amd64
 Depends: gnome-settings-daemon-common (= ${source:Version}),
          gsettings-desktop-schemas (>= 3.35.91),
          default-logind [linux-any] | logind [linux-any],
@@ -115,7 +115,7 @@ Description: daemon handling the GNOME session settings - common files
 
 Package: gnome-settings-daemon-dev
 Section: libdevel
-Architecture: any
+Architecture: amd64
 Multi-Arch: same
 Depends: libglib2.0-dev (>= 2.56),
          ${misc:Depends},
