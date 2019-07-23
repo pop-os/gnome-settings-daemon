@@ -16,3 +16,6 @@ ubuntu/lid-close-suspend-support.patch
 ubuntu/keyboard-Use-ibus-sources-from-locale.patch
 ubuntu/teach-gsd-about-the-gnome-calculator-snap-.desktop-name.patch
 ubuntu/git-media-keys-Add-one-second-delay-between-each-rfkill-.patch
+
+# Pop!_OS patches
+oled_brightness.patch
