@@ -16,3 +16,7 @@ ubuntu/lid-close-suspend-support.patch
 ubuntu/keyboard-Use-ibus-sources-from-locale.patch
 ubuntu/Revert-media-keys-fix-gnome-settings-desktop-file.patch
 ubuntu/teach-gsd-about-the-gnome-calculator-snap-.desktop-name.patch
+
+# Pop!_OS patches
+oled_brightness.patch
+disable-window-system-color-transform.patch
