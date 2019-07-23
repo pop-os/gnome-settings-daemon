@@ -1,3 +1,10 @@
+gnome-settings-daemon (3.32.1-1ubuntu2pop0) eoan; urgency=medium
+
+  * debian/patches/oled_brightness.patch:
+    - Use gsd-color to apply brightness to gamma values on OLED displays
+
+ -- Jeremy Soller <jeremy@system76.com>  Tue, 23 Jul 2019 09:06:37 -0600
+
 gnome-settings-daemon (3.32.1-1ubuntu2) eoan; urgency=medium
 
   * debian/patches/ubuntu_ibus_configs.patch:
