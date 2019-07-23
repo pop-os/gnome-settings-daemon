@@ -2,6 +2,7 @@
 
 include /usr/share/dpkg/default.mk
 
+export CCACHE_DISABLE=1
 export DEB_BUILD_MAINT_OPTIONS = hardening=+all
 export DEB_LDFLAGS_MAINT_APPEND = -Wl,-z,defs -Wl,-O1 -Wl,--warn-unresolved-symbols -Wl,--as-needed
 export DEB_LDFLAGS_MAINT_STRIP = -Wl,-Bsymbolic-functions
@@ -29,15 +30,6 @@ override_dh_auto_configure:
 		$(CONFFLAGS)
 
 override_dh_auto_test:
-ifeq (,$(filter nocheck, $(DEB_BUILD_OPTIONS)))
-# The tests are not fatal on non-linux architectures
-# See: https://bugzilla.gnome.org/show_bug.cgi?id=770684#c2
-ifeq (,$(filter $(DEB_HOST_ARCH), hurd-i386 kfreebsd-i386 kfreebsd-amd64))
-	xvfb-run --auto-servernum dh_auto_test
-else
-	xvfb-run --auto-servernum dh_auto_test || true
-endif
-endif
 
 override_dh_installchangelogs:
 	dh_installchangelogs -XChangeLog
