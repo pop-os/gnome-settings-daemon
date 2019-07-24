@@ -97,16 +97,17 @@ Index: gnome-settings-daemon/plugins/color/gsd-color-state.c
                                GError **error)
  {
          gboolean ret = TRUE;
-@@ -481,15 +548,22 @@ gcm_session_output_set_gamma (GnomeRROut
+@@ -481,15 +548,23 @@ gcm_session_output_set_gamma (GnomeRROut
                  goto out;
          }
  
 +        g_debug ("oled_display %d", oled_display);
-+        guint32 oled_brightness = 100;
++        gdouble oled_brightness = 1.0;
 +        if (oled_display) {
-+            oled_brightness = gcm_session_get_output_percentage();
++            double ratio = (double)gcm_session_get_output_percentage() / 100.0;
++            oled_brightness = 0.75 * ratio + 0.25;
 +        }
-+        g_debug ("oled_brightness %d", oled_brightness);
++        g_debug ("oled_brightness %f", oled_brightness);
 +
          /* convert to a type X understands */
          red = g_new (guint16, array->len);
@@ -117,13 +118,13 @@ Index: gnome-settings-daemon/plugins/color/gsd-color-state.c
 -                red[i] = data->red;
 -                green[i] = data->green;
 -                blue[i] = data->blue;
-+                red[i] = (data->red * oled_brightness) / 100;
-+                green[i] = (data->green * oled_brightness) / 100;
-+                blue[i] = (data->blue * oled_brightness) / 100;
++                red[i] = (guint16)((gdouble)data->red * oled_brightness);
++                green[i] = (guint16)((gdouble)data->green * oled_brightness);
++                blue[i] = (guint16)((gdouble)data->blue * oled_brightness);
          }
  
          /* send to LUT */
-@@ -516,6 +590,7 @@ static gboolean
+@@ -516,6 +591,7 @@ static gboolean
  gcm_session_device_set_gamma (GnomeRROutput *output,
                                CdProfile *profile,
                                guint color_temperature,
@@ -131,7 +132,7 @@ Index: gnome-settings-daemon/plugins/color/gsd-color-state.c
                                GError **error)
  {
          gboolean ret = FALSE;
-@@ -538,7 +613,7 @@ gcm_session_device_set_gamma (GnomeRROut
+@@ -538,7 +614,7 @@ gcm_session_device_set_gamma (GnomeRROut
          }
  
          /* apply the vcgt to this output */
@@ -140,7 +141,7 @@ Index: gnome-settings-daemon/plugins/color/gsd-color-state.c
          if (!ret)
                  goto out;
  out:
-@@ -550,6 +625,7 @@ out:
+@@ -550,6 +626,7 @@ out:
  static gboolean
  gcm_session_device_reset_gamma (GnomeRROutput *output,
                                  guint color_temperature,
@@ -148,7 +149,7 @@ Index: gnome-settings-daemon/plugins/color/gsd-color-state.c
                                  GError **error)
  {
          gboolean ret;
-@@ -588,7 +664,7 @@ gcm_session_device_reset_gamma (GnomeRRO
+@@ -588,7 +665,7 @@ gcm_session_device_reset_gamma (GnomeRRO
          }
  
          /* apply the vcgt to this output */
@@ -157,7 +158,7 @@ Index: gnome-settings-daemon/plugins/color/gsd-color-state.c
          if (!ret)
                  goto out;
  out:
-@@ -685,6 +761,41 @@ gcm_session_use_output_profile_for_scree
+@@ -685,6 +762,41 @@ gcm_session_use_output_profile_for_scree
  #define GSD_DBUS_INTERFACE_POWER_SCREEN	GSD_DBUS_BASE_INTERFACE ".Power.Screen"
  #define GSD_DBUS_PATH_POWER		GSD_DBUS_PATH "/Power"
  
@@ -199,7 +200,7 @@ Index: gnome-settings-daemon/plugins/color/gsd-color-state.c
  static void
  gcm_session_set_output_percentage (guint percentage)
  {
-@@ -748,12 +859,15 @@ gcm_session_device_assign_profile_connec
+@@ -748,12 +860,15 @@ gcm_session_device_assign_profile_connec
           * calibration brightness then set this new brightness */
          brightness_profile = cd_profile_get_metadata_item (profile,
                                                             CD_PROFILE_METADATA_SCREEN_BRIGHTNESS);
@@ -217,7 +218,7 @@ Index: gnome-settings-daemon/plugins/color/gsd-color-state.c
          }
  
          /* set the _ICC_PROFILE atom */
-@@ -775,6 +889,7 @@ gcm_session_device_assign_profile_connec
+@@ -775,6 +890,7 @@ gcm_session_device_assign_profile_connec
                  ret = gcm_session_device_set_gamma (output,
                                                      profile,
                                                      priv->color_temperature,
@@ -225,7 +226,7 @@ Index: gnome-settings-daemon/plugins/color/gsd-color-state.c
                                                      &error);
                  if (!ret) {
                          g_warning ("failed to set %s gamma tables: %s",
-@@ -786,6 +901,7 @@ gcm_session_device_assign_profile_connec
+@@ -786,6 +902,7 @@ gcm_session_device_assign_profile_connec
          } else {
                  ret = gcm_session_device_reset_gamma (output,
                                                        priv->color_temperature,
@@ -233,7 +234,7 @@ Index: gnome-settings-daemon/plugins/color/gsd-color-state.c
                                                        &error);
                  if (!ret) {
                          g_warning ("failed to reset %s gamma tables: %s",
-@@ -928,9 +1044,15 @@ gcm_session_device_assign_connect_cb (GO
+@@ -928,9 +1045,15 @@ gcm_session_device_assign_connect_cb (GO
                                               gdk_atom_intern_static_string ("_ICC_PROFILE_IN_X_VERSION"));
                  }
  
@@ -249,7 +250,7 @@ Index: gnome-settings-daemon/plugins/color/gsd-color-state.c
                                                        &error);
                  if (!ret) {
                          g_warning ("failed to reset %s gamma tables: %s",
-@@ -1489,6 +1611,52 @@ gsd_color_state_class_init (GsdColorStat
+@@ -1489,6 +1612,52 @@ gsd_color_state_class_init (GsdColorStat
  }
  
  static void
@@ -302,7 +303,7 @@ Index: gnome-settings-daemon/plugins/color/gsd-color-state.c
  gsd_color_state_init (GsdColorState *state)
  {
          GsdColorStatePrivate *priv;
-@@ -1519,6 +1687,15 @@ gsd_color_state_init (GsdColorState *sta
+@@ -1519,6 +1688,15 @@ gsd_color_state_init (GsdColorState *sta
          priv->color_temperature = GSD_COLOR_TEMPERATURE_DEFAULT;
  
          priv->client = cd_client_new ();
@@ -318,7 +319,7 @@ Index: gnome-settings-daemon/plugins/color/gsd-color-state.c
  }
  
  static void
-@@ -1539,6 +1716,11 @@ gsd_color_state_finalize (GObject *objec
+@@ -1539,6 +1717,11 @@ gsd_color_state_finalize (GObject *objec
          g_clear_pointer (&state->priv->device_assign_hash, g_hash_table_destroy);
          g_clear_object (&state->priv->state_screen);
  
