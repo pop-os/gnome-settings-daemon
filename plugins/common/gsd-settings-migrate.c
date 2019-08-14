@@ -34,32 +34,39 @@ gsd_settings_migrate_check (const gchar             *origin_schema,
                             guint                    n_entries)
 {
         GSettings *origin_settings, *dest_settings;
-        GVariant *variant;
         guint i;
 
         origin_settings = g_settings_new_with_path (origin_schema, origin_path);
         dest_settings = g_settings_new_with_path (dest_schema, dest_path);
 
         for (i = 0; i < n_entries; i++) {
+                g_autoptr(GVariant) variant = NULL;
+
                 variant = g_settings_get_user_value (origin_settings, entries[i].origin_key);
 
                 if (!variant)
                         continue;
 
+                g_settings_reset (origin_settings, entries[i].origin_key);
+
                 if (entries[i].dest_key) {
                         if (entries[i].func) {
+                                g_autoptr(GVariant) old_default = NULL;
+                                g_autoptr(GVariant) new_default = NULL;
                                 GVariant *modified;
 
-                                modified = entries[i].func (variant);
-                                g_variant_unref (variant);
-                                variant = g_variant_ref_sink (modified);
+                                old_default = g_settings_get_default_value (origin_settings, entries[i].origin_key);
+                                new_default = g_settings_get_default_value (dest_settings, entries[i].dest_key);
+
+                                modified = entries[i].func (variant, old_default, new_default);
+                                g_clear_pointer (&variant, g_variant_unref);
+                                if (modified)
+                                        variant = g_variant_ref_sink (modified);
                         }
 
-                        g_settings_set_value (dest_settings, entries[i].dest_key, variant);
+                        if (variant)
+                                g_settings_set_value (dest_settings, entries[i].dest_key, variant);
                 }
-
-                g_settings_reset (origin_settings, entries[i].origin_key);
-                g_variant_unref (variant);
         }
 
         g_object_unref (origin_settings);
