@@ -1,3 +1,9 @@
+gnome-settings-daemon (3.33.90-1) UNRELEASED; urgency=medium
+
+  * New upstream release
+
+ -- Iain Lane <iain.lane@canonical.com>  Wed, 14 Aug 2019 16:51:24 +0100
+
 gnome-settings-daemon (3.32.1-1) experimental; urgency=medium
 
   * New upstream release
