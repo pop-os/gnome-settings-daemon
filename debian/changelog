@@ -1,4 +1,4 @@
-gnome-settings-daemon (3.33.90-1) UNRELEASED; urgency=medium
+gnome-settings-daemon (3.33.90-1) experimental; urgency=medium
 
   * New upstream release
     - Add systemd user service files for all the plugins
@@ -39,7 +39,7 @@ gnome-settings-daemon (3.33.90-1) UNRELEASED; urgency=medium
     requirements. The present requirement is for the ITS rules, but we've
     backported them in Debian.
 
- -- Iain Lane <laney@debian.org>  Wed, 14 Aug 2019 17:17:49 +0100
+ -- Iain Lane <laney@debian.org>  Wed, 14 Aug 2019 18:11:46 +0100
 
 gnome-settings-daemon (3.32.1-1) experimental; urgency=medium
 
