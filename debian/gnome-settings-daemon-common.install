@@ -2,4 +2,5 @@
 usr/share/GConf
 usr/share/glib-2.0
 usr/share/locale
+usr/lib/systemd/user
 [linux-any] lib/udev
