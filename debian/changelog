@@ -1,3 +1,46 @@
+gnome-settings-daemon (3.33.90-1) experimental; urgency=medium
+
+  * New upstream release
+    - Add systemd user service files for all the plugins
+    - With the exception of gsd-xsettings, daemons do not use the GDK X11
+      backend anymore
+    - WWAN:
+      + New daemon, handles WWAN device settings
+    - Mouse:
+      + Removed daemon, everything is now implemented in mutter
+    - Clipboard:
+      + Removed daemon, everything is now implemented in mutter
+    - Color:
+      + Use Planckian calculations on night light
+      + Allow night light to be always on
+    - Rfkill:
+      + Handle airplane mode for WWAN interfaces
+    - XSettings:
+      + Round Xft.dpi setting to an integer
+      + Add entry for overlay scrolling setting
+    - Media-keys:
+      + Use device node from AcceleratorActivated arguments
+      + Keygrabbing has been reworked. The new UngrabAccelerators DBus API on
+        the shell is now required. Non-GNOME Desktops using g-s-d will need to
+        be updated for this.
+      + Add mapping for screen brightness cycle key
+      + Fix launched clients inheriting DESKTOP_AUTOSTART_ID
+      + Signal connector rather than output ID for OSD
+      + Fix MPRIS issues with disconnecting clients
+      + Allow mapping of hard-coded keys
+    - Power:
+      + Fix memory leak
+      + Signal connector rather than output ID for OSD
+      + Only disable Suspend/Hibernate actions inside VM
+      + Remove special handling of tablet devices
+  * debian/control: Update BDs per upstream. There's a new WWAN plugin which
+    pulls in gcr and modemmanager.
+  * meson.build-Lower-polkit-requirement.patch: Let polkit 0.105 satisfy the
+    requirements. The present requirement is for the ITS rules, but we've
+    backported them in Debian.
+
+ -- Iain Lane <laney@debian.org>  Wed, 14 Aug 2019 18:11:46 +0100
+
 gnome-settings-daemon (3.32.1-1ubuntu2) eoan; urgency=medium
 
   * debian/patches/ubuntu_ibus_configs.patch:

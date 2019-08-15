@@ -1,6 +1,6 @@
 project(
   'gnome-settings-daemon', 'c',
-  version: '3.32.1',
+  version: '3.33.90',
   license: [ 'GPL2+', 'LGPLv2+' ],
   meson_version: '>= 0.44.0'
 )
@@ -83,12 +83,12 @@ endif
 add_project_arguments(common_flags + compiler_flags, language: 'c')
 
 glib_dep = dependency('glib-2.0', version: '>= 2.56')
-colord_dep = dependency('colord', version: '>= 1.0.2')
+colord_dep = dependency('colord', version: '>= 1.3.5')
 geocode_glib_dep = dependency('geocode-glib-1.0', version: '>= 3.10.0')
 gio_dep = dependency('gio-2.0', version: '>= 2.53.0')
 gio_unix_dep = dependency('gio-unix-2.0')
 gnome_desktop_dep = dependency('gnome-desktop-3.0', version: '>= 3.11.1')
-gsettings_desktop_dep = dependency('gsettings-desktop-schemas', version: '>= 3.27.90')
+gsettings_desktop_dep = dependency('gsettings-desktop-schemas', version: '>= 3.33.0')
 gtk_dep = dependency('gtk+-3.0', version: '>= 3.15.3')
 gtk_x11_dep = dependency('gtk+-x11-3.0')
 gweather_dep = dependency('gweather-3.0', version: '>= 3.9.5')
@@ -98,9 +98,21 @@ libgeoclue_dep = dependency('libgeoclue-2.0', version: '>= 2.3.1')
 libnotify_dep = dependency('libnotify', version: '>= 0.7.3')
 libpulse_mainloop_glib_dep = dependency('libpulse-mainloop-glib', version: '>= 2.0')
 pango_dep = dependency('pango', version: '>= 1.20.0')
-polkit_gobject_dep = dependency('polkit-gobject-1', version: '>= 0.103')
-upower_glib_dep = dependency('upower-glib', version: '>= 0.99.0')
+polkit_gobject_dep = dependency('polkit-gobject-1', version: '>= 0.114')
+upower_glib_dep = dependency('upower-glib', version: '>= 0.99.8')
 x11_dep = dependency('x11')
+
+enable_systemd = get_option('systemd')
+if enable_systemd
+  systemd_dep = dependency('systemd', required: false)
+  assert(systemd_dep.found(), 'Systemd support explicitly required, but systemd not found')
+
+  # XXX: Once https://github.com/systemd/systemd/issues/9595 is fixed and we can
+  # depend on this version, replace with something like:
+  #  systemduserunitdir = systemd_dep.get_pkgconfig_variable('systemduserunitdir')
+  # and uncomment systemd_dep below
+  systemd_userunitdir = join_paths(gsd_prefix, 'lib', 'systemd', 'user')
+endif
 
 m_dep = cc.find_library('m')
 
@@ -191,6 +203,13 @@ if enable_rfkill
   endif
 endif
 
+# wwan
+enable_wwan = get_option('wwan')
+if enable_wwan
+  gcr_base_dep = dependency('gcr-base-3', version: '>= 3.7.5')
+  mm_glib_dep = dependency('mm-glib', version: '>= 1.0')
+endif
+
 # Sharing plugin
 enable_network_manager = get_option('network_manager')
 assert(enable_network_manager or not host_is_linux, 'NetworkManager support is not optional on Linux platforms')
@@ -244,6 +263,9 @@ output += '        Wacom support:            ' + enable_wacom.to_string() + '\n'
 output += '        RFKill support:           ' + enable_rfkill.to_string() + '\n'
 if enable_smartcard
   output += '        System nssdb:             ' + system_nssdb_dir + '\n'
+endif
+if enable_systemd
+  output += '        Systemd user unit dir:    ' + systemd_userunitdir + '\n'
 endif
 if enable_rfkill
   output += '        udev dir:                 ' + udev_dir + '\n'

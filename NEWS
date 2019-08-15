@@ -1,20 +1,64 @@
-==============
-Version 3.32.1
-==============
+===============
+Version 3.33.90
+===============
 - Translation updates
-- Signal connector rather than output ID for OSDs
+- Add systemd user service files for all the plugins
+- With the exception of gsd-xsettings, daemons do not use the GDK X11
+  backend anymore
+
+WWAN:
+- New daemon, handles WWAN device settings
+
+Mouse:
+- Removed daemon, everything is now implemented in mutter
+
+Clipboard:
+- Removed daemon, everything is now implemented in mutter
+
+Color:
+- Use Planckian calculations on night light
+
+Rfkill:
+- Handle airplane mode for WWAN interfaces
+
+XSettings:
+- Round Xft.dpi setting to an integer
+- Add entry for overlay scrolling setting
 
 Media-keys:
+- Use device node from AcceleratorActivated arguments
+
+==============
+Version 3.33.0
+==============
+- Translation updates
+- Compile warning fixes
+
+Media-keys:
+- Keygrabbing has been reworked. The new UngrabAccelerators DBus API on the
+  shell is now required. Non-GNOME Desktops using g-s-d will need to be
+  updated for this.
+- Add mapping for screen brightness cycle key
+- Fix launched clients inheriting DESKTOP_AUTOSTART_ID
+- Signal connector rather than output ID for OSD
 - Fix MPRIS issues with disconnecting clients
+- Allow mapping of hard-coded keys
+
+Power:
+- Fix memory leak
+- Signal connector rather than output ID for OSD
+- Only disable Suspend/Hibernate actions inside VM
+- Remove special handling of tablet devices
 
 Color:
 - Allow night light to be always on
 
-Power:
-- Only disable Suspend/Hibernate actions inside VM
+Mouse:
+- Remove locate-pointer, in favor of gnome-shell handling
+- Remove mousetweaks support, in favor of gnome-shell handling
 
-Smartcard:
-- Fix cancellation issues
+Keyboard:
+- Remove numlock persistence, in favor of gnome-shell handling
 
 ==============
 Version 3.32.0

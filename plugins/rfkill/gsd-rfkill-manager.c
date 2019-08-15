@@ -38,6 +38,16 @@
  *        "org.gnome.SettingsDaemon.Rfkill" \
  *        "BluetoothAirplaneMode" \
  *        "<true|false>"
+ *
+ * and
+ *    gdbus call \
+ *        --session \
+ *        --dest org.gnome.SettingsDaemon.Rfkill \
+ *        --object-path /org/gnome/SettingsDaemon/Rfkill \
+ *        --method org.freedesktop.DBus.Properties.Set \
+ *        "org.gnome.SettingsDaemon.Rfkill" \
+ *        "WwanAirplaneMode" \
+ *        "<true|false>"
  */
 
 #include "config.h"
@@ -50,10 +60,10 @@
 #include "rfkill-glib.h"
 #include "gnome-settings-bus.h"
 
-#define GSD_RFKILL_MANAGER_GET_PRIVATE(o) (G_TYPE_INSTANCE_GET_PRIVATE ((o), GSD_TYPE_RFKILL_MANAGER, GsdRfkillManagerPrivate))
-
-struct GsdRfkillManagerPrivate
+struct _GsdRfkillManager
 {
+        GObject                  parent;
+
         GDBusNodeInfo           *introspection_data;
         guint                    name_id;
         GDBusConnection         *connection;
@@ -62,6 +72,7 @@ struct GsdRfkillManagerPrivate
         CcRfkillGlib            *rfkill;
         GHashTable              *killswitches;
         GHashTable              *bt_killswitches;
+        GHashTable              *wwan_killswitches;
 
         /* In addition to using the rfkill kernel subsystem
            (which is exposed by wlan, wimax, bluetooth, nfc,
@@ -100,6 +111,9 @@ static const gchar introspection_xml[] =
 "    <property name='BluetoothAirplaneMode' type='b' access='readwrite'/>"
 "    <property name='BluetoothHardwareAirplaneMode' type='b' access='read'/>"
 "    <property name='BluetoothHasAirplaneMode' type='b' access='read'/>"
+"    <property name='WwanAirplaneMode' type='b' access='readwrite'/>"
+"    <property name='WwanHardwareAirplaneMode' type='b' access='read'/>"
+"    <property name='WwanHasAirplaneMode' type='b' access='read'/>"
 "  </interface>"
 "</node>";
 
@@ -117,14 +131,11 @@ gsd_rfkill_manager_class_init (GsdRfkillManagerClass *klass)
         GObjectClass   *object_class = G_OBJECT_CLASS (klass);
 
         object_class->finalize = gsd_rfkill_manager_finalize;
-
-        g_type_class_add_private (klass, sizeof (GsdRfkillManagerPrivate));
 }
 
 static void
 gsd_rfkill_manager_init (GsdRfkillManager *manager)
 {
-        manager->priv = GSD_RFKILL_MANAGER_GET_PRIVATE (manager);
 }
 
 static gboolean
@@ -153,7 +164,7 @@ engine_get_airplane_mode_helper (GHashTable *killswitches)
 static gboolean
 engine_get_bluetooth_airplane_mode (GsdRfkillManager *manager)
 {
-	return engine_get_airplane_mode_helper (manager->priv->bt_killswitches);
+	return engine_get_airplane_mode_helper (manager->bt_killswitches);
 }
 
 static gboolean
@@ -163,10 +174,10 @@ engine_get_bluetooth_hardware_airplane_mode (GsdRfkillManager *manager)
 	gpointer key, value;
 
 	/* If we have no killswitches, hw airplane mode is off. */
-	if (g_hash_table_size (manager->priv->bt_killswitches) == 0)
+	if (g_hash_table_size (manager->bt_killswitches) == 0)
 		return FALSE;
 
-	g_hash_table_iter_init (&iter, manager->priv->bt_killswitches);
+	g_hash_table_iter_init (&iter, manager->bt_killswitches);
 	while (g_hash_table_iter_next (&iter, &key, &value)) {
 		int state;
 
@@ -184,17 +195,69 @@ engine_get_bluetooth_hardware_airplane_mode (GsdRfkillManager *manager)
 static gboolean
 engine_get_has_bluetooth_airplane_mode (GsdRfkillManager *manager)
 {
-	return (g_hash_table_size (manager->priv->bt_killswitches) > 0);
+	return (g_hash_table_size (manager->bt_killswitches) > 0);
+}
+
+static gboolean
+engine_get_wwan_airplane_mode (GsdRfkillManager *manager)
+{
+        gboolean is_airplane;
+
+        is_airplane = engine_get_airplane_mode_helper (manager->wwan_killswitches);
+
+        /* Try our luck with Modem Manager too.  Check only if no rfkill
+         * devices found, or if rfkill reports all devices to be down.
+         * (Airplane mode will be disabled if at least one device is up,
+         * so if rfkill says no device is up, check any device is up via
+         * Network Manager (which in turn, is handled via Modem Manager))
+         */
+        if (g_hash_table_size (manager->wwan_killswitches) == 0 || is_airplane)
+                if (manager->wwan_interesting)
+                        is_airplane = !manager->wwan_enabled;
+
+        return is_airplane;
+}
+
+static gboolean
+engine_get_wwan_hardware_airplane_mode (GsdRfkillManager *manager)
+{
+        GHashTableIter iter;
+        gpointer key, value;
+
+        /* If we have no killswitches, hw airplane mode is off. */
+        if (g_hash_table_size (manager->wwan_killswitches) == 0)
+                return FALSE;
+
+        g_hash_table_iter_init (&iter, manager->wwan_killswitches);
+        while (g_hash_table_iter_next (&iter, &key, &value)) {
+                int state;
+
+                state = GPOINTER_TO_INT (value);
+
+                /* A single rfkill switch that's not hw blocked? Hw airplane mode is off */
+                if (state != RFKILL_STATE_HARD_BLOCKED) {
+                        return FALSE;
+                }
+        }
+
+        return TRUE;
+}
+
+static gboolean
+engine_get_has_wwan_airplane_mode (GsdRfkillManager *manager)
+{
+        return (g_hash_table_size (manager->wwan_killswitches) > 0 ||
+                manager->wwan_interesting);
 }
 
 static gboolean
 engine_get_airplane_mode (GsdRfkillManager *manager)
 {
-	if (!manager->priv->wwan_interesting)
-		return engine_get_airplane_mode_helper (manager->priv->killswitches);
+	if (!manager->wwan_interesting)
+		return engine_get_airplane_mode_helper (manager->killswitches);
         /* wwan enabled? then airplane mode is off (because an USB modem
            could be on in this state) */
-	return engine_get_airplane_mode_helper (manager->priv->killswitches) && !manager->priv->wwan_enabled;
+	return engine_get_airplane_mode_helper (manager->killswitches) && !manager->wwan_enabled;
 }
 
 static gboolean
@@ -204,10 +267,10 @@ engine_get_hardware_airplane_mode (GsdRfkillManager *manager)
 	gpointer key, value;
 
         /* If we have no killswitches, hw airplane mode is off. */
-        if (g_hash_table_size (manager->priv->killswitches) == 0)
+        if (g_hash_table_size (manager->killswitches) == 0)
                 return FALSE;
 
-	g_hash_table_iter_init (&iter, manager->priv->killswitches);
+	g_hash_table_iter_init (&iter, manager->killswitches);
 	while (g_hash_table_iter_next (&iter, &key, &value)) {
 		int state;
 
@@ -225,17 +288,17 @@ engine_get_hardware_airplane_mode (GsdRfkillManager *manager)
 static gboolean
 engine_get_has_airplane_mode (GsdRfkillManager *manager)
 {
-        return (g_hash_table_size (manager->priv->killswitches) > 0) ||
-                manager->priv->wwan_interesting;
+        return (g_hash_table_size (manager->killswitches) > 0) ||
+                manager->wwan_interesting;
 }
 
 static gboolean
 engine_get_should_show_airplane_mode (GsdRfkillManager *manager)
 {
-        return (g_strcmp0 (manager->priv->chassis_type, "desktop") != 0) &&
-                (g_strcmp0 (manager->priv->chassis_type, "server") != 0) &&
-                (g_strcmp0 (manager->priv->chassis_type, "vm") != 0) &&
-                (g_strcmp0 (manager->priv->chassis_type, "container") != 0);
+        return (g_strcmp0 (manager->chassis_type, "desktop") != 0) &&
+                (g_strcmp0 (manager->chassis_type, "server") != 0) &&
+                (g_strcmp0 (manager->chassis_type, "vm") != 0) &&
+                (g_strcmp0 (manager->chassis_type, "container") != 0);
 }
 
 static void
@@ -245,7 +308,7 @@ engine_properties_changed (GsdRfkillManager *manager)
         GVariant *props_changed = NULL;
 
         /* not yet connected to the session bus */
-        if (manager->priv->connection == NULL)
+        if (manager->connection == NULL)
                 return;
 
         g_variant_builder_init (&props_builder, G_VARIANT_TYPE ("a{sv}"));
@@ -264,12 +327,18 @@ engine_properties_changed (GsdRfkillManager *manager)
                                g_variant_new_boolean (engine_get_bluetooth_hardware_airplane_mode (manager)));
         g_variant_builder_add (&props_builder, "{sv}", "BluetoothHasAirplaneMode",
                                g_variant_new_boolean (engine_get_has_bluetooth_airplane_mode (manager)));
+        g_variant_builder_add (&props_builder, "{sv}", "WwanAirplaneMode",
+                               g_variant_new_boolean (engine_get_wwan_airplane_mode (manager)));
+        g_variant_builder_add (&props_builder, "{sv}", "WwanHardwareAirplaneMode",
+                               g_variant_new_boolean (engine_get_wwan_hardware_airplane_mode (manager)));
+        g_variant_builder_add (&props_builder, "{sv}", "WwanHasAirplaneMode",
+                               g_variant_new_boolean (engine_get_has_wwan_airplane_mode (manager)));
 
         props_changed = g_variant_new ("(s@a{sv}@as)", GSD_RFKILL_DBUS_NAME,
                                        g_variant_builder_end (&props_builder),
                                        g_variant_new_strv (NULL, 0));
 
-        g_dbus_connection_emit_signal (manager->priv->connection,
+        g_dbus_connection_emit_signal (manager->connection,
                                        NULL,
                                        GSD_RFKILL_DBUS_PATH,
                                        "org.freedesktop.DBus.Properties",
@@ -287,6 +356,12 @@ rfkill_changed (CcRfkillGlib     *rfkill,
 
 	for (l = events; l != NULL; l = l->next) {
 		struct rfkill_event *event = l->data;
+                const gchar *type = "";
+
+                if (event->type == RFKILL_TYPE_BLUETOOTH)
+                        type = "Bluetooth ";
+                else if (event->type == RFKILL_TYPE_WWAN)
+                        type = "WWAN ";
 
                 switch (event->op) {
                 case RFKILL_OP_ADD:
@@ -298,26 +373,31 @@ rfkill_changed (CcRfkillGlib     *rfkill,
                         else
                                 value = RFKILL_STATE_UNBLOCKED;
 
-                        g_hash_table_insert (manager->priv->killswitches,
+                        g_hash_table_insert (manager->killswitches,
                                              GINT_TO_POINTER (event->idx),
                                              GINT_TO_POINTER (value));
                         if (event->type == RFKILL_TYPE_BLUETOOTH)
-				g_hash_table_insert (manager->priv->bt_killswitches,
+				g_hash_table_insert (manager->bt_killswitches,
 						     GINT_TO_POINTER (event->idx),
 						     GINT_TO_POINTER (value));
-			g_debug ("%s %srfkill with ID %d",
-				 event->op == RFKILL_OP_ADD ? "Added" : "Changed",
-				 event->type == RFKILL_TYPE_BLUETOOTH ? "Bluetooth " : "",
-				 event->idx);
+                        else if (event->type == RFKILL_TYPE_WWAN)
+                                g_hash_table_insert (manager->wwan_killswitches,
+                                                     GINT_TO_POINTER (event->idx),
+                                                     GINT_TO_POINTER (value));
+                        g_debug ("%s %srfkill with ID %d",
+                                 event->op == RFKILL_OP_ADD ? "Added" : "Changed",
+                                 type, event->idx);
                         break;
                 case RFKILL_OP_DEL:
-			g_hash_table_remove (manager->priv->killswitches,
+			g_hash_table_remove (manager->killswitches,
 					     GINT_TO_POINTER (event->idx));
 			if (event->type == RFKILL_TYPE_BLUETOOTH)
-				g_hash_table_remove (manager->priv->bt_killswitches,
+				g_hash_table_remove (manager->bt_killswitches,
 						     GINT_TO_POINTER (event->idx));
-			g_debug ("Removed %srfkill with ID %d", event->type == RFKILL_TYPE_BLUETOOTH ? "Bluetooth " : "",
-				 event->idx);
+                        else if (event->type == RFKILL_TYPE_WWAN)
+                                g_hash_table_remove (manager->wwan_killswitches,
+                                                     GINT_TO_POINTER (event->idx));
+                        g_debug ("Removed %srfkill with ID %d", type, event->idx);
                         break;
                 }
 	}
@@ -368,8 +448,31 @@ static gboolean
 engine_set_bluetooth_airplane_mode (GsdRfkillManager *manager,
                                     gboolean          enable)
 {
-        cc_rfkill_glib_send_change_all_event (manager->priv->rfkill, RFKILL_TYPE_BLUETOOTH,
-                                              enable, manager->priv->cancellable, rfkill_set_cb, manager);
+        cc_rfkill_glib_send_change_all_event (manager->rfkill, RFKILL_TYPE_BLUETOOTH,
+                                              enable, manager->cancellable, rfkill_set_cb, manager);
+
+        return TRUE;
+}
+
+static gboolean
+engine_set_wwan_airplane_mode (GsdRfkillManager *manager,
+                               gboolean          enable)
+{
+        cc_rfkill_glib_send_change_all_event (manager->rfkill, RFKILL_TYPE_WWAN,
+                                              enable, manager->cancellable, rfkill_set_cb, manager);
+
+        if (manager->nm_client) {
+                g_dbus_proxy_call (manager->nm_client,
+                                   "org.freedesktop.DBus.Properties.Set",
+                                   g_variant_new ("(ssv)",
+                                                  "org.freedesktop.NetworkManager",
+                                                  "WwanEnabled",
+                                                  g_variant_new_boolean (!enable)),
+                                   G_DBUS_CALL_FLAGS_NONE,
+                                   -1, /* timeout */
+                                   manager->cancellable,
+                                   set_wwan_complete, NULL);
+        }
 
         return TRUE;
 }
@@ -378,13 +481,13 @@ static gboolean
 engine_set_airplane_mode (GsdRfkillManager *manager,
                           gboolean          enable)
 {
-        cc_rfkill_glib_send_change_all_event (manager->priv->rfkill, RFKILL_TYPE_ALL,
-                                              enable, manager->priv->cancellable, rfkill_set_cb, manager);
+        cc_rfkill_glib_send_change_all_event (manager->rfkill, RFKILL_TYPE_ALL,
+                                              enable, manager->cancellable, rfkill_set_cb, manager);
 
         /* Note: we set the the NM property even if there are no modems, so we don't
            need to resync when one is plugged in */
-        if (manager->priv->nm_client) {
-                g_dbus_proxy_call (manager->priv->nm_client,
+        if (manager->nm_client) {
+                g_dbus_proxy_call (manager->nm_client,
                                    "org.freedesktop.DBus.Properties.Set",
                                    g_variant_new ("(ssv)",
                                                   "org.freedesktop.NetworkManager",
@@ -392,7 +495,7 @@ engine_set_airplane_mode (GsdRfkillManager *manager,
                                                   g_variant_new_boolean (!enable)),
                                    G_DBUS_CALL_FLAGS_NONE,
                                    -1, /* timeout */
-                                   manager->priv->cancellable,
+                                   manager->cancellable,
                                    set_wwan_complete, NULL);
         }
 
@@ -421,6 +524,12 @@ handle_set_property (GDBusConnection *connection,
                 return engine_set_bluetooth_airplane_mode (manager, airplane_mode);
         }
 
+        if (g_strcmp0 (property_name, "WwanAirplaneMode") == 0) {
+                gboolean airplane_mode;
+                g_variant_get (value, "b", &airplane_mode);
+                return engine_set_wwan_airplane_mode (manager, airplane_mode);
+        }
+
         return FALSE;
 }
 
@@ -437,7 +546,7 @@ handle_get_property (GDBusConnection *connection,
 
         /* Check session pointer as a proxy for whether the manager is in the
            start or stop state */
-        if (manager->priv->connection == NULL) {
+        if (manager->connection == NULL) {
                 return NULL;
         }
 
@@ -483,6 +592,24 @@ handle_get_property (GDBusConnection *connection,
                 return g_variant_new_boolean (has_airplane_mode);
         }
 
+        if (g_strcmp0 (property_name, "WwanAirplaneMode") == 0) {
+                gboolean airplane_mode;
+                airplane_mode = engine_get_wwan_airplane_mode (manager);
+                return g_variant_new_boolean (airplane_mode);
+        }
+
+        if (g_strcmp0 (property_name, "WwanHardwareAirplaneMode") == 0) {
+                gboolean hw_airplane_mode;
+                hw_airplane_mode = engine_get_wwan_hardware_airplane_mode (manager);
+                return g_variant_new_boolean (hw_airplane_mode);
+        }
+
+        if (g_strcmp0 (property_name, "WwanHasAirplaneMode") == 0) {
+                gboolean has_airplane_mode;
+                has_airplane_mode = engine_get_has_wwan_airplane_mode (manager);
+                return g_variant_new_boolean (has_airplane_mode);
+        }
+
         return NULL;
 }
 
@@ -508,17 +635,17 @@ on_bus_gotten (GObject               *source_object,
                 g_error_free (error);
                 return;
         }
-        manager->priv->connection = connection;
+        manager->connection = connection;
 
         g_dbus_connection_register_object (connection,
                                            GSD_RFKILL_DBUS_PATH,
-                                           manager->priv->introspection_data->interfaces[0],
+                                           manager->introspection_data->interfaces[0],
                                            &interface_vtable,
                                            manager,
                                            NULL,
                                            NULL);
 
-        manager->priv->name_id = g_bus_own_name_on_connection (connection,
+        manager->name_id = g_bus_own_name_on_connection (connection,
                                                                GSD_RFKILL_DBUS_NAME,
                                                                G_BUS_NAME_OWNER_FLAGS_NONE,
                                                                NULL,
@@ -526,9 +653,9 @@ on_bus_gotten (GObject               *source_object,
                                                                NULL,
                                                                NULL);
 
-        manager->priv->session = gnome_settings_bus_get_session_proxy ();
-        manager->priv->rfkill_input_inhibit_binding = g_object_bind_property (manager->priv->session, "session-is-active",
-                                                                              manager->priv->rfkill, "rfkill-input-inhibited",
+        manager->session = gnome_settings_bus_get_session_proxy ();
+        manager->rfkill_input_inhibit_binding = g_object_bind_property (manager->session, "session-is-active",
+                                                                              manager->rfkill, "rfkill-input-inhibited",
                                                                               G_BINDING_SYNC_CREATE);
 }
 
@@ -537,7 +664,7 @@ sync_wwan_enabled (GsdRfkillManager *manager)
 {
         GVariant *property;
 
-        property = g_dbus_proxy_get_cached_property (manager->priv->nm_client,
+        property = g_dbus_proxy_get_cached_property (manager->nm_client,
                                                      "WwanEnabled");
 
         if (property == NULL) {
@@ -545,7 +672,7 @@ sync_wwan_enabled (GsdRfkillManager *manager)
                 return;
         }
 
-        manager->priv->wwan_enabled = g_variant_get_boolean (property);
+        manager->wwan_enabled = g_variant_get_boolean (property);
         engine_properties_changed (manager);
 
         g_variant_unref (property);
@@ -597,9 +724,9 @@ on_nm_proxy_gotten (GObject      *source,
                 goto out;
         }
 
-        manager->priv->nm_client = proxy;
+        manager->nm_client = proxy;
 
-        g_signal_connect (manager->priv->nm_client, "g-signal",
+        g_signal_connect (manager->nm_client, "g-signal",
                           G_CALLBACK (nm_signal), manager);
         sync_wwan_enabled (manager);
 
@@ -617,7 +744,7 @@ sync_wwan_interesting (GDBusObjectManager *object_manager,
         GList *objects;
 
         objects = g_dbus_object_manager_get_objects (object_manager);
-        manager->priv->wwan_interesting = (objects != NULL);
+        manager->wwan_interesting = (objects != NULL);
         engine_properties_changed (manager);
 
         g_list_free_full (objects, g_object_unref);
@@ -644,13 +771,13 @@ on_mm_proxy_gotten (GObject      *source,
                 goto out;
         }
 
-        manager->priv->mm_client = proxy;
+        manager->mm_client = proxy;
 
-        g_signal_connect (manager->priv->mm_client, "interface-added",
+        g_signal_connect (manager->mm_client, "interface-added",
                           G_CALLBACK (sync_wwan_interesting), manager);
-        g_signal_connect (manager->priv->mm_client, "interface-removed",
+        g_signal_connect (manager->mm_client, "interface-removed",
                           G_CALLBACK (sync_wwan_interesting), manager);
-        sync_wwan_interesting (manager->priv->mm_client, NULL, NULL, manager);
+        sync_wwan_interesting (manager->mm_client, NULL, NULL, manager);
 
  out:
         g_object_unref (manager);
@@ -664,23 +791,24 @@ gsd_rfkill_manager_start (GsdRfkillManager *manager,
 
         gnome_settings_profile_start (NULL);
 
-        manager->priv->introspection_data = g_dbus_node_info_new_for_xml (introspection_xml, NULL);
-        g_assert (manager->priv->introspection_data != NULL);
+        manager->introspection_data = g_dbus_node_info_new_for_xml (introspection_xml, NULL);
+        g_assert (manager->introspection_data != NULL);
 
-        manager->priv->killswitches = g_hash_table_new (g_direct_hash, g_direct_equal);
-        manager->priv->bt_killswitches = g_hash_table_new (g_direct_hash, g_direct_equal);
-        manager->priv->rfkill = cc_rfkill_glib_new ();
-        g_signal_connect (G_OBJECT (manager->priv->rfkill), "changed",
+        manager->killswitches = g_hash_table_new (g_direct_hash, g_direct_equal);
+        manager->bt_killswitches = g_hash_table_new (g_direct_hash, g_direct_equal);
+        manager->wwan_killswitches = g_hash_table_new (g_direct_hash, g_direct_equal);
+        manager->rfkill = cc_rfkill_glib_new ();
+        g_signal_connect (G_OBJECT (manager->rfkill), "changed",
                           G_CALLBACK (rfkill_changed), manager);
 
-        if (!cc_rfkill_glib_open (manager->priv->rfkill, &local_error)) {
+        if (!cc_rfkill_glib_open (manager->rfkill, &local_error)) {
                 g_warning ("Error setting up rfkill: %s", local_error->message);
                 g_clear_error (&local_error);
         }
 
-        manager->priv->cancellable = g_cancellable_new ();
+        manager->cancellable = g_cancellable_new ();
 
-        manager->priv->chassis_type = gnome_settings_get_chassis_type ();
+        manager->chassis_type = gnome_settings_get_chassis_type ();
 
         g_dbus_proxy_new_for_bus (G_BUS_TYPE_SYSTEM,
                                   G_DBUS_PROXY_FLAGS_NONE,
@@ -688,7 +816,7 @@ gsd_rfkill_manager_start (GsdRfkillManager *manager,
                                   "org.freedesktop.NetworkManager",
                                   "/org/freedesktop/NetworkManager",
                                   "org.freedesktop.NetworkManager",
-                                  manager->priv->cancellable,
+                                  manager->cancellable,
                                   on_nm_proxy_gotten, g_object_ref (manager));
 
         g_dbus_object_manager_client_new_for_bus (G_BUS_TYPE_SYSTEM,
@@ -696,12 +824,12 @@ gsd_rfkill_manager_start (GsdRfkillManager *manager,
                                                   "org.freedesktop.ModemManager1",
                                                   "/org/freedesktop/ModemManager1",
                                                   NULL, NULL, NULL, /* get_proxy_type and closure */
-                                                  manager->priv->cancellable,
+                                                  manager->cancellable,
                                                   on_mm_proxy_gotten, g_object_ref (manager));
 
         /* Start process of owning a D-Bus name */
         g_bus_get (G_BUS_TYPE_SESSION,
-                   manager->priv->cancellable,
+                   manager->cancellable,
                    (GAsyncReadyCallback) on_bus_gotten,
                    manager);
 
@@ -713,34 +841,33 @@ gsd_rfkill_manager_start (GsdRfkillManager *manager,
 void
 gsd_rfkill_manager_stop (GsdRfkillManager *manager)
 {
-        GsdRfkillManagerPrivate *p = manager->priv;
-
         g_debug ("Stopping rfkill manager");
 
-        if (manager->priv->name_id != 0) {
-                g_bus_unown_name (manager->priv->name_id);
-                manager->priv->name_id = 0;
+        if (manager->name_id != 0) {
+                g_bus_unown_name (manager->name_id);
+                manager->name_id = 0;
         }
 
-        g_clear_pointer (&p->introspection_data, g_dbus_node_info_unref);
-        g_clear_object (&p->connection);
-        g_clear_object (&p->rfkill_input_inhibit_binding);
-        g_clear_object (&p->session);
-        g_clear_object (&p->rfkill);
-        g_clear_pointer (&p->killswitches, g_hash_table_destroy);
-        g_clear_pointer (&p->bt_killswitches, g_hash_table_destroy);
+        g_clear_pointer (&manager->introspection_data, g_dbus_node_info_unref);
+        g_clear_object (&manager->connection);
+        g_clear_object (&manager->rfkill_input_inhibit_binding);
+        g_clear_object (&manager->session);
+        g_clear_object (&manager->rfkill);
+        g_clear_pointer (&manager->killswitches, g_hash_table_destroy);
+        g_clear_pointer (&manager->bt_killswitches, g_hash_table_destroy);
+        g_clear_pointer (&manager->wwan_killswitches, g_hash_table_destroy);
 
-        if (p->cancellable) {
-                g_cancellable_cancel (p->cancellable);
-                g_clear_object (&p->cancellable);
+        if (manager->cancellable) {
+                g_cancellable_cancel (manager->cancellable);
+                g_clear_object (&manager->cancellable);
         }
 
-        g_clear_object (&p->nm_client);
-        g_clear_object (&p->mm_client);
-        p->wwan_enabled = FALSE;
-        p->wwan_interesting = FALSE;
+        g_clear_object (&manager->nm_client);
+        g_clear_object (&manager->mm_client);
+        manager->wwan_enabled = FALSE;
+        manager->wwan_interesting = FALSE;
 
-        g_clear_pointer (&p->chassis_type, g_free);
+        g_clear_pointer (&manager->chassis_type, g_free);
 }
 
 static void
@@ -753,7 +880,7 @@ gsd_rfkill_manager_finalize (GObject *object)
 
         manager = GSD_RFKILL_MANAGER (object);
 
-        g_return_if_fail (manager->priv != NULL);
+        g_return_if_fail (manager != NULL);
 
         gsd_rfkill_manager_stop (manager);
 
