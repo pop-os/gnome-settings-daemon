@@ -105,7 +105,7 @@ Index: gnome-settings-daemon/plugins/color/gsd-color-state.c
 +        gdouble oled_brightness = 1.0;
 +        if (oled_display) {
 +            double ratio = (double)gcm_session_get_output_percentage() / 100.0;
-+            oled_brightness = 0.75 * ratio + 0.25;
++            oled_brightness = 0.6 * ratio + 0.4;
 +        }
 +        g_debug ("oled_brightness %f", oled_brightness);
 +
