@@ -1,4 +1,4 @@
-gnome-settings-daemon (3.33.90-1ubuntu1) UNRELEASED; urgency=medium
+gnome-settings-daemon (3.33.90-1ubuntu1) eoan; urgency=medium
 
   * Merge with Debian. Remaining changes:
     + debian/control.in:
@@ -27,7 +27,7 @@ gnome-settings-daemon (3.33.90-1ubuntu1) UNRELEASED; urgency=medium
   * gnome-settings-daemon.maintscript: Clean up Mouse & Clipboard XDG
     autostart files. These plugins have been dropped.
 
- -- Iain Lane <iain.lane@canonical.com>  Fri, 16 Aug 2019 16:12:33 +0100
+ -- Iain Lane <iain.lane@canonical.com>  Fri, 16 Aug 2019 16:38:59 +0100
 
 gnome-settings-daemon (3.33.90-1) experimental; urgency=medium
 
