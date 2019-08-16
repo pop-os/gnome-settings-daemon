@@ -1,3 +1,34 @@
+gnome-settings-daemon (3.33.90-1ubuntu1) UNRELEASED; urgency=medium
+
+  * Merge with Debian. Remaining changes:
+    + debian/control.in:
+      - Build-depend on accountsservice
+    + debian/patches:
+       - 45_suppress-printer-may-not-be-connected-notification.patch
+       - 53_sync_input_sources_to_accountsservice.patch
+       - 64_restore_terminal_keyboard_shortcut_schema.patch
+       - correct_logout_action.patch
+          display the logout action on ctrl-alt-del
+       - ubuntu-lid-close-suspend.patch
+          Reimplement support for setting lid close suspend actions
+       - revert-wacom-migration.patch
+       - revert-gsettings-removals.patch
+          Revert gsettings keys that were dropped since 3.8, for u-s-d
+       - revert-mediakeys-dbus-interface-drop.patch
+       - ubuntu_ibus_configs.patch
+       - git_binary_encoding.patch
+       - ubuntu_calculator_snap.patch
+    + debian/gnome-settings-daemon.install:
+      - Install apport hook
+  * Rebase patches. Many of these required manual resolution - especially
+    64_restore_terminal_keyboard_shortcut_schema.patch which needed to be
+    adjusted to upstream's new method.
+  * control: BD on systemd - the build system requires its pcfile
+  * gnome-settings-daemon.maintscript: Clean up Mouse & Clipboard XDG
+    autostart files. These plugins have been dropped.
+
+ -- Iain Lane <iain.lane@canonical.com>  Fri, 16 Aug 2019 16:12:33 +0100
+
 gnome-settings-daemon (3.33.90-1) experimental; urgency=medium
 
   * New upstream release
