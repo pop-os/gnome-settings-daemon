@@ -6,15 +6,15 @@ the locale, upstream removed it because they use an intial setup but we don't
 Bug: https://bugs.launchpad.net/bugs/1719938
 Forwarded: not-needed
 ---
- plugins/keyboard/gsd-keyboard-manager.c | 64 +++++++++++++++++++++++-
- 1 file changed, 62 insertions(+), 2 deletions(-)
+ plugins/keyboard/gsd-keyboard-manager.c | 68 +++++++++++++++++++++++++++++++--
+ 1 file changed, 64 insertions(+), 4 deletions(-)
 
 diff --git a/plugins/keyboard/gsd-keyboard-manager.c b/plugins/keyboard/gsd-keyboard-manager.c
-index fadde34..6a2b2ba 100644
+index f5fde93..2f77bfc 100644
 --- a/plugins/keyboard/gsd-keyboard-manager.c
 +++ b/plugins/keyboard/gsd-keyboard-manager.c
-@@ -168,6 +168,58 @@ check_xkb_extension (GsdKeyboardManager *manager)
-         return have_xkb;
+@@ -145,6 +145,58 @@ schema_is_installed (const char *schema)
+         return installed;
  }
  
 +static const gchar *
@@ -70,9 +70,24 @@ index fadde34..6a2b2ba 100644
 +}
 +
  static void
- xkb_init (GsdKeyboardManager *manager)
+ apply_bell (GsdKeyboardManager *manager)
  {
-@@ -707,7 +759,7 @@ convert_libgnomekbd_layouts (GSettings *settings)
+@@ -399,12 +451,12 @@ update_gtk_im_module (GsdKeyboardManager *manager)
+         if (user_manager_loaded)
+                 manager_notify_is_loaded_cb (G_OBJECT (user_manager),
+                                              NULL,
+-                                             manager->priv->input_sources_settings);
++                                             manager->input_sources_settings);
+         else
+                 g_signal_connect (user_manager,
+                                   "notify::is-loaded",
+                                   G_CALLBACK (manager_notify_is_loaded_cb),
+-                                  manager->priv->input_sources_settings);
++                                  manager->input_sources_settings);
+ }
+ 
+ static void
+@@ -557,7 +609,7 @@ convert_libgnomekbd_layouts (GSettings *settings)
          g_object_unref (libgnomekbd_settings);
  }
  
@@ -81,7 +96,7 @@ index fadde34..6a2b2ba 100644
  maybe_convert_old_settings (GSettings *settings)
  {
          GVariant *sources;
-@@ -715,6 +767,7 @@ maybe_convert_old_settings (GSettings *settings)
+@@ -565,6 +617,7 @@ maybe_convert_old_settings (GSettings *settings)
          gchar *stamp_dir_path = NULL;
          gchar *stamp_file_path = NULL;
          GError *error = NULL;
@@ -89,7 +104,7 @@ index fadde34..6a2b2ba 100644
  
          stamp_dir_path = g_build_filename (g_get_user_data_dir (), PACKAGE_NAME, NULL);
          if (g_mkdir_with_parents (stamp_dir_path, 0755)) {
-@@ -726,6 +779,8 @@ maybe_convert_old_settings (GSettings *settings)
+@@ -576,6 +629,8 @@ maybe_convert_old_settings (GSettings *settings)
          if (g_file_test (stamp_file_path, G_FILE_TEST_EXISTS))
                  goto out;
  
@@ -98,7 +113,7 @@ index fadde34..6a2b2ba 100644
          sources = g_settings_get_value (settings, KEY_INPUT_SOURCES);
          if (g_variant_n_children (sources) < 1) {
                  convert_libgnomekbd_layouts (settings);
-@@ -744,6 +799,8 @@ maybe_convert_old_settings (GSettings *settings)
+@@ -594,6 +649,8 @@ maybe_convert_old_settings (GSettings *settings)
  out:
          g_free (stamp_file_path);
          g_free (stamp_dir_path);
@@ -107,7 +122,7 @@ index fadde34..6a2b2ba 100644
  }
  
  static void
-@@ -758,7 +815,7 @@ maybe_create_initial_settings (GsdKeyboardManager *manager)
+@@ -608,7 +665,7 @@ maybe_create_initial_settings (GsdKeyboardManager *manager)
          if (g_getenv ("RUNNING_UNDER_GDM"))
                  return;
  
@@ -116,7 +131,7 @@ index fadde34..6a2b2ba 100644
  
          /* if we still don't have anything do some educated guesses */
          sources = g_settings_get_value (settings, KEY_INPUT_SOURCES);
-@@ -766,6 +823,9 @@ maybe_create_initial_settings (GsdKeyboardManager *manager)
+@@ -616,6 +673,9 @@ maybe_create_initial_settings (GsdKeyboardManager *manager)
                  get_sources_from_xkb_config (manager);
          g_variant_unref (sources);
  

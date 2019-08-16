@@ -9,7 +9,7 @@ Subject: _suppress-printer-may-not-be-connected-notification
  1 file changed, 3 insertions(+), 3 deletions(-)
 
 diff --git a/plugins/print-notifications/gsd-print-notifications-manager.c b/plugins/print-notifications/gsd-print-notifications-manager.c
-index 3578b96..cb8ccea 100644
+index 53aaccf..09b0d88 100644
 --- a/plugins/print-notifications/gsd-print-notifications-manager.c
 +++ b/plugins/print-notifications/gsd-print-notifications-manager.c
 @@ -379,7 +379,7 @@ get_statuses_second (guint i,

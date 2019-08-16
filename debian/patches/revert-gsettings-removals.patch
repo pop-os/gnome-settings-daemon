@@ -47,7 +47,7 @@ index eea1fb1..ebc7db0 100644
  {
    GSD_WACOM_ROTATION_NONE,
 diff --git a/data/meson.build b/data/meson.build
-index e93ba64..0402664 100644
+index d53eb26..702f62a 100644
 --- a/data/meson.build
 +++ b/data/meson.build
 @@ -5,10 +5,15 @@ schemas = [
@@ -67,7 +67,7 @@ index e93ba64..0402664 100644
  ]
  
 diff --git a/data/org.gnome.settings-daemon.peripherals.gschema.xml.in b/data/org.gnome.settings-daemon.peripherals.gschema.xml.in
-index f1785ed..b9daaee 100644
+index a670580..40b85f2 100644
 --- a/data/org.gnome.settings-daemon.peripherals.gschema.xml.in
 +++ b/data/org.gnome.settings-daemon.peripherals.gschema.xml.in
 @@ -1,10 +1,21 @@
@@ -92,7 +92,7 @@ index f1785ed..b9daaee 100644
    </schema>
    <schema gettext-domain="@GETTEXT_PACKAGE@" id="org.gnome.settings-daemon.peripherals.smartcard" path="/org/gnome/settings-daemon/peripherals/smartcard/">
      <key name="removal-action" enum="org.gnome.settings-daemon.GsdSmartcardRemovalAction">
-@@ -68,6 +79,13 @@
+@@ -54,6 +65,13 @@
        <summary>Whether the tablet’s orientation is locked, or rotated automatically.</summary>
      </key>
    </schema>
@@ -222,7 +222,7 @@ index f687496..09643af 100644
 +  </schema>
  </schemalist>
 diff --git a/data/org.gnome.settings-daemon.plugins.color.gschema.xml.in b/data/org.gnome.settings-daemon.plugins.color.gschema.xml.in
-index cb24e3c..1aff70f 100644
+index 286ea80..26c204f 100644
 --- a/data/org.gnome.settings-daemon.plugins.color.gschema.xml.in
 +++ b/data/org.gnome.settings-daemon.plugins.color.gschema.xml.in
 @@ -1,6 +1,16 @@
@@ -470,12 +470,24 @@ index 0000000..9a1f330
 +  </schema>
 +</schemalist>
 diff --git a/data/org.gnome.settings-daemon.plugins.media-keys.gschema.xml.in b/data/org.gnome.settings-daemon.plugins.media-keys.gschema.xml.in
-index 7f101cb..b95bd99 100644
+index ac0a37e..a30bafc 100644
 --- a/data/org.gnome.settings-daemon.plugins.media-keys.gschema.xml.in
 +++ b/data/org.gnome.settings-daemon.plugins.media-keys.gschema.xml.in
-@@ -1,6 +1,16 @@
- <?xml version="1.0" encoding="UTF-8"?>
- <schemalist>
+@@ -76,6 +76,11 @@
+       <summary>Stop playback</summary>
+       <description>Binding to stop playback.</description>
+     </key>
++    <key name="video-out" type="s">
++      <default>'&lt;Super&gt;p'</default>
++      <summary>Video output</summary>
++      <description>Binding to switch the video output device.</description>
++    </key>
+     <key name="volume-down" type="s">
+       <default>'XF86AudioLowerVolume'</default>
+       <summary>Volume down</summary>
+@@ -184,6 +189,16 @@
+   </schema>
+ 
    <schema gettext-domain="@GETTEXT_PACKAGE@" id="org.gnome.settings-daemon.plugins.media-keys" path="/org/gnome/settings-daemon/plugins/media-keys/">
 +   <key name="priority" type="i">
 +      <default>0</default>
@@ -490,18 +502,6 @@ index 7f101cb..b95bd99 100644
      <key name="custom-keybindings" type="as">
        <default>[]</default>
        <summary>Custom keybindings</summary>
-@@ -81,6 +91,11 @@
-       <summary>Stop playback</summary>
-       <description>Binding to stop playback.</description>
-     </key>
-+    <key name="video-out" type="s">
-+      <default>'&lt;Super&gt;p'</default>
-+      <summary>Video output</summary>
-+      <description>Binding to switch the video output device.</description>
-+    </key>
-     <key name="volume-down" type="s">
-       <default>'XF86AudioLowerVolume'</default>
-       <summary>Volume down</summary>
 diff --git a/data/org.gnome.settings-daemon.plugins.orientation.gschema.xml.in b/data/org.gnome.settings-daemon.plugins.orientation.gschema.xml.in
 new file mode 100644
 index 0000000..3717f5c
@@ -713,7 +713,7 @@ index ce45ac6..e91be62 100644
        <default>'grayscale'</default>
        <summary>Antialiasing</summary>
 diff --git a/po/POTFILES.in b/po/POTFILES.in
-index 7f17d5b..39201f5 100644
+index b9ff9a3..23275b3 100644
 --- a/po/POTFILES.in
 +++ b/po/POTFILES.in
 @@ -3,11 +3,16 @@
