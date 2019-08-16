@@ -1,4 +1,0 @@
-etc/xdg/autostart
-usr/lib/gnome-settings-daemon*
-usr/share/gnome-settings-daemon
-usr/share/polkit-1
