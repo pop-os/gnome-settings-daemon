@@ -49,7 +49,7 @@ Build-Depends: debhelper (>= 12),
                xkb-data,
                xserver-xorg-input-wacom [!hurd-any !kfreebsd-any !s390 !s390x],
                xvfb <!nocheck>
-Standards-Version: 4.2.1
+Standards-Version: 4.4.0
 Vcs-Git: https://salsa.debian.org/gnome-team/gnome-settings-daemon.git
 Vcs-Browser: https://salsa.debian.org/gnome-team/gnome-settings-daemon
 Rules-Requires-Root: no

@@ -4,8 +4,9 @@ gnome-settings-daemon (3.33.90-2) UNRELEASED; urgency=medium
     dh_installsystemduser is called by default
   * debian/control.in: Bump gsettings-desktop-schemas dependency to 3.33.0
     to match the build-dependency version
+  * debian/control.in: Bump Standards-Version to 4.4.0 (no further changes)
 
- -- Laurent Bigonville <bigon@debian.org>  Sat, 17 Aug 2019 09:39:35 +0200
+ -- Laurent Bigonville <bigon@debian.org>  Sat, 17 Aug 2019 09:56:46 +0200
 
 gnome-settings-daemon (3.33.90-1) experimental; urgency=medium
 
