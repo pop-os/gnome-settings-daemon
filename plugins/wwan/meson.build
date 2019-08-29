@@ -1,14 +1,13 @@
 sources = files(
-  'gsd-clipboard-manager.c',
-  'list.c',
-  'main.c',
-  'xutils.c'
+  'gsd-wwan-device.c',
+  'gsd-wwan-manager.c',
+  'gsd-wwan-pinentry.c',
+  'main.c'
 )
 
-deps = plugins_deps + [
-  gtk_x11_dep,
-  x11_dep
-]
+deps = plugins_deps + [gio_dep, gcr_base_dep, mm_glib_dep]
+
+cflags += ['-DGNOMECC_DATA_DIR="@0@"'.format(gsd_pkgdatadir)]
 
 executable(
   'gsd-' + plugin_name,
@@ -20,3 +19,4 @@ executable(
   install_rpath: gsd_pkglibdir,
   install_dir: gsd_libexecdir
 )
+

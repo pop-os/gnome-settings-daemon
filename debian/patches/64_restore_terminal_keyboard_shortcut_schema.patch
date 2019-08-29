@@ -3,17 +3,17 @@ Date: Thu, 26 Jul 2018 16:19:06 +0100
 Subject: _restore_terminal_keyboard_shortcut_schema
 
 ---
- ....settings-daemon.plugins.media-keys.gschema.xml.in |  5 +++++
- plugins/media-keys/gsd-media-keys-manager.c           | 19 +++++++++++++++++++
- plugins/media-keys/media-keys.h                       |  1 +
- plugins/media-keys/shortcuts-list.h                   |  1 +
- 4 files changed, 26 insertions(+)
+ ...settings-daemon.plugins.media-keys.gschema.xml.in | 10 ++++++++++
+ plugins/media-keys/gsd-media-keys-manager.c          | 20 ++++++++++++++++++++
+ plugins/media-keys/media-keys.h                      |  1 +
+ plugins/media-keys/shortcuts-list.h                  |  1 +
+ 4 files changed, 32 insertions(+)
 
 diff --git a/data/org.gnome.settings-daemon.plugins.media-keys.gschema.xml.in b/data/org.gnome.settings-daemon.plugins.media-keys.gschema.xml.in
-index 089b861..7f101cb 100644
+index d00b73a..ac0a37e 100644
 --- a/data/org.gnome.settings-daemon.plugins.media-keys.gschema.xml.in
 +++ b/data/org.gnome.settings-daemon.plugins.media-keys.gschema.xml.in
-@@ -136,6 +136,11 @@
+@@ -131,6 +131,11 @@
        <summary>Record a short video of the screen</summary>
        <description>Binding to record a short video of the screen</description>
      </key>
@@ -25,11 +25,23 @@ index 089b861..7f101cb 100644
      <key name="www" type="s">
        <default>'XF86WWW'</default>
        <summary>Launch web browser</summary>
+@@ -346,6 +351,11 @@
+       <summary>Record a short video of the screen</summary>
+       <description>Binding to record a short video of the screen</description>
+     </key>
++    <key name="terminal" type="as">
++      <default>['&lt;Primary&gt;&lt;Alt&gt;t']</default>
++      <summary>Launch terminal</summary>
++      <description>Binding to launch the terminal.</description>
++    </key>
+     <key name="www" type="as">
+       <default>['']</default>
+       <summary>Launch web browser</summary>
 diff --git a/plugins/media-keys/gsd-media-keys-manager.c b/plugins/media-keys/gsd-media-keys-manager.c
-index fd6a5ec..c702a50 100644
+index 4b0af3d..f12a39b 100644
 --- a/plugins/media-keys/gsd-media-keys-manager.c
 +++ b/plugins/media-keys/gsd-media-keys-manager.c
-@@ -981,6 +981,22 @@ gnome_session_shutdown_cb (GObject *source_object,
+@@ -1099,6 +1099,22 @@ gnome_session_shutdown_cb (GObject *source_object,
          }
  }
  
@@ -52,7 +64,7 @@ index fd6a5ec..c702a50 100644
  static void
  gnome_session_shutdown (GsdMediaKeysManager *manager)
  {
-@@ -2502,6 +2518,9 @@ do_action (GsdMediaKeysManager *manager,
+@@ -2649,6 +2665,9 @@ do_action (GsdMediaKeysManager *manager,
          case SCREENCAST_KEY:
                  do_screencast_action (manager);
                  break;
@@ -62,8 +74,16 @@ index fd6a5ec..c702a50 100644
          case WWW_KEY:
                  do_url_action (manager, "http", timestamp);
                  break;
+@@ -3258,6 +3277,7 @@ migrate_keybinding_settings (void)
+                 { "window-screenshot-clip",     "window-screenshot-clip",       map_keybinding },
+                 { "area-screenshot-clip",       "area-screenshot-clip",         map_keybinding },
+                 { "screencast",                 "screencast",                   map_keybinding },
++                { "terminal",                   "terminal",                     map_keybinding },
+                 { "www",                        "www",                          map_keybinding },
+                 { "magnifier",                  "magnifier",                    map_keybinding },
+                 { "screenreader",               "screenreader",                 map_keybinding },
 diff --git a/plugins/media-keys/media-keys.h b/plugins/media-keys/media-keys.h
-index 85af02b..a1183da 100644
+index cc4ea8e..64362a4 100644
 --- a/plugins/media-keys/media-keys.h
 +++ b/plugins/media-keys/media-keys.h
 @@ -49,6 +49,7 @@ typedef enum {
@@ -75,14 +95,14 @@ index 85af02b..a1183da 100644
          PLAY_KEY,
          PAUSE_KEY,
 diff --git a/plugins/media-keys/shortcuts-list.h b/plugins/media-keys/shortcuts-list.h
-index 068a439..17a5c50 100644
+index 8ced72d..45f0772 100644
 --- a/plugins/media-keys/shortcuts-list.h
 +++ b/plugins/media-keys/shortcuts-list.h
-@@ -77,6 +77,7 @@ static struct {
-         { WINDOW_SCREENSHOT_CLIP_KEY, "window-screenshot-clip", NULL, NULL, SHELL_ACTION_MODE_NORMAL, META_KEY_BINDING_IGNORE_AUTOREPEAT },
-         { AREA_SCREENSHOT_CLIP_KEY, "area-screenshot-clip", NULL, NULL, SHELL_ACTION_MODE_ALL, META_KEY_BINDING_IGNORE_AUTOREPEAT },
-         { SCREENCAST_KEY, "screencast", NULL, NULL, NO_LOCK_MODE, META_KEY_BINDING_IGNORE_AUTOREPEAT },
-+        { TERMINAL_KEY, "terminal", NULL, NULL, GSD_ACTION_MODE_LAUNCHER, META_KEY_BINDING_IGNORE_AUTOREPEAT },
-         { WWW_KEY, "www", NULL, NULL, GSD_ACTION_MODE_LAUNCHER, META_KEY_BINDING_IGNORE_AUTOREPEAT },
-         { PLAY_KEY, "play", NULL, NULL, SHELL_ACTION_MODE_ALL, META_KEY_BINDING_IGNORE_AUTOREPEAT },
-         { PLAY_KEY, NULL, NULL, "<Ctrl>XF86AudioPlay", SHELL_ACTION_MODE_ALL, META_KEY_BINDING_IGNORE_AUTOREPEAT },
+@@ -71,6 +71,7 @@ static struct {
+         { WINDOW_SCREENSHOT_CLIP_KEY, "window-screenshot-clip", FALSE, SHELL_ACTION_MODE_NORMAL, META_KEY_BINDING_IGNORE_AUTOREPEAT },
+         { AREA_SCREENSHOT_CLIP_KEY, "area-screenshot-clip", FALSE, SHELL_ACTION_MODE_ALL, META_KEY_BINDING_IGNORE_AUTOREPEAT },
+         { SCREENCAST_KEY, "screencast", FALSE, NO_LOCK_MODE, META_KEY_BINDING_IGNORE_AUTOREPEAT },
++        { TERMINAL_KEY, "terminal", FALSE, GSD_ACTION_MODE_LAUNCHER, META_KEY_BINDING_IGNORE_AUTOREPEAT },
+         { WWW_KEY, "www", TRUE, GSD_ACTION_MODE_LAUNCHER, META_KEY_BINDING_IGNORE_AUTOREPEAT },
+         { PLAY_KEY, "play", TRUE, SHELL_ACTION_MODE_ALL, META_KEY_BINDING_IGNORE_AUTOREPEAT },
+         { PAUSE_KEY, "pause", TRUE, SHELL_ACTION_MODE_ALL, META_KEY_BINDING_IGNORE_AUTOREPEAT },

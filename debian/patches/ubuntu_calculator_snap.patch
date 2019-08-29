@@ -1,23 +1,16 @@
 From: Ubuntu Desktop Team <ubuntu-desktop@lists.ubuntu.com>
 Date: Tue, 26 Feb 2019 12:24:15 +0000
-Subject: ubuntu_calculator_snap
+Subject: teach gsd about the gnome-calculator snap .desktop name
 
-# Description: teach gsd about the gnome-calculator snap .desktop name
-# Ubuntu: https://launchpad.net/bugs/1796499
-# Upstream: needs a better solution for snaps
-
-# Description: teach gsd about the gnome-calculator snap .desktop name
-# Ubuntu: https://launchpad.net/bugs/1796499
-# Upstream: needs a better solution for snaps
 ---
  plugins/media-keys/gsd-media-keys-manager.c | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/plugins/media-keys/gsd-media-keys-manager.c b/plugins/media-keys/gsd-media-keys-manager.c
-index ffcf7a2..f08f02b 100644
+index 081411f..38bc16c 100644
 --- a/plugins/media-keys/gsd-media-keys-manager.c
 +++ b/plugins/media-keys/gsd-media-keys-manager.c
-@@ -2535,7 +2535,7 @@ do_action (GsdMediaKeysManager *manager,
+@@ -2682,7 +2682,7 @@ do_action (GsdMediaKeysManager *manager,
                  do_media_action (manager, timestamp);
                  break;
          case CALCULATOR_KEY:
