@@ -215,7 +215,7 @@ Index: gnome-settings-daemon/plugins/color/gsd-color-state.c
                  brightness_percentage = atoi (brightness_profile);
                  gcm_session_set_output_percentage (brightness_percentage);
 +            }
-+            oled_display = priv->oled_builtin_display;
++            oled_display = state->oled_builtin_display;
          }
  
          /* set the _ICC_PROFILE atom */
@@ -241,7 +241,7 @@ Index: gnome-settings-daemon/plugins/color/gsd-color-state.c
  
 +                gboolean oled_display = FALSE;
 +                if (gnome_rr_output_is_builtin_display (output)) {
-+                    oled_display = priv->oled_builtin_display;
++                    oled_display = state->oled_builtin_display;
 +                }
 +
                  /* reset, as we want linear profiles for profiling */
@@ -275,10 +275,10 @@ Index: gnome-settings-daemon/plugins/color/gsd-color-state.c
 +{
 +        GsdColorState *state = data;
 +
-+        state->priv->power_proxy =
++        state->power_proxy =
 +                g_dbus_proxy_new_for_bus_finish (result, NULL);
 +
-+        g_signal_connect (state->priv->power_proxy, "g-signal",
++        g_signal_connect (state->power_proxy, "g-signal",
 +                          G_CALLBACK (power_proxy_signal_cb),
 +                          state);
 +}
@@ -296,7 +296,7 @@ Index: gnome-settings-daemon/plugins/color/gsd-color-state.c
 +                                  GSD_DBUS_NAME_POWER,
 +                                  GSD_DBUS_PATH_POWER,
 +                                  "org.freedesktop.DBus.Properties",
-+                                  state->priv->cancellable,
++                                  state->cancellable,
 +                                  on_power_proxy_ready, state);
 +}
 +
@@ -309,9 +309,9 @@ Index: gnome-settings-daemon/plugins/color/gsd-color-state.c
  
          state->client = cd_client_new ();
 +
-+        priv->oled_builtin_display = has_oled_builtin_display();
++        state->oled_builtin_display = has_oled_builtin_display();
 +
-+        priv->power_watch_id = g_bus_watch_name (G_BUS_TYPE_SESSION,
++        state->power_watch_id = g_bus_watch_name (G_BUS_TYPE_SESSION,
 +                                                 GSD_DBUS_NAME_POWER,
 +                                                 G_BUS_NAME_WATCHER_FLAGS_NONE,
 +                                                 power_appeared_cb,
@@ -324,9 +324,9 @@ Index: gnome-settings-daemon/plugins/color/gsd-color-state.c
          g_clear_pointer (&state->device_assign_hash, g_hash_table_destroy);
          g_clear_object (&state->state_screen);
  
-+        if (state->priv->power_watch_id > 0) {
-+                g_bus_unwatch_name (state->priv->power_watch_id);
-+                state->priv->power_watch_id = 0;
++        if (state->power_watch_id > 0) {
++                g_bus_unwatch_name (state->power_watch_id);
++                state->power_watch_id = 0;
 +        }
 +
          G_OBJECT_CLASS (gsd_color_state_parent_class)->finalize (object);
