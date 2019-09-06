@@ -1,6 +1,14 @@
 gnome-settings-daemon (3.33.92-1) UNRELEASED; urgency=medium
 
   * New upstream release
+    + Media-keys
+      - Fix MPRIS controller no longer working
+    + XSettings
+      - Make plugin able to run on demand
+      - Ensure plugin is started after the shell
+    + General
+      - Replace deprecated 'g_type_class_add_private' in
+        GnomeSettingsPluginInfo
 
  -- Iain Lane <laney@debian.org>  Fri, 06 Sep 2019 12:24:19 +0100
 
