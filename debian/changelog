@@ -1,4 +1,4 @@
-gnome-settings-daemon (3.33.92-1) UNRELEASED; urgency=medium
+gnome-settings-daemon (3.33.92-1) experimental; urgency=medium
 
   [ Iain Lane ]
   * New upstream release
@@ -18,7 +18,7 @@ gnome-settings-daemon (3.33.92-1) UNRELEASED; urgency=medium
     to match the build-dependency version
   * debian/control.in: Bump Standards-Version to 4.4.0 (no further changes)
 
- -- Iain Lane <laney@debian.org>  Fri, 06 Sep 2019 12:24:19 +0100
+ -- Iain Lane <laney@debian.org>  Fri, 06 Sep 2019 13:51:19 +0100
 
 gnome-settings-daemon (3.33.90-1) experimental; urgency=medium
 
