@@ -1,3 +1,25 @@
+gnome-settings-daemon (3.33.92-1) experimental; urgency=medium
+
+  [ Iain Lane ]
+  * New upstream release
+    + Media-keys
+      - Fix MPRIS controller no longer working
+    + XSettings
+      - Make plugin able to run on demand
+      - Ensure plugin is started after the shell
+    + General
+      - Replace deprecated 'g_type_class_add_private' in
+        GnomeSettingsPluginInfo
+
+  [ Laurent Bigonville ]
+  * Bump debhelper compatibility to 12, this will ensure that
+    dh_installsystemduser is called by default
+  * debian/control.in: Bump gsettings-desktop-schemas dependency to 3.33.0
+    to match the build-dependency version
+  * debian/control.in: Bump Standards-Version to 4.4.0 (no further changes)
+
+ -- Iain Lane <laney@debian.org>  Fri, 06 Sep 2019 13:51:19 +0100
+
 gnome-settings-daemon (3.33.90-1ubuntu1) eoan; urgency=medium
 
   * Merge with Debian. Remaining changes:
