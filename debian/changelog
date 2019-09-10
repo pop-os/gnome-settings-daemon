@@ -5,8 +5,9 @@ gnome-settings-daemon (3.34.0-1) UNRELEASED; urgency=medium
 
   [ Andre Moreira Magalhaes ]
   * New upstream release
+  * debian/control.in: Bump gsettings-desktop-schemas dependency to 3.34.0
 
- -- Andre Moreira Magalhaes <andre@endlessm.com>  Wed, 11 Sep 2019 11:01:14 -0300
+ -- Andre Moreira Magalhaes <andre@endlessm.com>  Wed, 11 Sep 2019 11:02:21 -0300
 
 gnome-settings-daemon (3.33.92-1) experimental; urgency=medium
 

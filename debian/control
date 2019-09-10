@@ -10,7 +10,7 @@ Uploaders: Iain Lane <laney@debian.org>, Jeremy Bicha <jbicha@debian.org>, Laure
 Build-Depends: debhelper (>= 12),
                dh-exec,
                gnome-pkg-tools,
-               gsettings-desktop-schemas-dev (>= 3.33.0),
+               gsettings-desktop-schemas-dev (>= 3.34.0),
                gtk-doc-tools,
                intltool (>= 0.37.1),
                libasound2-dev [linux-any],
@@ -61,7 +61,7 @@ Rules-Requires-Root: no
 Package: gnome-settings-daemon
 Architecture: any
 Depends: gnome-settings-daemon-common (= ${source:Version}),
-         gsettings-desktop-schemas (>= 3.33.0),
+         gsettings-desktop-schemas (>= 3.34.0),
          libpam-systemd [!hurd-any !kfreebsd-any],
          ${misc:Depends},
          ${shlibs:Depends}
