@@ -1,3 +1,14 @@
+gnome-settings-daemon (3.34.0-1) experimental; urgency=medium
+
+  [ Will Thompson ]
+  * debian/rules: pass --auto-servernum to xvfb-run.
+
+  [ Andre Moreira Magalhaes ]
+  * New upstream release
+  * debian/control.in: Bump gsettings-desktop-schemas dependency to 3.34.0
+
+ -- Iain Lane <laney@debian.org>  Wed, 11 Sep 2019 15:30:56 +0100
+
 gnome-settings-daemon (3.33.92-1ubuntu1) eoan; urgency=medium
 
   * Merge with Debian. Remaining changes:
