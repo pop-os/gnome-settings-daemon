@@ -1,3 +1,11 @@
+gnome-settings-daemon (3.34.0-2) experimental; urgency=medium
+
+  * Team upload
+  * d/p/GsdSmartcardService-Use-correct-parent-type-for-structs.patch:
+    Fix startup failure in smart card service
+
+ -- Simon McVittie <smcv@debian.org>  Mon, 16 Sep 2019 10:20:22 +0100
+
 gnome-settings-daemon (3.34.0-1) experimental; urgency=medium
 
   [ Will Thompson ]
