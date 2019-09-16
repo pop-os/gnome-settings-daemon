@@ -12,6 +12,7 @@ and if we're unlucky we'll get object fields overwriting each other.
 
 Signed-off-by: Simon McVittie <smcv@debian.org>
 Fixes: 76b6b794 "smartcard: Use G_DECLARE_FINAL_TYPE for GsdSmartcardService"
+Forwarded: https://gitlab.gnome.org/GNOME/gnome-settings-daemon/merge_requests/133
 ---
  plugins/smartcard/gsd-smartcard-service.c | 2 +-
  plugins/smartcard/gsd-smartcard-service.h | 2 +-
