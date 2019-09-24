@@ -1,9 +1,97 @@
-gnome-settings-daemon (3.33.90-1ubuntu1pop0) eoan; urgency=medium
+gnome-settings-daemon (3.34.0-1ubuntu1pop1) disco; urgency=medium
 
-  * debian/patches/oled_brightness.patch:
-    - Use gsd-color to apply brightness to gamma values on OLED displays
+  * New upstream release 
 
- -- Jeremy Soller <jeremy@system76.com>  Thu, 29 Aug 2019 16:19:40 -0600
+ -- Michael Aaron Murphy <michael@system76.com>  Tue, 24 Sep 2019 13:30:21 -0600
+
+gnome-settings-daemon (3.34.0-1ubuntu1) eoan; urgency=medium
+
+  * Merge with Debian. Remaining changes:
+    + debian/control.in:
+      - Build-depend on accountsservice
+    + debian/patches:
+       - 45_suppress-printer-may-not-be-connected-notification.patch
+       - 53_sync_input_sources_to_accountsservice.patch
+       - 64_restore_terminal_keyboard_shortcut_schema.patch
+       - correct_logout_action.patch
+          display the logout action on ctrl-alt-del
+       - ubuntu-lid-close-suspend.patch
+          Reimplement support for setting lid close suspend actions
+       - revert-wacom-migration.patch
+       - revert-gsettings-removals.patch
+          Revert gsettings keys that were dropped since 3.8, for u-s-d
+       - revert-mediakeys-dbus-interface-drop.patch
+       - ubuntu_ibus_configs.patch
+       - git_binary_encoding.patch
+       - ubuntu_calculator_snap.patch
+    + debian/gnome-settings-daemon.install:
+      - Install apport hook
+
+ -- Iain Lane <iain.lane@canonical.com>  Wed, 11 Sep 2019 16:55:06 +0100
+
+gnome-settings-daemon (3.34.0-1) experimental; urgency=medium
+
+  [ Will Thompson ]
+  * debian/rules: pass --auto-servernum to xvfb-run.
+
+  [ Andre Moreira Magalhaes ]
+  * New upstream release
+  * debian/control.in: Bump gsettings-desktop-schemas dependency to 3.34.0
+
+ -- Iain Lane <laney@debian.org>  Wed, 11 Sep 2019 15:30:56 +0100
+
+gnome-settings-daemon (3.33.92-1ubuntu1) eoan; urgency=medium
+
+  * Merge with Debian. Remaining changes:
+    + debian/control.in:
+      - Build-depend on accountsservice
+    + debian/patches:
+       - 45_suppress-printer-may-not-be-connected-notification.patch
+       - 53_sync_input_sources_to_accountsservice.patch
+       - 64_restore_terminal_keyboard_shortcut_schema.patch
+       - correct_logout_action.patch
+          display the logout action on ctrl-alt-del
+       - ubuntu-lid-close-suspend.patch
+          Reimplement support for setting lid close suspend actions
+       - revert-wacom-migration.patch
+       - revert-gsettings-removals.patch
+          Revert gsettings keys that were dropped since 3.8, for u-s-d
+       - revert-mediakeys-dbus-interface-drop.patch
+       - ubuntu_ibus_configs.patch
+       - git_binary_encoding.patch
+       - ubuntu_calculator_snap.patch
+    + debian/gnome-settings-daemon.install:
+      - Install apport hook
+  * Rebase patches. Many of these required manual resolution - especially
+    64_restore_terminal_keyboard_shortcut_schema.patch which needed to be
+    adjusted to upstream's new method.
+  * control: BD on systemd - the build system requires its pcfile
+  * gnome-settings-daemon.maintscript: Clean up Mouse & Clipboard XDG
+    autostart files. These plugins have been dropped.
+
+ -- Iain Lane <iain.lane@canonical.com>  Fri, 06 Sep 2019 15:54:41 +0100
+
+gnome-settings-daemon (3.33.92-1) experimental; urgency=medium
+
+  [ Iain Lane ]
+  * New upstream release
+    + Media-keys
+      - Fix MPRIS controller no longer working
+    + XSettings
+      - Make plugin able to run on demand
+      - Ensure plugin is started after the shell
+    + General
+      - Replace deprecated 'g_type_class_add_private' in
+        GnomeSettingsPluginInfo
+
+  [ Laurent Bigonville ]
+  * Bump debhelper compatibility to 12, this will ensure that
+    dh_installsystemduser is called by default
+  * debian/control.in: Bump gsettings-desktop-schemas dependency to 3.33.0
+    to match the build-dependency version
+  * debian/control.in: Bump Standards-Version to 4.4.0 (no further changes)
+
+ -- Iain Lane <laney@debian.org>  Fri, 06 Sep 2019 13:51:19 +0100
 
 gnome-settings-daemon (3.33.90-1ubuntu1) eoan; urgency=medium
 

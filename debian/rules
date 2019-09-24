@@ -29,9 +29,9 @@ ifeq (,$(filter nocheck, $(DEB_BUILD_OPTIONS)))
 # The tests are not fatal on non-linux architectures
 # See: https://bugzilla.gnome.org/show_bug.cgi?id=770684#c2
 ifeq (,$(filter $(DEB_HOST_ARCH), hurd-i386 kfreebsd-i386 kfreebsd-amd64))
-	xvfb-run dh_auto_test
+	xvfb-run --auto-servernum dh_auto_test
 else
-	xvfb-run dh_auto_test || true
+	xvfb-run --auto-servernum dh_auto_test || true
 endif
 endif
 
