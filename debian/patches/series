@@ -1,2 +1,1 @@
-GsdSmartcardService-Use-correct-parent-type-for-structs.patch
 debian/meson.build-Lower-polkit-requirement.patch
