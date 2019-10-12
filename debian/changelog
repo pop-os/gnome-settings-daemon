@@ -1,3 +1,16 @@
+gnome-settings-daemon (3.34.1-1) UNRELEASED; urgency=medium
+
+  * New upstream bugfix release
+    + Media-keys:
+      - Update to OSD DBus API changes for keyboard brightness
+    + Smartcards:
+      - Use correct parent type for structs
+      - Change manager to non-blocking
+    + Power:
+      - Fix rounding of brightness value
+
+ -- Jeremy Bicha <jbicha@debian.org>  Sat, 12 Oct 2019 14:11:25 -0400
+
 gnome-settings-daemon (3.34.0-3) unstable; urgency=medium
 
   * Team upload.
