@@ -1,4 +1,4 @@
-gnome-settings-daemon (3.34.1-1) UNRELEASED; urgency=medium
+gnome-settings-daemon (3.34.1-1) unstable; urgency=medium
 
   * New upstream bugfix release
     + Media-keys:
@@ -8,8 +8,10 @@ gnome-settings-daemon (3.34.1-1) UNRELEASED; urgency=medium
       - Change manager to non-blocking
     + Power:
       - Fix rounding of brightness value
+  * Drop GsdSmartcardService patch: applied in new release
+  * Build-Depend on dh-sequence-gnome instead of gnome-pkg-tools
 
- -- Jeremy Bicha <jbicha@debian.org>  Sat, 12 Oct 2019 14:11:25 -0400
+ -- Jeremy Bicha <jbicha@debian.org>  Sat, 12 Oct 2019 14:26:23 -0400
 
 gnome-settings-daemon (3.34.0-3) unstable; urgency=medium
 
