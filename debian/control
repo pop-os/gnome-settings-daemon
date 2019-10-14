@@ -10,7 +10,7 @@ XSBC-Original-Maintainer: Debian GNOME Maintainers <pkg-gnome-maintainers@lists.
 Uploaders: Iain Lane <laney@debian.org>, Jeremy Bicha <jbicha@debian.org>
 Build-Depends: debhelper (>= 12),
                dh-exec,
-               gnome-pkg-tools,
+               dh-sequence-gnome,
                gsettings-desktop-schemas-dev (>= 3.34.0),
                gtk-doc-tools,
                intltool (>= 0.37.1),
