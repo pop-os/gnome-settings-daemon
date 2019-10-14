@@ -1,4 +1,4 @@
-gnome-settings-daemon (3.34.1-1ubuntu1) UNRELEASED; urgency=medium
+gnome-settings-daemon (3.34.1-1ubuntu1) eoan; urgency=medium
 
   * Merge with Debian. Remaining changes:
     + debian/control.in:
