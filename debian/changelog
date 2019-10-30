@@ -1,3 +1,9 @@
+gnome-settings-daemon (3.34.1-1ubuntu2) focal; urgency=medium
+
+  * No-change rebuild against latest libgweather
+
+ -- Jeremy Bicha <jbicha@ubuntu.com>  Wed, 30 Oct 2019 19:11:15 -0400
+
 gnome-settings-daemon (3.34.1-1ubuntu1) eoan; urgency=medium
 
   * Merge with Debian. Remaining changes:
