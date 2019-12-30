@@ -1,5 +1,6 @@
-gnome-settings-daemon (3.34.2-1) UNRELEASED; urgency=medium
+gnome-settings-daemon (3.34.2-1) unstable; urgency=medium
 
+  * Team upload
   * New upstream release
     - Depend on libgnome-desktop-3-dev (>= 3.34.2), to put
       media-key-launched programs in a systemd scope if running under
@@ -15,7 +16,7 @@ gnome-settings-daemon (3.34.2-1) UNRELEASED; urgency=medium
     Thanks to Helmut Grohne (Closes: #916551)
   * Build-depend on debhelper-compat (= 12) instead of using debian/compat
 
- -- Simon McVittie <smcv@debian.org>  Mon, 30 Dec 2019 14:30:25 +0000
+ -- Simon McVittie <smcv@debian.org>  Mon, 30 Dec 2019 15:44:01 +0000
 
 gnome-settings-daemon (3.34.1-1) unstable; urgency=medium
 
