@@ -1,6 +1,9 @@
 gnome-settings-daemon (3.34.2-1) UNRELEASED; urgency=medium
 
   * New upstream release
+    - Depend on libgnome-desktop-3-dev (>= 3.34.2), to put
+      media-key-launched programs in a systemd scope if running under
+      systemd
 
  -- Simon McVittie <smcv@debian.org>  Mon, 30 Dec 2019 14:30:25 +0000
 
