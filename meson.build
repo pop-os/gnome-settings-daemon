@@ -1,6 +1,6 @@
 project(
   'gnome-settings-daemon', 'c',
-  version: '3.34.1',
+  version: '3.34.2',
   license: [ 'GPL2+', 'LGPLv2+' ],
   meson_version: '>= 0.44.0'
 )
@@ -218,6 +218,10 @@ if enable_network_manager
   libnm_dep = dependency('libnm', version: '>= 1.0')
 endif
 config_h.set10('HAVE_NETWORK_MANAGER', enable_network_manager)
+
+# GNOME Desktop systemd utilities (added in 3.34.2/3.35.2)
+has_gnome_desktop_systemd = cc.has_header('libgnome-desktop/gnome-systemd.h', dependencies: gnome_desktop_dep)
+config_h.set('HAVE_GNOME_SYSTEMD', has_gnome_desktop_systemd)
 
 gnome = import('gnome')
 i18n = import('i18n')
