@@ -5,6 +5,11 @@ gnome-settings-daemon (3.34.2-1) UNRELEASED; urgency=medium
       media-key-launched programs in a systemd scope if running under
       systemd
   * Bump Standards-Version to 4.4.1
+  * Swap libpam-systemd dependencies to default-logind | logind.
+    Thanks to Mark Hindley (Closes: #925335)
+    - While changing this line anyway, also swap from
+      negative architecture qualifier [!hurd-any !kfreebsd-any]
+      to positive architecture qualifier [linux-any]
 
  -- Simon McVittie <smcv@debian.org>  Mon, 30 Dec 2019 14:30:25 +0000
 

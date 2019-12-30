@@ -62,7 +62,7 @@ Package: gnome-settings-daemon
 Architecture: any
 Depends: gnome-settings-daemon-common (= ${source:Version}),
          gsettings-desktop-schemas (>= 3.34.0),
-         libpam-systemd [!hurd-any !kfreebsd-any],
+         default-logind [linux-any] | logind [linux-any],
          ${misc:Depends},
          ${shlibs:Depends}
 Recommends: iio-sensor-proxy,
