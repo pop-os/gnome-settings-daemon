@@ -13,6 +13,7 @@ gnome-settings-daemon (3.34.2-1) UNRELEASED; urgency=medium
   * Build-depend on libglib2.0-dev:native for gsd-power-enums-update,
     which is built and run on the build architecture when cross-compiling.
     Thanks to Helmut Grohne (Closes: #916551)
+  * Build-depend on debhelper-compat (= 12) instead of using debian/compat
 
  -- Simon McVittie <smcv@debian.org>  Mon, 30 Dec 2019 14:30:25 +0000
 
