@@ -6,7 +6,7 @@ Source: gnome-settings-daemon
 Section: gnome
 Priority: optional
 Maintainer: Debian GNOME Maintainers <pkg-gnome-maintainers@lists.alioth.debian.org>
-Uploaders: Iain Lane <laney@debian.org>, Jeremy Bicha <jbicha@debian.org>
+Uploaders: Iain Lane <laney@debian.org>, Jeremy Bicha <jbicha@debian.org>, Laurent Bigonville <bigon@debian.org>
 Build-Depends: debhelper-compat (= 12),
                dh-exec,
                dh-sequence-gnome,
@@ -54,7 +54,7 @@ Build-Depends: debhelper-compat (= 12),
                xkb-data,
                xserver-xorg-input-wacom [!hurd-any !kfreebsd-any !s390 !s390x],
                xvfb <!nocheck>
-Standards-Version: 4.4.1
+Standards-Version: 4.5.0
 Vcs-Git: https://salsa.debian.org/gnome-team/gnome-settings-daemon.git
 Vcs-Browser: https://salsa.debian.org/gnome-team/gnome-settings-daemon
 Rules-Requires-Root: no
