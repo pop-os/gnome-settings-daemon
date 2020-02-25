@@ -1,4 +1,4 @@
-gnome-settings-daemon (3.35.91-1ubuntu1) UNRELEASED; urgency=medium
+gnome-settings-daemon (3.35.91-1ubuntu1) focal; urgency=medium
 
   * Merge with Debian. Remaining changes:
     + debian/control.in:
