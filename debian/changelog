@@ -1,4 +1,4 @@
-gnome-settings-daemon (3.35.91-1) UNRELEASED; urgency=medium
+gnome-settings-daemon (3.35.91-1) experimental; urgency=medium
 
   [ Laurent Bigonville ]
   * debian/control.in: Bump Standards-Version to 4.5.0 (no further changes)
