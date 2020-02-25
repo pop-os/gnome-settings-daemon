@@ -1,6 +1,6 @@
 project(
   'gnome-settings-daemon', 'c',
-  version: '3.34.2',
+  version: '3.35.91',
   license: [ 'GPL2+', 'LGPLv2+' ],
   meson_version: '>= 0.44.0'
 )
@@ -87,7 +87,7 @@ colord_dep = dependency('colord', version: '>= 1.3.5')
 geocode_glib_dep = dependency('geocode-glib-1.0', version: '>= 3.10.0')
 gio_dep = dependency('gio-2.0', version: '>= 2.53.0')
 gio_unix_dep = dependency('gio-unix-2.0')
-gnome_desktop_dep = dependency('gnome-desktop-3.0', version: '>= 3.11.1')
+gnome_desktop_dep = dependency('gnome-desktop-3.0', version: '>= 3.34.2')
 gsettings_desktop_dep = dependency('gsettings-desktop-schemas', version: '>= 3.33.0')
 gtk_dep = dependency('gtk+-3.0', version: '>= 3.15.3')
 gtk_x11_dep = dependency('gtk+-x11-3.0')
@@ -218,10 +218,6 @@ if enable_network_manager
   libnm_dep = dependency('libnm', version: '>= 1.0')
 endif
 config_h.set10('HAVE_NETWORK_MANAGER', enable_network_manager)
-
-# GNOME Desktop systemd utilities (added in 3.34.2/3.35.2)
-has_gnome_desktop_systemd = cc.has_header('libgnome-desktop/gnome-systemd.h', dependencies: gnome_desktop_dep)
-config_h.set('HAVE_GNOME_SYSTEMD', has_gnome_desktop_systemd)
 
 gnome = import('gnome')
 i18n = import('i18n')

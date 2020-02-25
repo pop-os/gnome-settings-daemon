@@ -1,54 +1,37 @@
-==============
-Version 3.34.2
-==============
-Media-keys:
-- Place spawned processes into a systemd scope.
-  For this to work, gnome-settings-daemon needs to be build with
-  libgnome-desktop >= 3.34.2.1, as the API was added in that release.
-- Fixed saving screenshots to clipboard on wayland.
-  For 3.34, this feature was fixed by using the X11 clipboard,
-  saving to clipboard will indefinitely raise Xwayland
-  if the Xwayland-on-demand experimental feature was enabled,
-  and will not work at all if --no-x11 is passed to gnome-shell.
-- Fix crash on keybinding migration
+===============
+Version 3.35.91
+===============
+- Translation updates
+- Add capability to disable USB while the lockscreen is on
 
-Smartcard:
-- Initialize pointer before use
+Power:
+- Increase permissible runtime for some tests
+
+Color:
+- Look for builtin profiles in UEFI
 
 ==============
-Version 3.34.1
+Version 3.35.0
 ==============
 - Translation updates
+- Lower systemd stop timeout
 
 Media-keys:
-- Update to OSD DBus API changes
-
-Smartcards:
-- Use correct parent type for structs
-- Change manager to non-blocking
+- Place spawned processes in a systemd scope
+- Add volume step configuration key
+- Make brightness a 0.0..1.0 float in DBus
+- Let the screenshot service handle saving to clipboard
+- Fix crash on old settings migration
+- Skip volume-change feedback while playing
 
 Power:
 - Fix rounding of brightness value
+- Use logind helper to change backlight brightness
 
-==============
-Version 3.34.0
-==============
-- Translation updates
-
-===============
-Version 3.33.92
-===============
-- Translation updates
-
-Media-keys:
-- Fix MPRIS controller no longer working
-
-XSettings:
-- Make plugin able to run on demand
-- Ensure plugin is started after the shell
-
-General:
-- Replace deprecated 'g_type_class_add_private' in GnomeSettingsPluginInfo
+Smartcard:
+- Change manager to non-blocking
+- Use correct parent type for structs
+- Initialize pointer before use
 
 ===============
 Version 3.33.90

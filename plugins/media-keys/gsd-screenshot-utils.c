@@ -95,34 +95,6 @@ screenshot_save_to_recent (ScreenshotContext *ctx)
 }
 
 static void
-screenshot_save_to_clipboard (ScreenshotContext *ctx)
-{
-  static GdkDisplay *x11_display = NULL;
-  GdkPixbuf *screenshot;
-  GtkClipboard *clipboard;
-  GError *error = NULL;
-
-  screenshot = gdk_pixbuf_new_from_file (ctx->used_filename, &error);
-  if (error != NULL)
-    {
-      screenshot_play_error_sound_effect ();
-      g_warning ("Failed to save a screenshot to clipboard: %s\n", error->message);
-      g_error_free (error);
-      return;
-    }
-
-  screenshot_play_sound_effect ("screen-capture", _("Screenshot taken"));
-  if (!x11_display)
-    x11_display = gdk_display_open (g_getenv ("DISPLAY"));
-  clipboard = gtk_clipboard_get_for_display (x11_display, GDK_SELECTION_CLIPBOARD);
-  gtk_clipboard_set_image (clipboard, screenshot);
-
-  /* remove the temporary file created by the shell */
-  g_unlink (ctx->used_filename);
-  g_object_unref (screenshot);
-}
-
-static void
 bus_call_ready_cb (GObject *source,
                    GAsyncResult *res,
                    gpointer user_data)
@@ -148,11 +120,7 @@ bus_call_ready_cb (GObject *source,
 
   if (success)
     {
-      if (ctx->copy_to_clipboard)
-        {
-          screenshot_save_to_clipboard (ctx);
-        }
-      else
+      if (!ctx->copy_to_clipboard)
         {
           screenshot_play_sound_effect ("screen-capture", _("Screenshot taken"));
           screenshot_save_to_recent (ctx);
@@ -282,18 +250,6 @@ screenshot_take (ScreenshotContext *ctx)
 }
 
 static gchar *
-screenshot_build_tmp_path (void)
-{
-  gchar *path;
-  gint fd;
-
-  fd = g_file_open_tmp ("gnome-settings-daemon-screenshot-XXXXXX", &path, NULL);
-  close (fd);
-
-  return path;
-}
-
-static gchar *
 screenshot_build_filename (void)
 {
   char *file_name, *origin;
@@ -315,7 +271,7 @@ static void
 screenshot_check_name_ready (ScreenshotContext *ctx)
 {
   if (ctx->copy_to_clipboard)
-    ctx->save_filename = screenshot_build_tmp_path ();
+    ctx->save_filename = g_strdup ("");
   else
     ctx->save_filename = screenshot_build_filename ();
 
