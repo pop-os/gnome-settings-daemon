@@ -1,5 +1,6 @@
 etc/xdg/autostart
-usr/lib/gnome-settings-daemon*
+usr/lib/gnome-settings-daemon-3.0
+usr/libexec
 usr/share/gnome-settings-daemon
 usr/share/polkit-1
 debian/source_gnome-settings-daemon.py usr/share/apport/package-hooks

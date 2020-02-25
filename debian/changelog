@@ -1,10 +1,4 @@
-gnome-settings-daemon (3.34.1-1ubuntu2) focal; urgency=medium
-
-  * No-change rebuild against latest libgweather
-
- -- Jeremy Bicha <jbicha@ubuntu.com>  Wed, 30 Oct 2019 19:11:15 -0400
-
-gnome-settings-daemon (3.34.1-1ubuntu1) eoan; urgency=medium
+gnome-settings-daemon (3.35.91-1ubuntu1) UNRELEASED; urgency=medium
 
   * Merge with Debian. Remaining changes:
     + debian/control.in:
@@ -27,7 +21,47 @@ gnome-settings-daemon (3.34.1-1ubuntu1) eoan; urgency=medium
     + debian/gnome-settings-daemon.install:
       - Install apport hook
 
- -- Sebastien Bacher <seb128@ubuntu.com>  Mon, 14 Oct 2019 11:58:03 +0200
+ -- Sebastien Bacher <seb128@ubuntu.com>  Tue, 25 Feb 2020 09:30:10 +0100
+
+gnome-settings-daemon (3.35.91-1) experimental; urgency=medium
+
+  [ Laurent Bigonville ]
+  * debian/control.in: Bump Standards-Version to 4.5.0 (no further changes)
+  * Install the daemons in /usr/libexec now that's it's allowed in the policy
+  * Disable systemd support on non-linux architectures, this should only be
+    used to detect the path for the user .service/.target files
+
+  [ Sebastien Bacher ]
+  * New upstream release:
+    - Add capability to disable USB while the lockscreen is on
+      (based on USBGuard)
+  * debian/control.in:
+    - Suggests usbguard for the new lockscreen protection, the feature
+      didn't get much testing yet and usbguard could create problems so
+      don't bring it in by default yet
+    - udpate the gsettings-desktop-schemas and gnome-desktop requirements
+
+ -- Sebastien Bacher <seb128@ubuntu.com>  Tue, 25 Feb 2020 09:23:32 +0100
+
+gnome-settings-daemon (3.34.2-1) unstable; urgency=medium
+
+  * Team upload
+  * New upstream release
+    - Depend on libgnome-desktop-3-dev (>= 3.34.2), to put
+      media-key-launched programs in a systemd scope if running under
+      systemd
+  * Bump Standards-Version to 4.4.1
+  * Swap libpam-systemd dependencies to default-logind | logind.
+    Thanks to Mark Hindley (Closes: #925335)
+    - While changing this line anyway, also swap from
+      negative architecture qualifier [!hurd-any !kfreebsd-any]
+      to positive architecture qualifier [linux-any]
+  * Build-depend on libglib2.0-dev:native for gsd-power-enums-update,
+    which is built and run on the build architecture when cross-compiling.
+    Thanks to Helmut Grohne (Closes: #916551)
+  * Build-depend on debhelper-compat (= 12) instead of using debian/compat
+
+ -- Simon McVittie <smcv@debian.org>  Mon, 30 Dec 2019 15:44:01 +0000
 
 gnome-settings-daemon (3.34.1-1) unstable; urgency=medium
 

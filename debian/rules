@@ -11,13 +11,13 @@ ifneq ($(DEB_HOST_ARCH_OS),linux)
 CONFFLAGS = \
 	-Drfkill=false \
 	-Dnetwork_manager=false \
-	-Dalsa=false
+	-Dalsa=false \
+	-Dsystemd=false
 endif
 
 override_dh_auto_configure:
 	dh_auto_configure -- \
 		--libdir=/usr/lib \
-		--libexecdir=/usr/lib/gnome-settings-daemon \
 		$(CONFFLAGS)
 
 override_dh_missing:

@@ -7,11 +7,11 @@ Section: gnome
 Priority: optional
 Maintainer: Ubuntu Desktop Team <ubuntu-desktop@lists.ubuntu.com>
 XSBC-Original-Maintainer: Debian GNOME Maintainers <pkg-gnome-maintainers@lists.alioth.debian.org>
-Uploaders: Iain Lane <laney@debian.org>, Jeremy Bicha <jbicha@debian.org>
-Build-Depends: debhelper (>= 12),
+Uploaders: Iain Lane <laney@debian.org>, Jeremy Bicha <jbicha@debian.org>, Laurent Bigonville <bigon@debian.org>
+Build-Depends: debhelper-compat (= 12),
                dh-exec,
                dh-sequence-gnome,
-               gsettings-desktop-schemas-dev (>= 3.34.0),
+               gsettings-desktop-schemas-dev (>= 3.35.0),
                gtk-doc-tools,
                intltool (>= 0.37.1),
                libaccountsservice-dev (>= 0.6.34),
@@ -24,7 +24,8 @@ Build-Depends: debhelper (>= 12),
                libgeoclue-2-dev (>= 2.3.1),
                libgeocode-glib-dev (>= 3.10.0),
                libglib2.0-dev (>= 2.56),
-               libgnome-desktop-3-dev (>= 3.11.1),
+               libglib2.0-dev:native (>= 2.56),
+               libgnome-desktop-3-dev (>= 3.34.2),
                libgtk-3-dev (>= 3.16),
                libgudev-1.0-dev [linux-any],
                libgweather-3-dev (>= 3.9.5),
@@ -49,13 +50,13 @@ Build-Depends: debhelper (>= 12),
                policykit-1,
                python3-dbusmock <!nocheck>,
                python3-gi <!nocheck>,
-               systemd,
+               systemd [linux-any],
                udev [linux-any] <!nocheck>,
                xauth <!nocheck>,
                xkb-data,
                xserver-xorg-input-wacom [!hurd-any !kfreebsd-any !s390 !s390x],
                xvfb <!nocheck>
-Standards-Version: 4.4.0
+Standards-Version: 4.5.0
 XS-Debian-Vcs-Browser: https://salsa.debian.org/gnome-team/gnome-settings-daemon
 XS-Debian-Vcs-Git: https://salsa.debian.org/gnome-team/gnome-settings-daemon.git
 Vcs-Browser: https://git.launchpad.net/~ubuntu-desktop/ubuntu/+source/gnome-settings-daemon
@@ -66,11 +67,12 @@ Package: gnome-settings-daemon
 Architecture: any
 Depends: gnome-settings-daemon-common (= ${source:Version}),
          gsettings-desktop-schemas (>= 3.34.0),
-         libpam-systemd [!hurd-any !kfreebsd-any],
+         default-logind [linux-any] | logind [linux-any],
          ${misc:Depends},
          ${shlibs:Depends}
 Recommends: iio-sensor-proxy,
             pulseaudio
+Suggests: usbguard
 Breaks: afterstep (<< 2.2.12-11.1~),
         budgie-core (<< 10.4+git20171031.10.g9f71bb8-1.2~),
         cairo-dock (<< 3.4.1-1.2~),
