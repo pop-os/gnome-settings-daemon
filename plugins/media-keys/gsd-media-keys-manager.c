@@ -41,10 +41,8 @@
 
 #include <libupower-glib/upower.h>
 #include <gdesktop-enums.h>
-#ifdef HAVE_GNOME_SYSTEMD
 #define GNOME_DESKTOP_USE_UNSTABLE_API
 #include <libgnome-desktop/gnome-systemd.h>
-#endif
 
 #if HAVE_GUDEV
 #include <gudev/gudev.h>
@@ -121,7 +119,7 @@ static const gchar introspection_xml[] =
 #define TOUCHPAD_ENABLED_KEY "send-events"
 #define HIGH_CONTRAST "HighContrast"
 
-#define VOLUME_STEP 6           /* percents for one volume button press */
+#define VOLUME_STEP "volume-step"
 #define VOLUME_STEP_PRECISE 2
 #define MAX_VOLUME 65536.0
 
@@ -999,7 +997,6 @@ init_kbd (GsdMediaKeysManager *manager)
         gnome_settings_profile_end (NULL);
 }
 
-#ifdef HAVE_GNOME_SYSTEMD
 static void
 app_launched_cb (GAppLaunchContext *context,
                  GAppInfo          *info,
@@ -1025,7 +1022,6 @@ app_launched_cb (GAppLaunchContext *context,
                                    priv->connection,
                                    NULL, NULL, NULL);
 }
-#endif
 
 static void
 launch_app (GsdMediaKeysManager *manager,
@@ -1040,13 +1036,11 @@ launch_app (GsdMediaKeysManager *manager,
         gdk_app_launch_context_set_timestamp (launch_context, timestamp);
         set_launch_context_env (manager, G_APP_LAUNCH_CONTEXT (launch_context));
 
-#ifdef HAVE_GNOME_SYSTEMD
         g_signal_connect_object (launch_context,
                                  "launched",
                                  G_CALLBACK (app_launched_cb),
                                  manager,
                                  0);
-#endif
 
 	if (!g_app_info_launch (app_info, NULL, G_APP_LAUNCH_CONTEXT (launch_context), &error)) {
 		g_warning ("Could not launch '%s': %s",
@@ -1336,9 +1330,7 @@ do_lock_screensaver (GsdMediaKeysManager *manager)
 }
 
 static void
-sound_theme_changed (GtkSettings         *settings,
-                     GParamSpec          *pspec,
-                     GsdMediaKeysManager *manager)
+sound_theme_changed (GsdMediaKeysManager *manager)
 {
         GsdMediaKeysManagerPrivate *priv = GSD_MEDIA_KEYS_MANAGER_GET_PRIVATE (manager);
         char *theme_name;
@@ -1364,40 +1356,51 @@ allow_volume_above_100_percent_changed_cb (GSettings           *settings,
 }
 
 static void
-ensure_canberra (GsdMediaKeysManager *manager)
+play_volume_changed_audio (GsdMediaKeysManager *manager,
+                           GvcMixerStream      *stream)
 {
 	GsdMediaKeysManagerPrivate *priv = GSD_MEDIA_KEYS_MANAGER_GET_PRIVATE (manager);
-	char *theme_name;
 
-	if (priv->ca != NULL)
-		return;
+	if (priv->ca == NULL) {
+                ca_context_create (&priv->ca);
+                ca_context_set_driver (priv->ca, "pulse");
+                ca_context_change_props (priv->ca, 0,
+                                         CA_PROP_APPLICATION_ID,
+                                         "org.gnome.VolumeControl",
+                                         NULL);
 
-        ca_context_create (&priv->ca);
-        ca_context_set_driver (priv->ca, "pulse");
-        ca_context_change_props (priv->ca, 0,
-                                 CA_PROP_APPLICATION_ID, "org.gnome.VolumeControl",
-                                 NULL);
-        priv->gtksettings = gtk_settings_get_for_screen (gdk_screen_get_default ());
-        g_object_get (G_OBJECT (priv->gtksettings), "gtk-sound-theme-name", &theme_name, NULL);
-        if (theme_name)
-                ca_context_change_props (priv->ca, CA_PROP_CANBERRA_XDG_THEME_NAME, theme_name, NULL);
-        g_free (theme_name);
-        g_signal_connect (priv->gtksettings, "notify::gtk-sound-theme-name",
-                          G_CALLBACK (sound_theme_changed), manager);
+                priv->gtksettings =
+                        gtk_settings_get_for_screen (gdk_screen_get_default ());
+
+                g_signal_connect_swapped (priv->gtksettings,
+                                          "notify::gtk-sound-theme-name",
+                                          G_CALLBACK (sound_theme_changed),
+                                          manager);
+                sound_theme_changed (manager);
+        }
+
+        ca_context_change_device (priv->ca,
+                                  gvc_mixer_stream_get_name (stream));
+        ca_context_play (priv->ca, 1,
+                         CA_PROP_EVENT_ID, "audio-volume-change",
+                         CA_PROP_EVENT_DESCRIPTION, "volume changed through key press",
+                         CA_PROP_CANBERRA_CACHE_CONTROL, "permanent",
+                         NULL);
 }
 
 static void
-update_dialog (GsdMediaKeysManager *manager,
-               GvcMixerStream      *stream,
-               guint                vol,
-               gboolean             muted,
-               gboolean             sound_changed,
-               gboolean             quiet)
+show_volume_osd (GsdMediaKeysManager *manager,
+                 GvcMixerStream      *stream,
+                 guint                vol,
+                 gboolean             muted,
+                 gboolean             sound_changed,
+                 gboolean             quiet)
 {
         GsdMediaKeysManagerPrivate *priv = GSD_MEDIA_KEYS_MANAGER_GET_PRIVATE (manager);
         GvcMixerUIDevice *device;
         const GvcMixerStreamPort *port;
         const char *icon;
+        gboolean playing;
         double new_vol;
         double max_volume;
 
@@ -1422,16 +1425,10 @@ update_dialog (GsdMediaKeysManager *manager,
                 show_osd_with_max_level (manager, icon, NULL, new_vol, max_volume, NULL);
         }
 
-        if (quiet == FALSE && sound_changed != FALSE && muted == FALSE) {
-                ensure_canberra (manager);
-                ca_context_change_device (priv->ca,
-                                          gvc_mixer_stream_get_name (stream));
-                ca_context_play (priv->ca, 1,
-                                        CA_PROP_EVENT_ID, "audio-volume-change",
-                                        CA_PROP_EVENT_DESCRIPTION, "volume changed through key press",
-                                        CA_PROP_CANBERRA_CACHE_CONTROL, "permanent",
-                                        NULL);
-        }
+        playing = gvc_mixer_stream_get_state (stream) == GVC_STREAM_STATE_RUNNING;
+
+        if (quiet == FALSE && sound_changed != FALSE && muted == FALSE && playing == FALSE)
+                play_volume_changed_audio (manager, stream);
 }
 
 #if HAVE_GUDEV
@@ -1551,7 +1548,7 @@ do_sound_action (GsdMediaKeysManager *manager,
 	GsdMediaKeysManagerPrivate *priv = GSD_MEDIA_KEYS_MANAGER_GET_PRIVATE (manager);
         GvcMixerStream *stream = NULL;
         gboolean old_muted, new_muted;
-        guint old_vol, new_vol, norm_vol_step;
+        guint old_vol, new_vol, norm_vol_step, vol_step;
         gboolean sound_changed;
 
         /* Find the stream that corresponds to the device, if any */
@@ -1574,11 +1571,13 @@ do_sound_action (GsdMediaKeysManager *manager,
         if (stream == NULL)
                 return;
 
-        if (flags & SOUND_ACTION_FLAG_IS_PRECISE)
+        if (flags & SOUND_ACTION_FLAG_IS_PRECISE) {
                 norm_vol_step = PA_VOLUME_NORM * VOLUME_STEP_PRECISE / 100;
-        else
-                norm_vol_step = PA_VOLUME_NORM * VOLUME_STEP / 100;
-
+        }
+        else {
+                vol_step = g_settings_get_int (priv->settings, VOLUME_STEP);
+                norm_vol_step = PA_VOLUME_NORM * vol_step / 100;
+        }
         /* FIXME: this is racy */
         new_vol = old_vol = gvc_mixer_stream_get_volume (stream);
         new_muted = old_muted = gvc_mixer_stream_get_is_muted (stream);
@@ -1616,8 +1615,8 @@ do_sound_action (GsdMediaKeysManager *manager,
                 }
         }
 
-        update_dialog (manager, stream, new_vol, new_muted, sound_changed,
-                       flags & SOUND_ACTION_FLAG_IS_QUIET);
+        show_volume_osd (manager, stream, new_vol, new_muted, sound_changed,
+                         flags & SOUND_ACTION_FLAG_IS_QUIET);
 }
 
 static void
