@@ -8,6 +8,8 @@ gnome-settings-daemon (3.35.91-1) UNRELEASED; urgency=medium
 
   [ Sebastien Bacher ]
   * New upstream release
+  * debian/control.in:
+    - udpate the gsettings-desktop-schemas and gnome-desktop requirements
 
  -- Sebastien Bacher <seb128@ubuntu.com>  Tue, 25 Feb 2020 09:23:32 +0100
 
