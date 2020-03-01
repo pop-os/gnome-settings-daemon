@@ -10,7 +10,7 @@ Uploaders: Iain Lane <laney@debian.org>, Jeremy Bicha <jbicha@debian.org>, Laure
 Build-Depends: debhelper-compat (= 12),
                dh-exec,
                dh-sequence-gnome,
-               gsettings-desktop-schemas-dev (>= 3.35.0),
+               gsettings-desktop-schemas-dev (>= 3.35.91),
                gtk-doc-tools,
                intltool (>= 0.37.1),
                libasound2-dev [linux-any],
@@ -62,7 +62,7 @@ Rules-Requires-Root: no
 Package: gnome-settings-daemon
 Architecture: any
 Depends: gnome-settings-daemon-common (= ${source:Version}),
-         gsettings-desktop-schemas (>= 3.34.0),
+         gsettings-desktop-schemas (>= 3.35.91),
          default-logind [linux-any] | logind [linux-any],
          ${misc:Depends},
          ${shlibs:Depends}
