@@ -1,3 +1,9 @@
+gnome-settings-daemon (3.35.91-1ubuntu1pop1) focal; urgency=medium
+
+  * Backport for Pop 
+
+ -- Michael Aaron Murphy <michael@system76.com>  Tue, 03 Mar 2020 16:07:56 -0700
+
 gnome-settings-daemon (3.35.91-1ubuntu1) focal; urgency=medium
 
   * Merge with Debian. Remaining changes:
