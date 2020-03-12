@@ -64,6 +64,7 @@ Architecture: any
 Depends: gnome-settings-daemon-common (= ${source:Version}),
          gsettings-desktop-schemas (>= 3.35.91),
          default-logind [linux-any] | logind [linux-any],
+         x11-xserver-utils,
          ${misc:Depends},
          ${shlibs:Depends}
 Recommends: iio-sensor-proxy,
