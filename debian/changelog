@@ -1,4 +1,4 @@
-gnome-settings-daemon (3.36.0-1) UNRELEASED; urgency=medium
+gnome-settings-daemon (3.36.0-1) unstable; urgency=medium
 
   * debian/control.in: Bump gsettings-desktop-schemas to 3.35.91, this is
     needed for the usb-protection key in the org.gnome.desktop.privacy schema
@@ -6,7 +6,7 @@ gnome-settings-daemon (3.36.0-1) UNRELEASED; urgency=medium
   * debian/gnome-settings-daemon.install: Install new script shipped in
     etc/xdg/Xwayland-session.d and add a dependency against x11-xserver-utils
 
- -- Laurent Bigonville <bigon@debian.org>  Thu, 12 Mar 2020 16:59:45 +0100
+ -- Laurent Bigonville <bigon@debian.org>  Thu, 12 Mar 2020 17:09:48 +0100
 
 gnome-settings-daemon (3.35.91-1) experimental; urgency=medium
 
