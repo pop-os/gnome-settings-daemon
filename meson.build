@@ -1,6 +1,6 @@
 project(
   'gnome-settings-daemon', 'c',
-  version: '3.35.91',
+  version: '3.36.0',
   license: [ 'GPL2+', 'LGPLv2+' ],
   meson_version: '>= 0.44.0'
 )
@@ -88,7 +88,7 @@ geocode_glib_dep = dependency('geocode-glib-1.0', version: '>= 3.10.0')
 gio_dep = dependency('gio-2.0', version: '>= 2.53.0')
 gio_unix_dep = dependency('gio-unix-2.0')
 gnome_desktop_dep = dependency('gnome-desktop-3.0', version: '>= 3.34.2')
-gsettings_desktop_dep = dependency('gsettings-desktop-schemas', version: '>= 3.33.0')
+gsettings_desktop_dep = dependency('gsettings-desktop-schemas', version: '>= 3.35.91')
 gtk_dep = dependency('gtk+-3.0', version: '>= 3.15.3')
 gtk_x11_dep = dependency('gtk+-x11-3.0')
 gweather_dep = dependency('gweather-3.0', version: '>= 3.9.5')
