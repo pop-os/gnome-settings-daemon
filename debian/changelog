@@ -1,3 +1,11 @@
+gnome-settings-daemon (3.36.0-2) UNRELEASED; urgency=medium
+
+  * debian/patches/debian/01_debianize_xrdb.patch: Debianize the new 00-xrdb
+    script, in debian /etc/X11/Xresources is a directory. Also lower
+    x11-xserver-utils to Recommends
+
+ -- Laurent Bigonville <bigon@debian.org>  Thu, 12 Mar 2020 18:04:40 +0100
+
 gnome-settings-daemon (3.36.0-1) unstable; urgency=medium
 
   * debian/control.in: Bump gsettings-desktop-schemas to 3.35.91, this is
