@@ -1,3 +1,21 @@
+gnome-settings-daemon (3.36.0-1ubuntu1) focal; urgency=medium
+
+  * Update to the stable version by merging from Debian
+  * debian/patches/git_sound_feedback.patch:
+    - backport a fix to always give feedback to sound changes
+
+ -- Sebastien Bacher <seb128@ubuntu.com>  Mon, 06 Apr 2020 18:37:29 +0200
+
+gnome-settings-daemon (3.36.0-1) unstable; urgency=medium
+
+  * debian/control.in: Bump gsettings-desktop-schemas to 3.35.91, this is
+    needed for the usb-protection key in the org.gnome.desktop.privacy schema
+  * New upstream release
+  * debian/gnome-settings-daemon.install: Install new script shipped in
+    etc/xdg/Xwayland-session.d and add a dependency against x11-xserver-utils
+
+ -- Laurent Bigonville <bigon@debian.org>  Thu, 12 Mar 2020 17:09:48 +0100
+
 gnome-settings-daemon (3.35.91-1ubuntu1) focal; urgency=medium
 
   * Merge with Debian. Remaining changes:
