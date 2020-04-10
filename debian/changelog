@@ -1,10 +1,10 @@
-gnome-settings-daemon (3.36.0-1ubuntu2) UNRELEASED; urgency=medium
+gnome-settings-daemon (3.36.0-1ubuntu2) focal; urgency=medium
 
   * debian/patches/ubuntu_vino_handling.patch: restore support to handle
     the vino service, upstream considers it deprecated of favor of
     gnome-remote-desktop but we don't have that yet (lp: #1871787)
 
- -- Sebastien Bacher <seb128@ubuntu.com>  Fri, 10 Apr 2020 12:47:28 +0200
+ -- Sebastien Bacher <seb128@ubuntu.com>  Fri, 10 Apr 2020 15:03:27 +0200
 
 gnome-settings-daemon (3.36.0-1ubuntu1) focal; urgency=medium
 
