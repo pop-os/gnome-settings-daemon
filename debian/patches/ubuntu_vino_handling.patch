@@ -1,0 +1,17 @@
+# Description: restore support to handle to the vino service,
+# upstream considers it deprecated of favor of gnome-remote-desktop
+# but we don't have that yet
+# Ubuntu-bug: https://launchpad.net/bugs/1871787
+# Upstream: not-needed
+diff --git a/plugins/sharing/gsd-sharing-manager.c b/plugins/sharing/gsd-sharing-manager.c
+index ab3d83c..9e2381c 100644
+--- a/plugins/sharing/gsd-sharing-manager.c
++++ b/plugins/sharing/gsd-sharing-manager.c
+@@ -98,6 +98,7 @@ static gpointer manager_object = NULL;
+ 
+ static const char * const services[] = {
+         "rygel",
++        "vino-server",
+         "gnome-remote-desktop",
+         "gnome-user-share-webdav"
+ };

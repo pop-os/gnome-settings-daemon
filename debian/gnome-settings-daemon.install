@@ -1,4 +1,5 @@
 etc/xdg/autostart
+etc/xdg/Xwayland-session.d
 usr/lib/gnome-settings-daemon-3.0
 usr/libexec
 usr/share/gnome-settings-daemon

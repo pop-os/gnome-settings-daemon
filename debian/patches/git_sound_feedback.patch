@@ -1,0 +1,43 @@
+From cf3ac24a12234b5f8919bc0139b06a54eba4dea4 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Florian=20M=C3=BCllner?= <fmuellner@gnome.org>
+Date: Sat, 28 Mar 2020 04:12:13 +0100
+Subject: [PATCH] media-keys: Ignore our own output when omitting sound
+ feedback
+
+Since commit 7d74327dc2b we omit sound feedback on volume changes
+if something is already outputting sound. Unfortunately that
+"something" may be our own feedback (from a previous volume
+change).
+
+We do not want to omit the feedback in that case, so only consider
+sound playing if something *else* is outputting sound.
+
+https://gitlab.gnome.org/GNOME/gnome-settings-daemon/-/issues/508
+---
+ plugins/media-keys/gsd-media-keys-manager.c | 6 ++++--
+ 1 file changed, 4 insertions(+), 2 deletions(-)
+
+Index: gnome-settings-daemon-3.36.0/plugins/media-keys/gsd-media-keys-manager.c
+===================================================================
+--- gnome-settings-daemon-3.36.0.orig/plugins/media-keys/gsd-media-keys-manager.c
++++ gnome-settings-daemon-3.36.0/plugins/media-keys/gsd-media-keys-manager.c
+@@ -1423,7 +1423,7 @@ show_volume_osd (GsdMediaKeysManager *ma
+         GvcMixerUIDevice *device;
+         const GvcMixerStreamPort *port;
+         const char *icon;
+-        gboolean playing;
++        gboolean playing = FALSE;
+         double new_vol;
+         double max_volume;
+ 
+@@ -1448,7 +1448,9 @@ show_volume_osd (GsdMediaKeysManager *ma
+                 show_osd_with_max_level (manager, icon, NULL, new_vol, max_volume, NULL);
+         }
+ 
+-        playing = gvc_mixer_stream_get_state (stream) == GVC_STREAM_STATE_RUNNING;
++        if (priv->ca)
++                ca_context_playing (priv->ca, 1, &playing);
++        playing = !playing && gvc_mixer_stream_get_state (stream) == GVC_STREAM_STATE_RUNNING;
+ 
+         if (quiet == FALSE && sound_changed != FALSE && muted == FALSE && playing == FALSE)
+                 play_volume_changed_audio (manager, stream);

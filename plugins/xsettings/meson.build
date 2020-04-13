@@ -5,7 +5,6 @@ fc_monitor = files('fc-monitor.c')
 wm_button_layout_translation = files('wm-button-layout-translation.c')
 
 sources = gsd_xsettings_gtk + fc_monitor + wm_button_layout_translation + files(
-  'gsd-remote-display-manager.c',
   'gsd-xsettings-manager.c',
   'xsettings-common.c',
   'xsettings-manager.c',
@@ -46,6 +45,11 @@ foreach program: programs
     c_args: program[2]
   )
 endforeach
+
+install_data(
+  files('00-xrdb'),
+  install_dir: join_paths(gsd_sysconfdir, 'xdg/Xwayland-session.d')
+)
 
 test_py = find_program('test.py')
 

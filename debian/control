@@ -7,11 +7,11 @@ Section: gnome
 Priority: optional
 Maintainer: Ubuntu Desktop Team <ubuntu-desktop@lists.ubuntu.com>
 XSBC-Original-Maintainer: Debian GNOME Maintainers <pkg-gnome-maintainers@lists.alioth.debian.org>
-Uploaders: Iain Lane <laney@debian.org>, Jeremy Bicha <jbicha@debian.org>
+Uploaders: Iain Lane <laney@debian.org>, Jeremy Bicha <jbicha@debian.org>, Laurent Bigonville <bigon@debian.org>
 Build-Depends: debhelper-compat (= 12),
                dh-exec,
                dh-sequence-gnome,
-               gsettings-desktop-schemas-dev (>= 3.35.0),
+               gsettings-desktop-schemas-dev (>= 3.35.91),
                gtk-doc-tools,
                intltool (>= 0.37.1),
                libaccountsservice-dev (>= 0.6.34),
@@ -57,17 +57,18 @@ Build-Depends: debhelper-compat (= 12),
                xserver-xorg-input-wacom [!hurd-any !kfreebsd-any !s390 !s390x],
                xvfb <!nocheck>
 Standards-Version: 4.5.0
-XS-Debian-Vcs-Browser: https://salsa.debian.org/gnome-team/gnome-settings-daemon
 XS-Debian-Vcs-Git: https://salsa.debian.org/gnome-team/gnome-settings-daemon.git
-Vcs-Browser: https://git.launchpad.net/~ubuntu-desktop/ubuntu/+source/gnome-settings-daemon
-Vcs-Git: https://git.launchpad.net/~ubuntu-desktop/ubuntu/+source/gnome-settings-daemon
+XS-Debian-Vcs-Browser: https://salsa.debian.org/gnome-team/gnome-settings-daemon
+Vcs-Git: https://salsa.debian.org/gnome-team/gnome-settings-daemon.git -b ubuntu/master
+Vcs-Browser: https://salsa.debian.org/gnome-team/gnome-settings-daemon/tree/ubuntu/master
 Rules-Requires-Root: no
 
 Package: gnome-settings-daemon
 Architecture: amd64
 Depends: gnome-settings-daemon-common (= ${source:Version}),
-         gsettings-desktop-schemas (>= 3.34.0),
+         gsettings-desktop-schemas (>= 3.35.91),
          default-logind [linux-any] | logind [linux-any],
+         x11-xserver-utils,
          ${misc:Depends},
          ${shlibs:Depends}
 Recommends: iio-sensor-proxy,
