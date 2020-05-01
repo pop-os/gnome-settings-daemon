@@ -1,4 +1,4 @@
-gnome-settings-daemon (3.36.1-1) UNRELEASED; urgency=medium
+gnome-settings-daemon (3.36.1-1) unstable; urgency=medium
 
   [ Laurent Bigonville ]
   * debian/patches/debian/01_debianize_xrdb.patch: Debianize the new 00-xrdb
