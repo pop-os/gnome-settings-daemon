@@ -1,3 +1,4 @@
+debian/01_debianize_xrdb.patch
 debian/meson.build-Lower-polkit-requirement.patch
 45_suppress-printer-may-not-be-connected-notification.patch
 53_sync_input_sources_to_accountsservice.patch
@@ -8,5 +9,4 @@ revert-gsettings-removals.patch
 revert-mediakeys-dbus-interface-drop.patch
 ubuntu_ibus_configs.patch
 ubuntu_calculator_snap.patch
-git_sound_feedback.patch
 ubuntu_vino_handling.patch

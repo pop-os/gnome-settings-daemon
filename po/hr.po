@@ -3,19 +3,19 @@ msgstr ""
 "Project-Id-Version: gnome-control-center 0\n"
 "Report-Msgid-Bugs-To: https://gitlab.gnome.org/GNOME/gnome-settings-daemon/"
 "issues\n"
-"POT-Creation-Date: 2020-01-18 13:37+0000\n"
-"PO-Revision-Date: 2020-01-19 00:52+0100\n"
-"Last-Translator: gogo <linux.hr@protonmail.com>\n"
+"POT-Creation-Date: 2020-03-28 16:23+0000\n"
+"PO-Revision-Date: 2020-03-28 17:25+0100\n"
+"Last-Translator: gogo <trebelnik2@gmail.com>\n"
 "Language-Team: Croatian <lokalizacija@linux.hr>\n"
 "Language: hr\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n"
-"%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
-"4 && (n%100<10 || n%100>=20) ? 1: 2;\n"
+"Plural-Forms: nplurals=3; plural=n%10==1 && n%100!=11 ? 0 : n%10>=2 && n"
+"%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2;\n"
+"X-Launchpad-Export-Date: 2020-03-28 16:20+0000\n"
 "X-Generator: Poedit 2.0.6\n"
-"X-Launchpad-Export-Date: 2017-03-15 15:24+0000\n"
+"4 && (n%100<10 || n%100>=20) ? 1: 2;\n"
 
 #: data/org.gnome.settings-daemon.peripherals.gschema.xml.in:12
 msgid "Smartcard removal action"
@@ -1613,28 +1613,28 @@ msgstr "Postavke"
 msgid "Date & Time Settings"
 msgstr "Datum i vremenske postavke"
 
-#: plugins/housekeeping/gsd-disk-space.c:575
+#: plugins/housekeeping/gsd-disk-space.c:629
 msgid "Disk Space"
 msgstr "Diskovni prostor"
 
-#: plugins/housekeeping/gsd-disk-space.c:588
+#: plugins/housekeeping/gsd-disk-space.c:642
 msgid "Examine"
 msgstr "Istraži"
 
-#: plugins/housekeeping/gsd-disk-space.c:599
+#: plugins/housekeeping/gsd-disk-space.c:653
 msgid "Empty Trash"
 msgstr "Isprazni smeće"
 
-#: plugins/housekeeping/gsd-disk-space.c:607
+#: plugins/housekeeping/gsd-disk-space.c:661
 msgid "Ignore"
 msgstr "Zanemari"
 
-#: plugins/housekeeping/gsd-disk-space.c:638
+#: plugins/housekeeping/gsd-disk-space.c:692
 #, c-format
 msgid "Low Disk Space on “%s”"
 msgstr "Premalo slobodnog diskovnog prostora na “%s”"
 
-#: plugins/housekeeping/gsd-disk-space.c:640
+#: plugins/housekeeping/gsd-disk-space.c:694
 #, c-format
 msgid ""
 "The volume “%s” has only %s disk space remaining.  You may free up some "
@@ -1643,16 +1643,16 @@ msgstr ""
 "Uređaju \"%s\" je preostalo samo %s slobodnog diskovnog prostora. Možete "
 "osloboditi nešto prostora pražnjenjem smeća."
 
-#: plugins/housekeeping/gsd-disk-space.c:644
+#: plugins/housekeeping/gsd-disk-space.c:698
 #, c-format
 msgid "The volume “%s” has only %s disk space remaining."
 msgstr "Uređaju \"%s\" je preostalo samo %s slobodnog diskovnog prostora."
 
-#: plugins/housekeeping/gsd-disk-space.c:649
+#: plugins/housekeeping/gsd-disk-space.c:703
 msgid "Low Disk Space"
 msgstr "Premalo slobodnog diskovnog prostora"
 
-#: plugins/housekeeping/gsd-disk-space.c:651
+#: plugins/housekeeping/gsd-disk-space.c:705
 #, c-format
 msgid ""
 "This computer has only %s disk space remaining.  You may free up some space "
@@ -1661,7 +1661,7 @@ msgstr ""
 "Ovom računalo je preostalo samo %s slobodnog diskovnog prostora. Možete "
 "osloboditi nešto prostora pražnjenjem smeća."
 
-#: plugins/housekeeping/gsd-disk-space.c:654
+#: plugins/housekeeping/gsd-disk-space.c:708
 #, c-format
 msgid "This computer has only %s disk space remaining."
 msgstr "Ovom računalu je preostalo samo %s slobodnog diskovnog prostora."
@@ -2035,12 +2035,12 @@ msgstr ""
 #. TRANSLATORS: this is the sound description
 #: plugins/power/gsd-power-manager.c:1260
 msgid "Lid has been opened"
-msgstr "Poklopac je otvoren"
+msgstr "Zaslon prijenosnika je otvoren"
 
 #. TRANSLATORS: this is the sound description
 #: plugins/power/gsd-power-manager.c:1294
 msgid "Lid has been closed"
-msgstr "Poklopac je zatvoren"
+msgstr "Zaslon prijenosnika je zatvoren"
 
 #. TRANSLATORS: this is the sound description
 #: plugins/power/gsd-power-manager.c:1857
@@ -2135,7 +2135,7 @@ msgstr "Pisaču “%s” je ponestalo tinte u toneru."
 #: plugins/print-notifications/gsd-print-notifications-manager.c:382
 #, c-format
 msgid "Printer “%s” may not be connected."
-msgstr "Pisaču “%s” možda nije povezan."
+msgstr "Pisač “%s” možda nije povezan s mrežom."
 
 #. Translators: One or more covers on the printer are open (same as in system-config-printer)
 #: plugins/print-notifications/gsd-print-notifications-manager.c:386
@@ -2216,7 +2216,7 @@ msgstr "Prazan toner"
 #. Translators: The printer is in the process of connecting to a shared network output device (same as in system-config-printer)
 #: plugins/print-notifications/gsd-print-notifications-manager.c:604
 msgid "Not connected?"
-msgstr "Nije povezan?"
+msgstr "Nije povezan na mrežu?"
 
 #. Translators: One or more covers on the printer are open (same as in system-config-printer)
 #: plugins/print-notifications/gsd-print-notifications-manager.c:606
@@ -2440,28 +2440,28 @@ msgstr "Odustani"
 #: plugins/wwan/gsd-wwan-pinentry.c:95
 #, c-format
 msgid "Please provide the PIN for SIM card %s"
-msgstr "Omogućite PIN kôd za SIM karticu %s"
+msgstr "Upišite PIN kôd za SIM karticu %s"
 
 #: plugins/wwan/gsd-wwan-pinentry.c:97
 msgid "Enter PIN to unlock your SIM card"
-msgstr "Upišite PIN kôd kako bi otključali SIM karticu"
+msgstr "Upišite PIN kôd za otključavanje SIM kartice"
 
 #. msg is already localised
 #: plugins/wwan/gsd-wwan-pinentry.c:123
 #, c-format
 msgid "%2$s You have %1$u try left"
 msgid_plural "%2$s You have %1$u tries left"
-msgstr[0] "%2$s Imate %1$u preostali pokušaj"
-msgstr[1] "%2$s Imate %1$u preostala pokušaja"
-msgstr[2] "%2$s Imate %1$u preostalih pokušaja"
+msgstr[0] "%2$s Preostao vam je %1$u pokušaj"
+msgstr[1] "%2$s Preostala su vam %1$u pokušaja"
+msgstr[2] "%2$s Preostalo vam je %1$u pokušaja"
 
 #: plugins/wwan/gsd-wwan-pinentry.c:127
 #, c-format
 msgid "You have %u try left"
 msgid_plural "You have %u tries left"
-msgstr[0] "Imate %u preostali pokušaj"
-msgstr[1] "Imate %u preostala pokušaja"
-msgstr[2] "Imate %u preostalih pokušaja"
+msgstr[0] "Preostao vam je %u pokušaj"
+msgstr[1] "Preostala su vam %u pokušaja"
+msgstr[2] "Preostalo vam je %u pokušaja"
 
 #. Set up the dialog
 #: plugins/wwan/gsd-wwan-pinentry.c:173 plugins/wwan/gsd-wwan-pinentry.c:175
@@ -2475,178 +2475,20 @@ msgstr "U redu"
 #. TODO: handle PUK as well
 #: plugins/wwan/gsd-wwan-pinentry.c:194
 msgid "Too many incorrect PINs."
-msgstr "Previše neispravnih PIN kôdova."
+msgstr "Previše netočnih PIN-ova."
 
 #: plugins/wwan/gsd-wwan-pinentry.c:200
 msgid "Wrong PIN code"
 msgstr "Pogrešan PIN kôd"
 
-#~ msgid "NumLock state"
-#~ msgstr "NumLock stanje"
-
-#~ msgid "The remembered state of the NumLock LED."
-#~ msgstr "Zapamćeno stanje NumLock LED-a."
-
-#~ msgid ""
-#~ "Highlights the current location of the pointer when the Control key is "
-#~ "pressed and released."
-#~ msgstr ""
-#~ "Označava trenutnu lokaciju pokazivača kad se tipka Control pritisne i "
-#~ "otpusti."
-
-#~ msgid "Touchpad toggle"
-#~ msgstr "Aktivacija touchpada"
-
-#~ msgid "Quiet Volume Mute"
-#~ msgstr "Postepeno utišavanje glasnoće zvuka"
-
-#~ msgid "Lock Screen"
-#~ msgstr "Zaključaj zaslon"
-
-#~ msgid "Help"
-#~ msgstr "Pomoć"
-
-#~ msgid "Rewind"
-#~ msgstr "Premotaj unatrag"
-
-#~ msgid "Forward"
-#~ msgstr "Premotaj unaprijed"
-
-#~ msgid "Repeat"
-#~ msgstr "Ponovi"
-
-#~ msgid "Random Play"
-#~ msgstr "Naizmjenična reprodukcija"
-
-#~ msgid "Orientation Lock"
-#~ msgstr "Zaključavanje orjentacije"
-
-#~ msgid "Power Off"
-#~ msgstr "Isključivanje"
-
-#~ msgid "Sleep"
-#~ msgstr "Spavanje"
-
-#~ msgid "Toggle Bluetooth"
-#~ msgstr "Uključi/Isključi Bluetooth"
-
-#~ msgid "Slow Keys Turned On"
-#~ msgstr "Uključene spore tipke"
-
-#~ msgid "Slow Keys Turned Off"
-#~ msgstr "Isključene spore tipke"
-
-#~ msgid ""
-#~ "You just held down the Shift key for 8 seconds.  This is the shortcut for "
-#~ "the Slow Keys feature, which affects the way your keyboard works."
-#~ msgstr ""
-#~ "Upravo ste držali Shift tipku pritisnutu 8 sekundi. Ovo je prečac za "
-#~ "spore tipke, što utječe na način na koji tipkovnica radi."
-
-#~ msgid "Universal Access"
-#~ msgstr "Univerzalni pristup"
-
-#~ msgid "Turn Off"
-#~ msgstr "Isključi"
-
-#~ msgid "Turn On"
-#~ msgstr "Uključi"
-
-#~ msgid "Leave On"
-#~ msgstr "Ostavi uključeno"
-
-#~ msgid "Leave Off"
-#~ msgstr "Ostavi isključeno"
-
-#~ msgid "Sticky Keys Turned On"
-#~ msgstr "Uključene ljepljive tipke"
-
-#~ msgid "Sticky Keys Turned Off"
-#~ msgstr "Isključene ljepljive tipke"
-
-#~ msgid ""
-#~ "You just pressed the Shift key 5 times in a row.  This is the shortcut "
-#~ "for the Sticky Keys feature, which affects the way your keyboard works."
-#~ msgstr ""
-#~ "Pritisnuli ste Shift tipku 5 puta zaredom. Ovo je prečac za ljepljive "
-#~ "tipke, što utječe na način na koji tipkovnica radi."
-
-#~ msgid ""
-#~ "You just pressed two keys at once, or pressed the Shift key 5 times in a "
-#~ "row.  This turns off the Sticky Keys feature, which affects the way your "
-#~ "keyboard works."
-#~ msgstr ""
-#~ "Pritisnuli ste dvije tipke odjednom, ili ste pritisnuli Shift tipku 5 "
-#~ "puta zaredom. To uključuje ljepljive tipke, što utječe na način na koji "
-#~ "tipkovnica radi."
-
-#~ msgid "Disabled"
-#~ msgstr "Onemogućeno"
-
-#~ msgid "%u Output"
-#~ msgid_plural "%u Outputs"
-#~ msgstr[0] "%u Izlaz"
-#~ msgstr[1] "%u Izlaza"
-#~ msgstr[2] "%u Izlaza"
-
-#~ msgid "%u Input"
-#~ msgid_plural "%u Inputs"
-#~ msgstr[0] "%u Ulaz"
-#~ msgstr[1] "%u Ulaza"
-#~ msgstr[2] "%u Ulaza"
-
-#~ msgid "System Sounds"
-#~ msgstr "Zvukovi sustava"
-
-#~ msgid "File for default configuration for RandR"
-#~ msgstr "Datoteka za uobičajeno podešenje RandR-a"
-
-#~ msgid ""
-#~ "The XRandR plugin will look for a default configuration in the file "
-#~ "specified by this key. This is similar to the ~/.config/monitors.xml that "
-#~ "normally gets stored in users’ home directories. If a user does not have "
-#~ "such a file, or has one that does not match the user’s setup of monitors, "
-#~ "then the file specified by this key will be used instead."
-#~ msgstr ""
-#~ "XRandR priključak će potražiti zadano podešavanje u datoteci određenoj "
-#~ "ovim ključem. To je slično ~/.config/monitors.xml koji je uobičajeno "
-#~ "spremljen u osobnoj mapi korisnika. Ako korisnik nema takvu datoteku, ili "
-#~ "ima onu koja se ne podudara korisnikovim postavkama monitora, tada će se "
-#~ "umjesto koristiti datoteka određena tim ključem."
-
-#~ msgid "Whether to turn off specific monitors after boot"
-#~ msgstr "Hoće li se isključiti određeni monitori nakon uključivanja računala"
-
-#~ msgid ""
-#~ "“clone” will display the same thing on all monitors, “dock” will switch "
-#~ "off the internal monitor, “do-nothing” will use the default Xorg "
-#~ "behaviour (extend the desktop in recent versions). The default, “follow-"
-#~ "lid”, will choose between “do-nothing” and “dock” depending on whether "
-#~ "the lid is (respectively) open or closed."
-#~ msgstr ""
-#~ "“clone” će prikazati isti prikaz na svim monitorima, “dock” će isključiti "
-#~ "unutrašnji monitor, “do-nothing” će koristiti zadano Xorg ponašanje "
-#~ "(proširiti radnu površinu u novijim inačicama). Zadano, “follow-lid”, će "
-#~ "odabrati između “do-nothing” i “dock” ovisno je li poklopac zaslona "
-#~ "otvoren ili zatvoren."
-
-#~ msgid "Video Out"
-#~ msgstr "Video izlaz"
-
-#~ msgid "Rotate Screen"
-#~ msgstr "Zakreni zaslon"
-
-#~ msgid "Could not refresh the screen information: %s"
-#~ msgstr "Neuspjelo osvježavanje zaslonskih informacija: %s"
-
 #~ msgid "Priority to use for this plugin"
 #~ msgstr "Prioritet koji se koristi za ovaj priključak"
 
 #~ msgid ""
-#~ "Priority to use for this plugin in gnome-settings-daemon startup queue"
+#~ "Priority to use for this plugin in unity-settings-daemon startup queue"
 #~ msgstr ""
-#~ "Prioritet koji se koristi za ovaj priključak u redu pokretanja gnome-"
-#~ "settings-daemona"
+#~ "Prioritet koji se koristi za ovaj priključak u unity-settings-daemon redu "
+#~ "pokretanja"
 
 #~ msgid "Activation of this plugin"
 #~ msgstr "Aktivacija ovog priključka"
@@ -2669,12 +2511,18 @@ msgstr "Pogrešan PIN kôd"
 #~ "vrijednost 1 znači da uređajem ubuduće neće rukovati gnome-settings-"
 #~ "daemon."
 
+#~ msgid ""
+#~ "Enable this to set the tablet to absolute mode for unity-settings-daemon."
+#~ msgstr ""
+#~ "Omogućite ovo za postavljanje apsolutnog načina tableta za unity-settings-"
+#~ "daemon."
+
 #~ msgid "Wacom tablet PC feature"
 #~ msgstr "PC značajka Wacomovog tableta"
 
 #~ msgid "Enable this to only report stylus events when the tip is pressed."
 #~ msgstr ""
-#~ "Omogućite ovo za prijavljivanje olovkinih događaja samo kad se pritisne "
+#~ "Omogućite ovo za prijavljivanje pisaljkinih događaja samo kad se pritisne "
 #~ "njezin vrh."
 
 #~ msgid "Wacom display mapping"
@@ -2688,23 +2536,94 @@ msgstr "Pogrešan PIN kôd"
 #~ "obliku [proizvođač, proizvod, serijski broj]. [\"\",\"\",\"\"] "
 #~ "onemogućava mapiranje."
 
-#~ msgid ""
-#~ "A list of strings representing the plugins that are allowed to be loaded "
-#~ "(default: “all”). The plugins still need to be marked as active to get "
-#~ "loaded by Unity (but not by GNOME). This is only evaluated on startup."
-#~ msgstr ""
-#~ "Popis znakova predstavlja priključke kojima je dopušteno učitavanje "
-#~ "(zadano: \"all\"). Priključke još uvijek treba označiti aktivnima kako bi "
-#~ "ih učitao Unity (ali ne i GNOME)."
-
 #~ msgid "Video output"
 #~ msgstr "Video izlaz"
+
+#~ msgid "Binding to switch the video output device."
+#~ msgstr "Prečac tipkovnice za prebacivanje uređaja video izlaza."
 
 #~ msgid "Launch terminal"
 #~ msgstr "Pokreni terminal"
 
 #~ msgid "Binding to launch the terminal."
 #~ msgstr "Prečac tipkovnice za pokretanje terminala."
+
+#~ msgid "Laptop lid close action on battery"
+#~ msgstr "Radnja zatvaranja zaslona prijenosnika pri korištenju baterije"
+
+#~ msgid ""
+#~ "The action to take when the laptop lid is closed and the laptop is on "
+#~ "battery power."
+#~ msgstr ""
+#~ "Radnja koja će se pokrenuti kada se zatvara zaslon prijenosnika pri "
+#~ "korištenju baterije."
+
+#~ msgid "Laptop lid close action when on AC"
+#~ msgstr ""
+#~ "Radnja zatvaranja zaslona prijenosnika pri korištenju vanjskog napajanja"
+
+#~ msgid ""
+#~ "The action to take when the laptop lid is closed and the laptop is on AC "
+#~ "power."
+#~ msgstr ""
+#~ "Radnja koja će se pokrenuti kada se zatvara zaslon prijenosnika i "
+#~ "prijenosnik je priključen na vanjsko napajanje."
+
+#~ msgid ""
+#~ "Laptop lid, when closed, will suspend even if there is an external "
+#~ "monitor plugged in"
+#~ msgstr ""
+#~ "Radnja zatvaranja zaslona prijenosnika, će ga suspendirati čak i ako je "
+#~ "priključen vanjski zaslon"
+
+#~ msgid ""
+#~ "With no external monitors plugged in, closing a laptop's lid will suspend "
+#~ "the machine (as set by the lid-close-battery-action and lid-close-ac-"
+#~ "action keys). By default, however, closing the lid when an external "
+#~ "monitor is present will not suspend the machine, so that one can keep "
+#~ "working on that monitor (e.g. for docking stations or media viewers). Set "
+#~ "this key to False to keep the default behavior, or to True to suspend the "
+#~ "laptop whenever the lid is closed and regardless of external monitors."
+#~ msgstr ""
+#~ "Kada nema priključenih vanjskih zaslona, zatvaranje zaslona prijenosnika "
+#~ "će ga suspendirati (ako je postavljeno lid-close-battery-action i lid-"
+#~ "close-ac-action izraze) Po zadanome, ipak, zatvaranje zaslona "
+#~ "prijenosnika kada je vanjski zaslon prisutan neće ga suspendirati, stoga "
+#~ "prijenosnik može nastavit raditi na tome zaslonu (npr. za priključne "
+#~ "stanice ili medijske preglednike). Postavite ovaj izraz na False kako bi "
+#~ "zadržali zadano ponašanje, ili True za suspendiranje prijenosnika kada se "
+#~ "zaslon prijenosnika zatvori bez obzira na vanjski zaslon."
+
+#~ msgid "Suspend button action"
+#~ msgstr "Radnja tipke suspendiranja"
+
+#~ msgid "The action to take when the system suspend button is pressed."
+#~ msgstr "Radnja koja se poduzima pri pritisku tipke suspendiranja sustava."
+
+#~ msgid "Hibernate button action"
+#~ msgstr "Radnja tipke hibernacije"
+
+#~ msgid "The action to take when the system hibernate button is pressed."
+#~ msgstr "Radnja koja se poduzima pri pritisku tipke hibernacije sustava."
+
+#~ msgid "Sleep button action"
+#~ msgstr "Radnja tipke spavanja"
+
+#~ msgid ""
+#~ "The action to take when the system sleep (non-specific type) button is "
+#~ "pressed."
+#~ msgstr ""
+#~ "Radnja koja se poduzima pri pritisku tipke spavanja sustava (neodređene "
+#~ "vrste)."
+
+#~ msgid "The action to take when the system power button is pressed."
+#~ msgstr "Radnja koja se poduzima pri pritisku tipke isključivanja sustava."
+
+#~ msgid "Battery critical low action"
+#~ msgstr "Radnja pri kritičnoj razini baterije"
+
+#~ msgid "The action to take when the battery is critically low."
+#~ msgstr "Radnja koja se poduzima pri kritičnoj razini energije baterije."
 
 #~ msgid "Percentage considered low"
 #~ msgstr "Postotak smatran slabim"
@@ -2790,390 +2709,40 @@ msgstr "Pogrešan PIN kôd"
 #~ "bateriju. Ovo treba isključiti samo u slučaju kada znate da je baterija u "
 #~ "redu."
 
-#~ msgid "XRandR"
-#~ msgstr "XRandR"
-
-#~ msgid "Sound"
-#~ msgstr "Zvuk"
-
-#~ msgid "Keyboard"
-#~ msgstr "Tipkovnica"
-
-#~ msgid "Mouse"
-#~ msgstr "Miš"
-
-#~ msgid "Accessibility Keyboard"
-#~ msgstr "Pristupačna tipkovnica"
-
-#~ msgid "Media keys"
-#~ msgstr "Medijske tipke"
-
-#~ msgid "X Settings"
-#~ msgstr "X postavke"
-
-#~ msgid "Manage X Settings"
-#~ msgstr "Upravljaj X postavkama"
-
-#~ msgid "GNOME Settings Daemon"
-#~ msgstr "Pozadinski program GNOME postavki"
-
-#~ msgid ""
-#~ "Whether the tablet's orientation is locked, or rotated automatically."
-#~ msgstr ""
-#~ "Hoće li se orijentacija tableta zaključati ili automatski zaokrenuti."
-
-#~ msgid ""
-#~ "Set this to one of \"none\", \"lock-screen\", or \"force-logout\". The "
-#~ "action will get performed when the smartcard used for log in is removed."
-#~ msgstr ""
-#~ "Postavito ovo na jedno od \"ništa\", \"zaključaj zaslon\" ili \"prisilna "
-#~ "odjava\". Radnja će se obaviti kad se pametna kartica korištena za "
-#~ "prijavu ukloni."
-
-#~ msgid ""
-#~ "Whether this plugin would be activated by gnome-settings-daemon or not"
-#~ msgstr "Hoće li ovaj priključak aktivirati gnome-settings-daemon"
-
-#~ msgid ""
-#~ "Set this to 'none', 'cw' for 90 degree clockwise, 'half' for 180 degree, "
-#~ "and 'ccw' for 90 degree counterclockwise."
-#~ msgstr ""
-#~ "Postavite ovo na \"ništa\", \"cw\" za 90 stupnjeva u smjeru kazaljke "
-#~ "sata, \"pola\" za 180 stupnjeva i \"ccw\" za 90 stupnjeva za obrnuti "
-#~ "smjer kazaljke sata."
-
-#~ msgid "Exit after a time (for debugging)"
-#~ msgstr "Izađi nakon vremena (za otklanjanje grešaka)"
-
-#~ msgid "Enable debugging code"
-#~ msgstr "Omogući ispravljanje grešaka"
-
-#~ msgid "Accessibility settings"
-#~ msgstr "Postavke pristupačnosti"
-
-#~ msgid "Clipboard"
-#~ msgstr "Međuspremnik"
-
-#~ msgid "The display '%s' should be recalibrated soon."
-#~ msgstr "Zaslon \"%s\" bi uskoro trebao biti rekalibriran."
-
-#~ msgid "The printer '%s' should be recalibrated soon."
-#~ msgstr "Pisač \"%s\" bi uskoro trebao biti rekalibriran."
-
-#~ msgid "Print-notifications"
-#~ msgstr "Obavijesti o ispisu"
-
-#~ msgid "The door is open on printer '%s'."
-#~ msgstr "Vratašca na pisaču '%s' su otvorena."
-
-#~ msgid "Printer '%s' is low on a marker supply."
-#~ msgstr "Niska razina tinte u pisaču \"%s\"."
-
-#~ msgid "The cover is open on printer '%s'."
-#~ msgstr "Poklopac na pisaču '%s' je otvoren."
-
-#~ msgid "There is a missing print filter for printer '%s'."
-#~ msgstr "Nedostaje ispisni filtar za pisač \"%s\"."
-
-#~ msgid "Printer '%s' is out of a marker supply."
-#~ msgstr "Nema više tinte u pisaču \"%s\"."
-
-#~ msgid "Printer '%s' is out of paper."
-#~ msgstr "Pisač '%s' ostao je bez papira."
-
-#~ msgid "There is a problem on printer '%s'."
-#~ msgstr "Postoji problem s pisačem \"%s\"."
-
-#~ msgid "Please wait..."
-#~ msgstr "Molim pričekajte..."
-
-#~ msgid "Left Touchstrip Mode Switch"
-#~ msgstr "Prebacivanje načina lijeve dodirne trake"
-
-#~ msgid "Right Touchstrip Mode Switch"
-#~ msgstr "Prebacivanje načina desne dodirne trake"
-
-#~ msgid "Right Touchstrip Mode #%d"
-#~ msgstr "Način desne dodirne trake #%d"
-
-#~ msgid "Left Touchring Mode Switch"
-#~ msgstr "Prebacivanje načina lijevog dodirnog prstena"
-
-#~ msgid "Printer '%s': '%s'."
-#~ msgstr "Pisač '%s': '%s'."
-
-#~ msgid "Left Ring Mode #%d"
-#~ msgstr "Način lijevog prstena #%d"
-
-#~ msgid "Right Ring Mode #%d"
-#~ msgstr "Način desnog prstena #%d"
-
-#~ msgid "Left Touchstrip Mode #%d"
-#~ msgstr "Način lijeve dodirne trake #%d"
-
-#~ msgid "Right Touchring Mode Switch"
-#~ msgstr "Prebacivanje načina desnog dodirnog prstena"
-
-#~ msgid "Mode Switch #%d"
-#~ msgstr "Prebacivanje načina #%d"
-
-#~ msgid "Replace existing daemon"
-#~ msgstr "Zamijeni postojeći pozadinski program"
-
-#~ msgid "Housekeeping"
-#~ msgstr "Pospremanje"
-
-#~ msgid "Orientation"
-#~ msgstr "Orijentacija"
-
-#~ msgid "Screensaver Proxy"
-#~ msgstr "Proxy čuvara zaslona"
-
-#~ msgid "Proxy FreeDesktop screensaver inhibition to gnome-session"
-#~ msgstr "Proxy FreeDesktop čuvara zaslona smeta gnome-session"
-
-#~ msgid "Smartcard"
-#~ msgstr "Pametna kartica"
-
-#~ msgctxt "Action type"
-#~ msgid "None"
-#~ msgstr "Nijedna"
-
-#~ msgctxt "Action type"
-#~ msgid "Send Keystroke %s"
-#~ msgstr "Pošalji pritisak tipke %s"
-
-#~ msgid "Right Touchstrip"
-#~ msgstr "Desna dodirna traka"
-
-#~ msgctxt "Action type"
-#~ msgid "Switch Monitor"
-#~ msgstr "Prebaci monitor"
-
-#~ msgctxt "Action type"
-#~ msgid "Show On-Screen Help"
-#~ msgstr "Prikaži zaslonsku pomoć"
-
-#~ msgid "Mode %d: %s"
-#~ msgstr "Način %d: %s"
-
-#~ msgid "Left Ring"
-#~ msgstr "Lijevi prsten"
-
-#~ msgid "Right Ring"
-#~ msgstr "Desni prsten"
-
-#~ msgid "Edit"
-#~ msgstr "Uredi"
-
-#~ msgid "Wacom"
-#~ msgstr "Wacom"
-
-#~ msgid "Wacom plugin"
-#~ msgstr "Wacom priključak"
-
-#~ msgid "Date and Time"
-#~ msgstr "Datum i vrijeme"
-
-#~ msgctxt "Wacom action-type"
-#~ msgid "None"
-#~ msgstr "Nijedna"
-
-#~ msgctxt "print job"
-#~ msgid "\"%s\" on %s"
-#~ msgstr "\"%s\" na %s"
-
-#~ msgctxt "Wacom action-type"
-#~ msgid "Switch Monitor"
-#~ msgstr "Prebaci zaslon"
-
-#~ msgctxt "Wacom action-type"
-#~ msgid "Show On-Screen Help"
-#~ msgstr "Prikaži zaslonsku pomoć"
-
-#~ msgctxt "Wacom action-type"
-#~ msgid "Send Keystroke"
-#~ msgstr "Pošalji pritisak tipke"
-
-#~ msgid "(press any key to exit)"
-#~ msgstr "(pritisnite bilo koju tipku za izlaz)"
-
-#~ msgid "Done"
-#~ msgstr "Završeno"
-
-#~ msgctxt "keyboard shortcut"
-#~ msgid "None"
-#~ msgstr "Nijedan"
-
-#~ msgid "New shortcut…"
-#~ msgstr "Novi prečac..."
-
-#~ msgid "The \"%s\" tablet may not work as expected."
-#~ msgstr "\"%s\" tablet možda neće raditi kao što je očekivano."
-
-#~ msgid "Unknown Tablet Connected"
-#~ msgstr "Nepoznat tablet povezan"
-
-#~ msgid "Wacom Settings"
-#~ msgstr "Wacom postavke"
-
-#~ msgid "Left Touchstrip"
-#~ msgstr "Lijeva dodirna traka"
-
-#~ msgid ""
-#~ "'clone' will display the same thing on all monitors, 'dock' will switch "
-#~ "off the internal monitor, 'do-nothing' will use the default Xorg "
-#~ "behaviour (extend the desktop in recent versions). The default, 'follow-"
-#~ "lid', will choose between 'do-nothing' and 'dock' depending on whether "
-#~ "the lid is (respectively) open or closed."
-#~ msgstr ""
-#~ "'clone' će prikazati jednake stvari na svim zaslonima, 'dock' će "
-#~ "isključiti unutrašnji zaslon, 'do-nothing' će koristiti zadano Xorg "
-#~ "ponašanje (proširi radnu površinu u nedavnim inačicama). Zadano, 'follow-"
-#~ "lid', će odabrati između 'do-nothing' i 'dock' ovisno je li lid (za svaki "
-#~ "posebno) otvoren ili zatvoren."
-
-#~ msgid "Rfkill plugin"
-#~ msgstr "Rfkill priključak"
-
-#~ msgid "Automatically update timezone"
-#~ msgstr "Automatski nadopuni vremensku zonu"
-
-#~ msgid "(Esc to cancel)"
-#~ msgstr "(Esc za prekid)"
-
-#~ msgid "Push a button to configure"
-#~ msgstr "Pritisnite tipku za podešavanje"
-
-#~ msgid ""
-#~ "Automatically prunes thumbnail caches and other transient files, and "
-#~ "warns about low disk space"
-#~ msgstr ""
-#~ "Automatski uklanja predmemoriju minijatura i ostalih privremenih "
-#~ "datoteka, i upozorava na nedostatak slobodnog diskovnog prostora"
-
-#~ msgid "Accessibility keyboard plugin"
-#~ msgstr "Priključak pristupačnosti tipkovnice"
-
-#~ msgid "Accessibility settings plugin"
-#~ msgstr "Priključak postavki pristupačnosti"
-
-#~ msgid "Bottom Button #%d"
-#~ msgstr "Donja tipka #%d"
-
-#~ msgid "Clipboard plugin"
-#~ msgstr "Priključak  međuspremnika"
-
-#~ msgid "Color plugin"
-#~ msgstr "Priključak boja"
-
-#~ msgid "Dummy"
-#~ msgstr "Lažan"
-
-#~ msgid "Dummy plugin"
-#~ msgstr "Priključak lažan"
-
-#~ msgid "Keyboard plugin"
-#~ msgstr "Priključak tipkovnice"
-
-#~ msgid "Left Button #%d"
-#~ msgstr "Lijeva tipka #%d"
-
-#~ msgid "Media keys plugin"
-#~ msgstr "Priključak medijske tipka"
-
-#~ msgid "Mouse plugin"
-#~ msgstr "Priključak miša"
-
-#~ msgid "Orientation plugin"
-#~ msgstr "Priključak usmjerenja"
-
-#~ msgid "Power plugin"
-#~ msgstr "Priključak energije"
-
-#~ msgid "Print-notifications plugin"
-#~ msgstr "Priključak obavijesti o ispisu"
-
-#~ msgid "Printer '%s' has no toner left."
-#~ msgstr "Pisač '%s' je ostao bez tinte u toneru."
-
-#~ msgid "Printer '%s' is currently off-line."
-#~ msgstr "Pisač \"%s\" je trenutno nedostupan."
-
-#~ msgid "Printer '%s' is low on paper."
-#~ msgstr "Pisaču '%s' ponestaje papira."
-
-#~ msgid "Printer '%s' is low on toner."
-#~ msgstr "Pisaču '%s' ponestaje tinte u toneru."
-
-#~ msgid "Right Button #%d"
-#~ msgstr "Desna tipka #%d"
-
-#~ msgid "Set up screen size and rotation settings"
-#~ msgstr "Postavite veličinu zaslona i postavke okretanja"
-
-#~ msgid "Smartcard plugin"
-#~ msgstr "Priključak pametne kartice"
-
-#~ msgid "Sound Sample Cache plugin"
-#~ msgstr "Priključak predmemorije uzorka zvuka"
+#~ msgid "File for default configuration for RandR"
+#~ msgstr "Datoteka za uobičajeno podešenje RandR-a"
 
 #~ msgid ""
 #~ "The XRandR plugin will look for a default configuration in the file "
 #~ "specified by this key. This is similar to the ~/.config/monitors.xml that "
-#~ "normally gets stored in users' home directories. If a user does not have "
-#~ "such a file, or has one that does not match the user's setup of monitors, "
+#~ "normally gets stored in users’ home directories. If a user does not have "
+#~ "such a file, or has one that does not match the user’s setup of monitors, "
 #~ "then the file specified by this key will be used instead."
 #~ msgstr ""
-#~ "XRandR priključak će potražiti uobičajena podešavnja u datoteci određenoj "
-#~ "ovim ključem. Ovo je slično ~/.config/monitors.xml koja se inače sprema u "
-#~ "korisnikovu osobnu mapu. Ako korisnik nema takvu datoteku ili ima onu "
-#~ "koja ne odgovara trenutnoj postavi monitora, onda će se koristiti "
-#~ "datoteka određena ovim ključem."
+#~ "XRandR priključak će potražiti zadano podešavanje u datoteci određenoj "
+#~ "ovim ključem. To je slično ~/.config/monitors.xml koji je uobičajeno "
+#~ "spremljen u osobnoj mapi korisnika. Ako korisnik nema takvu datoteku, ili "
+#~ "ima onu koja se ne podudara korisnikovim postavkama monitora, tada će se "
+#~ "umjesto koristiti datoteka određena tim ključem."
+
+#~ msgid "Whether to turn off specific monitors after boot"
+#~ msgstr "Hoće li se isključiti određeni monitori nakon uključivanja računala"
 
 #~ msgid ""
-#~ "The order of subpixel elements on an LCD screen; only used when "
-#~ "antialiasing is set to \"rgba\". Possible values are: \"rgb\" for red on "
-#~ "left (most common), \"bgr\" for blue on left, \"vrgb\" for red on top, "
-#~ "\"vbgr\" for red on bottom."
+#~ "“clone” will display the same thing on all monitors, “dock” will switch "
+#~ "off the internal monitor, “do-nothing” will use the default Xorg "
+#~ "behaviour (extend the desktop in recent versions). The default, “follow-"
+#~ "lid”, will choose between “do-nothing” and “dock” depending on whether "
+#~ "the lid is (respectively) open or closed."
 #~ msgstr ""
-#~ "Poredak podpikselnih elemenata na LCD zaslonu; koristi se samo kad je "
-#~ "zaglađivanje rubova postavljeno na \"rgba\". Moguće vrijednosti su: \"rgb"
-#~ "\" za crveno lijevo (najčešće), \"bgr\" za plavo lijevo, \"vgrb\" za "
-#~ "crveno na vrhu, \"vbgr\" za crveno na dnu."
+#~ "“clone” će prikazati isti prikaz na svim monitorima, “dock” će isključiti "
+#~ "unutrašnji monitor, “do-nothing” će koristiti zadano Xorg ponašanje "
+#~ "(proširiti radnu površinu u novijim inačicama). Zadano, “follow-lid”, će "
+#~ "odabrati između “do-nothing” i “dock” ovisno je li poklopac zaslona "
+#~ "otvoren ili zatvoren."
 
-#~ msgid ""
-#~ "The type of antialiasing to use when rendering fonts. Possible values "
-#~ "are: \"none\" for no antialiasing, \"grayscale\" for standard grayscale "
-#~ "antialiasing, and \"rgba\" for subpixel antialiasing (LCD screens only)."
-#~ msgstr ""
-#~ "Vrsta zaglađivanja rubova koje će se koristiti kad se prikazuju slova. "
-#~ "Moguće vrijednosti su: \"ništa\" za isključivanje zaglađivanja, \"sivo\" "
-#~ "za standardno sivo zaglađivanje i \"rgba\" za podpikselno zaglađivanje "
-#~ "(samo LCD zasloni)."
+#~ msgid "Binding to launch GNOME settings."
+#~ msgstr "Prečac tipkovnice za pokretanje GNOME postavki."
 
-#~ msgid "Top Button #%d"
-#~ msgstr "Gornja tipka #%d"
-
-#~ msgid ""
-#~ "The type of hinting to use when rendering fonts. Possible values are: "
-#~ "\"none\" for no hinting and \"slight\" for fitting only to the Y-axis "
-#~ "like Microsoft's ClearType, DirectWrite and Adobe's proprietary font "
-#~ "rendering engine. Ignores native hinting within the font, generates hints "
-#~ "algorithmically. Used on Ubuntu by default. Recommended. The meaning of "
-#~ "\"medium\" and \"full\" depends on the font format (.ttf, .otf, .pfa/."
-#~ "pfb) and the installed version of FreeType. They usually try to fit "
-#~ "glyphs to both the X and the Y axis (except for .otf: Y-only). This can "
-#~ "lead to distortion and/or inconsistent rendering depending on the quality "
-#~ "of the font, the font format and the state of FreeType's font engines."
-#~ msgstr ""
-#~ "Vrsta naglašavanja prilikom prikazivanja slova. Moguće vrijednosti su: "
-#~ "\"none\" za bez naglašavanja \"slight\" za upotrebu samo Y-osi poput "
-#~ "Microsoftovog ClearTypa, DirectWrite i Adobovog vlasničkog pogona "
-#~ "prikazivanja slova. Zanemaruje izvorno naglašavanje unutar slova, stvara "
-#~ "naglašavanje algoritamski. Koristi se u Ubuntu po zadanome. To je "
-#~ "preporučljivo. Značenje \"medium\" i \"full\" ovisi o formatu slova (."
-#~ "ttf, .otf, .pfa/.pfb) i instaliranoj FreeType inačici. Oni uobičajeno "
-#~ "pokušavaju prilagoditi simbole prema obje X i Y osi (osim za .otf: Y-"
-#~ "samo). To može voditi u izobličenje i nedosljednost prikazivanja ovisno o "
-#~ "kvaliteti slova, formatu slova i stanju FreeType pogona prikazivanja."
+#~ msgid "Static binding to launch GNOME settings."
+#~ msgstr "Nepromjenjivi prečac tipkovnice za pokretanje GNOME postavki."
