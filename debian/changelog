@@ -1,8 +1,16 @@
-gnome-settings-daemon (3.36.0-1ubuntu2pop1) focal; urgency=medium
+gnome-settings-daemon (3.36.1-0ubuntu1pop0) focal; urgency=medium
 
-  * Upstream release 
+  * Pop!_OS Patches
 
- -- Michael Aaron Murphy <michael@system76.com>  Mon, 13 Apr 2020 10:13:52 -0600
+ -- Jeremy Soller <jeremy@system76.com>  Wed, 17 Jun 2020 12:33:48 -0600
+
+gnome-settings-daemon (3.36.1-0ubuntu1) focal; urgency=medium
+
+  * New upstream version (lp: #1876263)
+  * debian/patches/git_sound_feedback.patch:
+    - removed, included in the new version
+
+ -- Sebastien Bacher <seb128@ubuntu.com>  Fri, 01 May 2020 10:36:23 +0200
 
 gnome-settings-daemon (3.36.0-1ubuntu2) focal; urgency=medium
 

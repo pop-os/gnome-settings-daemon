@@ -59,8 +59,8 @@ Build-Depends: debhelper-compat (= 12),
 Standards-Version: 4.5.0
 XS-Debian-Vcs-Git: https://salsa.debian.org/gnome-team/gnome-settings-daemon.git
 XS-Debian-Vcs-Browser: https://salsa.debian.org/gnome-team/gnome-settings-daemon
-Vcs-Git: https://salsa.debian.org/gnome-team/gnome-settings-daemon.git -b ubuntu/master
-Vcs-Browser: https://salsa.debian.org/gnome-team/gnome-settings-daemon/tree/ubuntu/master
+Vcs-Git: https://salsa.debian.org/gnome-team/gnome-settings-daemon.git -b ubuntu/focal
+Vcs-Browser: https://salsa.debian.org/gnome-team/gnome-settings-daemon/tree/ubuntu/focal
 Rules-Requires-Root: no
 
 Package: gnome-settings-daemon
