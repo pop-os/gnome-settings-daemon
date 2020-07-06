@@ -1,4 +1,4 @@
-gnome-settings-daemon (3.36.1-1ubuntu2) UNRELEASED; urgency=medium
+gnome-settings-daemon (3.36.1-1ubuntu2) groovy; urgency=medium
 
   * debian/patches/git_cupsbrowsed_notification.patch:
     - Ignore 'Printer-added' notifications for queues created by
