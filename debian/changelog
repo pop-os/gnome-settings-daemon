@@ -1,8 +1,20 @@
 gnome-settings-daemon (3.37.0-1) UNRELEASED; urgency=medium
 
   * New upstream release
+    - Revamp of systemd service structure
+    - Media-keys
+      + Add static mapping for XF86RotationLockToggle
+      + Use heuristic to switch MPRIS clients
+    - Power
+      + Ambient light moving average now time-aware
+    - WWan
+      + Handle multiple devices
+      + Handle PUK unlocking
+    - Wacom
+      + Drop LED helper, handled by the kernel for long enough.
+  * control: Bump BDs per meson.build
 
- -- Iain Lane <laney@debian.org>  Wed, 19 Aug 2020 14:36:34 +0100
+ -- Iain Lane <laney@debian.org>  Wed, 19 Aug 2020 15:31:03 +0100
 
 gnome-settings-daemon (3.36.1-1) unstable; urgency=medium
 
