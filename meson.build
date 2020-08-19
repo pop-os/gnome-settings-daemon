@@ -1,8 +1,8 @@
 project(
   'gnome-settings-daemon', 'c',
-  version: '3.36.1',
+  version: '3.37.0',
   license: [ 'GPL2+', 'LGPLv2+' ],
-  meson_version: '>= 0.44.0'
+  meson_version: '>= 0.47.0'
 )
 
 gsd_version = meson.project_version()
@@ -12,6 +12,11 @@ gsd_major_version = version_array[0].to_int()
 gsd_api_version_minor = 0
 gsd_api_version = '@0@.@1@'.format(gsd_major_version, gsd_api_version_minor)
 gsd_api_name = '@0@-@1@'.format(meson.project_name(), gsd_api_version)
+
+glib_min_version = '2.56'
+
+glib_version_def = 'GLIB_VERSION_@0@_@1@'.format(
+    glib_min_version.split('.')[0], glib_min_version.split('.')[1])
 
 gsd_prefix = get_option('prefix')
 gsd_bindir = join_paths(gsd_prefix, get_option('bindir'))
@@ -66,7 +71,9 @@ if gsd_buildtype.contains('debug')
     '-Wnested-externs',
     '-Wno-strict-aliasing',
     '-Wno-sign-compare',
-    '-Wpointer-arith'
+    '-Wpointer-arith',
+    '-DGLIB_VERSION_MIN_REQUIRED=' + glib_version_def,
+    '-DGLIB_VERSION_MAX_ALLOWED=' + glib_version_def,
   ]
 
   compiler_flags = cc.get_supported_arguments(test_cflags)
@@ -82,7 +89,7 @@ endif
 
 add_project_arguments(common_flags + compiler_flags, language: 'c')
 
-glib_dep = dependency('glib-2.0', version: '>= 2.56')
+glib_dep = dependency('glib-2.0', version: '>=' + glib_min_version)
 colord_dep = dependency('colord', version: '>= 1.3.5')
 geocode_glib_dep = dependency('geocode-glib-1.0', version: '>= 3.10.0')
 gio_dep = dependency('gio-2.0', version: '>= 2.53.0')
@@ -104,14 +111,11 @@ x11_dep = dependency('x11')
 
 enable_systemd = get_option('systemd')
 if enable_systemd
-  systemd_dep = dependency('systemd', required: false)
+  systemd_dep = dependency('systemd', version: '>= 243', required: false)
   assert(systemd_dep.found(), 'Systemd support explicitly required, but systemd not found')
 
-  # XXX: Once https://github.com/systemd/systemd/issues/9595 is fixed and we can
-  # depend on this version, replace with something like:
-  #  systemduserunitdir = systemd_dep.get_pkgconfig_variable('systemduserunitdir')
-  # and uncomment systemd_dep below
-  systemd_userunitdir = join_paths(gsd_prefix, 'lib', 'systemd', 'user')
+   systemd_userunitdir = systemd_dep.get_pkgconfig_variable('systemduserunitdir',
+                                                            define_variable: ['prefix', gsd_prefix])
 endif
 
 m_dep = cc.find_library('m')
@@ -169,6 +173,8 @@ if enable_smartcard
     system_nssdb_dir = join_paths(gsd_sysconfdir, 'pki', 'nssdb')
   endif
 endif
+
+enable_usb_protection = get_option('usb-protection')
 
 # CUPS
 enable_cups = get_option('cups')
@@ -257,6 +263,7 @@ output += '        cflags:                   ' + ' '.join(compiler_flags) + '\n\
 output += '        ALSA support:             ' + enable_alsa.to_string() + '\n'
 output += '        NetworkManager support:   ' + enable_network_manager.to_string() + '\n'
 output += '        Smartcard support:        ' + enable_smartcard.to_string() + '\n'
+output += '        USB Protection support:   ' + enable_usb_protection.to_string() + '\n'
 output += '        Cups support:             ' + enable_cups.to_string() + '\n'
 output += '        Wayland support:          ' + enable_wayland.to_string() + '\n'
 output += '        Wacom support:            ' + enable_wacom.to_string() + '\n'
