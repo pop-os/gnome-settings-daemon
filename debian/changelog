@@ -1,3 +1,22 @@
+gnome-settings-daemon (3.37.0-1) experimental; urgency=medium
+
+  [ Iain Lane ]
+  * New upstream release
+    - Revamp of systemd service structure
+    - Media-keys
+      + Add static mapping for XF86RotationLockToggle
+      + Use heuristic to switch MPRIS clients
+    - Power
+      + Ambient light moving average now time-aware
+    - WWan
+      + Handle multiple devices
+      + Handle PUK unlocking
+    - Wacom
+      + Drop LED helper, handled by the kernel for long enough.
+  * control: Bump BDs per meson.build
+
+ -- Marco Trevisan (Treviño) <marco@ubuntu.com>  Thu, 27 Aug 2020 18:46:47 +0200
+
 gnome-settings-daemon (3.36.1-1ubuntu2) groovy; urgency=medium
 
   * debian/patches/git_cupsbrowsed_notification.patch:

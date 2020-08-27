@@ -79,10 +79,13 @@
 /* And the time before we stop the warning sound */
 #define GSD_STOP_SOUND_DELAY GSD_ACTION_DELAY - 2
 
-/* the amount of smoothing done to the the ambient light readings; a lower
- * number means the backlight changes slower in response to changing ambient
- * conditions, a hugher number may lead to noticable jitteryness */
-#define GSD_AMBIENT_SMOOTH          0.3f
+/* The bandwidth of the low-pass filter used to smooth ambient light readings,
+ * measured in Hz.  Smaller numbers result in smoother backlight changes.
+ * Larger numbers are more responsive to abrupt changes in ambient light. */
+#define GSD_AMBIENT_BANDWIDTH_HZ       0.1f
+
+/* Convert bandwidth to time constant.  Units of constant are microseconds. */
+#define GSD_AMBIENT_TIME_CONSTANT       (G_USEC_PER_SEC * 1.0f / (2.0f * G_PI * GSD_AMBIENT_BANDWIDTH_HZ))
 
 static const gchar introspection_xml[] =
 "<node>"
@@ -179,6 +182,7 @@ struct _GsdPowerManager
         gdouble                  ambient_norm_value;
         gdouble                  ambient_percentage_old;
         gdouble                  ambient_last_absolute;
+        gint64                   ambient_last_time;
 
         /* Sound */
         guint32                  critical_alert_timeout_id;
@@ -198,6 +202,7 @@ struct _GsdPowerManager
         guint                    idle_blank_id;
         guint                    idle_sleep_warning_id;
         guint                    idle_sleep_id;
+        guint                    user_active_id;
         GsdPowerIdleMode         current_idle_mode;
 
         guint                    temporary_unidle_on_ac_id;
@@ -452,6 +457,7 @@ engine_charge_low (GsdPowerManager *manager, UpDevice *device)
         gchar *tmp;
         gchar *remaining_text;
         gdouble percentage;
+        guint battery_level;
         char *icon_name;
         gint64 time_to_empty;
         UpDeviceKind kind;
@@ -461,8 +467,12 @@ engine_charge_low (GsdPowerManager *manager, UpDevice *device)
                       "kind", &kind,
                       "percentage", &percentage,
                       "time-to-empty", &time_to_empty,
+                      "battery-level", &battery_level,
                       "icon-name", &icon_name,
                       NULL);
+
+        if (battery_level == UP_DEVICE_LEVEL_UNKNOWN)
+                battery_level = UP_DEVICE_LEVEL_NONE;
 
         if (kind == UP_DEVICE_KIND_BATTERY) {
 
@@ -499,49 +509,70 @@ engine_charge_low (GsdPowerManager *manager, UpDevice *device)
                 title = _("Mouse battery low");
 
                 /* TRANSLATORS: tell user more details */
-                message = g_strdup_printf (_("Wireless mouse is low in power (%.0f%%)"), percentage);
+                if (battery_level == UP_DEVICE_LEVEL_NONE)
+                        message = g_strdup_printf (_("Wireless mouse is low in power (%.0f%%)"), percentage);
+                else
+                        message = g_strdup_printf (_("Wireless mouse is low in power"));
 
         } else if (kind == UP_DEVICE_KIND_KEYBOARD) {
                 /* TRANSLATORS: keyboard is getting a little low */
                 title = _("Keyboard battery low");
 
                 /* TRANSLATORS: tell user more details */
-                message = g_strdup_printf (_("Wireless keyboard is low in power (%.0f%%)"), percentage);
+                if (battery_level == UP_DEVICE_LEVEL_NONE)
+                        message = g_strdup_printf (_("Wireless keyboard is low in power (%.0f%%)"), percentage);
+                else
+                        message = g_strdup_printf (_("Wireless keyboard is low in power"));
 
         } else if (kind == UP_DEVICE_KIND_PDA) {
                 /* TRANSLATORS: PDA is getting a little low */
                 title = _("PDA battery low");
 
                 /* TRANSLATORS: tell user more details */
-                message = g_strdup_printf (_("PDA is low in power (%.0f%%)"), percentage);
+                if (battery_level == UP_DEVICE_LEVEL_NONE)
+                        message = g_strdup_printf (_("PDA is low in power (%.0f%%)"), percentage);
+                else
+                        message = g_strdup_printf (_("PDA is low in power"));
 
         } else if (kind == UP_DEVICE_KIND_PHONE) {
                 /* TRANSLATORS: cell phone (mobile) is getting a little low */
                 title = _("Cell phone battery low");
 
                 /* TRANSLATORS: tell user more details */
-                message = g_strdup_printf (_("Cell phone is low in power (%.0f%%)"), percentage);
+                if (battery_level == UP_DEVICE_LEVEL_NONE)
+                        message = g_strdup_printf (_("Cell phone is low in power (%.0f%%)"), percentage);
+                else
+                        message = g_strdup_printf (_("Cell phone is low in power"));
 
         } else if (kind == UP_DEVICE_KIND_MEDIA_PLAYER) {
                 /* TRANSLATORS: media player, e.g. mp3 is getting a little low */
                 title = _("Media player battery low");
 
                 /* TRANSLATORS: tell user more details */
-                message = g_strdup_printf (_("Media player is low in power (%.0f%%)"), percentage);
+                if (battery_level == UP_DEVICE_LEVEL_NONE)
+                        message = g_strdup_printf (_("Media player is low in power (%.0f%%)"), percentage);
+                else
+                        message = g_strdup_printf (_("Media player is low in power"));
 
         } else if (kind == UP_DEVICE_KIND_TABLET) {
                 /* TRANSLATORS: graphics tablet, e.g. wacom is getting a little low */
                 title = _("Tablet battery low");
 
                 /* TRANSLATORS: tell user more details */
-                message = g_strdup_printf (_("Tablet is low in power (%.0f%%)"), percentage);
+                if (battery_level == UP_DEVICE_LEVEL_NONE)
+                        message = g_strdup_printf (_("Tablet is low in power (%.0f%%)"), percentage);
+                else
+                        message = g_strdup_printf (_("Tablet is low in power"));
 
         } else if (kind == UP_DEVICE_KIND_COMPUTER) {
                 /* TRANSLATORS: computer, e.g. ipad is getting a little low */
                 title = _("Attached computer battery low");
 
                 /* TRANSLATORS: tell user more details */
-                message = g_strdup_printf (_("Attached computer is low in power (%.0f%%)"), percentage);
+                if (battery_level == UP_DEVICE_LEVEL_NONE)
+                        message = g_strdup_printf (_("Attached computer is low in power (%.0f%%)"), percentage);
+                else
+                        message = g_strdup_printf (_("Attached computer is low in power"));
         }
 
         /* close any existing notification of this class */
@@ -575,6 +606,7 @@ engine_charge_critical (GsdPowerManager *manager, UpDevice *device)
         gboolean ret;
         gchar *message = NULL;
         gdouble percentage;
+        guint battery_level;
         char *icon_name;
         gint64 time_to_empty;
         GsdPowerActionType policy;
@@ -584,9 +616,13 @@ engine_charge_critical (GsdPowerManager *manager, UpDevice *device)
         g_object_get (device,
                       "kind", &kind,
                       "percentage", &percentage,
+                      "battery-level", &battery_level,
                       "time-to-empty", &time_to_empty,
                       "icon-name", &icon_name,
                       NULL);
+
+        if (battery_level == UP_DEVICE_LEVEL_UNKNOWN)
+                battery_level = UP_DEVICE_LEVEL_NONE;
 
         if (kind == UP_DEVICE_KIND_BATTERY) {
 
@@ -633,26 +669,40 @@ engine_charge_critical (GsdPowerManager *manager, UpDevice *device)
                 title = _("Mouse battery low");
 
                 /* TRANSLATORS: the device is just going to stop working */
-                message = g_strdup_printf (_("Wireless mouse is very low in power (%.0f%%). "
-                                             "This device will soon stop functioning if not charged."),
-                                           percentage);
+                if (battery_level == UP_DEVICE_LEVEL_NONE)
+                        message = g_strdup_printf (_("Wireless mouse is very low in power (%.0f%%). "
+                                                     "This device will soon stop functioning if not charged."),
+                                                   percentage);
+                else
+                        message = g_strdup_printf (_("Wireless mouse is very low in power. "
+                                                     "This device will soon stop functioning if not charged."));
+
         } else if (kind == UP_DEVICE_KIND_KEYBOARD) {
                 /* TRANSLATORS: the keyboard battery is very low */
                 title = _("Keyboard battery low");
 
                 /* TRANSLATORS: the device is just going to stop working */
-                message = g_strdup_printf (_("Wireless keyboard is very low in power (%.0f%%). "
-                                             "This device will soon stop functioning if not charged."),
-                                           percentage);
+                if (battery_level == UP_DEVICE_LEVEL_NONE)
+                        message = g_strdup_printf (_("Wireless keyboard is very low in power (%.0f%%). "
+                                                     "This device will soon stop functioning if not charged."),
+                                                   percentage);
+                else
+                        message = g_strdup_printf (_("Wireless keyboard is very low in power. "
+                                                     "This device will soon stop functioning if not charged."));
+
         } else if (kind == UP_DEVICE_KIND_PDA) {
 
                 /* TRANSLATORS: the PDA battery is very low */
                 title = _("PDA battery low");
 
                 /* TRANSLATORS: the device is just going to stop working */
-                message = g_strdup_printf (_("PDA is very low in power (%.0f%%). "
-                                             "This device will soon stop functioning if not charged."),
-                                           percentage);
+                if (battery_level == UP_DEVICE_LEVEL_NONE)
+                        message = g_strdup_printf (_("PDA is very low in power (%.0f%%). "
+                                                     "This device will soon stop functioning if not charged."),
+                                                   percentage);
+                else
+                        message = g_strdup_printf (_("PDA is very low in power. "
+                                                     "This device will soon stop functioning if not charged."));
 
         } else if (kind == UP_DEVICE_KIND_PHONE) {
 
@@ -660,36 +710,56 @@ engine_charge_critical (GsdPowerManager *manager, UpDevice *device)
                 title = _("Cell phone battery low");
 
                 /* TRANSLATORS: the device is just going to stop working */
-                message = g_strdup_printf (_("Cell phone is very low in power (%.0f%%). "
-                                             "This device will soon stop functioning if not charged."),
-                                           percentage);
+                if (battery_level == UP_DEVICE_LEVEL_NONE)
+                        message = g_strdup_printf (_("Cell phone is very low in power (%.0f%%). "
+                                                     "This device will soon stop functioning if not charged."),
+                                                   percentage);
+                else
+                        message = g_strdup_printf (_("Cell phone is very low in power. "
+                                                     "This device will soon stop functioning if not charged."));
+
         } else if (kind == UP_DEVICE_KIND_MEDIA_PLAYER) {
 
                 /* TRANSLATORS: the cell battery is very low */
                 title = _("Cell phone battery low");
 
                 /* TRANSLATORS: the device is just going to stop working */
-                message = g_strdup_printf (_("Media player is very low in power (%.0f%%). "
-                                             "This device will soon stop functioning if not charged."),
-                                           percentage);
+                if (battery_level == UP_DEVICE_LEVEL_NONE)
+                        message = g_strdup_printf (_("Media player is very low in power (%.0f%%). "
+                                                     "This device will soon stop functioning if not charged."),
+                                                   percentage);
+                else
+                        message = g_strdup_printf (_("Media player is very low in power. "
+                                                     "This device will soon stop functioning if not charged."));
+
         } else if (kind == UP_DEVICE_KIND_TABLET) {
 
                 /* TRANSLATORS: the cell battery is very low */
                 title = _("Tablet battery low");
 
                 /* TRANSLATORS: the device is just going to stop working */
-                message = g_strdup_printf (_("Tablet is very low in power (%.0f%%). "
-                                             "This device will soon stop functioning if not charged."),
-                                           percentage);
+                if (battery_level == UP_DEVICE_LEVEL_NONE)
+                        message = g_strdup_printf (_("Tablet is very low in power (%.0f%%). "
+                                                     "This device will soon stop functioning if not charged."),
+                                                   percentage);
+                else
+                        message = g_strdup_printf (_("Tablet is very low in power. "
+                                                     "This device will soon stop functioning if not charged."));
+
         } else if (kind == UP_DEVICE_KIND_COMPUTER) {
 
                 /* TRANSLATORS: the cell battery is very low */
                 title = _("Attached computer battery low");
 
                 /* TRANSLATORS: the device is just going to stop working */
-                message = g_strdup_printf (_("Attached computer is very low in power (%.0f%%). "
-                                             "The device will soon shutdown if not charged."),
-                                           percentage);
+                if (battery_level == UP_DEVICE_LEVEL_NONE)
+                        message = g_strdup_printf (_("Attached computer is very low in power (%.0f%%). "
+                                                     "The device will soon shutdown if not charged."),
+                                                   percentage);
+                else
+                        message = g_strdup_printf (_("Attached computer is very low in power. "
+                                                     "The device will soon shutdown if not charged."));
+
         }
 
         /* close any existing notification of this class */
@@ -1004,13 +1074,15 @@ iio_proxy_claim_light (GsdPowerManager *manager, gboolean active)
          * Remove when iio-sensor-proxy sends events only to clients instead
          * of all listeners:
          * https://github.com/hadess/iio-sensor-proxy/issues/210 */
+
+        /* disconnect, otherwise callback can be added multiple times */
+        g_signal_handlers_disconnect_by_func (manager->iio_proxy,
+                                              G_CALLBACK (iio_proxy_changed_cb),
+                                              manager);
+
         if (active)
                 g_signal_connect (manager->iio_proxy, "g-properties-changed",
                                   G_CALLBACK (iio_proxy_changed_cb), manager);
-        else
-                g_signal_handlers_disconnect_by_func (manager->iio_proxy,
-                                                      G_CALLBACK (iio_proxy_changed_cb),
-                                                      manager);
 
         if (!g_dbus_proxy_call_sync (manager->iio_proxy,
                                      active ? "ClaimLight" : "ReleaseLight",
@@ -1526,10 +1598,14 @@ idle_set_mode (GsdPowerManager *manager, GsdPowerIdleMode mode)
         /* if we're moving to an idle mode, make sure
          * we add a watch to take us back to normal */
         if (mode != GSD_POWER_IDLE_MODE_NORMAL) {
-                gnome_idle_monitor_add_user_active_watch (manager->idle_monitor,
-                                                          idle_became_active_cb,
-                                                          manager,
-                                                          NULL);
+                if (manager->user_active_id < 1) {
+                    manager->user_active_id = gnome_idle_monitor_add_user_active_watch (manager->idle_monitor,
+                                                                                        idle_became_active_cb,
+                                                                                        manager,
+                                                                                        NULL);
+                    g_debug ("installing idle_became_active_cb to clear sleep warning when transitioning away from normal (%i)",
+                             manager->user_active_id);
+                }
         }
 
         /* save current brightness, and set dim level */
@@ -2107,6 +2183,15 @@ idle_triggered_idle_cb (GnomeIdleMonitor *monitor,
                 idle_set_mode_no_temp (manager, GSD_POWER_IDLE_MODE_SLEEP);
         } else if (watch_id == manager->idle_sleep_warning_id) {
                 show_sleep_warning (manager);
+
+                if (manager->user_active_id < 1) {
+                    manager->user_active_id = gnome_idle_monitor_add_user_active_watch (manager->idle_monitor,
+                                                                                        idle_became_active_cb,
+                                                                                        manager,
+                                                                                        NULL);
+                    g_debug ("installing idle_became_active_cb to clear sleep warning on activity (%i)",
+                             manager->user_active_id);
+                }
         }
 }
 
@@ -2117,7 +2202,7 @@ idle_became_active_cb (GnomeIdleMonitor *monitor,
 {
         GsdPowerManager *manager = GSD_POWER_MANAGER (user_data);
 
-        g_debug ("idletime reset");
+        g_debug ("idletime reset (%i)", watch_id);
 
         set_temporary_unidle_on_ac (manager, FALSE);
 
@@ -2125,6 +2210,7 @@ idle_became_active_cb (GnomeIdleMonitor *monitor,
         notify_close_if_showing (&manager->notification_sleep_warning);
 
         idle_set_mode (manager, GSD_POWER_IDLE_MODE_NORMAL);
+        manager->user_active_id = 0;
 }
 
 static void
@@ -2505,6 +2591,8 @@ iio_proxy_changed (GsdPowerManager *manager)
         GVariant *val_has = NULL;
         GVariant *val_als = NULL;
         gdouble brightness;
+        gdouble alpha;
+        gint64 current_time;
         gint pc;
 
         /* no display hardware */
@@ -2533,12 +2621,21 @@ iio_proxy_changed (GsdPowerManager *manager)
                 ch_backlight_renormalize (manager);
         }
 
-        /* calculate exponential moving average */
+        /* time-weighted constant for moving average */
+        current_time = g_get_monotonic_time();
+        if (manager->ambient_last_time)
+                alpha = 1.0f / (1.0f + (GSD_AMBIENT_TIME_CONSTANT / (current_time - manager->ambient_last_time)));
+        else
+                alpha = 0.0f;
+        manager->ambient_last_time = current_time;
+
+        /* calculate exponential weighted moving average */
         brightness = manager->ambient_last_absolute * 100.f / manager->ambient_norm_value;
         brightness = MIN (brightness, 100.f);
         brightness = MAX (brightness, 0.f);
-        manager->ambient_accumulator = (GSD_AMBIENT_SMOOTH * brightness) +
-                (1.0 - GSD_AMBIENT_SMOOTH) * manager->ambient_accumulator;
+
+        manager->ambient_accumulator = (alpha * brightness) +
+                (1.0 - alpha) * manager->ambient_accumulator;
 
         /* no valid readings yet */
         if (manager->ambient_accumulator < 0.f)
@@ -2645,6 +2742,7 @@ gsd_power_manager_start (GsdPowerManager *manager,
         manager->ambient_norm_value = -1.f;
         manager->ambient_percentage_old = -1.f;
         manager->ambient_last_absolute = -1.f;
+        manager->ambient_last_time = 0;
 
         gnome_settings_profile_end (NULL);
         return TRUE;
@@ -2776,6 +2874,7 @@ backlight_brightness_step_cb (GObject *object,
         GDBusMethodInvocation *invocation = G_DBUS_METHOD_INVOCATION (user_data);
         GsdPowerManager *manager;
         GError *error = NULL;
+        const char *connector;
         gint brightness;
 
         manager = g_object_get_data (G_OBJECT (invocation), "gsd-power-manager");
@@ -2789,10 +2888,12 @@ backlight_brightness_step_cb (GObject *object,
                 g_dbus_method_invocation_take_error (invocation,
                                                      error);
         } else {
+                connector = gsd_backlight_get_connector (backlight);
+
                 g_dbus_method_invocation_return_value (invocation,
                                                        g_variant_new ("(is)",
                                                                       brightness,
-                                                                      gsd_backlight_get_connector (backlight)));
+                                                                      connector ? connector : ""));
         }
 }
 
