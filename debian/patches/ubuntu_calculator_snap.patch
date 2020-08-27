@@ -6,10 +6,10 @@ Subject: teach gsd about the gnome-calculator snap .desktop name
  plugins/media-keys/gsd-media-keys-manager.c | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 
-Index: gnome-settings-daemon-3.36.1/plugins/media-keys/gsd-media-keys-manager.c
-===================================================================
---- gnome-settings-daemon-3.36.1.orig/plugins/media-keys/gsd-media-keys-manager.c
-+++ gnome-settings-daemon-3.36.1/plugins/media-keys/gsd-media-keys-manager.c
+diff --git a/plugins/media-keys/gsd-media-keys-manager.c b/plugins/media-keys/gsd-media-keys-manager.c
+index b9ad715..0b22706 100644
+--- a/plugins/media-keys/gsd-media-keys-manager.c
++++ b/plugins/media-keys/gsd-media-keys-manager.c
 @@ -2722,7 +2722,7 @@ do_action (GsdMediaKeysManager *manager,
                  do_media_action (manager, timestamp);
                  break;

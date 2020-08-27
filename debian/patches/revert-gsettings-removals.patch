@@ -470,7 +470,7 @@ index 0000000..9a1f330
 +  </schema>
 +</schemalist>
 diff --git a/data/org.gnome.settings-daemon.plugins.media-keys.gschema.xml.in b/data/org.gnome.settings-daemon.plugins.media-keys.gschema.xml.in
-index ac0a37e..a30bafc 100644
+index 5a05d7f..1466f84 100644
 --- a/data/org.gnome.settings-daemon.plugins.media-keys.gschema.xml.in
 +++ b/data/org.gnome.settings-daemon.plugins.media-keys.gschema.xml.in
 @@ -76,6 +76,11 @@
@@ -713,7 +713,7 @@ index ce45ac6..e91be62 100644
        <default>'grayscale'</default>
        <summary>Antialiasing</summary>
 diff --git a/po/POTFILES.in b/po/POTFILES.in
-index b9ff9a3..23275b3 100644
+index 1bd6ffc..5361119 100644
 --- a/po/POTFILES.in
 +++ b/po/POTFILES.in
 @@ -3,11 +3,16 @@

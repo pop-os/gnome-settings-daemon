@@ -1,10 +1,20 @@
+From: Ubuntu Desktop Team <ubuntu-desktop@lists.ubuntu.com>
+Date: Thu, 27 Aug 2020 19:08:16 +0200
+Subject: ubuntu_vino_handling
+
+# Description: restore support to handle to the vino service,
+
 # Description: restore support to handle to the vino service,
 # upstream considers it deprecated of favor of gnome-remote-desktop
 # but we don't have that yet
 # Ubuntu-bug: https://launchpad.net/bugs/1871787
 # Upstream: not-needed
+---
+ plugins/sharing/gsd-sharing-manager.c | 1 +
+ 1 file changed, 1 insertion(+)
+
 diff --git a/plugins/sharing/gsd-sharing-manager.c b/plugins/sharing/gsd-sharing-manager.c
-index ab3d83c..9e2381c 100644
+index 43067cc..761e05b 100644
 --- a/plugins/sharing/gsd-sharing-manager.c
 +++ b/plugins/sharing/gsd-sharing-manager.c
 @@ -98,6 +98,7 @@ static gpointer manager_object = NULL;

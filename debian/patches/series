@@ -10,4 +10,3 @@ revert-mediakeys-dbus-interface-drop.patch
 ubuntu_ibus_configs.patch
 ubuntu_calculator_snap.patch
 ubuntu_vino_handling.patch
-git_cupsbrowsed_notification.patch

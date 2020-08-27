@@ -1,3 +1,13 @@
+From: Ubuntu Desktop Team <ubuntu-desktop@lists.ubuntu.com>
+Date: Thu, 27 Aug 2020 19:08:16 +0200
+Subject: _debianize_xrdb
+
+---
+ plugins/xsettings/00-xrdb | 36 +++++++++++++++++++++++++++++++-----
+ 1 file changed, 31 insertions(+), 5 deletions(-)
+
+diff --git a/plugins/xsettings/00-xrdb b/plugins/xsettings/00-xrdb
+index a047e8b..7fc8492 100755
 --- a/plugins/xsettings/00-xrdb
 +++ b/plugins/xsettings/00-xrdb
 @@ -1,9 +1,35 @@
