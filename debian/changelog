@@ -1,4 +1,4 @@
-gnome-settings-daemon (3.37.0-1ubuntu1) UNRELEASED; urgency=medium
+gnome-settings-daemon (3.37.0-1ubuntu1) groovy; urgency=medium
 
   * Merge with debian, remaining changes:
     + debian/control.in:
@@ -23,7 +23,7 @@ gnome-settings-daemon (3.37.0-1ubuntu1) UNRELEASED; urgency=medium
       - Install apport hook
   * debian/patches: Refresh
 
- -- Marco Trevisan (Treviño) <marco@ubuntu.com>  Thu, 27 Aug 2020 19:14:33 +0200
+ -- Marco Trevisan (Treviño) <marco@ubuntu.com>  Fri, 28 Aug 2020 01:17:51 +0200
 
 gnome-settings-daemon (3.37.0-1) experimental; urgency=medium
 
