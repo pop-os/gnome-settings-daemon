@@ -1,3 +1,16 @@
+gnome-settings-daemon (3.37.92-1) UNRELEASED; urgency=medium
+
+  * New upstream release
+    - Translation updates
+    - USB protection: Relax the whitelist to all HIDs and hubs
+    - Translation updates
+    - WWAN: Translatable string improvements
+    - Media keys: Use well-known name for screencast proxy
+    - Xsettings: Fix race condition in fontconfig timestamp test
+    - Power: Drop lid switch inhibitor when session is inactive
+
+ -- Simon McVittie <smcv@debian.org>  Mon, 07 Sep 2020 14:55:44 +0100
+
 gnome-settings-daemon (3.37.0-1) experimental; urgency=medium
 
   [ Iain Lane ]
