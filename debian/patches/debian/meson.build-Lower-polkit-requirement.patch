@@ -10,10 +10,10 @@ Forwarded: not-needed
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/meson.build b/meson.build
-index b794652..f0aa4a8 100644
+index 65ddb98..af59200 100644
 --- a/meson.build
 +++ b/meson.build
-@@ -105,7 +105,7 @@ libgeoclue_dep = dependency('libgeoclue-2.0', version: '>= 2.3.1')
+@@ -104,7 +104,7 @@ libgeoclue_dep = dependency('libgeoclue-2.0', version: '>= 2.3.1')
  libnotify_dep = dependency('libnotify', version: '>= 0.7.3')
  libpulse_mainloop_glib_dep = dependency('libpulse-mainloop-glib', version: '>= 2.0')
  pango_dep = dependency('pango', version: '>= 1.20.0')

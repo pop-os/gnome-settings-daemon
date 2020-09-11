@@ -13,7 +13,7 @@ Subject: correct_logout_action
  1 file changed, 7 insertions(+), 1 deletion(-)
 
 diff --git a/plugins/media-keys/gsd-media-keys-manager.c b/plugins/media-keys/gsd-media-keys-manager.c
-index 9830d21..4edf555 100644
+index 8c38590..677a31a 100644
 --- a/plugins/media-keys/gsd-media-keys-manager.c
 +++ b/plugins/media-keys/gsd-media-keys-manager.c
 @@ -1168,6 +1168,12 @@ gnome_session_shutdown (GsdMediaKeysManager *manager)

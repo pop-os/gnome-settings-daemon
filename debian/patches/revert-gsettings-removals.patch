@@ -713,7 +713,7 @@ index ce45ac6..e91be62 100644
        <default>'grayscale'</default>
        <summary>Antialiasing</summary>
 diff --git a/po/POTFILES.in b/po/POTFILES.in
-index 1bd6ffc..5361119 100644
+index e721f52..db345ff 100644
 --- a/po/POTFILES.in
 +++ b/po/POTFILES.in
 @@ -3,11 +3,16 @@

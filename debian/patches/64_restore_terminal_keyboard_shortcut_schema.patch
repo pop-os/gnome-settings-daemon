@@ -38,7 +38,7 @@ index fb0c85c..5a05d7f 100644
        <default>['']</default>
        <summary>Launch web browser</summary>
 diff --git a/plugins/media-keys/gsd-media-keys-manager.c b/plugins/media-keys/gsd-media-keys-manager.c
-index d25f812..9830d21 100644
+index ae5411e..8c38590 100644
 --- a/plugins/media-keys/gsd-media-keys-manager.c
 +++ b/plugins/media-keys/gsd-media-keys-manager.c
 @@ -1132,6 +1132,22 @@ gnome_session_shutdown_cb (GObject *source_object,

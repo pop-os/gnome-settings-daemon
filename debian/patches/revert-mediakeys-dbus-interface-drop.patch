@@ -9,7 +9,7 @@ https://mail.gnome.org/archives/distributor-list/2017-April/msg00009.html
  1 file changed, 11 insertions(+)
 
 diff --git a/plugins/media-keys/gsd-media-keys-manager.c b/plugins/media-keys/gsd-media-keys-manager.c
-index 4edf555..b9ad715 100644
+index 677a31a..5307d79 100644
 --- a/plugins/media-keys/gsd-media-keys-manager.c
 +++ b/plugins/media-keys/gsd-media-keys-manager.c
 @@ -246,6 +246,7 @@ typedef struct
