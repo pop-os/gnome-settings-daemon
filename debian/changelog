@@ -1,3 +1,15 @@
+gnome-settings-daemon (3.38.0-1) experimental; urgency=medium
+
+  * Team upload
+  * New upstream stable release
+    - Translation updates
+  * Revert "watch: Find unstable versions"
+  * Continue to upload to experimental for now, so we can batch together
+    this and other core GNOME packages as part of #969321 when mozjs78
+    has passed through NEW
+
+ -- Simon McVittie <smcv@debian.org>  Mon, 14 Sep 2020 11:40:48 +0100
+
 gnome-settings-daemon (3.37.92-1ubuntu1) groovy; urgency=medium
 
   * Merge with debian, remaining changes:
