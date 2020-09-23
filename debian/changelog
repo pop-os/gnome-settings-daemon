@@ -1,3 +1,9 @@
+gnome-settings-daemon (3.38.0-1ubuntu1pop0) groovy; urgency=medium
+
+  * Pop!_OS patches
+
+ -- Jeremy Soller <jeremy@system76.com>  Wed, 23 Sep 2020 12:03:19 -0600
+
 gnome-settings-daemon (3.38.0-1ubuntu1) groovy; urgency=medium
 
   * Merge with debian, remaining changes:
