@@ -64,8 +64,8 @@ Depends: gnome-settings-daemon-common (= ${source:Version}),
          ${shlibs:Depends}
 Recommends: iio-sensor-proxy,
             pulseaudio,
+            usbguard,
             x11-xserver-utils
-Suggests: usbguard
 Breaks: afterstep (<< 2.2.12-11.1~),
         budgie-core (<< 10.4+git20171031.10.g9f71bb8-1.2~),
         cairo-dock (<< 3.4.1-1.2~),
