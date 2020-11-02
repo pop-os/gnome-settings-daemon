@@ -1,3 +1,18 @@
+From: Laurent Bigonville <bigon@debian.org>
+Date: Thu, 12 Mar 2020 18:05:51 +0100
+Subject: Debianize the 00-xrdb script
+
+In Debian, /etc/X11/Xresources is a directory, processing of ~/.Xresources
+is controlled by /etc/X11/Xsession.options, and xrdb is not a mandatory
+dependency.
+
+Forwarded: not-needed, Debian-specific
+---
+ plugins/xsettings/00-xrdb | 36 +++++++++++++++++++++++++++++++-----
+ 1 file changed, 31 insertions(+), 5 deletions(-)
+
+diff --git a/plugins/xsettings/00-xrdb b/plugins/xsettings/00-xrdb
+index a047e8b..7fc8492 100755
 --- a/plugins/xsettings/00-xrdb
 +++ b/plugins/xsettings/00-xrdb
 @@ -1,9 +1,35 @@
