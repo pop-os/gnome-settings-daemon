@@ -1,7 +1,12 @@
 gnome-settings-daemon (3.38.1-1) UNRELEASED; urgency=medium
 
-  * d/p/01_debianize_xrdb.patch: Add DEP-3 metadata
   * New upstream release
+    - Update gnome-volume-control with support for PulseAudio 14
+      (currently only in experimental, a binNMU will be required when
+      it arrives in unstable)
+    - Avoid unnecessary warnings from media-keys plugin
+    - Translation updates
+  * d/p/01_debianize_xrdb.patch: Add DEP-3 metadata
 
  -- Simon McVittie <smcv@debian.org>  Mon, 02 Nov 2020 09:45:35 +0000
 
