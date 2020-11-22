@@ -1,2 +1,8 @@
+Fix-crashing-when-atime-is-not-present.patch
+power-Avoid-automatic-logout-in-GDM-greeter.patch
+Update-Friulian-translation.patch
+power-Never-register-sleep-timeout-for-logout-in-GDM.patch
+Update-German-translation.patch
+usb-protection-Do-not-warn-about-ServiceUnknown-errors-fo.patch
 debian/01_debianize_xrdb.patch
 debian/meson.build-Lower-polkit-requirement.patch

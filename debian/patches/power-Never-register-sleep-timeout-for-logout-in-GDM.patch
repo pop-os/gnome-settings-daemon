@@ -1,0 +1,47 @@
+From: Benjamin Berg <bberg@redhat.com>
+Date: Tue, 27 Oct 2020 10:20:34 +0100
+Subject: power: Never register sleep timeout for logout in GDM
+
+We already suppress logout actions in GDM (10aa1714b05b, power: Avoid
+automatic logout in GDM/greeter). However, while this prevents the
+action, we may still warn.
+
+Change it so that the corresponding timeouts will never be registered.
+Leave the guard in gnome_session_logout but add a warning as we should
+never be hitting that code path.
+
+Origin: upstream, 3.39.0, commit:c1f141033c1d8e77748b1fee8a1f4b053d8935ab
+---
+ plugins/power/gsd-power-manager.c | 11 ++++++++++-
+ 1 file changed, 10 insertions(+), 1 deletion(-)
+
+diff --git a/plugins/power/gsd-power-manager.c b/plugins/power/gsd-power-manager.c
+index cecd53f..e45a24e 100644
+--- a/plugins/power/gsd-power-manager.c
++++ b/plugins/power/gsd-power-manager.c
+@@ -985,8 +985,10 @@ static void
+ gnome_session_logout (GsdPowerManager *manager,
+                       guint            logout_mode)
+ {
+-        if (g_getenv("RUNNING_UNDER_GDM"))
++        if (g_getenv ("RUNNING_UNDER_GDM")) {
++                g_warning ("Prevented logout from GDM session! This indicates an issue in gsd-power.");
+                 return;
++        }
+ 
+         g_dbus_proxy_call (G_DBUS_PROXY (manager->session),
+                            "Logout",
+@@ -1808,6 +1810,13 @@ idle_configure (GsdPowerManager *manager)
+                 timeout_sleep = 0;
+         }
+ 
++        /* don't do any automatic logout if we are in GDM */
++        if (g_getenv ("RUNNING_UNDER_GDM") &&
++            (action_type == GSD_POWER_ACTION_LOGOUT)) {
++                g_debug ("Ignoring sleep timeout with logout action inside GDM");
++                timeout_sleep = 0;
++        }
++
+         if (timeout_sleep != 0) {
+                 g_debug ("setting up sleep callback %is", timeout_sleep);
+ 
