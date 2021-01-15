@@ -10,7 +10,7 @@ Change it so that the corresponding timeouts will never be registered.
 Leave the guard in gnome_session_logout but add a warning as we should
 never be hitting that code path.
 
-Origin: upstream, 3.39.0, commit:c1f141033c1d8e77748b1fee8a1f4b053d8935ab
+Origin: upstream, 3.38.2, commit:c1f141033c1d8e77748b1fee8a1f4b053d8935ab
 ---
  plugins/power/gsd-power-manager.c | 11 ++++++++++-
  1 file changed, 10 insertions(+), 1 deletion(-)

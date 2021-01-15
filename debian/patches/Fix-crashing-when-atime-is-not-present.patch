@@ -2,11 +2,13 @@ From: Jing Wang <99jingw@gmail.com>
 Date: Sat, 10 Oct 2020 16:06:33 -0400
 Subject: Fix crashing when atime is not present
 
-Recent changes to gio omit the atime instead of setting it to an out of range value.
+Recent changes to gio omit the atime instead of setting it to an out of
+range value.
 
-Fixes #556, but note this doesn't fix the fact that gio omitted atime on a system where atime should have been available.
+Fixes #556, but note this doesn't fix the fact that gio omitted atime
+on a system where atime should have been available.
 
-Origin: upstream, 3.39.0, commit:647c0af7779757b18708a07b7cfc95e6b1bc79f0
+Origin: upstream, 3.38.2, commit:647c0af7779757b18708a07b7cfc95e6b1bc79f0
 ---
  plugins/housekeeping/gsd-housekeeping-manager.c | 37 +++++++++++++++----------
  1 file changed, 23 insertions(+), 14 deletions(-)

@@ -2,7 +2,7 @@ From: Fabio Tomat <f.t.public@gmail.com>
 Date: Sun, 18 Oct 2020 14:42:12 +0000
 Subject: Update Friulian translation
 
-Origin: upstream, 3.39.0, commit:e48ac6f519c8353b90d9733e15645dfe5612e656
+Origin: upstream, 3.38.2, commit:e48ac6f519c8353b90d9733e15645dfe5612e656
 ---
  po/fur.po | 112 +++++++++++++++++++++++++-------------------------------------
  1 file changed, 45 insertions(+), 67 deletions(-)

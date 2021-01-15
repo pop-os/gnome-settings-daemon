@@ -2,7 +2,7 @@ From: Tim Sabsch <tim@sabsch.com>
 Date: Sun, 1 Nov 2020 13:57:32 +0000
 Subject: Update German translation
 
-Origin: upstream, 3.39.0, commit:23763dfec62ff80fb7f04f39c107b1ab45296705
+Origin: upstream, 3.38.2, commit:23763dfec62ff80fb7f04f39c107b1ab45296705
 ---
  po/de.po | 53 ++++++++++++++++++++++++-----------------------------
  1 file changed, 24 insertions(+), 29 deletions(-)

@@ -5,9 +5,8 @@ Subject: usb-protection: Do not warn about ServiceUnknown errors for USBGuard
 It is expected for USBGuard to not be installed on many systems. We
 should not warn about that DBus error, as it does not indicate an issue.
 
-Closes: #567
-
-Origin: upstream, 3.39.0, commit:affebf890fdc032f246490f6bcd8f2c7777c7be1
+Bug: https://gitlab.gnome.org/GNOME/gnome-settings-daemon/-/issues/567
+Origin: upstream, 3.38.2, commit:affebf890fdc032f246490f6bcd8f2c7777c7be1
 ---
  plugins/usb-protection/gsd-usb-protection-manager.c | 3 ++-
  1 file changed, 2 insertions(+), 1 deletion(-)

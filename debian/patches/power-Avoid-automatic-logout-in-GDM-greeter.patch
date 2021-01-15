@@ -11,7 +11,7 @@ the keyboard plugin currently. So doing this is likely sane, even if we
 probably want a more elegant strategy to detect whether we are in a
 "login" session.
 
-Origin: upstream, 3.39.0, commit:10aa1714b05b9834bae7b31e49742baf707b35cb
+Origin: upstream, 3.38.2, commit:10aa1714b05b9834bae7b31e49742baf707b35cb
 ---
  plugins/power/gsd-power-manager.c | 3 +++
  1 file changed, 3 insertions(+)
