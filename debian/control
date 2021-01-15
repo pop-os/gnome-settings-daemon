@@ -115,6 +115,7 @@ Description: daemon handling the GNOME session settings - common files
 Package: gnome-settings-daemon-dev
 Section: libdevel
 Architecture: any
+Multi-Arch: same
 Depends: libglib2.0-dev (>= 2.56),
          ${misc:Depends},
          ${shlibs:Depends}
