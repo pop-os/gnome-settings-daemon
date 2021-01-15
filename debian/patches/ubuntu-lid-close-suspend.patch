@@ -8,10 +8,10 @@ This reverts commit 58cb4eee64bbd8ca43111b1f80fdaacde8ad5f12.
  ...me.settings-daemon.plugins.power.gschema.xml.in | 22 ++++++++++++++++++++++
  1 file changed, 22 insertions(+)
 
-diff --git a/data/org.gnome.settings-daemon.plugins.power.gschema.xml.in b/data/org.gnome.settings-daemon.plugins.power.gschema.xml.in
-index 93c704e..7984f16 100644
---- a/data/org.gnome.settings-daemon.plugins.power.gschema.xml.in
-+++ b/data/org.gnome.settings-daemon.plugins.power.gschema.xml.in
+Index: gnome-settings-daemon/data/org.gnome.settings-daemon.plugins.power.gschema.xml.in
+===================================================================
+--- gnome-settings-daemon.orig/data/org.gnome.settings-daemon.plugins.power.gschema.xml.in
++++ gnome-settings-daemon/data/org.gnome.settings-daemon.plugins.power.gschema.xml.in
 @@ -31,6 +31,28 @@
        <summary>Whether to hibernate, suspend or do nothing when inactive</summary>
        <description>The type of sleeping that should be performed when the computer is inactive.</description>

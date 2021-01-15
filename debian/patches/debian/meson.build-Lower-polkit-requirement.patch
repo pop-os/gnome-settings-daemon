@@ -10,7 +10,7 @@ Forwarded: not-needed
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/meson.build b/meson.build
-index 82c4159..5b6f4bc 100644
+index 7dbee64..7acf80a 100644
 --- a/meson.build
 +++ b/meson.build
 @@ -104,7 +104,7 @@ libgeoclue_dep = dependency('libgeoclue-2.0', version: '>= 2.3.1')

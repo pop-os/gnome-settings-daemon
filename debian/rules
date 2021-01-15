@@ -12,6 +12,7 @@ CONFFLAGS = \
 	-Drfkill=false \
 	-Dnetwork_manager=false \
 	-Dalsa=false \
+	-Dcolord=false \
 	-Dsystemd=false
 endif
 

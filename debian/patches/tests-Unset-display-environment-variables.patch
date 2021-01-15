@@ -1,0 +1,29 @@
+From: Benjamin Berg <bberg@redhat.com>
+Date: Wed, 25 Nov 2020 18:11:31 +0100
+Subject: tests: Unset display environment variables
+
+The environment variables were not correctly cleared. Fix this and also
+make sure that we don't have the GNOME_SETUP_DISPLAY environment
+variable leaking in from the outside.
+
+Origin: upstream, 3.38.2, commit:cdd42298d6c154f71fdb0a294b117877a4965551
+---
+ tests/x11session.py | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
+
+diff --git a/tests/x11session.py b/tests/x11session.py
+index ff2d389..7fb0b83 100644
+--- a/tests/x11session.py
++++ b/tests/x11session.py
+@@ -94,7 +94,10 @@ class X11SessionTestCase(DBusTestCase):
+         klass.X_display = display
+         # Export information into our environment for tests to use
+         os.environ['DISPLAY'] = ":%d" % klass.X_display
+-        os.environ['WAYLAND'] = ''
++        if 'GNOME_SETUP_DISPLAY' in os.environ:
++            del os.environ['GNOME_SETUP_DISPLAY']
++        if 'WAYLAND_DISPLAY' in os.environ:
++            del os.environ['WAYLAND_DISPLAY']
+ 
+         # Server should still be up and running at this point
+         assert klass.xorg.poll() is None

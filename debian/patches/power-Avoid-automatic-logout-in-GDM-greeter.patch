@@ -1,0 +1,32 @@
+From: Benjamin Berg <bberg@redhat.com>
+Date: Thu, 15 Oct 2020 15:18:35 +0200
+Subject: power: Avoid automatic logout in GDM/greeter
+
+In GDM sessions (greeter, initial-setup), it does not make sense to
+automatically logout. This can happen if the system wide default is
+changed to default to the "logout" action.
+
+Note that we already use the RUNNING_UNDER_GDM environment variable in
+the keyboard plugin currently. So doing this is likely sane, even if we
+probably want a more elegant strategy to detect whether we are in a
+"login" session.
+
+Origin: upstream, 3.38.2, commit:10aa1714b05b9834bae7b31e49742baf707b35cb
+---
+ plugins/power/gsd-power-manager.c | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/plugins/power/gsd-power-manager.c b/plugins/power/gsd-power-manager.c
+index 0e65bd2..cecd53f 100644
+--- a/plugins/power/gsd-power-manager.c
++++ b/plugins/power/gsd-power-manager.c
+@@ -985,6 +985,9 @@ static void
+ gnome_session_logout (GsdPowerManager *manager,
+                       guint            logout_mode)
+ {
++        if (g_getenv("RUNNING_UNDER_GDM"))
++                return;
++
+         g_dbus_proxy_call (G_DBUS_PROXY (manager->session),
+                            "Logout",
+                            g_variant_new ("(u)", logout_mode),

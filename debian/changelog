@@ -1,3 +1,62 @@
+gnome-settings-daemon (3.38.1-3) unstable; urgency=medium
+
+  * Team upload
+
+  [ Laurent Bigonville ]
+  * Disable colord support on non-linux architectures
+
+  [ Simon McVittie ]
+  * Update to upstream git commit
+    GNOME_SETTINGS_DAEMON_3_38_1-15-g6018dd49 from the gnome-3-38 branch
+    - Avoid warning about wireless input devices' low battery levels every
+      time they reconnect, which can be frequent
+    - Reduce memory use of gsd-datetime plugin
+    - Unit test fixes
+    - Translation updates
+  * Standards-Version: 4.5.1 (no changes required)
+  * Use upstream/3.38.x git branch.
+    Upstream has branched for GNOME 40.
+  * Mark g-s-d-dev as Multi-Arch: same.
+    Move the pkg-config metadata to /usr/share/pkgconfig to allow for
+    cross-compilation. There is actually nothing architecture-specific in
+    g-s-d-dev itself, but it depends on libglib2.0-dev, so leave it as
+    Architecture: any to get the right transitive dependency.
+
+ -- Simon McVittie <smcv@debian.org>  Fri, 15 Jan 2021 09:56:54 +0000
+
+gnome-settings-daemon (3.38.1-2) unstable; urgency=medium
+
+  * Team upload
+  * d/patches: Update from upstream git commit
+    GNOME_SETTINGS_DAEMON_3_38_1-6-gaffebf89
+    - Fix a crash if a filesystem does not provide atime
+    - If system-wide power management idle action is set to log out,
+      ignore it in the gdm greeter (for which logging out makes no sense)
+    - Silence unnecessary warnings if usbguard is not installed
+    - Translation updates
+
+ -- Simon McVittie <smcv@debian.org>  Mon, 23 Nov 2020 10:14:55 +0000
+
+gnome-settings-daemon (3.38.1-1) unstable; urgency=medium
+
+  * Team upload
+  * New upstream release
+    - Update gnome-volume-control with support for PulseAudio 14
+      (currently only in experimental, a binNMU will be required when
+      it arrives in unstable)
+    - Avoid unnecessary warnings from media-keys plugin
+    - Translation updates
+  * d/p/01_debianize_xrdb.patch: Add DEP-3 metadata
+
+ -- Simon McVittie <smcv@debian.org>  Mon, 02 Nov 2020 10:26:54 +0000
+
+gnome-settings-daemon (3.38.0-2) unstable; urgency=medium
+
+  * Team upload
+  * Release to unstable
+
+ -- Simon McVittie <smcv@debian.org>  Fri, 25 Sep 2020 10:24:13 +0100
+
 gnome-settings-daemon (3.38.0-1ubuntu1) groovy; urgency=medium
 
   * Merge with debian, remaining changes:
