@@ -1,10 +1,10 @@
-gnome-settings-daemon (3.38.1-3ubuntu2) UNRELEASED; urgency=medium
+gnome-settings-daemon (3.38.1-3ubuntu2) hirsute; urgency=medium
 
   * debian/patches/ubuntu_vino_handling.patch:
     - remove the patch bringing back the vino desktop sharing since
       gnome-remote-desktop support is enabled in Ubuntu now
 
- -- Sebastien Bacher <seb128@ubuntu.com>  Tue, 09 Feb 2021 14:50:03 +0100
+ -- Sebastien Bacher <seb128@ubuntu.com>  Tue, 09 Feb 2021 15:26:10 +0100
 
 gnome-settings-daemon (3.38.1-3ubuntu1) hirsute; urgency=medium
 
