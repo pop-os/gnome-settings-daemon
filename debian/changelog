@@ -1,3 +1,11 @@
+gnome-settings-daemon (3.38.1-3ubuntu3) UNRELEASED; urgency=medium
+
+  * debian/patches: Support smartcard reders via p11kit API (LP: #1865226)
+  * debian/control: Build depend on libgck-1-dev and remove nss dependency
+    (LP: #1865226)
+
+ -- Marco Trevisan (Treviño) <marco@ubuntu.com>  Thu, 25 Feb 2021 04:53:17 +0100
+
 gnome-settings-daemon (3.38.1-3ubuntu2) hirsute; urgency=medium
 
   * debian/patches/ubuntu_vino_handling.patch:
