@@ -23,3 +23,11 @@ revert-gsettings-removals.patch
 revert-mediakeys-dbus-interface-drop.patch
 ubuntu_ibus_configs.patch
 ubuntu_calculator_snap.patch
+smartcard-Rewrite-to-use-p11-kit-backend-via-Gck-APIs.patch
+smartcard-manager-Use-Blocking-wait-for-slot-event-if-ava.patch
+smartcard-manager-Only-sync-token-state-if-it-really-chan.patch
+smarcard-utils-Free-the-type-name-when-registering-domain.patch
+smartcard-service-Unown-the-name-on-dispose.patch
+smartcard-Use-autopointers.patch
+smartcard-manager-Use-mutex-auto-lockers-when-convenient.patch
+smarcard-Add-utility-function-to-get-the-login-token-name.patch

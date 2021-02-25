@@ -7,10 +7,10 @@ Subject: teach gsd about the gnome-calculator snap .desktop name
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/plugins/media-keys/gsd-media-keys-manager.c b/plugins/media-keys/gsd-media-keys-manager.c
-index 5307d79..a1d1d95 100644
+index eefb2f1..12779f0 100644
 --- a/plugins/media-keys/gsd-media-keys-manager.c
 +++ b/plugins/media-keys/gsd-media-keys-manager.c
-@@ -2722,7 +2722,7 @@ do_action (GsdMediaKeysManager *manager,
+@@ -2730,7 +2730,7 @@ do_action (GsdMediaKeysManager *manager,
                  do_media_action (manager, timestamp);
                  break;
          case CALCULATOR_KEY:
