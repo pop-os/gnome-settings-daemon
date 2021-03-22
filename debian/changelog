@@ -1,3 +1,9 @@
+gnome-settings-daemon (3.38.1-3ubuntu3pop0) hirsute; urgency=medium
+
+  * Pop!_OS patches
+
+ -- Jeremy Soller <jeremy@system76.com>  Mon, 22 Mar 2021 14:11:35 -0600
+
 gnome-settings-daemon (3.38.1-3ubuntu3) hirsute; urgency=medium
 
   * debian/patches: Support smartcard reders via p11kit API (LP: #1865226)
