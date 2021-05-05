@@ -1,16 +1,2 @@
-Fix-crashing-when-atime-is-not-present.patch
-power-Avoid-automatic-logout-in-GDM-greeter.patch
-Update-Friulian-translation.patch
-power-Never-register-sleep-timeout-for-logout-in-GDM.patch
-Update-German-translation.patch
-usb-protection-Do-not-warn-about-ServiceUnknown-errors-fo.patch
-Update-Romanian-translation.patch
-Update-Norwegian-Bokm-l-translation.patch
-power-Don-t-warn-more-than-once-per-warning-level-for-dev.patch
-Update-Catalan-translation.patch
-datetime-Query-GWeather-DB-on-the-fly-instead-of-caching.patch
-datetime-Load-Olson-DB-on-the-fly-instead-of-caching-it.patch
-tests-Unset-display-environment-variables.patch
-Update-Norwegian-Bokm-l-translation-1.patch
 debian/01_debianize_xrdb.patch
 debian/meson.build-Lower-polkit-requirement.patch
