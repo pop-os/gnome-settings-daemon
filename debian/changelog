@@ -1,8 +1,13 @@
 gnome-settings-daemon (3.38.2-1) UNRELEASED; urgency=medium
 
   * New upstream release
+    - Set unbuffered mode to read /dev/rfkill, fixing rfkill monitoring
+      on some kernel versions
+    - Translation update: sr
+    - Various other changes were already in 3.38.1-3
+  * Drop patches that came from upstream
 
- -- Simon McVittie <smcv@debian.org>  Wed, 05 May 2021 01:15:35 +0100
+ -- Simon McVittie <smcv@debian.org>  Wed, 05 May 2021 01:16:48 +0100
 
 gnome-settings-daemon (3.38.1-3) unstable; urgency=medium
 
