@@ -13,7 +13,8 @@ CONFFLAGS = \
 	-Dnetwork_manager=false \
 	-Dalsa=false \
 	-Dcolord=false \
-	-Dsystemd=false
+	-Dsystemd=false \
+	-Dwwan=false
 endif
 
 override_dh_auto_configure:
