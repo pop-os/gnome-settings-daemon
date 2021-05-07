@@ -13,7 +13,9 @@ CONFFLAGS = \
 	-Dnetwork_manager=false \
 	-Dalsa=false \
 	-Dcolord=false \
+	-Dgudev=false \
 	-Dsystemd=false \
+	-Dwayland=false \
 	-Dwwan=false
 endif
 
