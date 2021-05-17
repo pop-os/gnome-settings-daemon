@@ -1,3 +1,21 @@
+gnome-settings-daemon (3.38.2-1ubuntu1) UNRELEASED; urgency=medium
+
+  * New upstream version merged from Debian
+
+ -- Sebastien Bacher <seb128@ubuntu.com>  Mon, 17 May 2021 15:26:52 +0200
+
+gnome-settings-daemon (3.38.2-1) unstable; urgency=medium
+
+  * Team upload
+  * New upstream release
+    - Set unbuffered mode to read /dev/rfkill, fixing rfkill monitoring
+      on some kernel versions
+    - Translation update: sr
+    - Various other changes were already in 3.38.1-3
+  * Drop patches that came from upstream
+
+ -- Simon McVittie <smcv@debian.org>  Wed, 05 May 2021 21:38:31 +0100
+
 gnome-settings-daemon (3.38.1-3ubuntu3) hirsute; urgency=medium
 
   * debian/patches: Support smartcard reders via p11kit API (LP: #1865226)
