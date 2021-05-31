@@ -1,3 +1,13 @@
+gnome-settings-daemon (40.0.1-1) UNRELEASED; urgency=medium
+
+  * New upstream release:
+    - Remove screenshot sound feedback, performed by gnome-shell
+    - Make use of new gweather API
+    - Use font aa/hinting/rgba-order from gsettings-desktop-schemas
+    - Use mouse drag-threshold/double-click from gsettings-desktop-schemas
+
+ -- Marco Trevisan (Treviño) <marco@ubuntu.com>  Mon, 31 May 2021 14:26:21 +0200
+
 gnome-settings-daemon (3.38.2-1) unstable; urgency=medium
 
   * Team upload
