@@ -1,6 +1,6 @@
 From: Ubuntu Desktop Team <ubuntu-desktop@lists.ubuntu.com>
 Date: Thu, 26 Jul 2018 16:19:06 +0100
-Subject: _restore_terminal_keyboard_shortcut_schema
+Subject: media-keys: restore terminal keyboard shortcut schema
 
 ---
  ...settings-daemon.plugins.media-keys.gschema.xml.in | 10 ++++++++++

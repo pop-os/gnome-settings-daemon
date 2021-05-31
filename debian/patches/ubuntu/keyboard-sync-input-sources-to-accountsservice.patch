@@ -1,6 +1,6 @@
 From: Ubuntu Desktop Team <ubuntu-desktop@lists.ubuntu.com>
 Date: Thu, 26 Jul 2018 16:19:06 +0100
-Subject: _sync_input_sources_to_accountsservice
+Subject: keyboard: sync input sources to accountsservice
 
 ---
  meson.build                             |  1 +
@@ -9,7 +9,7 @@ Subject: _sync_input_sources_to_accountsservice
  3 files changed, 80 insertions(+), 1 deletion(-)
 
 diff --git a/meson.build b/meson.build
-index 9b81db3..f5fccb4 100644
+index 04f9bf6..72f34be 100644
 --- a/meson.build
 +++ b/meson.build
 @@ -90,6 +90,7 @@ endif

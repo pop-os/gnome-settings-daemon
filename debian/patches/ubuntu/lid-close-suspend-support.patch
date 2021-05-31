@@ -1,7 +1,7 @@
 From: Tim Lunn <tim@feathertop.org>
 Date: Sun, 14 Jul 2013 10:30:08 +1000
-Subject: [PATCH] Revert "Remove unused settings" and add a
- 'handle-lid-switch'  inhibitor based on lid-close-*-action settings.
+Subject: Revert "Remove unused settings" and add a 'handle-lid-switch'
+  inhibitor based on lid-close-*-action settings.
 
 This reverts commit 58cb4eee64bbd8ca43111b1f80fdaacde8ad5f12.
 ---

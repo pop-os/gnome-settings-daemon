@@ -1,13 +1,11 @@
 From: Ubuntu Desktop Team <ubuntu-desktop@lists.ubuntu.com>
 Date: Thu, 26 Jul 2018 16:19:06 +0100
-Subject: correct_logout_action
+Subject: media-keys: correct logout action
 
-# Description: let the logout key do what it's supposed to do
-# Ubuntu: https://launchpad.net/bugs/961501
-# Upstream: https://bugzilla.gnome.org/show_bug.cgi?id=671979
-# Description: let the logout key do what it's supposed to do
-# Ubuntu: https://launchpad.net/bugs/961501
-# Upstream: https://bugzilla.gnome.org/show_bug.cgi?id=671979
+let the logout key do what it's supposed to do
+
+Bug-Ubuntu: https://launchpad.net/bugs/961501
+Bug-GNOME: https://bugzilla.gnome.org/show_bug.cgi?id=671979
 ---
  plugins/media-keys/gsd-media-keys-manager.c | 8 +++++++-
  1 file changed, 7 insertions(+), 1 deletion(-)

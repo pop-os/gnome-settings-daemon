@@ -1,9 +1,10 @@
 From: Ubuntu Desktop Team <ubuntu-desktop@lists.ubuntu.com>
 Date: Thu, 26 Jul 2018 16:19:06 +0100
-Subject: _suppress-printer-may-not-be-connected-notification
+Subject: print-notifications: suppress printer may not be connected
+ notification
 
-# Ubuntu: https://launchpad.net/bugs/842768
-# Ubuntu: https://launchpad.net/bugs/842768
+ # Ubuntu: https://launchpad.net/bugs/842768
+ # Ubuntu: https://launchpad.net/bugs/842768
 ---
  plugins/print-notifications/gsd-print-notifications-manager.c | 6 +++---
  1 file changed, 3 insertions(+), 3 deletions(-)
