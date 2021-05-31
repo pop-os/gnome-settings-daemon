@@ -4,9 +4,6 @@ debian/meson.build-Lower-polkit-requirement.patch
 53_sync_input_sources_to_accountsservice.patch
 64_restore_terminal_keyboard_shortcut_schema.patch
 correct_logout_action.patch
-ubuntu-lid-close-suspend.patch
-ubuntu_ibus_configs.patch
-ubuntu_calculator_snap.patch
 p11-kit/smartcard-Rewrite-to-use-p11-kit-backend-via-Gck-APIs.patch
 p11-kit/smartcard-manager-Use-Blocking-wait-for-slot-event-if-ava.patch
 p11-kit/smartcard-manager-Only-sync-token-state-if-it-really-chan.patch
@@ -15,3 +12,7 @@ p11-kit/smartcard-service-Unown-the-name-on-dispose.patch
 p11-kit/smartcard-Use-autopointers.patch
 p11-kit/smartcard-manager-Use-mutex-auto-lockers-when-convenient.patch
 p11-kit/smarcard-Add-utility-function-to-get-the-login-token-name.patch
+ubuntu/ubuntu-lid-close-suspend.patch
+ubuntu/ubuntu_ibus_configs.patch
+ubuntu/calculator_snap.patch
+
