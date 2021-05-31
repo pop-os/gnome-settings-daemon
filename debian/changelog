@@ -1,3 +1,38 @@
+gnome-settings-daemon (40.0.1-1ubuntu1) UNRELEASED; urgency=medium
+
+  * Merged with debian, including new upstream release
+  * debian/control: Follow debian and mark x11-xserver-utils as recommended
+  * d/p/revert-gsettings-removals.patch:
+    - Drop, u-s-d moved to their own namespace
+  * d/p/revert-mediakeys-dbus-interface-drop.patch:
+    - Drop, no need to stay compatible
+  * debian/patches:
+    - Move smartcard p11-kit support under such namespace
+    - Reorganize moving them in the ubuntu topic
+      And use gbp to generate nicer names instead
+  * debian/source_gnome-settings-daemon.py:
+    Compute libdir version number dynamically.
+    The g-s-d library version will now change at each major version update,
+    so compute it from the package version instead of hardcoding it.
+  * Remaining changes with debian:
+    + debian/control.in:
+      - Build-depend on accountsservice
+      - Drop build-dependency on libnss-dev and add to libgck-1-dev
+    + debian/patches/ubuntu:
+      - keyboard-sync-input-sources-to-accountsservice.patch
+      - keyboard-Use-ibus-sources-from-locale.patch
+      - lid-close-suspend-support.patch
+      - media-keys-correct-logout-action.patch
+      - media-keys-restore-terminal-keyboard-shortcut-schema.patch
+      - print-notifications-suppress-printer-may-not-be-connected.patch
+      - teach-gsd-about-the-gnome-calculator-snap-.desktop-name.patch
+    + debian/patches/p11-kit:
+      - Use p11-kit (via gck) as smartcards backend
+    + debian/gnome-settings-daemon.install:
+      - Install apport hook
+
+ -- Marco Trevisan (Treviño) <marco@ubuntu.com>  Mon, 31 May 2021 22:01:10 +0200
+
 gnome-settings-daemon (40.0.1-1) experimental; urgency=medium
 
   * New upstream release:
