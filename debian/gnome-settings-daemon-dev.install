@@ -1,2 +1,2 @@
-usr/include
+usr/include/gnome-settings-daemon-${env:GSD_MAJOR_VERSION}
 usr/lib/pkgconfig/gnome-settings-daemon.pc usr/share/pkgconfig
