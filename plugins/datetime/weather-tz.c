@@ -25,26 +25,18 @@
 #define GWEATHER_I_KNOW_THIS_IS_UNSTABLE
 #include <libgweather/gweather.h>
 
-struct _WeatherTzDB
-{
-        GList *tz_locations;
-};
-
 static GList *
 location_get_cities (GWeatherLocation *parent_location)
 {
         GList *cities = NULL;
-        GWeatherLocation **children;
-        gint i;
+        GWeatherLocation *child = NULL;
 
-        children = gweather_location_get_children (parent_location);
-        for (i = 0; children[i]; i++) {
-                if (gweather_location_get_level (children[i]) == GWEATHER_LOCATION_CITY) {
-                        cities = g_list_prepend (cities,
-                                                 children[i]);
+        while ((child = gweather_location_next_child (parent_location, child))) {
+                if (gweather_location_get_level (child) == GWEATHER_LOCATION_CITY) {
+                        cities = g_list_prepend (cities, gweather_location_ref (child));
                 } else {
                         cities = g_list_concat (cities,
-                                                location_get_cities (children[i]));
+                                                location_get_cities (child));
                 }
         }
 
@@ -104,33 +96,22 @@ load_timezones (GList *cities)
 }
 
 GList *
-weather_tz_db_get_locations (WeatherTzDB *tzdb)
+weather_tz_db_get_locations (const gchar *country_code)
 {
-        return g_list_copy (tzdb->tz_locations);
-}
-
-WeatherTzDB *
-weather_tz_db_new (void)
-{
-        GList *cities;
-        GWeatherLocation *world;
-        WeatherTzDB *tzdb;
+        g_autoptr(GWeatherLocation) world = NULL;
+        g_autoptr(GWeatherLocation) country = NULL;
+        g_autolist(GWeatherLocation) cities = NULL;
+        GList *tz_locations;
 
         world = gweather_location_get_world ();
-        cities = location_get_cities (world);
 
-        tzdb = g_new0 (WeatherTzDB, 1);
-        tzdb->tz_locations = load_timezones (cities);
+        country = gweather_location_find_by_country_code (world, country_code);
 
-        g_list_free (cities);
+        if (!country)
+                return NULL;
 
-        return tzdb;
-}
+        cities = location_get_cities (country);
+        tz_locations = load_timezones (cities);
 
-void
-weather_tz_db_free (WeatherTzDB *tzdb)
-{
-        g_list_free_full (tzdb->tz_locations, (GDestroyNotify) tz_location_free);
-
-        g_free (tzdb);
+        return tz_locations;
 }
