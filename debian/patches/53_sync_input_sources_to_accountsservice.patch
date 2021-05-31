@@ -9,10 +9,10 @@ Subject: _sync_input_sources_to_accountsservice
  3 files changed, 80 insertions(+), 1 deletion(-)
 
 diff --git a/meson.build b/meson.build
-index 7acf80a..6ea3c4d 100644
+index 9b81db3..f5fccb4 100644
 --- a/meson.build
 +++ b/meson.build
-@@ -89,6 +89,7 @@ endif
+@@ -90,6 +90,7 @@ endif
  
  add_project_arguments(common_flags + compiler_flags, language: 'c')
  

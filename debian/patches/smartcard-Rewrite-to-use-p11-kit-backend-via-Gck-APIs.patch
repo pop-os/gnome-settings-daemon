@@ -60,10 +60,10 @@ Origin: https://gitlab.gnome.org/GNOME/gnome-settings-daemon/-/merge_requests/20
  9 files changed, 399 insertions(+), 492 deletions(-)
 
 diff --git a/meson.build b/meson.build
-index 6ea3c4d..5d00095 100644
+index f5fccb4..72f34be 100644
 --- a/meson.build
 +++ b/meson.build
-@@ -166,12 +166,7 @@ config_h.set10('HAVE_WACOM', enable_wacom)
+@@ -167,12 +167,7 @@ config_h.set10('HAVE_WACOM', enable_wacom)
  # smartcard section
  enable_smartcard = get_option('smartcard')
  if enable_smartcard
@@ -77,7 +77,7 @@ index 6ea3c4d..5d00095 100644
  endif
  
  enable_usb_protection = get_option('usb-protection')
-@@ -274,9 +269,6 @@ output += '        Cups support:             ' + enable_cups.to_string() + '\n'
+@@ -276,9 +271,6 @@ output += '        Cups support:             ' + enable_cups.to_string() + '\n'
  output += '        Wayland support:          ' + enable_wayland.to_string() + '\n'
  output += '        Wacom support:            ' + enable_wacom.to_string() + '\n'
  output += '        RFKill support:           ' + enable_rfkill.to_string() + '\n'

@@ -38,7 +38,7 @@ index fb0c85c..5a05d7f 100644
        <default>['']</default>
        <summary>Launch web browser</summary>
 diff --git a/plugins/media-keys/gsd-media-keys-manager.c b/plugins/media-keys/gsd-media-keys-manager.c
-index 42fa14d..5be08c8 100644
+index 2e05499..d923978 100644
 --- a/plugins/media-keys/gsd-media-keys-manager.c
 +++ b/plugins/media-keys/gsd-media-keys-manager.c
 @@ -1132,6 +1132,22 @@ gnome_session_shutdown_cb (GObject *source_object,
@@ -64,7 +64,7 @@ index 42fa14d..5be08c8 100644
  static void
  gnome_session_shutdown (GsdMediaKeysManager *manager)
  {
-@@ -2697,6 +2713,9 @@ do_action (GsdMediaKeysManager *manager,
+@@ -2700,6 +2716,9 @@ do_action (GsdMediaKeysManager *manager,
          case SCREENCAST_KEY:
                  do_screencast_action (manager);
                  break;
@@ -74,7 +74,7 @@ index 42fa14d..5be08c8 100644
          case WWW_KEY:
                  do_url_action (manager, "http", timestamp);
                  break;
-@@ -3307,6 +3326,7 @@ migrate_keybinding_settings (void)
+@@ -3310,6 +3329,7 @@ migrate_keybinding_settings (void)
                  { "window-screenshot-clip",     "window-screenshot-clip",       map_keybinding },
                  { "area-screenshot-clip",       "area-screenshot-clip",         map_keybinding },
                  { "screencast",                 "screencast",                   map_keybinding },
