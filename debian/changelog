@@ -1,4 +1,4 @@
-gnome-settings-daemon (40.0.1-1) UNRELEASED; urgency=medium
+gnome-settings-daemon (40.0.1-1) experimental; urgency=medium
 
   * New upstream release:
     - Remove screenshot sound feedback, performed by gnome-shell
@@ -20,7 +20,7 @@ gnome-settings-daemon (40.0.1-1) UNRELEASED; urgency=medium
     Do not break on gnome-tweaks, as it will still work even though without
     showing the font settings, but this is not an huge requirement.
 
- -- Marco Trevisan (Treviño) <marco@ubuntu.com>  Mon, 31 May 2021 20:16:28 +0200
+ -- Marco Trevisan (Treviño) <marco@ubuntu.com>  Mon, 31 May 2021 20:17:23 +0200
 
 gnome-settings-daemon (3.38.2-1) unstable; urgency=medium
 
