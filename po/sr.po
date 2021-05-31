@@ -1,18 +1,19 @@
-# Serbian translation of gnome-settings-deamon
+# Serbian translation of gnome-control-center
 # Courtesy of Prevod.org team (http://prevod.org/) -- 2003—2021.
-# This file is distributed under the same license as the gnome-settings-deamon package.
-# Вељко М. Станојевић <veljko@vms.homelinux.net>
+# This file is distributed under the same license as the gnome-control-center package.
 # Данило Шеган <danilo@gnome.org>, 2005.
+# Вељко М. Станојевић <veljko@vms.homelinux.net>
 # Слободан Д. Средојевић <slobo@akrep.be>, 2006.
-# Мирослав Николић <miroslavnikolic@rocketmail.com>, 2011—2021.
 # Милош Поповић <gpopac@gmail.com>, 2010—2015.
+# Марко М. Костић <marko.m.kostic@gmail.com>, 2019.
+# Мирослав Николић <miroslavnikolic@rocketmail.com>, 2011—2021.
 msgid ""
 msgstr ""
 "Project-Id-Version: gnome-control-center\n"
 "Report-Msgid-Bugs-To: https://gitlab.gnome.org/GNOME/gnome-settings-daemon/"
 "issues\n"
 "POT-Creation-Date: 2021-01-12 07:57+0000\n"
-"PO-Revision-Date: 2021-02-21 09:56+0200\n"
+"PO-Revision-Date: 2021-02-21 09:57+0200\n"
 "Last-Translator: Мирослав Николић <miroslavnikolic@rocketmail.com>\n"
 "Language-Team: српски <gnome-sr@googlegroups.org>\n"
 "Language: sr\n"
@@ -177,9 +178,9 @@ msgid ""
 "Select the touchpad scroll method. Supported values are: “disabled”, “edge-"
 "scrolling”, “two-finger-scrolling”."
 msgstr ""
-"Изаберите режим клизања по додирној табли. Дозвољене вредности су: "
-"„disabled“ (искључено клизање), „edge-scrolling“ (клизање ивицом додирне "
-"табле) и „two-finger-scrolling“ (клизање са два прста)."
+"Изаберите режим клизања по додирној табли. Дозвољене вредности су: „disabled“"
+" (искључено клизање), „edge-scrolling“ (клизање ивицом додирне табле) и „two-"
+"finger-scrolling“ (клизање са два прста)."
 
 #: data/org.gnome.settings-daemon.peripherals.gschema.xml.in:119
 msgid "Enable mouse clicks with touchpad"
@@ -555,7 +556,6 @@ msgstr "Подешавања покретања"
 
 #: data/org.gnome.settings-daemon.plugins.media-keys.gschema.xml.in:12
 #: data/org.gnome.settings-daemon.plugins.media-keys.gschema.xml.in:195
-#| msgid "Binding to launch GNOME settings."
 msgid "Binding to launch GNOME Settings."
 msgstr "Пречица за покретање подешавања Гнома."
 
@@ -915,7 +915,6 @@ msgid "List of custom keybindings"
 msgstr "Списак произвољних пречица"
 
 #: data/org.gnome.settings-daemon.plugins.media-keys.gschema.xml.in:282
-#| msgid "Quiet Volume Mute"
 msgid "Size of volume step"
 msgstr "Величина корака јачине звука"
 
@@ -925,88 +924,72 @@ msgstr "Величина корака јачине звука за сваку п
 
 #: data/org.gnome.settings-daemon.plugins.media-keys.gschema.xml.in:289
 #: data/org.gnome.settings-daemon.plugins.media-keys.gschema.xml.in:600
-#| msgid "Quiet Volume Down"
 msgid "Quiet volume down"
 msgstr "Тихо утишавање звука"
 
 #: data/org.gnome.settings-daemon.plugins.media-keys.gschema.xml.in:290
-#| msgid "Binding to lower the volume."
 msgid "Binding to lower the volume without emitting a sound effect."
 msgstr "Пречица за утишавање звука без емитовања звучног дејства."
 
 #: data/org.gnome.settings-daemon.plugins.media-keys.gschema.xml.in:294
 #: data/org.gnome.settings-daemon.plugins.media-keys.gschema.xml.in:605
-#| msgid "Volume mute/unmute"
 msgid "Quiet volume mute/unmute"
 msgstr "Тихо искључивање и укључивање звука"
 
 #: data/org.gnome.settings-daemon.plugins.media-keys.gschema.xml.in:295
-#| msgid "Binding to mute/unmute the volume."
 msgid "Binding to mute/unmute the volume without emitting a sound effect."
 msgstr "Пречица за искључивање и укључивање звука без емитовања звука дејства."
 
 #: data/org.gnome.settings-daemon.plugins.media-keys.gschema.xml.in:299
 #: data/org.gnome.settings-daemon.plugins.media-keys.gschema.xml.in:610
-#| msgid "Quiet Volume Up"
 msgid "Quiet volume up"
 msgstr "Тихо појачавање звука"
 
 #: data/org.gnome.settings-daemon.plugins.media-keys.gschema.xml.in:300
-#| msgid "Binding to raise the volume."
 msgid "Binding to raise the volume without emitting a sound effect."
 msgstr "Пречица за појачавање звука без емитовања звучног дејства."
 
 #: data/org.gnome.settings-daemon.plugins.media-keys.gschema.xml.in:306
 #: data/org.gnome.settings-daemon.plugins.media-keys.gschema.xml.in:617
-#| msgid "Precise Volume Down"
 msgid "Precise volume down"
 msgstr "Тачно утишавање звука"
 
 #: data/org.gnome.settings-daemon.plugins.media-keys.gschema.xml.in:307
-#| msgid "Binding to lower the volume."
 msgid "Binding to lower the volume with higher precision."
 msgstr "Пречица за утишавање звука са већом тачношћу."
 
 #: data/org.gnome.settings-daemon.plugins.media-keys.gschema.xml.in:311
 #: data/org.gnome.settings-daemon.plugins.media-keys.gschema.xml.in:622
-#| msgid "Precise Volume Up"
 msgid "Precise volume up"
 msgstr "Тачно појачавање звука"
 
 #: data/org.gnome.settings-daemon.plugins.media-keys.gschema.xml.in:312
-#| msgid "Binding to raise the volume."
 msgid "Binding to raise the volume with higher precision."
 msgstr "Пречица за појачавање звука са већом тачношћу."
 
 #: data/org.gnome.settings-daemon.plugins.media-keys.gschema.xml.in:402
-#| msgid "Touchpad Off"
 msgid "Toggle touchpad on/off"
 msgstr "Укључује/искључује додирну таблу"
 
 #: data/org.gnome.settings-daemon.plugins.media-keys.gschema.xml.in:403
-#| msgid "Binding to toggle the interface contrast"
 msgid "Binding to toggle the touchpad on/off."
 msgstr "Пречица за укључивање/искључивање додирне табле."
 
 #: data/org.gnome.settings-daemon.plugins.media-keys.gschema.xml.in:407
 #: data/org.gnome.settings-daemon.plugins.media-keys.gschema.xml.in:644
-#| msgid "Touchpad On"
 msgid "Switch touchpad on"
 msgstr "Укључује додирну таблу"
 
 #: data/org.gnome.settings-daemon.plugins.media-keys.gschema.xml.in:408
-#| msgid "Binding to launch the search tool."
 msgid "Binding to switch the touchpad on."
 msgstr "Пречица за укључивање додирне табле."
 
 #: data/org.gnome.settings-daemon.plugins.media-keys.gschema.xml.in:412
 #: data/org.gnome.settings-daemon.plugins.media-keys.gschema.xml.in:649
-#| msgid "Touchpad Off"
 msgid "Switch touchpad off"
 msgstr "Искључује додирну таблу"
 
 #: data/org.gnome.settings-daemon.plugins.media-keys.gschema.xml.in:413
-#| msgid "Binding to launch the search tool."
 msgid "Binding to switch the touchpad off."
 msgstr "Пречица за искључивање додирне табле."
 
@@ -1016,7 +999,6 @@ msgid "Skip backward in current track"
 msgstr "Прескаче уназад у текућој нумери"
 
 #: data/org.gnome.settings-daemon.plugins.media-keys.gschema.xml.in:419
-#| msgid "Binding to skip to next track."
 msgid "Binding to skip backward in current track."
 msgstr "Пречица за прескакање уназад у текућој нумери."
 
@@ -1026,96 +1008,79 @@ msgid "Skip forward in current track"
 msgstr "Прескаче унапред у текућој нумери"
 
 #: data/org.gnome.settings-daemon.plugins.media-keys.gschema.xml.in:424
-#| msgid "Binding to skip to next track."
 msgid "Binding to skip forward in current track."
 msgstr "Пречица за прескакање унапред у текућој нумери."
 
 #: data/org.gnome.settings-daemon.plugins.media-keys.gschema.xml.in:428
 #: data/org.gnome.settings-daemon.plugins.media-keys.gschema.xml.in:665
-#| msgid "Toggle Airplane Mode"
 msgid "Toggle repeat playback mode"
 msgstr "Окида режим понављања пуштања"
 
 #: data/org.gnome.settings-daemon.plugins.media-keys.gschema.xml.in:429
-#| msgid "Binding to launch the media player."
 msgid "Binding to toggle repeat mode in media player."
 msgstr "Пречица за окидање режима понављања у програму за пуштање медија."
 
 #: data/org.gnome.settings-daemon.plugins.media-keys.gschema.xml.in:433
 #: data/org.gnome.settings-daemon.plugins.media-keys.gschema.xml.in:670
-#| msgid "Toggle Airplane Mode"
 msgid "Toggle random playback mode"
 msgstr "Окида насумичан режим пуштања"
 
 #: data/org.gnome.settings-daemon.plugins.media-keys.gschema.xml.in:434
-#| msgid "Binding to launch the media player."
 msgid "Binding to toggle random playback mode in media player."
 msgstr ""
 "Пречица за окидање насумичног режима пуштања у програму за пуштање медија."
 
 #: data/org.gnome.settings-daemon.plugins.media-keys.gschema.xml.in:439
 #: data/org.gnome.settings-daemon.plugins.media-keys.gschema.xml.in:676
-#| msgid "Mouse button orientation"
 msgid "Toggle automatic screen orientation"
 msgstr "Окида самостално усмерење екрана"
 
 #: data/org.gnome.settings-daemon.plugins.media-keys.gschema.xml.in:440
-#| msgid "Binding to take a screenshot."
 msgid "Binding to toggle automatic screen orientation."
 msgstr "Пречица за окидање самосталног усмерења екрана."
 
 #: data/org.gnome.settings-daemon.plugins.media-keys.gschema.xml.in:444
 #: data/org.gnome.settings-daemon.plugins.media-keys.gschema.xml.in:681
-#| msgid "Power button action"
 msgid "Power button"
 msgstr "Дугме напајања"
 
 #: data/org.gnome.settings-daemon.plugins.media-keys.gschema.xml.in:445
-#| msgid "Binding to log out."
 msgid "Binding for power button."
 msgstr "Пречица за дугме напајања."
 
 #: data/org.gnome.settings-daemon.plugins.media-keys.gschema.xml.in:449
 #: data/org.gnome.settings-daemon.plugins.media-keys.gschema.xml.in:686
-#| msgid "Hibernate"
 msgid "Hibernate button"
 msgstr "Дугме замрзавања"
 
 #: data/org.gnome.settings-daemon.plugins.media-keys.gschema.xml.in:450
-#| msgid "Binding to mute/unmute the microphone."
 msgid "Binding to hibernate the machine."
 msgstr "Пречица за замрзавање рада рачунара."
 
 #: data/org.gnome.settings-daemon.plugins.media-keys.gschema.xml.in:454
 #: data/org.gnome.settings-daemon.plugins.media-keys.gschema.xml.in:691
-#| msgid "Suspend"
 msgid "Suspend button"
 msgstr "Дугме обустављања"
 
 #: data/org.gnome.settings-daemon.plugins.media-keys.gschema.xml.in:455
-#| msgid "Binding to launch the email client."
 msgid "Binding to suspend the machine."
 msgstr "Пречица за обустављање рада рачунара."
 
 #: data/org.gnome.settings-daemon.plugins.media-keys.gschema.xml.in:460
 #: data/org.gnome.settings-daemon.plugins.media-keys.gschema.xml.in:697
-#| msgid "Brightness Up"
 msgid "Screen brightness up"
 msgstr "Повећава осветљеност екрана"
 
 #: data/org.gnome.settings-daemon.plugins.media-keys.gschema.xml.in:461
-#| msgid "Binding to increase the text size"
 msgid "Binding to increase the screen brightness."
 msgstr "Пречица за повећавање осветљености екрана."
 
 #: data/org.gnome.settings-daemon.plugins.media-keys.gschema.xml.in:465
 #: data/org.gnome.settings-daemon.plugins.media-keys.gschema.xml.in:702
-#| msgid "Brightness Down"
 msgid "Screen brightness down"
 msgstr "Смањује осветљеност екрана"
 
 #: data/org.gnome.settings-daemon.plugins.media-keys.gschema.xml.in:466
-#| msgid "Binding to decrease the text size"
 msgid "Binding to decrease the screen brightness."
 msgstr "Пречица за смањивање осветљености екрана."
 
@@ -1125,154 +1090,125 @@ msgid "Screen brightness cycle"
 msgstr "Мења осветљеност екрана"
 
 #: data/org.gnome.settings-daemon.plugins.media-keys.gschema.xml.in:471
-#| msgid "Binding to lock the screen."
 msgid "Binding to cycle the screen brightness."
 msgstr "Пречица за промену осветљености екрана."
 
 #: data/org.gnome.settings-daemon.plugins.media-keys.gschema.xml.in:476
 #: data/org.gnome.settings-daemon.plugins.media-keys.gschema.xml.in:713
-#| msgid "Keyboard Brightness Up"
 msgid "Keyboard brightness up"
 msgstr "Повећава осветљај тастатуре"
 
 #: data/org.gnome.settings-daemon.plugins.media-keys.gschema.xml.in:477
-#| msgid "Binding to increase the text size"
 msgid "Binding to increase the keyboard brightness."
 msgstr "Пречица за повећавање осветљености тастатуре."
 
 #: data/org.gnome.settings-daemon.plugins.media-keys.gschema.xml.in:481
 #: data/org.gnome.settings-daemon.plugins.media-keys.gschema.xml.in:718
-#| msgid "Keyboard Brightness Down"
 msgid "Keyboard brightness down"
 msgstr "Смањује осветљај тастатуре"
 
 #: data/org.gnome.settings-daemon.plugins.media-keys.gschema.xml.in:482
-#| msgid "Binding to decrease the text size"
 msgid "Binding to decrease the keyboard brightness."
 msgstr "Пречица за смањење осветљености тастатуре."
 
 #: data/org.gnome.settings-daemon.plugins.media-keys.gschema.xml.in:486
 #: data/org.gnome.settings-daemon.plugins.media-keys.gschema.xml.in:723
-#| msgid "Keyboard Brightness Toggle"
 msgid "Keyboard brightness toggle"
 msgstr "Окидач осветљаја тастатуре"
 
 #: data/org.gnome.settings-daemon.plugins.media-keys.gschema.xml.in:487
-#| msgid "Binding to toggle the interface contrast"
 msgid "Binding to toggle the keyboard brightness."
 msgstr "Пречица за окидање осветљености тастатуре."
 
 #: data/org.gnome.settings-daemon.plugins.media-keys.gschema.xml.in:492
 #: data/org.gnome.settings-daemon.plugins.media-keys.gschema.xml.in:729
-#| msgid "Battery Status"
 msgid "Show battery status"
 msgstr "Приказује стање батерије"
 
 #: data/org.gnome.settings-daemon.plugins.media-keys.gschema.xml.in:493
-#| msgid "Binding to show the screen magnifier"
 msgid "Binding to show current battery status."
 msgstr "Пречица за приказивање тренутног стања батерије."
 
 #: data/org.gnome.settings-daemon.plugins.media-keys.gschema.xml.in:498
 #: data/org.gnome.settings-daemon.plugins.media-keys.gschema.xml.in:735
-#| msgid "Rfkill"
 msgid "RF kill"
 msgstr "РФ убија"
 
 #: data/org.gnome.settings-daemon.plugins.media-keys.gschema.xml.in:499
-#| msgid "Binding to toggle the interface contrast"
 msgid "Binding to toggle airplane mode."
 msgstr "Пречица за окидање режима у авиону."
 
 #: data/org.gnome.settings-daemon.plugins.media-keys.gschema.xml.in:503
 #: data/org.gnome.settings-daemon.plugins.media-keys.gschema.xml.in:740
-#| msgid "Bluetooth disabled"
 msgid "Bluetooth RF kill"
 msgstr "РФ убијање Блутута"
 
 #: data/org.gnome.settings-daemon.plugins.media-keys.gschema.xml.in:504
-#| msgid "Binding to toggle the interface contrast"
 msgid "Binding to toggle bluetooth airplane mode."
 msgstr "Пречица за окидање Блутут режима у авиону."
 
 #: data/org.gnome.settings-daemon.plugins.media-keys.gschema.xml.in:517
-#| msgid "Binding to launch the calculator."
 msgid "Static binding to launch the calculator."
 msgstr "Статичка пречица за покретање дигитрона."
 
 #: data/org.gnome.settings-daemon.plugins.media-keys.gschema.xml.in:522
-#| msgid "Binding to launch GNOME settings."
 msgid "Static binding to launch GNOME Settings."
 msgstr "Статичка пречица за покретање поставки Гнома."
 
 #: data/org.gnome.settings-daemon.plugins.media-keys.gschema.xml.in:527
-#| msgid "Binding to launch the email client."
 msgid "Static binding to launch the email client."
 msgstr "Статичка пречица за покретање програма за е-пошту."
 
 #: data/org.gnome.settings-daemon.plugins.media-keys.gschema.xml.in:532
-#| msgid "Binding to eject an optical disc."
 msgid "Static binding to eject an optical disc."
 msgstr "Статичка пречица за избацивање оптичког диска."
 
 #: data/org.gnome.settings-daemon.plugins.media-keys.gschema.xml.in:537
-#| msgid "Binding to open the Home folder."
 msgid "Static binding to open the Home folder."
 msgstr "Статичка пречица за отварање личне фасцикле."
 
 #: data/org.gnome.settings-daemon.plugins.media-keys.gschema.xml.in:542
-#| msgid "Binding to launch the media player."
 msgid "Static binding to launch the media player."
 msgstr "Статичка пречица за покретање програма за звук и видео."
 
 #: data/org.gnome.settings-daemon.plugins.media-keys.gschema.xml.in:547
-#| msgid "Binding to skip to next track."
 msgid "Static binding to skip to next track."
 msgstr "Статичка пречица за прелазак на наредну нумеру."
 
 #: data/org.gnome.settings-daemon.plugins.media-keys.gschema.xml.in:552
-#| msgid "Binding to pause playback."
 msgid "Static binding to pause playback."
 msgstr "Статичка пречица за паузирање музике/филма."
 
 #: data/org.gnome.settings-daemon.plugins.media-keys.gschema.xml.in:557
-#| msgid "Binding to start playback (or toggle play/pause)."
 msgid "Static binding to start playback (or toggle play/pause)."
 msgstr "Статичка пречица за пуштање музике/филма (или пуштање/паузу)."
 
 #: data/org.gnome.settings-daemon.plugins.media-keys.gschema.xml.in:562
-#| msgid "Binding to skip to previous track."
 msgid "Static binding to skip to previous track."
 msgstr "Статичка пречица за прелазак на претходну нумеру."
 
 #: data/org.gnome.settings-daemon.plugins.media-keys.gschema.xml.in:567
-#| msgid "Binding to lock the screen."
 msgid "Static binding to lock the screen."
 msgstr "Статичка пречица за закључавање екрана."
 
 #: data/org.gnome.settings-daemon.plugins.media-keys.gschema.xml.in:572
-#| msgid "Binding to launch the search tool."
 msgid "Static binding to launch the search tool."
 msgstr "Статичка пречица за покретање програма за претрагу."
 
 #: data/org.gnome.settings-daemon.plugins.media-keys.gschema.xml.in:577
-#| msgid "Binding to stop playback."
 msgid "Static binding to stop playback."
 msgstr "Статичка пречица за заустављање музике/филма."
 
 #: data/org.gnome.settings-daemon.plugins.media-keys.gschema.xml.in:584
-#| msgid "Binding to lower the volume."
 msgid "Static binding to lower the volume."
 msgstr "Статичка пречица за утишавање звука система."
 
 #: data/org.gnome.settings-daemon.plugins.media-keys.gschema.xml.in:589
 #: data/org.gnome.settings-daemon.plugins.media-keys.gschema.xml.in:606
-#| msgid "Binding to mute/unmute the volume."
 msgid "Static binding to mute/unmute the volume."
 msgstr "Статичка пречица за искључивање и укључивање звука система."
 
 #: data/org.gnome.settings-daemon.plugins.media-keys.gschema.xml.in:594
-#| msgid "Binding to raise the volume."
 msgid "Static binding to raise the volume."
 msgstr "Статичка пречица за појачавање звука система."
 
@@ -1285,27 +1221,22 @@ msgid "Static binding to raise the volume without emitting a sound effect."
 msgstr "Статичка пречица за повећавање звука без емитовања звучног дејства."
 
 #: data/org.gnome.settings-daemon.plugins.media-keys.gschema.xml.in:618
-#| msgid "Binding to lower the volume."
 msgid "Static binding to lower the volume with higher precision."
 msgstr "Статичка пречица за утишавање звука са већом тачношћу."
 
 #: data/org.gnome.settings-daemon.plugins.media-keys.gschema.xml.in:623
-#| msgid "Binding to raise the volume."
 msgid "Static binding to raise the volume with higher precision."
 msgstr "Статичка пречица за повећање звука са већом тачношћу."
 
 #: data/org.gnome.settings-daemon.plugins.media-keys.gschema.xml.in:629
-#| msgid "Binding to mute/unmute the microphone."
 msgid "Static binding to mute/unmute the microphone."
 msgstr "Статичка пречица за искључивање и укључивање микрофона."
 
 #: data/org.gnome.settings-daemon.plugins.media-keys.gschema.xml.in:634
-#| msgid "Binding to launch the web browser."
 msgid "Static binding to launch the web browser."
 msgstr "Статичка пречица за покретање интернет претраживача."
 
 #: data/org.gnome.settings-daemon.plugins.media-keys.gschema.xml.in:640
-#| msgid "Binding to toggle the interface contrast"
 msgid "Static binding to toggle the touchpad on/off."
 msgstr "Статичка пречица за укључивање/искључивање додирне табле."
 
@@ -1318,23 +1249,19 @@ msgid "Static binding to switch the touchpad off."
 msgstr "Статичка пречица за искључивање додирне табле."
 
 #: data/org.gnome.settings-daemon.plugins.media-keys.gschema.xml.in:656
-#| msgid "Binding to skip to next track."
 msgid "Static binding to skip backward in current track."
 msgstr "Статичка пречица за прескакање уназад у текућој нумери."
 
 #: data/org.gnome.settings-daemon.plugins.media-keys.gschema.xml.in:661
-#| msgid "Binding to skip to next track."
 msgid "Static binding to skip forward in current track."
 msgstr "Статичка пречица за прескакање унапред у текућој нумери."
 
 #: data/org.gnome.settings-daemon.plugins.media-keys.gschema.xml.in:666
-#| msgid "Binding to launch the media player."
 msgid "Static binding to toggle repeat mode in media player."
 msgstr ""
 "Статичка пречица за окидање режима понављања у програму за пуштање медија."
 
 #: data/org.gnome.settings-daemon.plugins.media-keys.gschema.xml.in:671
-#| msgid "Binding to launch the media player."
 msgid "Static binding to toggle random playback mode in media player."
 msgstr ""
 "Статичка пречица за окидање насумичног режима пуштања у програму за пуштање "
@@ -1349,37 +1276,30 @@ msgid "Static binding for power button."
 msgstr "Статичка пречица за дугме напајања."
 
 #: data/org.gnome.settings-daemon.plugins.media-keys.gschema.xml.in:687
-#| msgid "Binding to mute/unmute the microphone."
 msgid "Static binding to hibernate the machine."
 msgstr "Статичка пречица за замрзавање рада рачунара."
 
 #: data/org.gnome.settings-daemon.plugins.media-keys.gschema.xml.in:692
-#| msgid "Binding to mute/unmute the microphone."
 msgid "Static binding to suspend the machine."
 msgstr "Статичка пречица за обустављање рада рачунара."
 
 #: data/org.gnome.settings-daemon.plugins.media-keys.gschema.xml.in:698
-#| msgid "Binding to increase the text size"
 msgid "Static binding to increase the screen brightness."
 msgstr "Статичка пречица за повећавање осветљености екрана."
 
 #: data/org.gnome.settings-daemon.plugins.media-keys.gschema.xml.in:703
-#| msgid "Binding to decrease the text size"
 msgid "Static binding to decrease the screen brightness."
 msgstr "Статичка пречица за смањивање осветљености екрана."
 
 #: data/org.gnome.settings-daemon.plugins.media-keys.gschema.xml.in:708
-#| msgid "Binding to lock the screen."
 msgid "Static binding to cycle the screen brightness."
 msgstr "Статичка пречица за промену осветљености екрана."
 
 #: data/org.gnome.settings-daemon.plugins.media-keys.gschema.xml.in:714
-#| msgid "Binding to increase the text size"
 msgid "Static binding to increase the keyboard brightness."
 msgstr "Статичка пречица за повећавање осветљености тастатуре."
 
 #: data/org.gnome.settings-daemon.plugins.media-keys.gschema.xml.in:719
-#| msgid "Binding to decrease the text size"
 msgid "Static binding to decrease the keyboard brightness."
 msgstr "Статичка пречица за смањење осветљености тастатуре."
 
@@ -1898,7 +1818,6 @@ msgstr "Бежичном мишу су ослабиле батерије (%.0f%%
 
 #: plugins/power/gsd-power-manager.c:550
 #, c-format
-#| msgid "Wireless mouse is low in power (%.0f%%)"
 msgid "Wireless mouse is low in power"
 msgstr "Бежичном мишу су ослабиле батерије"
 
@@ -1915,7 +1834,6 @@ msgstr "Бежичној тастатури су ослабиле батериј
 
 #: plugins/power/gsd-power-manager.c:560
 #, c-format
-#| msgid "Wireless keyboard is low in power (%.0f%%)"
 msgid "Wireless keyboard is low in power"
 msgstr "Бежичној тастатури су ослабиле батерије"
 
@@ -1932,7 +1850,6 @@ msgstr "ПДА уређају су ослабиле батерије (%.0f%%)"
 
 #: plugins/power/gsd-power-manager.c:570
 #, c-format
-#| msgid "PDA is low in power (%.0f%%)"
 msgid "PDA is low in power"
 msgstr "ПДА уређају су ослабиле батерије"
 
@@ -1950,7 +1867,6 @@ msgstr "Мобилном телефону су ослабиле батерије
 
 #: plugins/power/gsd-power-manager.c:580
 #, c-format
-#| msgid "Cell phone is low in power (%.0f%%)"
 msgid "Cell phone is low in power"
 msgstr "Мобилном телефону су ослабиле батерије"
 
@@ -1966,7 +1882,6 @@ msgstr "Медијском уређају су ослабиле батерије
 
 #: plugins/power/gsd-power-manager.c:590
 #, c-format
-#| msgid "Media player is low in power (%.0f%%)"
 msgid "Media player is low in power"
 msgstr "Медијском уређају су ослабиле батерије"
 
@@ -1983,7 +1898,6 @@ msgstr "Таблици су ослабиле батерије (%.0f%%)"
 
 #: plugins/power/gsd-power-manager.c:600
 #, c-format
-#| msgid "Tablet is low in power (%.0f%%)"
 msgid "Tablet is low in power"
 msgstr "Таблици су ослабиле батерије"
 
@@ -2000,7 +1914,6 @@ msgstr "Прикљученом рачунару је ослабила батер
 
 #: plugins/power/gsd-power-manager.c:610
 #, c-format
-#| msgid "Attached computer is low in power (%.0f%%)"
 msgid "Attached computer is low in power"
 msgstr "Прикљученом рачунару је ослабила батерија"
 
@@ -2061,9 +1974,6 @@ msgstr ""
 
 #: plugins/power/gsd-power-manager.c:712
 #, c-format
-#| msgid ""
-#| "Wireless mouse is very low in power (%.0f%%). This device will soon stop "
-#| "functioning if not charged."
 msgid ""
 "Wireless mouse is very low in power. This device will soon stop functioning "
 "if not charged."
@@ -2082,9 +1992,6 @@ msgstr ""
 
 #: plugins/power/gsd-power-manager.c:725
 #, c-format
-#| msgid ""
-#| "Wireless keyboard is very low in power (%.0f%%). This device will soon "
-#| "stop functioning if not charged."
 msgid ""
 "Wireless keyboard is very low in power. This device will soon stop "
 "functioning if not charged."
@@ -2103,9 +2010,6 @@ msgstr ""
 
 #: plugins/power/gsd-power-manager.c:739
 #, c-format
-#| msgid ""
-#| "PDA is very low in power (%.0f%%). This device will soon stop functioning "
-#| "if not charged."
 msgid ""
 "PDA is very low in power. This device will soon stop functioning if not "
 "charged."
@@ -2124,9 +2028,6 @@ msgstr ""
 
 #: plugins/power/gsd-power-manager.c:753
 #, c-format
-#| msgid ""
-#| "Cell phone is very low in power (%.0f%%). This device will soon stop "
-#| "functioning if not charged."
 msgid ""
 "Cell phone is very low in power. This device will soon stop functioning if "
 "not charged."
@@ -2145,9 +2046,6 @@ msgstr ""
 
 #: plugins/power/gsd-power-manager.c:767
 #, c-format
-#| msgid ""
-#| "Media player is very low in power (%.0f%%). This device will soon stop "
-#| "functioning if not charged."
 msgid ""
 "Media player is very low in power. This device will soon stop functioning if "
 "not charged."
@@ -2166,9 +2064,6 @@ msgstr ""
 
 #: plugins/power/gsd-power-manager.c:781
 #, c-format
-#| msgid ""
-#| "Tablet is very low in power (%.0f%%). This device will soon stop "
-#| "functioning if not charged."
 msgid ""
 "Tablet is very low in power. This device will soon stop functioning if not "
 "charged."
@@ -2187,9 +2082,6 @@ msgstr ""
 
 #: plugins/power/gsd-power-manager.c:795
 #, c-format
-#| msgid ""
-#| "Attached computer is very low in power (%.0f%%). The device will soon "
-#| "shutdown if not charged."
 msgid ""
 "Attached computer is very low in power. The device will soon shutdown if not "
 "charged."
@@ -2635,7 +2527,6 @@ msgid "Phone failure"
 msgstr "Неуспех телефона"
 
 #: plugins/wwan/cc-wwan-errors-private.h:41
-#| msgid "Not connected?"
 msgid "No connection to phone"
 msgstr "Нема везе са телефоном"
 
@@ -2684,13 +2575,10 @@ msgid "SIM PUK2 required"
 msgstr "Потребан је СИМ ПУК2"
 
 #: plugins/wwan/cc-wwan-errors-private.h:72
-#| msgid "Unknown time"
 msgid "Unknown error"
 msgstr "Непозната грешка"
 
 #: plugins/wwan/cc-wwan-errors-private.h:91
-#| msgctxt "print job state"
-#| msgid "Printing canceled"
 msgid "Action Cancelled"
 msgstr "Радња је отказана"
 
@@ -2699,7 +2587,6 @@ msgid "Access denied"
 msgstr "Приступ је забрањен"
 
 #: plugins/wwan/cc-wwan-errors-private.h:103
-#| msgid "Unknown time"
 msgid "Unknown Error"
 msgstr "Непозната грешка"
 
@@ -4022,3 +3909,12 @@ msgstr[3] "Преостао вам је још један покушај"
 
 #~ msgid "Disable animations on remote displays"
 #~ msgstr "Искључује анимације на удаљеним екранима"
+
+#~ msgid "SIM card unlock error"
+#~ msgstr "Грешка откључавања СИМ картице"
+
+#~ msgid "Too many incorrect PINs."
+#~ msgstr "Превише неисправних ПИН-ова."
+
+#~ msgid "Wrong PIN code"
+#~ msgstr "Погрешан ПИН кôд"

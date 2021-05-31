@@ -1,22 +1,80 @@
 ==============
-Version 3.38.2
+Version 40.0.1
 ==============
 
 rfkill:
 - Fix reading /dev/rfkill on newer kernels
 
-housekeeping:
-- Fix crash when atime is not present #556
+============
+Version 40.0
+============
+- No changes WRT 40.rc
 
-power:
-- Avoid automatic logout when inappropriate (greeter session)
-- Only one warn once when the battery of external devices runs low #108
+=============
+Version 40.rc
+=============
+- Translation updates
+- Test framework improvements
 
-usb-protection:
-- Do not warn if usbguard is not installed #567
+Xsettings:
+- Go back to loading gtk modules from lib/gnome-settings-daemon-3.0
 
-datetime:
-- Optimizations of the required DB lookups
+===============
+Version 40.beta
+===============
+- Translation updates
+
+Power:
+- Close idleness notifications before suspending
+
+Media-keys:
+- Fix compiler warning
+- Remove screenshot sound feedback, performed by
+  GNOME Shell.
+
+Xsettings:
+- Use Restart=on-failure like other plugins
+
+==================
+Version 40.alpha.1
+==================
+- Translation updates
+- Use pathless "false" on dummy desktop files
+- Auto-start screen saver service
+
+Datetime:
+- Make use of new gweather API
+
+Xsettings:
+- Fix mouse schema location
+- Fix updates after font settings changes
+
+================
+Version 40.alpha
+================
+- Translation updates
+- CI/test fixes
+
+Housekeeping:
+- Fix crash when atime is not present
+
+Power:
+- Avoid automatic logout in GDM/greeter
+- Do not warn more than once per warning level for devices
+
+USB-protection:
+- Do not warn about ServiceUnknown errors for USBGuard
+
+Datetime:
+- Query GWeather DB on the fly instead of caching
+
+Color:
+- Use the windowing system color transform matrix if available
+- Consider night-light active when disabled until tomorrow
+
+Xsettings:
+- Use font aa/hinting/rgba-order from gsettings-desktop-schemas
+- Use mouse drag-threshold/double-click from gsettings-desktop-schemas
 
 ==============
 Version 3.38.1
