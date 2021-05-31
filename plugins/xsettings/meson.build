@@ -14,10 +14,12 @@ sources = gsd_xsettings_gtk + fc_monitor + wm_button_layout_translation + files(
 deps = plugins_deps + [
   gtk_dep,
   x11_dep,
+  libcommon_dep,
+  gsettings_desktop_dep,
   dependency('fontconfig')
 ]
 
-cflags += ['-DGTK_MODULES_DIRECTORY="@0@"'.format(join_paths(gsd_pkglibdir, 'gtk-modules'))]
+cflags += ['-DGTK_MODULES_DIRECTORY="@0@"'.format(gsd_gtk_modules_directory)]
 
 executable(
   'gsd-' + plugin_name,

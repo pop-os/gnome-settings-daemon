@@ -1,8 +1,12 @@
 #!/usr/bin/make -f
 
+include /usr/share/dpkg/default.mk
+
 export DEB_BUILD_MAINT_OPTIONS = hardening=+all
 export DEB_LDFLAGS_MAINT_APPEND = -Wl,-z,defs -Wl,-O1 -Wl,--warn-unresolved-symbols -Wl,--as-needed
 export DEB_LDFLAGS_MAINT_STRIP = -Wl,-Bsymbolic-functions
+
+export GSD_MAJOR_VERSION = $(shell echo $(DEB_VERSION_UPSTREAM) | cut -d. -f1)
 
 %:
 	dh $@
@@ -13,16 +17,16 @@ CONFFLAGS = \
 	-Dnetwork_manager=false \
 	-Dalsa=false \
 	-Dcolord=false \
-	-Dsystemd=false
+	-Dgudev=false \
+	-Dsystemd=false \
+	-Dwayland=false \
+	-Dwwan=false
 endif
 
 override_dh_auto_configure:
 	dh_auto_configure -- \
 		--libdir=/usr/lib \
 		$(CONFFLAGS)
-
-override_dh_missing:
-	dh_missing --fail-missing
 
 override_dh_auto_test:
 ifeq (,$(filter nocheck, $(DEB_BUILD_OPTIONS)))

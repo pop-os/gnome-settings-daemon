@@ -1,6 +1,6 @@
 etc/xdg/autostart
 etc/xdg/Xwayland-session.d
-usr/lib/gnome-settings-daemon-3.0
+usr/lib/gnome-settings-daemon-${env:GSD_MAJOR_VERSION}
 usr/libexec
 usr/share/gnome-settings-daemon
 usr/share/polkit-1

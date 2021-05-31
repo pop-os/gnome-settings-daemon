@@ -1,3 +1,27 @@
+gnome-settings-daemon (40.0.1-1) experimental; urgency=medium
+
+  * New upstream release:
+    - Remove screenshot sound feedback, performed by gnome-shell
+    - Make use of new gweather API
+    - Use font aa/hinting/rgba-order from gsettings-desktop-schemas
+    - Use mouse drag-threshold/double-click from gsettings-desktop-schemas
+  * debian/control: Update build-dependencies to follow upstream
+  * debian: Use debhelper 13 and simplify debian/rules accordingly
+  * debian: Use dh 13 variable substitutions to install versioned libs.
+    Upstream g-s-d will use major version name now to define various paths,
+    so follow this by using some dh-13 magic.
+  * debian/control: Add Breaks on old gtk and mutter.
+    Since the font-settings related schemas are now moved to
+    gsettings-desktop-schemas, this version will break with various
+    libraries and applications relying on them.
+    So, add breaks on old versions of gtk3, gtk4 and mutter libraries
+    (using unreleased versions, as it's not expected that any new version of
+    them will be adapted to this change).
+    Do not break on gnome-tweaks, as it will still work even though without
+    showing the font settings, but this is not an huge requirement.
+
+ -- Marco Trevisan (Treviño) <marco@ubuntu.com>  Mon, 31 May 2021 20:17:23 +0200
+
 gnome-settings-daemon (3.38.2-1ubuntu1) impish; urgency=medium
 
   * New upstream version merged from Debian
