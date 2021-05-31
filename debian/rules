@@ -24,9 +24,6 @@ override_dh_auto_configure:
 		--libdir=/usr/lib \
 		$(CONFFLAGS)
 
-override_dh_missing:
-	dh_missing --fail-missing
-
 override_dh_auto_test:
 ifeq (,$(filter nocheck, $(DEB_BUILD_OPTIONS)))
 # The tests are not fatal on non-linux architectures
