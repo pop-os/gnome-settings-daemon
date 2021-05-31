@@ -5,7 +5,6 @@ debian/meson.build-Lower-polkit-requirement.patch
 64_restore_terminal_keyboard_shortcut_schema.patch
 correct_logout_action.patch
 ubuntu-lid-close-suspend.patch
-revert-gsettings-removals.patch
 revert-mediakeys-dbus-interface-drop.patch
 ubuntu_ibus_configs.patch
 ubuntu_calculator_snap.patch
