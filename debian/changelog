@@ -1,4 +1,4 @@
-gnome-settings-daemon (40.0.1-1ubuntu1) UNRELEASED; urgency=medium
+gnome-settings-daemon (40.0.1-1ubuntu1) impish; urgency=medium
 
   * Merged with debian, including new upstream release
   * debian/control: Follow debian and mark x11-xserver-utils as recommended
@@ -31,7 +31,7 @@ gnome-settings-daemon (40.0.1-1ubuntu1) UNRELEASED; urgency=medium
     + debian/gnome-settings-daemon.install:
       - Install apport hook
 
- -- Marco Trevisan (Treviño) <marco@ubuntu.com>  Mon, 31 May 2021 22:01:10 +0200
+ -- Marco Trevisan (Treviño) <marco@ubuntu.com>  Mon, 31 May 2021 22:02:46 +0200
 
 gnome-settings-daemon (40.0.1-1) experimental; urgency=medium
 
