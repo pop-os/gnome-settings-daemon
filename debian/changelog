@@ -1,9 +1,9 @@
-gnome-settings-daemon (40.0.1-1ubuntu1.1) UNRELEASED; urgency=medium
+gnome-settings-daemon (40.0.1-1ubuntu2) impish; urgency=medium
 
   * d/p/git-media-keys-Addd-one-second-delay-between-each-rfkill-.patch
     - Add one second dely between each rfkill event (lp: #1936303)
 
- -- Andy Chi <andy.chi@canonical.com>  Fri, 16 Jul 2021 07:56:11 +0000
+ -- Andy Chi <andy.chi@canonical.com>  Fri, 16 Jul 2021 12:09:36 +0200
 
 gnome-settings-daemon (40.0.1-1ubuntu1) impish; urgency=medium
 
