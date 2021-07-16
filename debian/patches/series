@@ -15,3 +15,4 @@ ubuntu/media-keys-correct-logout-action.patch
 ubuntu/lid-close-suspend-support.patch
 ubuntu/keyboard-Use-ibus-sources-from-locale.patch
 ubuntu/teach-gsd-about-the-gnome-calculator-snap-.desktop-name.patch
+ubuntu/git-media-keys-Add-one-second-delay-between-each-rfkill-.patch

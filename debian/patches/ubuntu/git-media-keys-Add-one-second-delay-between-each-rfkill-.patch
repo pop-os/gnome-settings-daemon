@@ -1,0 +1,57 @@
+From f4dbcf3d7b0f951fe44b29229206c97b625dbfda Mon Sep 17 00:00:00 2001
+From: Kai-Heng Feng <kai.heng.feng@canonical.com>
+Date: Thu, 24 Jun 2021 14:53:45 +0800
+Subject: [PATCH] media-keys: Add one second delay between each rfkill event
+
+When pressing airplane mode hotkey on many HP laptops, the AT keyboard,
+HP Wireless device (HPQ6001) and Intel HID device (INT33D5) can all send
+rfkill hotkey event.
+
+Preferably we should just leave one device and unregister the others. In
+practice this is hard to achieve, becuase the presence of a device
+doesn't necessarily mean it can generate rfkill hotkey event, we can
+only know what devices are capable to generate rfkill event when the
+hotkey gets pressed.
+
+So add a delay between each rfkill event to workaround the issue. This
+is also how the other OS handles multiple rfkill events.
+---
+ plugins/media-keys/gsd-media-keys-manager.c | 11 +++++++++++
+ 1 file changed, 11 insertions(+)
+
+Index: gnome-settings-daemon-40.0.1/plugins/media-keys/gsd-media-keys-manager.c
+===================================================================
+--- gnome-settings-daemon-40.0.1.orig/plugins/media-keys/gsd-media-keys-manager.c
++++ gnome-settings-daemon-40.0.1/plugins/media-keys/gsd-media-keys-manager.c
+@@ -227,6 +227,7 @@ typedef struct
+ 
+         /* RFKill stuff */
+         guint            rfkill_watch_id;
++        guint64          rfkill_last_time;
+         GDBusProxy      *rfkill_proxy;
+         GCancellable    *rfkill_cancellable;
+ 
+@@ -2523,6 +2524,7 @@ do_rfkill_action (GsdMediaKeysManager *m
+         GsdMediaKeysManagerPrivate *priv = GSD_MEDIA_KEYS_MANAGER_GET_PRIVATE (manager);
+         const char *has_mode, *hw_mode, *mode;
+         gboolean new_state;
++        guint64 current_time;
+         RfkillData *data;
+ 
+         has_mode = bluetooth ? "BluetoothHasAirplaneMode" : "HasAirplaneMode";
+@@ -2532,6 +2534,15 @@ do_rfkill_action (GsdMediaKeysManager *m
+         if (priv->rfkill_proxy == NULL)
+                 return;
+ 
++        /* Some hardwares can generate multiple rfkill events from different
++         * drivers, on a single hotkey press. Only process the first event and
++         * debounce the others */
++        current_time = g_get_monotonic_time ();
++        if (current_time - priv->rfkill_last_time < G_USEC_PER_SEC)
++                return;
++
++        priv->rfkill_last_time = current_time;
++
+         if (get_rfkill_property (manager, has_mode) == FALSE)
+                 return;
+ 
