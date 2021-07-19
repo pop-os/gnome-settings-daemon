@@ -34,3 +34,4 @@ smarcard-Add-utility-function-to-get-the-login-token-name.patch
 
 # Pop!_OS patches
 oled_brightness.patch
+pop-rfkill.patch
