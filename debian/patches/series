@@ -12,3 +12,4 @@ ubuntu_vino_handling.patch
 
 # Pop!_OS Patches
 oled_brightness.patch
+pop-rfkill.patch
