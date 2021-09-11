@@ -1,3 +1,15 @@
+gnome-settings-daemon (40.0.1-2) unstable; urgency=medium
+
+  * Team upload
+  * d/p/datetime-Restore-compatibility-with-libgweather-3.36.patch:
+    Add patch to restore compatibility with libgweather 3.36.
+    This will let us get the core GNOME 40 components such as Shell and
+    g-s-d into testing without having to do a libgweather transition at
+    the same time.
+  * Release to unstable (part of transition: #992870)
+
+ -- Simon McVittie <smcv@debian.org>  Sat, 11 Sep 2021 21:21:20 +0100
+
 gnome-settings-daemon (40.0.1-1) experimental; urgency=medium
 
   * New upstream release:
