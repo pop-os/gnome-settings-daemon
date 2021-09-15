@@ -1,3 +1,10 @@
+gnome-settings-daemon (40.0.1-1ubuntu3) impish; urgency=medium
+
+  * d/p/ubuntu/keyboard-Use-ibus-sources-from-locale.patch: add si_LK to the
+    list of locales for which we prefer m17n.  LP: #1943768.
+
+ -- Steve Langasek <steve.langasek@ubuntu.com>  Wed, 15 Sep 2021 15:58:15 -0700
+
 gnome-settings-daemon (40.0.1-1ubuntu2) impish; urgency=medium
 
   * d/p/git-media-keys-Addd-one-second-delay-between-each-rfkill-.patch
