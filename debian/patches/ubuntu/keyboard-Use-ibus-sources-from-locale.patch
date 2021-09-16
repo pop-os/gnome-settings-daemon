@@ -15,13 +15,19 @@ Index: gnome-settings-daemon-40.0.1/plugins/keyboard/gsd-keyboard-manager.c
 ===================================================================
 --- gnome-settings-daemon-40.0.1.orig/plugins/keyboard/gsd-keyboard-manager.c
 +++ gnome-settings-daemon-40.0.1/plugins/keyboard/gsd-keyboard-manager.c
-@@ -145,6 +145,59 @@
+@@ -145,6 +145,63 @@
          return installed;
  }
  
 +static const gchar *
 +engine_from_locale (void)
 +{
++/* These are languages for which we automatically configure an IBus input
++ * method at installation. Each language in the list should:
++ * - have an entry in pkg_depends so the corresponding IM package is pulled,
++ * - be selectable in the installer, and
++ * - be represented by a set of language packs.
++ */
 +        const gchar *locale;
 +        const gchar *locale_engine[][2] = {
 +                { "as_IN", "m17n:as:phonetic" },
@@ -31,12 +37,10 @@ Index: gnome-settings-daemon-40.0.1/plugins/keyboard/gsd-keyboard-manager.c
 +                { "ja_JP", "mozc-jp" },
 +                { "kn_IN", "m17n:kn:kgp" },
 +                { "ko_KR", "hangul" },
-+                { "mai_IN", "m17n:mai:inscript" },
 +                { "ml_IN", "m17n:ml:inscript" },
 +                { "mr_IN", "m17n:mr:inscript" },
 +                { "or_IN", "m17n:or:inscript" },
 +                { "pa_IN", "m17n:pa:inscript" },
-+                { "sd_IN", "m17n:sd:inscript" },
 +                { "si_LK", "m17n:si:wijesekera" },
 +                { "ta_IN", "m17n:ta:tamil99" },
 +                { "te_IN", "m17n:te:inscript" },
@@ -75,7 +79,7 @@ Index: gnome-settings-daemon-40.0.1/plugins/keyboard/gsd-keyboard-manager.c
  static void
  apply_bell (GsdKeyboardManager *manager)
  {
-@@ -399,12 +452,12 @@
+@@ -399,12 +456,12 @@
          if (user_manager_loaded)
                  manager_notify_is_loaded_cb (G_OBJECT (user_manager),
                                               NULL,
@@ -90,7 +94,7 @@ Index: gnome-settings-daemon-40.0.1/plugins/keyboard/gsd-keyboard-manager.c
  }
  
  static void
-@@ -557,7 +610,7 @@
+@@ -557,7 +614,7 @@
          g_object_unref (libgnomekbd_settings);
  }
  
@@ -99,7 +103,7 @@ Index: gnome-settings-daemon-40.0.1/plugins/keyboard/gsd-keyboard-manager.c
  maybe_convert_old_settings (GSettings *settings)
  {
          GVariant *sources;
-@@ -565,6 +618,7 @@
+@@ -565,6 +622,7 @@
          gchar *stamp_dir_path = NULL;
          gchar *stamp_file_path = NULL;
          GError *error = NULL;
@@ -107,7 +111,7 @@ Index: gnome-settings-daemon-40.0.1/plugins/keyboard/gsd-keyboard-manager.c
  
          stamp_dir_path = g_build_filename (g_get_user_data_dir (), PACKAGE_NAME, NULL);
          if (g_mkdir_with_parents (stamp_dir_path, 0755)) {
-@@ -576,6 +630,8 @@
+@@ -576,6 +634,8 @@
          if (g_file_test (stamp_file_path, G_FILE_TEST_EXISTS))
                  goto out;
  
@@ -116,7 +120,7 @@ Index: gnome-settings-daemon-40.0.1/plugins/keyboard/gsd-keyboard-manager.c
          sources = g_settings_get_value (settings, KEY_INPUT_SOURCES);
          if (g_variant_n_children (sources) < 1) {
                  convert_libgnomekbd_layouts (settings);
-@@ -594,6 +650,8 @@
+@@ -594,6 +654,8 @@
  out:
          g_free (stamp_file_path);
          g_free (stamp_dir_path);
@@ -125,7 +129,7 @@ Index: gnome-settings-daemon-40.0.1/plugins/keyboard/gsd-keyboard-manager.c
  }
  
  static void
-@@ -608,7 +666,7 @@
+@@ -608,7 +670,7 @@
          if (g_getenv ("RUNNING_UNDER_GDM"))
                  return;
  
@@ -134,7 +138,7 @@ Index: gnome-settings-daemon-40.0.1/plugins/keyboard/gsd-keyboard-manager.c
  
          /* if we still don't have anything do some educated guesses */
          sources = g_settings_get_value (settings, KEY_INPUT_SOURCES);
-@@ -616,6 +674,9 @@
+@@ -616,6 +678,9 @@
                  get_sources_from_xkb_config (manager);
          g_variant_unref (sources);
  
