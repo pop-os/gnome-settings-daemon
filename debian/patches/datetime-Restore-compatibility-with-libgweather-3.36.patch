@@ -13,10 +13,10 @@ Forwarded: not-needed, Debian-specific transitional code
  2 files changed, 27 insertions(+), 1 deletion(-)
 
 diff --git a/meson.build b/meson.build
-index 9b81db3..90bfd0e 100644
+index b6639d9..a17824d 100644
 --- a/meson.build
 +++ b/meson.build
-@@ -98,7 +98,7 @@ gnome_desktop_dep = dependency('gnome-desktop-3.0', version: '>= 3.37.1')
+@@ -96,7 +96,7 @@ gnome_desktop_dep = dependency('gnome-desktop-3.0', version: '>= 3.37.1')
  gsettings_desktop_dep = dependency('gsettings-desktop-schemas', version: '>= 40')
  gtk_dep = dependency('gtk+-3.0', version: '>= 3.15.3')
  gtk_x11_dep = dependency('gtk+-x11-3.0')
