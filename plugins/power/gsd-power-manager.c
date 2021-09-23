@@ -59,6 +59,10 @@
 #define UPOWER_DBUS_INTERFACE                   "org.freedesktop.UPower"
 #define UPOWER_DBUS_INTERFACE_KBDBACKLIGHT      "org.freedesktop.UPower.KbdBacklight"
 
+#define PPD_DBUS_NAME                           "net.hadess.PowerProfiles"
+#define PPD_DBUS_PATH                           "/net/hadess/PowerProfiles"
+#define PPD_DBUS_INTERFACE                      "net.hadess.PowerProfiles"
+
 #define GSD_POWER_SETTINGS_SCHEMA               "org.gnome.settings-daemon.plugins.power"
 
 #define GSD_POWER_DBUS_NAME                     GSD_DBUS_NAME ".Power"
@@ -162,7 +166,7 @@ struct _GsdPowerManager
         NotifyNotification      *notification_sleep_warning;
         GsdPowerActionType       sleep_action_type;
         GHashTable              *devices_notified_ht; /* key = serial str, value = UpDeviceLevel */
-        gboolean                 battery_is_low; /* laptop battery low, or UPS discharging */
+        gboolean                 battery_is_low; /* battery low, or UPS discharging */
 
         /* Brightness */
         GsdBacklight            *backlight;
@@ -184,6 +188,11 @@ struct _GsdPowerManager
         gdouble                  ambient_percentage_old;
         gdouble                  ambient_last_absolute;
         gint64                   ambient_last_time;
+
+        /* Power Profiles */
+        GDBusProxy              *power_profiles_proxy;
+        guint32                  power_saver_cookie;
+        gboolean                 power_saver_enabled;
 
         /* Sound */
         guint32                  critical_alert_timeout_id;
@@ -483,11 +492,290 @@ engine_device_debounce_warn (GsdPowerManager *manager,
         return ret;
 }
 
+static const struct {
+        UpDeviceKind kind;
+        const char *title;
+        const char *low_body_remain;
+        const char *low_body;
+        const char *low_body_unk;
+        const char *crit_body;
+        const char *crit_body_unk;
+} peripheral_battery_notifications[] = {
+        /* Intentionally skipped types (too uncommon, and name too imprecise):
+         * UP_DEVICE_KIND_MODEM
+         * UP_DEVICE_KIND_NETWORK
+         * UP_DEVICE_KIND_VIDEO
+         * UP_DEVICE_KIND_WEARABLE
+         * UP_DEVICE_KIND_TOY
+         */
+        {
+                .kind = UP_DEVICE_KIND_MOUSE,
+                /* TRANSLATORS: notification title, a wireless mouse is low or very low on power */
+                .title         = N_("Mouse battery low"),
+
+                /* TRANSLATORS: notification body, a wireless mouse is low on power */
+                .low_body      = N_("Wireless mouse is low on power (%.0f%%)"),
+                .low_body_unk  = N_("Wireless mouse is low on power"),
+                /* TRANSLATORS: notification body, a wireless mouse is very low on power */
+                .crit_body     = N_("Wireless mouse is very low on power (%.0f%%). "
+                                    "This device will soon stop functioning if not charged."),
+                .crit_body_unk = N_("Wireless mouse is very low on power. "
+                                    "This device will soon stop functioning if not charged."),
+        }, {
+                .kind = UP_DEVICE_KIND_KEYBOARD,
+                /* TRANSLATORS: notification title, a wireless keyboard is low or very low on power */
+                .title         = N_("Keyboard battery low"),
+
+                /* TRANSLATORS: notification body, a wireless keyboard is low on power */
+                .low_body      = N_("Wireless keyboard is low on power (%.0f%%)"),
+                .low_body_unk  = N_("Wireless keyboard is low on power"),
+                /* TRANSLATORS: notification body, a wireless keyboard is very low on power */
+                .crit_body     = N_("Wireless keyboard is very low on power (%.0f%%). "
+                                    "This device will soon stop functioning if not charged."),
+                .crit_body_unk = N_("Wireless keyboard is very low on power. "
+                                    "This device will soon stop functioning if not charged."),
+        }, {
+                .kind = UP_DEVICE_KIND_PDA,
+                /* TRANSLATORS: notification title, a PDA (Personal Digital Assistance device) is low or very on power */
+                .title         = N_("PDA battery low"),
+
+                /* TRANSLATORS: notification body, a PDA (Personal Digital Assistance device) is low on power */
+                .low_body      = N_("PDA is low on power (%.0f%%)"),
+                .low_body_unk  = N_("PDA is low on power"),
+                /* TRANSLATORS: notification body, a PDA (Personal Digital Assistance device) is very low on power */
+                .crit_body     = N_("PDA is very low on power (%.0f%%). "
+                                    "This device will soon stop functioning if not charged."),
+                .crit_body_unk = N_("PDA is very low on power. "
+                                    "This device will soon stop functioning if not charged."),
+        }, {
+                .kind = UP_DEVICE_KIND_PHONE,
+                /* TRANSLATORS: notification title, a cell phone (mobile phone) is low or very low on power */
+                .title         = N_("Cell phone battery low"),
+
+                /* TRANSLATORS: notification body, a cell phone (mobile phone) is low on power */
+                .low_body      = N_("Cell phone is low on power (%.0f%%)"),
+                .low_body_unk  = N_("Cell phone is low on power"),
+                /* TRANSLATORS: notification body, a cell phone (mobile phone) is very low on power */
+                .crit_body     = N_("Cell phone is very low on power (%.0f%%). "
+                                    "This device will soon stop functioning if not charged."),
+                .crit_body_unk = N_("Cell phone is very low on power. "
+                                    "This device will soon stop functioning if not charged."),
+        }, {
+                .kind = UP_DEVICE_KIND_MEDIA_PLAYER,
+                /* TRANSLATORS: notification title, a media player (e.g. mp3 player) is low or very low on power */
+                .title         = N_("Media player battery low"),
+
+                /* TRANSLATORS: notification body, a media player (e.g. mp3 player) is low on power */
+                .low_body      = N_("Media player is low on power (%.0f%%)"),
+                .low_body_unk  = N_("Media player is low on power"),
+                /* TRANSLATORS: notification body, a media player (e.g. mp3 player) is very low on power */
+                .crit_body     = N_("Media player is very low on power (%.0f%%). "
+                                    "This device will soon stop functioning if not charged."),
+                .crit_body_unk = N_("Media player is very low on power. "
+                                    "This device will soon stop functioning if not charged."),
+        }, {
+                .kind = UP_DEVICE_KIND_TABLET,
+                /* TRANSLATORS: notification title, a graphics tablet (e.g. wacom) is low or very low on power */
+                .title         = N_("Tablet battery low"),
+
+                /* TRANSLATORS: notification body, a graphics tablet (e.g. wacom) is low on power */
+                .low_body      = N_("Tablet is low on power (%.0f%%)"),
+                .low_body_unk  = N_("Tablet is low on power"),
+                /* TRANSLATORS: notification body, a graphics tablet (e.g. wacom) is very low on power */
+                .crit_body     = N_("Tablet is very low on power (%.0f%%). "
+                                    "This device will soon stop functioning if not charged."),
+                .crit_body_unk = N_("Tablet is very low on power. "
+                                    "This device will soon stop functioning if not charged."),
+        }, {
+                .kind = UP_DEVICE_KIND_COMPUTER,
+                /* TRANSLATORS: notification title, an attached computer (e.g. ipad) is low or very low on power */
+                .title         = N_("Attached computer battery low"),
+
+                /* TRANSLATORS: notification body, an attached computer (e.g. ipad) is low on power */
+                .low_body      = N_("Attached computer is low on power (%.0f%%)"),
+                .low_body_unk  = N_("Attached computer is low on power"),
+                /* TRANSLATORS: notification body, an attached computer (e.g. ipad) is very low on power */
+                .crit_body     = N_("Attached computer is very low on power (%.0f%%). "
+                                    "The device will soon shutdown if not charged."),
+                .crit_body_unk = N_("Attached computer is very low on power. "
+                                    "The device will soon shutdown if not charged."),
+        }, {
+                .kind = UP_DEVICE_KIND_GAMING_INPUT,
+                /* TRANSLATORS: notification title, a game controller (e.g. joystick or joypad) is low or very low on power */
+                .title         = N_("Game controller battery low"),
+
+                /* TRANSLATORS: notification body, a game controller (e.g. joystick or joypad) is low on power */
+                .low_body      = N_("Game controller is low on power (%.0f%%)"),
+                .low_body_unk  = N_("Game controller is low on power"),
+                /* TRANSLATORS: notification body, an attached game controller (e.g. joystick or joypad) is very low on power */
+                .crit_body     = N_("Game controller is very low on power (%.0f%%). "
+                                    "The device will soon shutdown if not charged."),
+                .crit_body_unk = N_("Game controller is very low on power. "
+                                    "The device will soon shutdown if not charged."),
+        }, {
+                .kind = UP_DEVICE_KIND_PEN,
+                /* TRANSLATORS: notification title, a pen is low or very low on power */
+                .title         = N_("Pen battery low"),
+
+                /* TRANSLATORS: notification body, a pen is low on power */
+                .low_body      = N_("Pen is low on power (%.0f%%)"),
+                .low_body_unk  = N_("Pen is low on power"),
+                /* TRANSLATORS: notification body, a pen is very low on power */
+                .crit_body     = N_("Pen is very low on power (%.0f%%). "
+                                    "The device will soon shutdown if not charged."),
+                .crit_body_unk = N_("Pen is very low on power. "
+                                    "The device will soon shutdown if not charged."),
+        }, {
+                .kind = UP_DEVICE_KIND_TOUCHPAD,
+                /* TRANSLATORS: notification title, an external touchpad is low or very low on power */
+                .title         = N_("Touchpad battery low"),
+
+                /* TRANSLATORS: notification body, an external touchpad is low on power */
+                .low_body      = N_("Touchpad is low on power (%.0f%%)"),
+                .low_body_unk  = N_("Touchpad is low on power"),
+                /* TRANSLATORS: notification body, an external touchpad is very low on power */
+                .crit_body     = N_("Touchpad is very low on power (%.0f%%). "
+                                    "The device will soon shutdown if not charged."),
+                .crit_body_unk = N_("Touchpad is very low on power. "
+                                    "The device will soon shutdown if not charged."),
+        }, {
+                .kind = UP_DEVICE_KIND_HEADSET,
+                /* TRANSLATORS: notification title, a headset (headphones + microphone) is low or very low on power */
+                .title         = N_("Headset battery low"),
+
+                /* TRANSLATORS: notification body, a headset (headphones + microphone) is low on power */
+                .low_body      = N_("Headset is low on power (%.0f%%)"),
+                .low_body_unk  = N_("Headset is low on power"),
+                /* TRANSLATORS: notification body, a headset (headphones + microphone) is very low on power */
+                .crit_body     = N_("Headset is very low on power (%.0f%%). "
+                                    "The device will soon shutdown if not charged."),
+                .crit_body_unk = N_("Headset is very low on power. "
+                                    "The device will soon shutdown if not charged."),
+        }, {
+                .kind = UP_DEVICE_KIND_SPEAKERS,
+                /* TRANSLATORS: notification title, speaker is low or very low on power */
+                .title         = N_("Speaker battery low"),
+
+                /* TRANSLATORS: notification body, a speaker is low on power */
+                .low_body      = N_("Speaker is low on power (%.0f%%)"),
+                .low_body_unk  = N_("Speaker is low on power"),
+                /* TRANSLATORS: notification body, a speaker is very low on power */
+                .crit_body     = N_("Speaker is very low on power (%.0f%%). "
+                                    "The device will soon shutdown if not charged."),
+                .crit_body_unk = N_("Speaker is very low on power. "
+                                    "The device will soon shutdown if not charged."),
+        }, {
+                .kind = UP_DEVICE_KIND_HEADPHONES,
+                /* TRANSLATORS: notification title, headphones (no microphone) are low or very low on power */
+                .title         = N_("Headphones battery low"),
+
+                /* TRANSLATORS: notification body, headphones (no microphone) are low on power */
+                .low_body      = N_("Headphones are low on power (%.0f%%)"),
+                .low_body_unk  = N_("Headphones are low on power"),
+                /* TRANSLATORS: notification body, headphones (no microphone) are very low on power */
+                .crit_body     = N_("Headphones are very low on power (%.0f%%). "
+                                    "The device will soon shutdown if not charged."),
+                .crit_body_unk = N_("Headphones are very low on power. "
+                                    "The device will soon shutdown if not charged."),
+        }, {
+                .kind = UP_DEVICE_KIND_OTHER_AUDIO,
+                /* TRANSLATORS: notification title, an audio device is low or very low on power */
+                .title         = N_("Audio device battery low"),
+
+                /* TRANSLATORS: notification body, an audio device is low on power */
+                .low_body      = N_("Audio device is low on power (%.0f%%)"),
+                .low_body_unk  = N_("Audio device is low on power"),
+                /* TRANSLATORS: notification body, an audio device is very low on power */
+                .crit_body     = N_("Audio device is very low on power (%.0f%%). "
+                                    "The device will soon shutdown if not charged."),
+                .crit_body_unk = N_("Audio device is very low on power. "
+                                    "The device will soon shutdown if not charged."),
+        }, {
+                .kind = UP_DEVICE_KIND_REMOTE_CONTROL,
+                /* TRANSLATORS: notification title, a remote control is low or very low on power */
+                .title         = N_("Remote battery low"),
+
+                /* TRANSLATORS: notification body, an remote control is low on power */
+                .low_body      = N_("Remote is low on power (%.0f%%)"),
+                .low_body_unk  = N_("Remote is low on power"),
+                /* TRANSLATORS: notification body, a remote control is very low on power */
+                .crit_body     = N_("Remote is very low on power (%.0f%%). "
+                                    "The device will soon shutdown if not charged."),
+                .crit_body_unk = N_("Remote is very low on power. "
+                                    "The device will soon shutdown if not charged."),
+        }, {
+                .kind = UP_DEVICE_KIND_PRINTER,
+                /* TRANSLATORS: notification title, a printer is low or very low on power */
+                .title         = N_("Printer battery low"),
+
+                /* TRANSLATORS: notification body, a printer is low on power */
+                .low_body      = N_("Printer is low on power (%.0f%%)"),
+                .low_body_unk  = N_("Printer is low on power"),
+                /* TRANSLATORS: notification body, a printer is very low on power */
+                .crit_body     = N_("Printer is very low on power (%.0f%%). "
+                                    "The device will soon shutdown if not charged."),
+                .crit_body_unk = N_("Printer is very low on power. "
+                                    "The device will soon shutdown if not charged."),
+        }, {
+                .kind = UP_DEVICE_KIND_SCANNER,
+                /* TRANSLATORS: notification title, a scanner is low or very low on power */
+                .title         = N_("Scanner battery low"),
+
+                /* TRANSLATORS: notification body, a scanner is low on power */
+                .low_body      = N_("Scanner is low on power (%.0f%%)"),
+                .low_body_unk  = N_("Scanner is low on power"),
+                /* TRANSLATORS: notification body, a scanner is very low on power */
+                .crit_body     = N_("Scanner is very low on power (%.0f%%). "
+                                    "The device will soon shutdown if not charged."),
+                .crit_body_unk = N_("Scanner is very low on power. "
+                                    "The device will soon shutdown if not charged."),
+        }, {
+                .kind = UP_DEVICE_KIND_CAMERA,
+                /* TRANSLATORS: notification title, a camera is low or very low on power */
+                .title         = N_("Camera battery low"),
+
+                /* TRANSLATORS: notification body, a camera is low on power */
+                .low_body      = N_("Camera is low on power (%.0f%%)"),
+                .low_body_unk  = N_("Camera is low on power"),
+                /* TRANSLATORS: notification body, a camera is very low on power */
+                .crit_body     = N_("Camera is very low on power (%.0f%%). "
+                                    "The device will soon shutdown if not charged."),
+                .crit_body_unk = N_("Camera is very low on power. "
+                                    "The device will soon shutdown if not charged."),
+        }, {
+                .kind = UP_DEVICE_KIND_BLUETOOTH_GENERIC,
+                /* TRANSLATORS: notification title, a Bluetooth device is low or very low on power */
+                .title         = N_("Bluetooth device battery low"),
+
+                /* TRANSLATORS: notification body, a Bluetooth device is low on power */
+                .low_body      = N_("Bluetooth device is low on power (%.0f%%)"),
+                .low_body_unk  = N_("Bluetooth device is low on power"),
+                /* TRANSLATORS: notification body, a Bluetooth device is very low on power */
+                .crit_body     = N_("Bluetooth device is very low on power (%.0f%%). "
+                                    "The device will soon shutdown if not charged."),
+                .crit_body_unk = N_("Bluetooth device is very low on power. "
+                                    "The device will soon shutdown if not charged."),
+        }, {
+                /* Last entry is the fallback (kind is actually unused)! */
+                .kind = UP_DEVICE_KIND_UNKNOWN,
+                /* TRANSLATORS: notification title, a connected (wireless) device or peripheral of unhandled type is low or very on power */
+                .title         = N_("Connected device battery is low"),
+
+                /* TRANSLATORS: notification body, a connected (wireless) device or peripheral of unhandled type is low on power */
+                .low_body      = N_("A connected device is low on power (%.0f%%)"),
+                .low_body_unk  = N_("A connected device is low on power"),
+                /* TRANSLATORS: notification body, a connected (wireless) device or peripheral of unhandled type is very low on power */
+                .crit_body     = N_("A connected device is very low on power (%.0f%%). "
+                                    "The device will soon shutdown if not charged."),
+                .crit_body_unk = N_("A connected device is very low on power. "
+                                    "The device will soon shutdown if not charged."),
+        }
+};
+
 static void
 engine_charge_low (GsdPowerManager *manager, UpDevice *device)
 {
         const gchar *title = NULL;
-        gboolean ret;
         gchar *message = NULL;
         gchar *tmp;
         gchar *remaining_text;
@@ -510,104 +798,43 @@ engine_charge_low (GsdPowerManager *manager, UpDevice *device)
                 battery_level = UP_DEVICE_LEVEL_NONE;
 
         if (kind == UP_DEVICE_KIND_BATTERY) {
-
-                /* if the user has no other batteries, drop the "Laptop" wording */
-                ret = (manager->devices_array->len > 0);
-                if (ret) {
-                        /* TRANSLATORS: laptop battery low, and we only have one battery */
-                        title = _("Battery low");
-                } else {
-                        /* TRANSLATORS: laptop battery low, and we have more than one kind of battery */
-                        title = _("Laptop battery low");
-                }
+                /* TRANSLATORS: notification title, the battery of this laptop/tablet/phone is running low, shows time remaining */
+                title = _("Battery low");
                 tmp = gpm_get_timestring (time_to_empty);
                 remaining_text = g_strconcat ("<b>", tmp, "</b>", NULL);
                 g_free (tmp);
 
-                /* TRANSLATORS: tell the user how much time they have got */
+                /* TRANSLATORS: notification body, the battery of this laptop/tablet/phone is running low, shows time remaining */
                 message = g_strdup_printf (_("Approximately %s remaining (%.0f%%)"), remaining_text, percentage);
                 g_free (remaining_text);
 
         } else if (kind == UP_DEVICE_KIND_UPS) {
-                /* TRANSLATORS: UPS is starting to get a little low */
+                /* TRANSLATORS: notification title, an Uninterruptible Power Supply (UPS) is running low, shows time remaining */
                 title = _("UPS low");
                 tmp = gpm_get_timestring (time_to_empty);
                 remaining_text = g_strconcat ("<b>", tmp, "</b>", NULL);
                 g_free (tmp);
 
-                /* TRANSLATORS: tell the user how much time they have got */
+                /* TRANSLATORS: notification body, an Uninterruptible Power Supply (UPS) is running low, shows time remaining */
                 message = g_strdup_printf (_("Approximately %s of remaining UPS backup power (%.0f%%)"),
                                            remaining_text, percentage);
                 g_free (remaining_text);
-        } else if (kind == UP_DEVICE_KIND_MOUSE) {
-                /* TRANSLATORS: mouse is getting a little low */
-                title = _("Mouse battery low");
+        } else {
+                guint i;
 
-                /* TRANSLATORS: tell user more details */
+                for (i = 0; i < G_N_ELEMENTS (peripheral_battery_notifications); i++) {
+                        if (peripheral_battery_notifications[i].kind == kind)
+                                break;
+                }
+                /* Use the last element if nothing was found*/
+                i = MIN (i, G_N_ELEMENTS (peripheral_battery_notifications) - 1);
+
+                title = gettext (peripheral_battery_notifications[i].title);
+
                 if (battery_level == UP_DEVICE_LEVEL_NONE)
-                        message = g_strdup_printf (_("Wireless mouse is low in power (%.0f%%)"), percentage);
+                        message = g_strdup_printf (gettext (peripheral_battery_notifications[i].low_body), percentage);
                 else
-                        message = g_strdup_printf (_("Wireless mouse is low in power"));
-
-        } else if (kind == UP_DEVICE_KIND_KEYBOARD) {
-                /* TRANSLATORS: keyboard is getting a little low */
-                title = _("Keyboard battery low");
-
-                /* TRANSLATORS: tell user more details */
-                if (battery_level == UP_DEVICE_LEVEL_NONE)
-                        message = g_strdup_printf (_("Wireless keyboard is low in power (%.0f%%)"), percentage);
-                else
-                        message = g_strdup_printf (_("Wireless keyboard is low in power"));
-
-        } else if (kind == UP_DEVICE_KIND_PDA) {
-                /* TRANSLATORS: PDA is getting a little low */
-                title = _("PDA battery low");
-
-                /* TRANSLATORS: tell user more details */
-                if (battery_level == UP_DEVICE_LEVEL_NONE)
-                        message = g_strdup_printf (_("PDA is low in power (%.0f%%)"), percentage);
-                else
-                        message = g_strdup_printf (_("PDA is low in power"));
-
-        } else if (kind == UP_DEVICE_KIND_PHONE) {
-                /* TRANSLATORS: cell phone (mobile) is getting a little low */
-                title = _("Cell phone battery low");
-
-                /* TRANSLATORS: tell user more details */
-                if (battery_level == UP_DEVICE_LEVEL_NONE)
-                        message = g_strdup_printf (_("Cell phone is low in power (%.0f%%)"), percentage);
-                else
-                        message = g_strdup_printf (_("Cell phone is low in power"));
-
-        } else if (kind == UP_DEVICE_KIND_MEDIA_PLAYER) {
-                /* TRANSLATORS: media player, e.g. mp3 is getting a little low */
-                title = _("Media player battery low");
-
-                /* TRANSLATORS: tell user more details */
-                if (battery_level == UP_DEVICE_LEVEL_NONE)
-                        message = g_strdup_printf (_("Media player is low in power (%.0f%%)"), percentage);
-                else
-                        message = g_strdup_printf (_("Media player is low in power"));
-
-        } else if (kind == UP_DEVICE_KIND_TABLET) {
-                /* TRANSLATORS: graphics tablet, e.g. wacom is getting a little low */
-                title = _("Tablet battery low");
-
-                /* TRANSLATORS: tell user more details */
-                if (battery_level == UP_DEVICE_LEVEL_NONE)
-                        message = g_strdup_printf (_("Tablet is low in power (%.0f%%)"), percentage);
-                else
-                        message = g_strdup_printf (_("Tablet is low in power"));
-
-        } else if (kind == UP_DEVICE_KIND_COMPUTER) {
-                /* TRANSLATORS: computer, e.g. ipad is getting a little low */
-                title = _("Attached computer battery low");
-
-                /* TRANSLATORS: tell user more details */
-                if (battery_level == UP_DEVICE_LEVEL_NONE)
-                        message = g_strdup_printf (_("Attached computer is low in power (%.0f%%)"), percentage);
-                else
-                        message = g_strdup_printf (_("Attached computer is low in power"));
+                        message = g_strdup (gettext (peripheral_battery_notifications[i].low_body_unk));
         }
 
         /* close any existing notification of this class */
@@ -638,7 +865,6 @@ static void
 engine_charge_critical (GsdPowerManager *manager, UpDevice *device)
 {
         const gchar *title = NULL;
-        gboolean ret;
         gchar *message = NULL;
         gdouble percentage;
         guint battery_level;
@@ -660,141 +886,50 @@ engine_charge_critical (GsdPowerManager *manager, UpDevice *device)
                 battery_level = UP_DEVICE_LEVEL_NONE;
 
         if (kind == UP_DEVICE_KIND_BATTERY) {
-
-                /* if the user has no other batteries, drop the "Laptop" wording */
-                ret = (manager->devices_array->len > 0);
-                if (ret) {
-                        /* TRANSLATORS: laptop battery critically low, and only have one kind of battery */
-                        title = _("Battery critically low");
-                } else {
-                        /* TRANSLATORS: laptop battery critically low, and we have more than one type of battery */
-                        title = _("Laptop battery critically low");
-                }
+                /* TRANSLATORS: notification title, the battery of this laptop/tablet/phone is critically low, warning about action happening soon */
+                title = _("Battery critically low");
 
                 /* we have to do different warnings depending on the policy */
                 policy = manager_critical_action_get (manager);
 
-                /* use different text for different actions */
                 if (policy == GSD_POWER_ACTION_HIBERNATE) {
-                        /* TRANSLATORS: give the user a ultimatum */
-                        message = g_strdup_printf (_("Computer will hibernate very soon unless it is plugged in."));
-
+                        /* TRANSLATORS: notification body, the battery of this laptop/tablet/phone is critically low, warning about action happening soon */
+                        message = g_strdup_printf (_("Hibernating soon unless plugged in."));
                 } else if (policy == GSD_POWER_ACTION_SHUTDOWN) {
-                        /* TRANSLATORS: give the user a ultimatum */
-                        message = g_strdup_printf (_("Computer will shutdown very soon unless it is plugged in."));
+                        message = g_strdup_printf (_("Shutting down soon unless plugged in."));
                 }
 
         } else if (kind == UP_DEVICE_KIND_UPS) {
                 gchar *remaining_text;
                 gchar *tmp;
 
-                /* TRANSLATORS: the UPS is very low */
+                /* TRANSLATORS: notification title, an Uninterruptible Power Supply (UPS) is running low, warning about action happening soon */
                 title = _("UPS critically low");
                 tmp = gpm_get_timestring (time_to_empty);
                 remaining_text = g_strconcat ("<b>", tmp, "</b>", NULL);
                 g_free (tmp);
 
-                /* TRANSLATORS: give the user a ultimatum */
+                /* TRANSLATORS: notification body, an Uninterruptible Power Supply (UPS) is running low, warning about action happening soon */
                 message = g_strdup_printf (_("Approximately %s of remaining UPS power (%.0f%%). "
                                              "Restore AC power to your computer to avoid losing data."),
                                            remaining_text, percentage);
                 g_free (remaining_text);
-        } else if (kind == UP_DEVICE_KIND_MOUSE) {
-                /* TRANSLATORS: the mouse battery is very low */
-                title = _("Mouse battery low");
+        } else {
+                guint i;
 
-                /* TRANSLATORS: the device is just going to stop working */
+                for (i = 0; i < G_N_ELEMENTS (peripheral_battery_notifications); i++) {
+                        if (peripheral_battery_notifications[i].kind == kind)
+                                break;
+                }
+                /* Use the last element if nothing was found*/
+                i = MIN (i, G_N_ELEMENTS (peripheral_battery_notifications) - 1);
+
+                title = gettext (peripheral_battery_notifications[i].title);
+
                 if (battery_level == UP_DEVICE_LEVEL_NONE)
-                        message = g_strdup_printf (_("Wireless mouse is very low in power (%.0f%%). "
-                                                     "This device will soon stop functioning if not charged."),
-                                                   percentage);
+                        message = g_strdup_printf (gettext (peripheral_battery_notifications[i].crit_body), percentage);
                 else
-                        message = g_strdup_printf (_("Wireless mouse is very low in power. "
-                                                     "This device will soon stop functioning if not charged."));
-
-        } else if (kind == UP_DEVICE_KIND_KEYBOARD) {
-                /* TRANSLATORS: the keyboard battery is very low */
-                title = _("Keyboard battery low");
-
-                /* TRANSLATORS: the device is just going to stop working */
-                if (battery_level == UP_DEVICE_LEVEL_NONE)
-                        message = g_strdup_printf (_("Wireless keyboard is very low in power (%.0f%%). "
-                                                     "This device will soon stop functioning if not charged."),
-                                                   percentage);
-                else
-                        message = g_strdup_printf (_("Wireless keyboard is very low in power. "
-                                                     "This device will soon stop functioning if not charged."));
-
-        } else if (kind == UP_DEVICE_KIND_PDA) {
-
-                /* TRANSLATORS: the PDA battery is very low */
-                title = _("PDA battery low");
-
-                /* TRANSLATORS: the device is just going to stop working */
-                if (battery_level == UP_DEVICE_LEVEL_NONE)
-                        message = g_strdup_printf (_("PDA is very low in power (%.0f%%). "
-                                                     "This device will soon stop functioning if not charged."),
-                                                   percentage);
-                else
-                        message = g_strdup_printf (_("PDA is very low in power. "
-                                                     "This device will soon stop functioning if not charged."));
-
-        } else if (kind == UP_DEVICE_KIND_PHONE) {
-
-                /* TRANSLATORS: the cell battery is very low */
-                title = _("Cell phone battery low");
-
-                /* TRANSLATORS: the device is just going to stop working */
-                if (battery_level == UP_DEVICE_LEVEL_NONE)
-                        message = g_strdup_printf (_("Cell phone is very low in power (%.0f%%). "
-                                                     "This device will soon stop functioning if not charged."),
-                                                   percentage);
-                else
-                        message = g_strdup_printf (_("Cell phone is very low in power. "
-                                                     "This device will soon stop functioning if not charged."));
-
-        } else if (kind == UP_DEVICE_KIND_MEDIA_PLAYER) {
-
-                /* TRANSLATORS: the cell battery is very low */
-                title = _("Cell phone battery low");
-
-                /* TRANSLATORS: the device is just going to stop working */
-                if (battery_level == UP_DEVICE_LEVEL_NONE)
-                        message = g_strdup_printf (_("Media player is very low in power (%.0f%%). "
-                                                     "This device will soon stop functioning if not charged."),
-                                                   percentage);
-                else
-                        message = g_strdup_printf (_("Media player is very low in power. "
-                                                     "This device will soon stop functioning if not charged."));
-
-        } else if (kind == UP_DEVICE_KIND_TABLET) {
-
-                /* TRANSLATORS: the cell battery is very low */
-                title = _("Tablet battery low");
-
-                /* TRANSLATORS: the device is just going to stop working */
-                if (battery_level == UP_DEVICE_LEVEL_NONE)
-                        message = g_strdup_printf (_("Tablet is very low in power (%.0f%%). "
-                                                     "This device will soon stop functioning if not charged."),
-                                                   percentage);
-                else
-                        message = g_strdup_printf (_("Tablet is very low in power. "
-                                                     "This device will soon stop functioning if not charged."));
-
-        } else if (kind == UP_DEVICE_KIND_COMPUTER) {
-
-                /* TRANSLATORS: the cell battery is very low */
-                title = _("Attached computer battery low");
-
-                /* TRANSLATORS: the device is just going to stop working */
-                if (battery_level == UP_DEVICE_LEVEL_NONE)
-                        message = g_strdup_printf (_("Attached computer is very low in power (%.0f%%). "
-                                                     "The device will soon shutdown if not charged."),
-                                                   percentage);
-                else
-                        message = g_strdup_printf (_("Attached computer is very low in power. "
-                                                     "The device will soon shutdown if not charged."));
-
+                        message = g_strdup (gettext (peripheral_battery_notifications[i].crit_body_unk));
         }
 
         /* close any existing notification of this class */
@@ -847,21 +982,18 @@ engine_charge_action (GsdPowerManager *manager, UpDevice *device)
                       NULL);
 
         if (kind == UP_DEVICE_KIND_BATTERY) {
-
-                /* TRANSLATORS: laptop battery is really, really, low */
-                title = _("Laptop battery critically low");
+                /* TRANSLATORS: notification title, the battery of this laptop/tablet/phone is critically low, warning about action happening now */
+                title = _("Battery critically low");
 
                 /* we have to do different warnings depending on the policy */
                 policy = manager_critical_action_get (manager);
 
-                /* use different text for different actions */
                 if (policy == GSD_POWER_ACTION_HIBERNATE) {
-                        /* TRANSLATORS: computer will hibernate */
+                        /* TRANSLATORS: notification body, the battery of this laptop/tablet/phone is critically low, warning about action happening now */
                         message = g_strdup (_("The battery is below the critical level and "
                                               "this computer is about to hibernate."));
 
                 } else if (policy == GSD_POWER_ACTION_SHUTDOWN) {
-                        /* TRANSLATORS: computer will just shutdown */
                         message = g_strdup (_("The battery is below the critical level and "
                                               "this computer is about to shutdown."));
                 }
@@ -873,20 +1005,18 @@ engine_charge_action (GsdPowerManager *manager, UpDevice *device)
                 g_source_set_name_by_id (timer_id, "[GsdPowerManager] battery critical-action");
 
         } else if (kind == UP_DEVICE_KIND_UPS) {
-                /* TRANSLATORS: UPS is really, really, low */
+                /* TRANSLATORS: notification title, an Uninterruptible Power Supply (UPS) is running low, warning about action happening now */
                 title = _("UPS critically low");
 
                 /* we have to do different warnings depending on the policy */
                 policy = manager_critical_action_get (manager);
 
-                /* use different text for different actions */
                 if (policy == GSD_POWER_ACTION_HIBERNATE) {
-                        /* TRANSLATORS: computer will hibernate */
+                        /* TRANSLATORS: notification body, an Uninterruptible Power Supply (UPS) is running low, warning about action happening now */
                         message = g_strdup (_("UPS is below the critical level and "
                                               "this computer is about to hibernate."));
 
                 } else if (policy == GSD_POWER_ACTION_SHUTDOWN) {
-                        /* TRANSLATORS: computer will just shutdown */
                         message = g_strdup (_("UPS is below the critical level and "
                                               "this computer is about to shutdown."));
                 }
@@ -1772,6 +1902,20 @@ clear_idle_watch (GnomeIdleMonitor *monitor,
         *id = 0;
 }
 
+static gboolean
+is_power_save_active (GsdPowerManager *manager)
+{
+        /*
+         * If we have power-profiles-daemon, then we follow its setting,
+         * otherwise we go into power-save mode when the battery is low.
+         */
+        if (manager->power_profiles_proxy &&
+            g_dbus_proxy_get_name_owner (manager->power_profiles_proxy))
+                return manager->power_saver_enabled;
+        else
+                return manager->battery_is_low;
+}
+
 static void
 idle_configure (GsdPowerManager *manager)
 {
@@ -1893,10 +2037,8 @@ idle_configure (GsdPowerManager *manager)
         timeout_dim = 0;
         if (manager->screensaver_active) {
                 /* Don't dim when the screen lock is active */
-        } else if (!on_battery) {
-                /* Don't dim when charging */
-        } else if (manager->battery_is_low) {
-                /* Aggressively blank when battery is low */
+        } else if (is_power_save_active (manager)) {
+                /* Try to save power by dimming agressively */
                 timeout_dim = SCREENSAVER_TIMEOUT_BLANK;
         } else {
                 if (g_settings_get_boolean (manager->settings, "idle-dim")) {
@@ -1928,6 +2070,67 @@ idle_configure (GsdPowerManager *manager)
 }
 
 static void
+hold_profile_cb (GObject      *source_object,
+                 GAsyncResult *res,
+                 gpointer      user_data)
+{
+        GsdPowerManager *manager = user_data;
+        g_autoptr(GError) error = NULL;
+        g_autoptr(GVariant) result = NULL;
+
+        result = g_dbus_proxy_call_finish (G_DBUS_PROXY (source_object),
+                                           res,
+                                           &error);
+        if (result == NULL) {
+                g_warning ("Couldn't hold power-saver profile: %s", error->message);
+                return;
+        }
+
+        if (g_variant_is_of_type (result, G_VARIANT_TYPE ("(u)"))) {
+                g_variant_get (result, "(u)", &manager->power_saver_cookie);
+                g_debug ("Holding power-saver profile with cookie %u", manager->power_saver_cookie);
+        } else {
+                g_warning ("Calling HoldProfile() did not return a uint32");
+        }
+}
+
+static void
+enable_power_saver (GsdPowerManager *manager)
+{
+        if (!manager->power_profiles_proxy)
+                return;
+        if (!g_settings_get_boolean (manager->settings, "power-saver-profile-on-low-battery"))
+                return;
+
+        g_debug ("Starting hold of power-saver profile");
+
+        g_dbus_proxy_call (manager->power_profiles_proxy,
+                           "HoldProfile",
+                           g_variant_new("(sss)",
+                                         "power-saver",
+                                         "Power saver profile when low on battery",
+                                         GSD_POWER_DBUS_NAME),
+                           G_DBUS_CALL_FLAGS_NONE,
+                           -1, manager->cancellable, hold_profile_cb, manager);
+}
+
+static void
+disable_power_saver (GsdPowerManager *manager)
+{
+        if (!manager->power_profiles_proxy || manager->power_saver_cookie == 0)
+                return;
+
+        g_debug ("Releasing power-saver profile");
+
+        g_dbus_proxy_call (manager->power_profiles_proxy,
+                           "ReleaseProfile",
+                           g_variant_new ("(u)", manager->power_saver_cookie),
+                           G_DBUS_CALL_FLAGS_NONE,
+                           -1, NULL, dbus_call_log_error, "ReleaseProfile failed");
+        manager->power_saver_cookie = 0;
+}
+
+static void
 main_battery_or_ups_low_changed (GsdPowerManager *manager,
                                  gboolean         is_low)
 {
@@ -1935,6 +2138,10 @@ main_battery_or_ups_low_changed (GsdPowerManager *manager,
                 return;
         manager->battery_is_low = is_low;
         idle_configure (manager);
+        if (is_low)
+                enable_power_saver (manager);
+        else
+                disable_power_saver (manager);
 }
 
 static gboolean
@@ -2079,6 +2286,66 @@ screensaver_signal_cb (GDBusProxy *proxy,
 }
 
 static void
+power_profiles_proxy_signal_cb (GDBusProxy  *proxy,
+                               const gchar *sender_name,
+                               const gchar *signal_name,
+                               GVariant    *parameters,
+                               gpointer     user_data)
+{
+        GsdPowerManager *manager = GSD_POWER_MANAGER (user_data);
+
+        if (g_strcmp0 (signal_name, "ProfileReleased") != 0)
+                return;
+        manager->power_saver_cookie = 0;
+}
+
+static void
+update_active_power_profile (GsdPowerManager *manager)
+{
+        g_autoptr(GVariant) v = NULL;
+        const char *active_profile;
+        gboolean power_saver_enabled;
+
+        v = g_dbus_proxy_get_cached_property (manager->power_profiles_proxy, "ActiveProfile");
+        if (v) {
+                active_profile = g_variant_get_string (v, NULL);
+                power_saver_enabled = g_strcmp0 (active_profile, "power-saver") == 0;
+                if (power_saver_enabled != manager->power_saver_enabled) {
+                        manager->power_saver_enabled = power_saver_enabled;
+                        idle_configure (manager);
+                }
+        } else {
+                /* p-p-d might have disappeared from the bus */
+                idle_configure (manager);
+        }
+}
+
+static void
+power_profiles_proxy_ready_cb (GObject             *source_object,
+                              GAsyncResult        *res,
+                              gpointer             user_data)
+{
+        g_autoptr(GError) error = NULL;
+        GsdPowerManager *manager = GSD_POWER_MANAGER (user_data);
+
+        manager->power_profiles_proxy = g_dbus_proxy_new_for_bus_finish (res, &error);
+        if (manager->power_profiles_proxy == NULL) {
+                g_debug ("Could not connect to power-profiles-daemon: %s", error->message);
+                return;
+        }
+
+        g_signal_connect_swapped (manager->power_profiles_proxy,
+                                  "g-properties-changed",
+                                  G_CALLBACK (update_active_power_profile),
+                                  manager);
+        g_signal_connect (manager->power_profiles_proxy, "g-signal",
+                          G_CALLBACK (power_profiles_proxy_signal_cb),
+                          manager);
+
+        update_active_power_profile (manager);
+}
+
+static void
 power_keyboard_proxy_ready_cb (GObject             *source_object,
                                GAsyncResult        *res,
                                gpointer             user_data)
@@ -2180,12 +2447,12 @@ show_sleep_warning (GsdPowerManager *manager)
                                      &manager->notification_sleep_warning);
                 break;
         case GSD_POWER_ACTION_SUSPEND:
-                create_notification (_("Automatic suspend"), _("Computer will suspend very soon because of inactivity."),
+                create_notification (_("Automatic suspend"), _("Suspending soon because of inactivity."),
                                      NULL, NOTIFICATION_PRIVACY_SYSTEM,
                                      &manager->notification_sleep_warning);
                 break;
         case GSD_POWER_ACTION_HIBERNATE:
-                create_notification (_("Automatic hibernation"), _("Computer will suspend very soon because of inactivity."),
+                create_notification (_("Automatic hibernation"), _("Suspending soon because of inactivity."),
                                      NULL, NOTIFICATION_PRIVACY_SYSTEM,
                                      &manager->notification_sleep_warning);
                 break;
@@ -2287,6 +2554,14 @@ engine_settings_key_changed_cb (GSettings *settings,
             g_str_equal (key, "idle-delay") ||
             g_str_equal (key, "idle-dim")) {
                 idle_configure (manager);
+                return;
+        }
+        if (g_str_equal (key, "power-saver-profile-on-low-battery")) {
+                if (manager->battery_is_low &&
+                    g_settings_get_boolean (settings, key))
+                        enable_power_saver (manager);
+                else
+                        disable_power_saver (manager);
                 return;
         }
 }
@@ -2599,6 +2874,17 @@ on_rr_screen_acquired (GObject      *object,
         g_signal_connect (manager->up_client, "notify::on-battery",
                           G_CALLBACK (up_client_on_battery_cb), manager);
 
+        /* connect to power-profiles-daemon */
+        g_dbus_proxy_new_for_bus (G_BUS_TYPE_SYSTEM,
+                                  G_DBUS_PROXY_FLAGS_NONE,
+                                  NULL,
+                                  PPD_DBUS_NAME,
+                                  PPD_DBUS_PATH,
+                                  PPD_DBUS_INTERFACE,
+                                  manager->cancellable,
+                                  power_profiles_proxy_ready_cb,
+                                  manager);
+
         /* connect to UPower for keyboard backlight control */
         manager->kbd_brightness_now = -1;
         g_dbus_proxy_new_for_bus (G_BUS_TYPE_SYSTEM,
@@ -2861,6 +3147,9 @@ gsd_power_manager_stop (GsdPowerManager *manager)
         g_clear_pointer (&manager->devices_notified_ht, g_hash_table_destroy);
 
         g_clear_object (&manager->screensaver_proxy);
+
+        disable_power_saver (manager);
+        g_clear_object (&manager->power_profiles_proxy);
 
         play_loop_stop (&manager->critical_alert_timeout_id);
 
