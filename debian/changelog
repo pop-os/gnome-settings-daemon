@@ -1,3 +1,9 @@
+gnome-settings-daemon (41.0-1) UNRELEASED; urgency=medium
+
+  * New upstream release
+
+ -- Jeremy Bicha <jbicha@debian.org>  Thu, 23 Sep 2021 18:48:01 -0400
+
 gnome-settings-daemon (40.0.1-2) unstable; urgency=medium
 
   * Team upload
