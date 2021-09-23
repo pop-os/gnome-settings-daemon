@@ -1,4 +1,3 @@
 debian/01_debianize_xrdb.patch
 debian/Revert-xsettings-Add-support-for-XFixes-ClientDisconnect.patch
 debian/meson.build-Lower-polkit-requirement.patch
-datetime-Restore-compatibility-with-libgweather-3.36.patch
