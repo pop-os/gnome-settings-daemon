@@ -43,25 +43,34 @@ class OutputChecker(object):
                     fcntl.fcntl(self._pipe_fd_w, fcntl.F_GETFL) | os.O_CLOEXEC)
 
         # Start copier thread
-        self._thread = threading.Thread(target=self._copy)
+        self._thread = threading.Thread(target=self._copy, daemon=True)
         self._thread.start()
 
     def _copy(self):
+        p = select.poll()
+        p.register(self._pipe_fd_r)
         while True:
             try:
                 # Be lazy and wake up occasionally in case _pipe_fd_r became invalid
                 # The reason to do this is because os.read() will *not* return if the
                 # FD is forcefully closed.
-                select.select([self._pipe_fd_r], [], [], 0.1)
+                p.poll(0.1)
 
                 r = os.read(self._pipe_fd_r, 1024)
                 if not r:
+                    os.close(self._pipe_fd_r)
+                    self._pipe_fd_r = -1
+                    self._lines_sem.release()
                     return
             except OSError as e:
                 if e.errno == errno.EWOULDBLOCK:
                     continue
 
                 # We get a bad file descriptor error when the outside closes the FD
+                if self._pipe_fd_r >= 0:
+                    os.close(self._pipe_fd_r)
+                self._pipe_fd_r = -1
+                self._lines_sem.release()
                 return
 
             l = r.split(b'\n')
@@ -86,6 +95,13 @@ class OutputChecker(object):
             try:
                 l = self._lines.pop(0)
             except IndexError:
+                # EOF, throw error
+                if self._pipe_fd_r == -1:
+                    if failmsg:
+                        raise AssertionError("No further messages: " % failmsg)
+                    else:
+                        raise AssertionError('No client waiting for needle %s' % (str(needle_re)))
+
                 # Check if should wake up
                 if not self._lines_sem.acquire(timeout = deadline - time.time()):
                     if failmsg:
@@ -119,6 +135,10 @@ class OutputChecker(object):
             try:
                 l = self._lines.pop(0)
             except IndexError:
+                # EOF, so everything good
+                if self._pipe_fd_r == -1:
+                    break
+
                 # Check if should wake up
                 if not self._lines_sem.acquire(timeout = deadline - time.time()):
                     # Timed out, so everything is good
@@ -130,7 +150,7 @@ class OutputChecker(object):
                 if failmsg:
                     raise AssertionError(failmsg)
                 else:
-                    raise AssertionError('Found needle %s but shouldn\'t have been there (timeout: %0.2f)' % (str(needle_re), timeout))
+                    raise AssertionError('Found needle %s but shouldn\'t have been there (timeout: %0.2f)' % (str(needle_re), wait))
 
         return ret
 
@@ -157,7 +177,8 @@ class OutputChecker(object):
 
         fd = self._pipe_fd_r
         self._pipe_fd_r = -1
-        os.close(fd)
+        if fd >= 0:
+            os.close(fd)
 
         self._thread.join()
 
@@ -170,9 +191,9 @@ class OutputChecker(object):
         self._pipe_fd_w = -1
 
     def __del__(self):
-        if self._pipe_fd_r > 0:
+        if self._pipe_fd_r >= 0:
             os.close(self._pipe_fd_r)
-        if self._pipe_fd_w > 0:
+            self._pipe_fd_r = -1
+        if self._pipe_fd_w >= 0:
             os.close(self._pipe_fd_w)
-
-        assert not self._thread.is_alive()
+            self._pipe_fd_w = -1

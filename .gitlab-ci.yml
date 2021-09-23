@@ -1,0 +1,262 @@
+include:
+ - remote: 'https://gitlab.freedesktop.org/freedesktop/ci-templates/-/raw/5888c7388134cbe4661600222fe9befb10441f6e/templates/fedora.yml'
+
+variables:
+  FDO_DISTRIBUTION_TAG: latest
+  FDO_DISTRIBUTION_VERSION: rawhide
+  FDO_UPSTREAM_REPO: gnome/gnome-settings-daemon
+  # Expiry sets fdo.expires on the image
+  FEDORA_IMAGE: "$CI_REGISTRY/$FDO_UPSTREAM_REPO/fedora/$FDO_DISTRIBUTION_VERSION:$FDO_DISTRIBUTION_TAG"
+  FDO_EXPIRES_AFTER: 8w
+  FEDORA_DEPENDENCIES: >
+    @c-development
+    alsa-lib-devel
+    colord-devel
+    compiler-rt
+    cups-devel
+    fontconfig-devel
+    gcr-devel
+    geoclue2-devel geocode-glib-devel
+    gettext
+    git
+    glib2-devel
+    gnome-desktop3-devel
+    gnome-session
+    gobject-introspection
+    gobject-introspection-devel
+    gsettings-desktop-schemas-devel
+    gtk3-devel
+    lcms2-devel
+    lcov gcovr clang libasan libubsan libtsan
+    libcanberra-devel
+    libgtop2-devel
+    libgudev-devel
+    libgweather-devel
+    libnotify-devel
+    librsvg2-devel
+    libwacom-devel
+    libX11-devel
+    libXi-devel
+    libXtst-devel
+    libXfixes-devel
+    llvm
+    mesa-dri-drivers
+    meson
+    ModemManager-glib-devel
+    NetworkManager-libnm-devel
+    nss-devel
+    perl-interpreter
+    polkit-devel
+    pulseaudio-libs-devel
+    python3-gobject python3-dbusmock
+    umockdev
+    upower-devel
+    wayland-devel
+    which
+    xorg-x11-drv-wacom-devel
+    xorg-x11-server-Xvfb
+    mutter
+
+image: "$FEDORA_IMAGE"
+
+stages:
+  - build
+  - test
+  - manual
+  - delivery
+
+.Log files: &log_files  [./*.log, _build/meson-logs/]
+
+.Build logs: &save_build_logs
+  artifacts:
+    name: log
+    when: always
+    paths: *log_files
+
+.Git Untracked files: &save_untracked_files
+  artifacts:
+    name: untracked
+    when: always
+    paths: [$(pwd)]
+    expire_in: 3h30min
+
+.Show Info: &environment_information
+  build-aux/ci/ci-helper.sh "INFO" &&
+  build-aux/ci/ci-helper.sh "GIT_INFO"
+
+.Build procedure: &build_procedure
+  echo "== Building ==" &&
+  rm -rf _build/ &&
+  meson . _build ${BUILD_OPTS} &&
+  ninja -C _build 2>&1 | tee compilation.log
+
+.Run Tests: &run_tests
+  echo "== Testing ==" &&
+  meson test -C _build --verbose --no-stdsplit
+
+##
+# Stage: Build
+#
+# Checks if GNOME Settings Daemon is properly building and installing. This is the
+# most important stage of the CI, and no MR should ever be merged if it breaks
+# any of them.
+##
+build:
+  <<: *save_untracked_files
+  stage: build
+
+  script:
+    - *environment_information
+    - *build_procedure
+
+    - echo "== Installing =="
+    - ninja -C _build install
+
+    - echo "== Report =="
+    - build-aux/ci/ci-helper.sh "WARNINGS"
+
+    # Save all but git-related files
+    - rm -rf .git .gitignore .gitmodules
+
+  except:
+    variables:
+      - $CI_PIPELINE_SOURCE == "schedule"
+
+##
+# Stage: Test
+#
+# Runs the unit tests.
+##
+test:
+  <<: *save_build_logs
+  stage: test
+
+  dependencies:
+    - build
+
+  script:
+    - *environment_information
+
+    - |
+      if [[ -n "${CI_COMMIT_TAG}" ]]; then
+        *run_tests
+
+        echo "== Distro Test =="
+        ninja dist -C _build
+      else
+        echo "== Testing =="
+        meson test -C _build --verbose --no-stdsplit
+      fi
+
+  except:
+    variables:
+      - $CI_PIPELINE_SOURCE == "schedule"
+      - $CI_COMMIT_TITLE =~ /^Update.*translation$/
+
+# Runs the coverage test.
+coverage:
+  <<: *save_build_logs
+  stage: test
+  # Appears to be broken on Fedora Rawhide as of 2018-02-05
+  allow_failure: true
+  variables:
+    BUILD_OPTS: "-Db_coverage=true"
+    coverage: '/^Lines:.\d+.\d+.(\d+\.\d+\%)/'
+  only:
+    - master@GNOME/gnome-settings-daemon
+
+  script:
+    - *environment_information
+    - *build_procedure
+    - *run_tests
+
+    - ninja -C _build coverage-html
+
+    # Parse the report to get the coverage result
+    - |
+      echo == Coverage ==
+      sed -e 's/<[^>]*>//g' _build/meson-logs/coveragereport/index.html | tr -d ' \t' | grep -A3 -P '^Lines:$'  | tr '\n' ' '; echo
+
+##
+# Stage: Delivery
+#
+# Publishes the Coverage Report generated above
+##
+pages:
+  stage: delivery
+  # Don't error in case coverage failed
+  allow_failure: true
+  dependencies:
+    - coverage
+  script:
+    - mv _build/meson-logs/coveragereport/ public/
+  artifacts:
+    paths:
+      - public
+  only:
+    - master@GNOME/gnome-settings-daemon
+
+##
+# Stage: Manual
+#
+# Runs the sanitizers [address, thread, undefined, and memory].
+##
+.sanitizer: &sanitizer
+  <<: *save_build_logs
+  stage: manual
+  when: manual
+  script:
+    - *environment_information
+    - *build_procedure
+    - *run_tests
+
+  except:
+    variables:
+      - $CI_PIPELINE_SOURCE == "schedule"
+      - $CI_COMMIT_TITLE =~ /^Update.*translation$/
+
+asan:
+  <<: *sanitizer
+  # ASAN requires debugging capabilities
+  tags: [ asan ]
+  variables:
+    BUILD_OPTS: "-Db_sanitize=address"
+
+tsan:
+  <<: *sanitizer
+  variables:
+    BUILD_OPTS: "-Db_sanitize=thread"
+
+ubsan:
+  <<: *sanitizer
+  variables:
+    BUILD_OPTS: "-Db_sanitize=undefined"
+
+msan:
+  <<: *sanitizer
+  variables:
+    BUILD_OPTS: "-Db_sanitize=memory -Db_lundef=false"
+    CC: "clang"
+
+#############################################
+#          Create CI Docker Images          #
+#############################################
+
+# See also https://gitlab.freedesktop.org/freedesktop/ci-templates
+container_fedora_build:
+  extends: .fdo.container-build@fedora
+  only:
+    variables:
+      - $CI_PIPELINE_SOURCE == "schedule" && $CRON_TASK == "BUILD_CI_IMAGES"
+  variables:
+    GIT_STRATEGY: none # no need to pull the whole tree for rebuilding the image
+    FDO_FORCE_REBUILD: 1 # Force rebuilding the image
+    FDO_DISTRIBUTION_PACKAGES: $FEDORA_DEPENDENCIES
+    FDO_DISTRIBUTION_EXEC: |
+      git clone https://gitlab.gnome.org/GNOME/gsettings-desktop-schemas.git && \
+        cd gsettings-desktop-schemas && \
+        meson . _build --prefix=/usr && \
+        ninja -C _build && \
+        ninja -C _build install && \
+        cd ..
+

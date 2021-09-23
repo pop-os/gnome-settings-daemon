@@ -41,19 +41,23 @@ from gi.repository import UMockdev
 class PowerPluginBase(gsdtestcase.GSDTestCase):
     '''Test the power plugin'''
 
+    gsd_plugin = 'power'
+    gsd_plugin_case = 'Power'
+
     COMMON_SUSPEND_METHODS=['Suspend', 'Hibernate', 'SuspendThenHibernate']
 
     def setUp(self):
         self.mock_external_monitor_file = os.path.join(self.workdir, 'GSD_MOCK_EXTERNAL_MONITOR')
         os.environ['GSD_MOCK_EXTERNAL_MONITOR_FILE'] = self.mock_external_monitor_file
+        self.addCleanup(self.delete_external_monitor_file)
 
         self.check_logind_gnome_session()
         self.start_logind()
-        self.daemon_death_expected = False
-
+        self.addCleanup(self.stop_logind)
 
         # Setup umockdev testbed
         self.testbed = UMockdev.Testbed.new()
+        self.addCleanup(self.cleanup_testbed)
         os.environ['UMOCKDEV_DIR'] = self.testbed.get_root_dir()
 
         # Create a mock backlight device
@@ -68,30 +72,29 @@ class PowerPluginBase(gsdtestcase.GSDTestCase):
 
         # start mock upowerd
         (self.upowerd, self.obj_upower) = self.spawn_server_template(
-            'upower', {'DaemonVersion': '0.99', 'OnBattery': True, 'LidIsClosed': False}, stdout=subprocess.PIPE)
-        gsdtestcase.set_nonblock(self.upowerd.stdout)
+            'upower', {'DaemonVersion': '0.99', 'OnBattery': True, 'LidIsClosed': False})
+        self.addCleanup(self.stop_process, self.upowerd)
 
         # start mock gnome-shell screensaver
         (self.screensaver, self.obj_screensaver) = self.spawn_server_template(
-            'gnome_screensaver', stdout=subprocess.PIPE)
-        gsdtestcase.set_nonblock(self.screensaver.stdout)
+            'gnome_screensaver')
+        self.addCleanup(self.stop_process, self.screensaver)
 
-        self.session_log = OutputChecker()
-        self.session = subprocess.Popen(['gnome-session', '-f',
-                                         '-a', os.path.join(self.workdir, 'autostart'),
-                                         '--session=dummy', '--debug'],
-                                        stdout=self.session_log.fd,
-                                        stderr=subprocess.STDOUT)
-        self.session_log.writer_attached()
+        # start mock power-profiles-daemon
+        try:
+            (self.ppd, self.obj_ppd) = self.spawn_server_template('power_profiles_daemon')
+            self.addCleanup(self.stop_process, self.ppd)
+        except ModuleNotFoundError:
+            self.ppd = None
 
-        # wait until the daemon is on the bus
-        self.wait_for_bus_object('org.gnome.SessionManager',
-                                 '/org/gnome/SessionManager')
+        self.start_session()
+        self.addCleanup(self.stop_session)
 
         self.obj_session_mgr = self.session_bus_con.get_object(
             'org.gnome.SessionManager', '/org/gnome/SessionManager')
 
         self.start_mutter()
+        self.addCleanup(self.stop_mutter)
 
         # Set up the gnome-session presence
         obj_session_presence = self.session_bus_con.get_object(
@@ -101,12 +104,14 @@ class PowerPluginBase(gsdtestcase.GSDTestCase):
         # ensure that our tests don't lock the screen when the screensaver
         # gets active
         self.settings_screensaver = Gio.Settings(schema_id='org.gnome.desktop.screensaver')
+        self.addCleanup(self.reset_settings, self.settings_screensaver)
         self.settings_screensaver['lock-enabled'] = False
 
         # Ensure we set up the external monitor state
         self.set_has_external_monitor(False)
 
         self.settings_gsd_power = Gio.Settings(schema_id='org.gnome.settings-daemon.plugins.power')
+        self.addCleanup(self.reset_settings, self.settings_gsd_power)
 
         Gio.Settings.sync()
         # avoid painfully long delays of actions for tests
@@ -122,16 +127,8 @@ class PowerPluginBase(gsdtestcase.GSDTestCase):
             else:
                 env['LD_PRELOAD'] = env['POWER_LD_PRELOAD']
 
-        # We need to redirect stdout to grab the debug messages.
-        # stderr is not needed by the testing infrastructure but is useful to
-        # see warnings and errors.
-        self.plugin_log = OutputChecker()
-        self.daemon = subprocess.Popen(
-            [os.path.join(builddir, 'gsd-power'), '--verbose'],
-            stdout=self.plugin_log.fd,
-            stderr=subprocess.STDOUT,
-            env=env)
-        self.plugin_log.writer_attached()
+        self.start_plugin(env)
+        self.addCleanup(self.stop_plugin)
 
         # Store the early-init messages, some tests need them.
         self.plugin_startup_msgs = self.plugin_log.check_line(b'System inhibitor fd is', timeout=10)
@@ -139,54 +136,16 @@ class PowerPluginBase(gsdtestcase.GSDTestCase):
         # always start with zero idle time
         self.reset_idle_timer()
 
-        # flush notification log
-        self.p_notify.stdout.read()
+        self.p_notify_log.clear()
 
-    def tearDown(self):
+    def cleanup_testbed(self):
+        del self.testbed
 
-        daemon_running = self.daemon.poll() == None
-        if daemon_running:
-            self.daemon.terminate()
-            self.daemon.wait()
-        self.plugin_log.assert_closed()
-
-        self.upowerd.terminate()
-        self.upowerd.wait()
-        self.screensaver.terminate()
-        self.screensaver.wait()
-        self.stop_session()
-        self.stop_mutter()
-        self.stop_logind()
-
-        # reset all changed gsettings, so that tests are independent from each
-        # other
-        for schema in [self.settings_gsd_power, self.settings_session, self.settings_screensaver]:
-            for k in schema.list_keys():
-                schema.reset(k)
-        Gio.Settings.sync()
-
+    def delete_external_monitor_file(self):
         try:
             os.unlink(self.mock_external_monitor_file)
         except OSError:
             pass
-
-        del self.testbed
-
-        # we check this at the end so that the other cleanup always happens
-        self.assertTrue(daemon_running or self.daemon_death_expected, 'daemon died during the test')
-
-    def stop_session(self):
-        '''Stop GNOME session'''
-
-        assert self.session
-        self.session.terminate()
-        self.session.wait()
-        # dummyapp.desktop survives the session. This keeps the FD open in the
-        # CI environment when gnome-session fails to redirect the child output
-        # to journald.
-        # Though, gnome-session should probably kill the child anyway.
-        #self.session_log.assert_closed()
-        self.session_log.force_close()
 
     def check_logind_gnome_session(self):
         '''Check that gnome-session is built with logind support'''
@@ -476,6 +435,7 @@ class PowerPluginTest2(PowerPluginBase):
 
         # Lower idle delay a lot
         self.settings_session['idle-delay'] = 1
+        Gio.Settings.sync()
 
         # Bring down the screensaver
         self.obj_screensaver.SetActive(True)
@@ -503,6 +463,7 @@ class PowerPluginTest2(PowerPluginBase):
 
         # Verify that idle is set after 5 seconds
         self.settings_session['idle-delay'] = 5
+        Gio.Settings.sync()
         self.assertEqual(self.get_status(), gsdpowerenums.GSM_PRESENCE_STATUS_AVAILABLE)
         time.sleep(7)
         self.assertEqual(self.get_status(), gsdpowerenums.GSM_PRESENCE_STATUS_IDLE)
@@ -510,6 +471,7 @@ class PowerPluginTest2(PowerPluginBase):
         # Raise the idle delay, and see that we stop being idle
         # and get idle again after the timeout
         self.settings_session['idle-delay'] = 10
+        Gio.Settings.sync()
         # Resolve possible race condition, see also https://gitlab.gnome.org/GNOME/mutter/issues/113
         time.sleep(0.2)
         self.reset_idle_timer()
@@ -520,6 +482,7 @@ class PowerPluginTest2(PowerPluginBase):
 
         # Lower the delay again, and see that we get idle as we should
         self.settings_session['idle-delay'] = 5
+        Gio.Settings.sync()
         # Resolve possible race condition, see also https://gitlab.gnome.org/GNOME/mutter/issues/113
         time.sleep(0.2)
         self.reset_idle_timer()
@@ -535,6 +498,7 @@ class PowerPluginTest2(PowerPluginBase):
 
         # Go idle
         self.settings_session['idle-delay'] = 5
+        Gio.Settings.sync()
         self.assertEqual(self.get_status(), gsdpowerenums.GSM_PRESENCE_STATUS_AVAILABLE)
         time.sleep(7)
         self.assertEqual(self.get_status(), gsdpowerenums.GSM_PRESENCE_STATUS_IDLE)
@@ -557,6 +521,7 @@ class PowerPluginTest3(PowerPluginBase):
         self.settings_session['idle-delay'] = 2
         self.settings_gsd_power['sleep-inactive-battery-timeout'] = 5
         self.settings_gsd_power['sleep-inactive-battery-type'] = 'suspend'
+        Gio.Settings.sync()
 
         # wait for idle delay; should not yet suspend
         self.check_no_suspend(2)
@@ -573,6 +538,7 @@ class PowerPluginTest3(PowerPluginBase):
         # Hibernate isn't possible, so it should end up suspending
         # FIXME
         self.settings_gsd_power['critical-battery-action'] = 'hibernate'
+        Gio.Settings.sync()
 
         # wait for idle delay; should not yet hibernate
         self.check_no_suspend(2)
@@ -589,6 +555,7 @@ class PowerPluginTest3(PowerPluginBase):
         self.settings_session['idle-delay'] = idle_delay
         self.settings_gsd_power['sleep-inactive-battery-timeout'] = 5
         self.settings_gsd_power['sleep-inactive-battery-type'] = 'suspend'
+        Gio.Settings.sync()
 
         # create inhibitor
         inhibit_id = self.obj_session_mgr.Inhibit(
@@ -609,6 +576,7 @@ class PowerPluginTest4(PowerPluginBase):
         '''Check that we do lock on lid closing, if the machine will not suspend'''
 
         self.settings_screensaver['lock-enabled'] = True
+        Gio.Settings.sync()
 
         # create inhibitor
         inhibit_id = self.obj_session_mgr.Inhibit(
@@ -632,6 +600,7 @@ class PowerPluginTest4(PowerPluginBase):
                 dbus_interface='org.gnome.SessionManager')
         # At this point logind should suspend for us
         self.settings_screensaver['lock-enabled'] = False
+        Gio.Settings.sync()
 
     def test_blank_on_lid_close(self):
         '''Check that we do blank on lid closing, if the machine will not suspend'''
@@ -699,6 +668,7 @@ class PowerPluginTest5(PowerPluginBase):
         self.settings_session['idle-delay'] = idle_delay
         self.settings_gsd_power['sleep-inactive-battery-timeout'] = idle_delay + 1
         self.settings_gsd_power['sleep-inactive-battery-type'] = 'suspend'
+        Gio.Settings.sync()
         # This is an absolute percentage, and our brightness is 0..100
         dim_level = self.settings_gsd_power['idle-brightness'];
 
@@ -774,13 +744,7 @@ class PowerPluginTest6(PowerPluginBase):
         # Check that it was picked up
         self.check_plugin_log('EMIT: charge-critical', 2)
 
-        # Wait a bit longer to ensure event has been fired
-        time.sleep(0.5)
-        # we should have gotten a notification now
-        notify_log = self.p_notify.stdout.read()
-
-        # verify notification
-        self.assertRegex(notify_log, b'[0-9.]+ Notify "Power" .* "battery-caution-symbolic" ".*battery critical.*"')
+        self.p_notify_log.check_line_re(b'[0-9.]+ Notify "Power" .* "battery-caution-symbolic" ".*[Bb]attery critical.*"', timeout=0.5)
 
     def test_notify_critical_battery_on_start(self):
         '''action on critical battery on startup'''
@@ -790,13 +754,7 @@ class PowerPluginTest6(PowerPluginBase):
         # Check that it was picked up
         self.check_plugin_log('EMIT: charge-critical', 2)
 
-        time.sleep(0.5)
-
-        # we should have gotten a notification by now
-        notify_log = self.p_notify.stdout.read()
-
-        # verify notification
-        self.assertRegex(notify_log, b'[0-9.]+ Notify "Power" .* "battery-caution-symbolic" ".*battery critical.*"')
+        self.p_notify_log.check_line_re(b'[0-9.]+ Notify "Power" .* "battery-caution-symbolic" ".*[Bb]attery critical.*"', timeout=0.5)
 
     def test_notify_device_battery(self):
         '''critical power level notification for device batteries'''
@@ -841,13 +799,8 @@ class PowerPluginTest6(PowerPluginBase):
                                    dbus_interface='org.freedesktop.DBus.Mock')
 
         self.check_plugin_log('EMIT: charge-critical', 2)
-        time.sleep(0.5)
 
-        # we should have gotten a notification by now
-        notify_log = self.p_notify.stdout.read()
-
-        # verify notification
-        self.assertRegex(notify_log, b'[0-9.]+ Notify "Power" .* ".*" ".*Wireless mouse .*low.* power.*\([0-9.]+%\).*"')
+        self.p_notify_log.check_line_re(b'[0-9.]+ Notify "Power" .* ".*" ".*Wireless mouse .*low.* power.*\([0-9.]+%\).*"', timeout=0.5)
 
     def test_notify_device_spam(self):
         '''no repeat notifications for device batteries'''
@@ -876,13 +829,8 @@ class PowerPluginTest6(PowerPluginBase):
         time.sleep(1)
 
         self.check_plugin_log('EMIT: charge-low', 2)
-        time.sleep(0.5)
 
-        # we should have gotten a notification by now
-        notify_log = self.p_notify.stdout.read()
-
-        # verify notification
-        self.assertRegex(notify_log, b'[0-9.]+ Notify "Power" .* ".*" ".*Wireless mouse .*low.* power.*\([0-9.]+%\).*"')
+        self.p_notify_log.check_line_re(b'[0-9.]+ Notify "Power" .* ".*" ".*Wireless mouse .*low.* power.*\([0-9.]+%\).*"', timeout=0.5)
 
         # Disconnect mouse
         self.obj_upower.RemoveObject(bat2_path)
@@ -905,11 +853,8 @@ class PowerPluginTest6(PowerPluginBase):
         obj_bat2 = self.system_bus_con.get_object('org.freedesktop.UPower', bat2_path)
         self.obj_upower.EmitSignal('', 'DeviceAdded', 'o', [bat2_path],
                                    dbus_interface='org.freedesktop.DBus.Mock')
-        time.sleep(1)
 
-        # we shouldn't have gotten a notification by now
-        notify_log = self.p_notify.stdout.read()
-        self.assertIsNone(notify_log)
+        self.p_notify_log.check_no_line(b'', wait=1)
 
         # Disconnect mouse
         self.obj_upower.RemoveObject(bat2_path)
@@ -936,13 +881,8 @@ class PowerPluginTest6(PowerPluginBase):
 
         # Verify new warning
         self.check_plugin_log('EMIT: charge-critical', 2)
-        time.sleep(0.5)
 
-        # we should have gotten a notification by now
-        notify_log = self.p_notify.stdout.read()
-
-        # verify notification
-        self.assertRegex(notify_log, b'[0-9.]+ Notify "Power" .* ".*" ".*Wireless mouse .*very low.* power.*\([0-9.]+%\).*"')
+        self.p_notify_log.check_line_re(b'[0-9.]+ Notify "Power" .* ".*" ".*Wireless mouse .*very low.* power.*\([0-9.]+%\).*"', timeout=0.5)
 
     def test_notify_device_battery_coarse_level(self):
         '''critical power level notification for device batteries with coarse level'''
@@ -988,30 +928,27 @@ class PowerPluginTest6(PowerPluginBase):
                                    dbus_interface='org.freedesktop.DBus.Mock')
 
         self.check_plugin_log('EMIT: charge-critical', 2)
+
         time.sleep(0.5)
-
-        # we should have gotten a notification by now
-        notify_log = self.p_notify.stdout.read()
-
-        # verify notification
-        self.assertRegex(notify_log, b'[0-9.]+ Notify "Power" .* ".*" ".*Wireless mouse .*low.* power.*"')
-        self.assertNotRegex(notify_log, b'[0-9.]+ Notify "Power" .* ".*" ".*\([0-9.]+%\).*"')
+        lines = self.p_notify_log.check_line_re(b'[0-9.]+ Notify "Power" .* ".*" ".*Wireless mouse .*low.* power.*"')
+        lines += self.p_notify_log.clear()
+        for l in lines:
+            self.assertNotRegex(l, b'[0-9.]+ Notify "Power" .* ".*" ".*\([0-9.]+%\).*"')
 
     def test_forced_logout(self):
         '''Test forced logout'''
 
-        self.daemon_death_expected = True
+        self.plugin_death_expected = True
         idle_delay = round(gsdpowerconstants.MINIMUM_IDLE_DIM_DELAY / gsdpowerconstants.IDLE_DELAY_TO_IDLE_DIM_MULTIPLIER)
 
         self.settings_session['idle-delay'] = idle_delay
         self.settings_gsd_power['sleep-inactive-battery-timeout'] = idle_delay + 1
         self.settings_gsd_power['sleep-inactive-battery-type'] = 'logout'
+        Gio.Settings.sync()
 
         self.check_for_logout(idle_delay + 2)
 
-        # The notification should have been received before the logout, but it's saved anyway
-        notify_log = self.p_notify.stdout.read()
-        self.assertTrue(b'You will soon log out because of inactivity.' in notify_log)
+        self.p_notify_log.check_line(b'You will soon log out because of inactivity.')
 
     def test_forced_logout_inhibition(self):
         '''Test we don't force logout when inhibited'''
@@ -1021,6 +958,7 @@ class PowerPluginTest6(PowerPluginBase):
         self.settings_session['idle-delay'] = idle_delay
         self.settings_gsd_power['sleep-inactive-battery-timeout'] = idle_delay + 1
         self.settings_gsd_power['sleep-inactive-battery-type'] = 'logout'
+        Gio.Settings.sync()
 
         # create suspend inhibitor which should stop us logging out
         inhibit_id = self.obj_session_mgr.Inhibit(
@@ -1059,6 +997,7 @@ class PowerPluginTest7(PowerPluginBase):
         self.settings_session['idle-delay'] = idle_delay
         self.settings_gsd_power['sleep-inactive-battery-timeout'] = 5
         self.settings_gsd_power['sleep-inactive-battery-type'] = 'suspend'
+        Gio.Settings.sync()
 
         # create inhibitor
         inhibit_id = self.obj_session_mgr.Inhibit(
@@ -1084,6 +1023,7 @@ class PowerPluginTest7(PowerPluginBase):
     def disabled_test_unindle_on_ac_plug(self):
         idle_delay = round(gsdpowerconstants.MINIMUM_IDLE_DIM_DELAY / gsdpowerconstants.IDLE_DELAY_TO_IDLE_DIM_MULTIPLIER)
         self.settings_session['idle-delay'] = idle_delay
+        Gio.Settings.sync()
 
         # Wait for idle
         self.check_dim(idle_delay + 2)
@@ -1247,31 +1187,31 @@ class PowerPluginTest8(PowerPluginBase):
         obj_gsd_power_prop_iface = dbus.Interface(obj_gsd_power, dbus.PROPERTIES_IFACE)
 
         obj_gsd_power_prop_iface.Set('org.gnome.SettingsDaemon.Power.Screen', 'Brightness', 0)
-        time.sleep(0.4)
+        time.sleep(0.6)
         self.assertEqual(self.get_brightness(), 0)
         obj_gsd_power_prop_iface.Set('org.gnome.SettingsDaemon.Power.Screen', 'Brightness', 10)
-        time.sleep(0.4)
+        time.sleep(0.6)
         self.assertEqual(self.get_brightness(), 2)
         obj_gsd_power_prop_iface.Set('org.gnome.SettingsDaemon.Power.Screen', 'Brightness', 20)
-        time.sleep(0.4)
+        time.sleep(0.6)
         self.assertEqual(self.get_brightness(), 3)
         obj_gsd_power_prop_iface.Set('org.gnome.SettingsDaemon.Power.Screen', 'Brightness', 25)
-        time.sleep(0.4)
+        time.sleep(0.6)
         self.assertEqual(self.get_brightness(), 4)
         obj_gsd_power_prop_iface.Set('org.gnome.SettingsDaemon.Power.Screen', 'Brightness', 49)
-        time.sleep(0.4)
+        time.sleep(0.6)
         self.assertEqual(self.get_brightness(), 7)
         obj_gsd_power_prop_iface.Set('org.gnome.SettingsDaemon.Power.Screen', 'Brightness', 50)
-        time.sleep(0.4)
+        time.sleep(0.6)
         self.assertEqual(self.get_brightness(), 8)
         obj_gsd_power_prop_iface.Set('org.gnome.SettingsDaemon.Power.Screen', 'Brightness', 56)
-        time.sleep(0.4)
+        time.sleep(0.6)
         self.assertEqual(self.get_brightness(), 8)
         obj_gsd_power_prop_iface.Set('org.gnome.SettingsDaemon.Power.Screen', 'Brightness', 57)
-        time.sleep(0.4)
+        time.sleep(0.6)
         self.assertEqual(self.get_brightness(), 9)
         obj_gsd_power_prop_iface.Set('org.gnome.SettingsDaemon.Power.Screen', 'Brightness', 98)
-        time.sleep(0.4)
+        time.sleep(0.6)
         self.assertEqual(self.get_brightness(), 15)
 
     def test_no_backlight(self):
@@ -1301,6 +1241,31 @@ class PowerPluginTest8(PowerPluginBase):
             obj_gsd_power_screen.StepDown()
 
         self.assertEqual(exc.exception.get_dbus_message(), 'No usable backlight could be found!')
+
+    def test_power_saver_on_low_battery(self):
+        '''Check that the power-saver profile gets held when low on battery'''
+
+        if not self.ppd:
+            self.skipTest("power-profiles-daemon dbusmock support is not available")
+
+        obj_props = dbus.Interface(self.obj_ppd, dbus.PROPERTIES_IFACE)
+
+        self.set_composite_battery_discharging()
+        time.sleep(0.5)
+        holds = obj_props.Get('net.hadess.PowerProfiles', 'ActiveProfileHolds')
+        self.assertEqual(len(holds), 0)
+
+        self.set_composite_battery_critical()
+        time.sleep(0.5)
+        holds = obj_props.Get('net.hadess.PowerProfiles', 'ActiveProfileHolds')
+        self.assertEqual(len(holds), 1)
+        self.assertEqual(holds[0]['Profile'], 'power-saver')
+        self.assertEqual(holds[0]['ApplicationId'], 'org.gnome.SettingsDaemon.Power')
+
+        self.set_composite_battery_discharging()
+        time.sleep(0.5)
+        holds = obj_props.Get('net.hadess.PowerProfiles', 'ActiveProfileHolds')
+        self.assertEqual(len(holds), 0)
 
 # avoid writing to stderr
 unittest.main(testRunner=unittest.TextTestRunner(stream=sys.stdout, verbosity=2))

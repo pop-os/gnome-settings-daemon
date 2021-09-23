@@ -22,6 +22,7 @@ sys.path.insert(0, builddir)
 import gsdtestcase
 import dbus
 import dbusmock
+from output_checker import OutputChecker
 
 from gi.repository import Gio
 from gi.repository import GLib
@@ -29,36 +30,23 @@ from gi.repository import GLib
 class XsettingsPluginTest(gsdtestcase.GSDTestCase):
     '''Test the xsettings plugin'''
 
+    gsd_plugin = 'xsettings'
+    gsd_plugin_case = 'XSettings'
+
     def setUp(self):
         self.start_logind()
+        self.addCleanup(self.stop_logind)
 
-        self.daemon_death_expected = False
-        self.session_log_write = open(os.path.join(self.workdir, 'gnome-session.log'), 'wb')
-        self.session = subprocess.Popen(['gnome-session', '-f',
-                                         '-a', os.path.join(self.workdir, 'autostart'),
-                                         '--session=dummy', '--debug'],
-                                        stdout=self.session_log_write,
-                                        stderr=subprocess.STDOUT)
-
-        # wait until the daemon is on the bus
-        try:
-            self.wait_for_bus_object('org.gnome.SessionManager',
-                                     '/org/gnome/SessionManager')
-        except:
-            # on failure, print log
-            with open(self.session_log_write.name) as f:
-                print('----- session log -----\n%s\n------' % f.read())
-            raise
-
-        self.session_log = open(self.session_log_write.name)
+        self.start_session()
+        self.addCleanup(self.stop_session)
 
         self.obj_session_mgr = self.session_bus_con.get_object(
             'org.gnome.SessionManager', '/org/gnome/SessionManager')
 
         self.start_mutter()
+        self.addCleanup(self.stop_mutter)
 
         Gio.Settings.sync()
-        self.plugin_log_write = open(os.path.join(self.workdir, 'plugin_xsettings.log'), 'wb', buffering=0)
         os.environ['GSD_ignore_llvmpipe'] = '1'
 
         # Setup fontconfig config path before starting the daemon
@@ -84,63 +72,20 @@ class XsettingsPluginTest(gsdtestcase.GSDTestCase):
                 os.path.join(modules_dir, 'pk-gtk-module.desktop'))
 
         self.settings_sound = Gio.Settings.new('org.gnome.desktop.sound')
+        self.addCleanup(self.reset_settings, self.settings_sound)
+        Gio.Settings.sync()
 
         env = os.environ.copy()
-        self.daemon = subprocess.Popen(
-            [os.path.join(builddir, 'gsd-xsettings'), '--verbose'],
-            # comment out this line if you want to see the logs in real time
-            stdout=self.plugin_log_write,
-            stderr=subprocess.STDOUT,
-            env=env)
-
-        # you can use this for reading the current daemon log in tests
-        self.plugin_log = open(self.plugin_log_write.name, 'rb', buffering=0)
+        self.start_plugin(os.environ.copy())
 
         # flush notification log
-        try:
-            self.p_notify.stdout.read()
-        except IOError:
-            pass
+        self.p_notify_log.clear()
 
-        time.sleep(3)
+        self.plugin_log.check_line(b'GsdXSettingsGtk initializing', timeout=10)
+
         obj_xsettings = self.session_bus_con.get_object(
             'org.gtk.Settings', '/org/gtk/Settings')
         self.obj_xsettings_props = dbus.Interface(obj_xsettings, dbus.PROPERTIES_IFACE)
-
-    def tearDown(self):
-
-        daemon_running = self.daemon.poll() == None
-        if daemon_running:
-            self.daemon.terminate()
-            self.daemon.wait()
-        self.plugin_log.close()
-        self.plugin_log_write.flush()
-        self.plugin_log_write.close()
-
-        self.stop_session()
-        self.stop_mutter()
-        self.stop_logind()
-
-        # reset all changed gsettings, so that tests are independent from each
-        # other
-        for schema in [self.settings_sound]:
-            for k in schema.list_keys():
-                schema.reset(k)
-        Gio.Settings.sync()
-
-        # we check this at the end so that the other cleanup always happens
-        self.assertTrue(daemon_running or self.daemon_death_expected, 'daemon died during the test')
-
-    def stop_session(self):
-        '''Stop GNOME session'''
-
-        assert self.session
-        self.session.terminate()
-        self.session.wait()
-
-        self.session_log_write.flush()
-        self.session_log_write.close()
-        self.session_log.close()
 
     def check_plugin_log(self, needle, timeout=0, failmsg=None):
         '''Check that needle is found in the log within the given timeout.
@@ -148,30 +93,12 @@ class XsettingsPluginTest(gsdtestcase.GSDTestCase):
 
         Fail after the given timeout.
         '''
-        if type(needle) == str:
-            needle = needle.encode('ascii')
-        # Fast path if the message was already logged
-        log = self.plugin_log.read()
-        if needle in log:
-            return
-
-        while timeout > 0:
-            time.sleep(0.5)
-            timeout -= 0.5
-
-            # read new data (lines) from the log
-            log = self.plugin_log.read()
-            if needle in log:
-                break
-        else:
-            if failmsg is not None:
-                self.fail(failmsg)
-            else:
-                self.fail('timed out waiting for needle "%s"' % needle)
+        self.plugin_log.check_line(needle, timeout=timeout, failmsg=failmsg)
 
     def test_gtk_modules(self):
         # Turn off event sounds
         self.settings_sound['event-sounds'] = False
+        Gio.Settings.sync()
         time.sleep(2)
 
         # Verify that only the PackageKit plugin is enabled
@@ -180,6 +107,7 @@ class XsettingsPluginTest(gsdtestcase.GSDTestCase):
 
         # Turn on sounds
         self.settings_sound['event-sounds'] = True
+        Gio.Settings.sync()
         time.sleep(2)
 
         # Check that both PK and canberra plugin are enabled
@@ -191,6 +119,9 @@ class XsettingsPluginTest(gsdtestcase.GSDTestCase):
         # Initially, the value is zero
         before = self.obj_xsettings_props.Get('org.gtk.Settings', 'FontconfigTimestamp')
         self.assertEqual(before, 0)
+
+        # Make sure the seconds changed
+        time.sleep(1)
 
         # Copy the fonts.conf again
         shutil.copy(os.path.join(os.path.dirname(__file__), 'fontconfig-test/fonts.conf'),
