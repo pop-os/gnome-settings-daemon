@@ -1,4 +1,4 @@
-gnome-settings-daemon (41.0-2ubuntu1) UNRELEASED; urgency=medium
+gnome-settings-daemon (41.0-2ubuntu1) jammy; urgency=medium
 
   * Merged with debian, including new upstream release
   * Remaining changes with debian:
@@ -25,7 +25,7 @@ gnome-settings-daemon (41.0-2ubuntu1) UNRELEASED; urgency=medium
     - Added a comment about prerequisites for the engine_from_locale()
       items.
 
- -- Sebastien Bacher <seb128@ubuntu.com>  Thu, 11 Nov 2021 13:30:29 +0100
+ -- Sebastien Bacher <seb128@ubuntu.com>  Thu, 11 Nov 2021 15:26:15 +0100
 
 gnome-settings-daemon (41.0-2) unstable; urgency=medium
 
