@@ -1,8 +1,8 @@
 project(
   'gnome-settings-daemon', 'c',
-  version: '40.0.1',
+  version: '41.0',
   license: [ 'GPL2+', 'LGPLv2+' ],
-  meson_version: '>= 0.47.0'
+  meson_version: '>= 0.49.0'
 )
 
 gsd_version = meson.project_version()
@@ -11,7 +11,7 @@ gsd_major_version = version_array[0].to_int()
 
 gsd_api_name = '@0@-@1@'.format(meson.project_name(), gsd_major_version)
 
-glib_min_version = '2.56'
+glib_min_version = '2.58'
 
 glib_version_def = 'GLIB_VERSION_@0@_@1@'.format(
     glib_min_version.split('.')[0], glib_min_version.split('.')[1])
@@ -82,9 +82,7 @@ elif gsd_buildtype.contains('release')
   common_flags += ['-DG_DISABLE_CAST_CHECKS']
 endif
 
-# Workaround for meson's bug
-# https://github.com/mesonbuild/meson/pull/1896
-if get_option('b_ndebug') == true
+if get_option('b_ndebug') == 'true'
   common_flags += ['-DG_DISABLE_ASSERT']
 endif
 
@@ -108,6 +106,7 @@ pango_dep = dependency('pango', version: '>= 1.20.0')
 polkit_gobject_dep = dependency('polkit-gobject-1', version: '>= 0.114')
 upower_glib_dep = dependency('upower-glib', version: '>= 0.99.8')
 x11_dep = dependency('x11')
+xfixes_dep = dependency('xfixes', version: '>= 6.0')
 
 enable_systemd = get_option('systemd')
 if enable_systemd

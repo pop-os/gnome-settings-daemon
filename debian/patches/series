@@ -1,4 +1,5 @@
 debian/01_debianize_xrdb.patch
+debian/Revert-xsettings-Add-support-for-XFixes-ClientDisconnect.patch
 debian/meson.build-Lower-polkit-requirement.patch
 p11-kit/smartcard-Rewrite-to-use-p11-kit-backend-via-Gck-APIs.patch
 p11-kit/smartcard-manager-Use-Blocking-wait-for-slot-event-if-ava.patch
@@ -15,4 +16,3 @@ ubuntu/media-keys-correct-logout-action.patch
 ubuntu/lid-close-suspend-support.patch
 ubuntu/keyboard-Use-ibus-sources-from-locale.patch
 ubuntu/teach-gsd-about-the-gnome-calculator-snap-.desktop-name.patch
-ubuntu/git-media-keys-Add-one-second-delay-between-each-rfkill-.patch

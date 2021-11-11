@@ -59,11 +59,11 @@ Origin: https://gitlab.gnome.org/GNOME/gnome-settings-daemon/-/merge_requests/20
  plugins/smartcard/meson.build             |   4 +-
  9 files changed, 399 insertions(+), 492 deletions(-)
 
-diff --git a/meson.build b/meson.build
-index 9b81db3..04f9bf6 100644
---- a/meson.build
-+++ b/meson.build
-@@ -166,12 +166,7 @@ config_h.set10('HAVE_WACOM', enable_wacom)
+Index: gnome-settings-daemon/meson.build
+===================================================================
+--- gnome-settings-daemon.orig/meson.build
++++ gnome-settings-daemon/meson.build
+@@ -164,12 +164,7 @@ config_h.set10('HAVE_WACOM', enable_waco
  # smartcard section
  enable_smartcard = get_option('smartcard')
  if enable_smartcard
@@ -77,7 +77,7 @@ index 9b81db3..04f9bf6 100644
  endif
  
  enable_usb_protection = get_option('usb-protection')
-@@ -275,9 +270,6 @@ output += '        Cups support:             ' + enable_cups.to_string() + '\n'
+@@ -273,9 +268,6 @@ output += '        Cups support:
  output += '        Wayland support:          ' + enable_wayland.to_string() + '\n'
  output += '        Wacom support:            ' + enable_wacom.to_string() + '\n'
  output += '        RFKill support:           ' + enable_rfkill.to_string() + '\n'
@@ -87,19 +87,19 @@ index 9b81db3..04f9bf6 100644
  if enable_systemd
    output += '        Systemd user unit dir:    ' + systemd_userunitdir + '\n'
  endif
-diff --git a/meson_options.txt b/meson_options.txt
-index 3e04cf6..388c386 100644
---- a/meson_options.txt
-+++ b/meson_options.txt
+Index: gnome-settings-daemon/meson_options.txt
+===================================================================
+--- gnome-settings-daemon.orig/meson_options.txt
++++ gnome-settings-daemon/meson_options.txt
 @@ -1,4 +1,3 @@
 -option('nssdb_dir', type: 'string', value: '', description: 'Absolute path to the system NSS database directory')
  option('udev_dir', type: 'string', value: '', description: 'Absolute path of the udev base directory')
  option('systemd', type: 'boolean', value: true, description: 'Enable systemd integration')
  
-diff --git a/plugins/smartcard/gsd-smartcard-manager.c b/plugins/smartcard/gsd-smartcard-manager.c
-index fc6ae0b..ae034d1 100644
---- a/plugins/smartcard/gsd-smartcard-manager.c
-+++ b/plugins/smartcard/gsd-smartcard-manager.c
+Index: gnome-settings-daemon/plugins/smartcard/gsd-smartcard-manager.c
+===================================================================
+--- gnome-settings-daemon.orig/plugins/smartcard/gsd-smartcard-manager.c
++++ gnome-settings-daemon/plugins/smartcard/gsd-smartcard-manager.c
 @@ -2,6 +2,7 @@
   *
   * Copyright (C) 2007 William Jon McCann <mccann@jhu.edu>
@@ -147,7 +147,7 @@ index fc6ae0b..ae034d1 100644
  };
  
  #define CONF_SCHEMA "org.gnome.settings-daemon.peripherals.smartcard"
-@@ -64,19 +58,13 @@ static void     gsd_smartcard_manager_init        (GsdSmartcardManager      *sel
+@@ -64,19 +58,13 @@ static void     gsd_smartcard_manager_in
  static void     gsd_smartcard_manager_finalize    (GObject                  *object);
  static void     lock_screen                       (GsdSmartcardManager *self);
  static void     log_out                           (GsdSmartcardManager *self);
@@ -169,7 +169,7 @@ index fc6ae0b..ae034d1 100644
  static gpointer manager_object = NULL;
  
  static void
-@@ -95,95 +83,176 @@ gsd_smartcard_manager_init (GsdSmartcardManager *self)
+@@ -95,95 +83,176 @@ gsd_smartcard_manager_init (GsdSmartcard
  {
  }
  
@@ -260,7 +260,7 @@ index fc6ae0b..ae034d1 100644
 +         */
 +        p11_module = gck_module_get_functions (module);
 +        ret = p11_module->C_WaitForSlotEvent (CKF_DONT_BLOCK, &slot_id, NULL);
-+
+ 
 +        if (ret == CKR_NO_EVENT) {
 +                g_set_error (error, G_IO_ERROR, G_IO_ERROR_AGAIN,
 +                             "Got no event, ignoring...");
@@ -281,7 +281,7 @@ index fc6ae0b..ae034d1 100644
 +        }
 +
 +        slot = get_module_slot_by_handle (module, slot_id, FALSE);
- 
++
 +        if (!slot) {
 +                g_autofree char *module_name = NULL;
 +
@@ -405,7 +405,7 @@ index fc6ae0b..ae034d1 100644
  
          handler_id = g_cancellable_connect (cancellable,
                                              G_CALLBACK (on_watch_cancelled),
-@@ -191,11 +260,7 @@ watch_one_event_from_driver (GsdSmartcardManager       *self,
+@@ -191,11 +260,7 @@ watch_one_event_from_driver (GsdSmartcar
                                              NULL);
  
          if (handler_id != 0) {
@@ -418,7 +418,7 @@ index fc6ae0b..ae034d1 100644
          }
  
          g_cancellable_disconnect (cancellable, handler_id);
-@@ -205,94 +270,106 @@ watch_one_event_from_driver (GsdSmartcardManager       *self,
+@@ -205,94 +270,106 @@ watch_one_event_from_driver (GsdSmartcar
                  return FALSE;
          }
  
@@ -490,12 +490,12 @@ index fc6ae0b..ae034d1 100644
 +        if (old_token != NULL) {
 +                if (token_is_present) {
 +                        g_autoptr(GckTokenInfo) token = NULL;
- 
--                if (old_slot_series != slot_series) {
++
 +                        token = gck_slot_get_token_info (slot);
 +                        token_changed = !token_info_equals (token, old_token);
 +                }
-+
+ 
+-                if (old_slot_series != slot_series) {
 +                if (token_changed) {
                          /* Card registered with slot previously is
                           * different than this card, so update its
@@ -560,7 +560,7 @@ index fc6ae0b..ae034d1 100644
                                GsdSmartcardManager      *self,
                                WatchSmartcardsOperation *operation,
                                GCancellable             *cancellable)
-@@ -302,7 +379,7 @@ watch_smartcards_from_driver (GTask                    *task,
+@@ -302,7 +379,7 @@ watch_smartcards_from_driver (GTask
                  gboolean watch_succeeded;
                  GError *error = NULL;
  
@@ -569,7 +569,7 @@ index fc6ae0b..ae034d1 100644
  
                  if (g_task_return_error_if_cancelled (task)) {
                          break;
-@@ -318,7 +395,7 @@ watch_smartcards_from_driver (GTask                    *task,
+@@ -318,7 +395,7 @@ watch_smartcards_from_driver (GTask
  static void
  destroy_watch_smartcards_operation (WatchSmartcardsOperation *operation)
  {
@@ -578,7 +578,7 @@ index fc6ae0b..ae034d1 100644
          g_hash_table_unref (operation->smartcards);
          g_free (operation);
  }
-@@ -335,34 +412,31 @@ on_smartcards_watch_task_destroyed (GsdSmartcardManager *self,
+@@ -335,34 +412,31 @@ on_smartcards_watch_task_destroyed (GsdS
  
  static void
  sync_initial_tokens_from_driver (GsdSmartcardManager *self,
@@ -626,7 +626,7 @@ index fc6ae0b..ae034d1 100644
                                      GCancellable        *cancellable,
                                      GAsyncReadyCallback  callback,
                                      gpointer             user_data)
-@@ -371,11 +445,11 @@ watch_smartcards_from_driver_async (GsdSmartcardManager *self,
+@@ -371,11 +445,11 @@ watch_smartcards_from_driver_async (GsdS
          WatchSmartcardsOperation *operation;
  
          operation = g_new0 (WatchSmartcardsOperation, 1);
@@ -643,16 +643,16 @@ index fc6ae0b..ae034d1 100644
  
          task = g_task_new (self, cancellable, callback, user_data);
  
-@@ -391,300 +465,104 @@ watch_smartcards_from_driver_async (GsdSmartcardManager *self,
+@@ -391,300 +465,104 @@ watch_smartcards_from_driver_async (GsdS
                             self);
          G_UNLOCK (gsd_smartcards_watch_tasks);
  
 -        sync_initial_tokens_from_driver (self, driver, operation->smartcards, cancellable);
-+        sync_initial_tokens_from_driver (self, module, operation->smartcards, cancellable);
- 
+-
 -        g_task_run_in_thread (task, (GTaskThreadFunc) watch_smartcards_from_driver);
 -}
--
++        sync_initial_tokens_from_driver (self, module, operation->smartcards, cancellable);
+ 
 -static gboolean
 -register_driver_finish (GsdSmartcardManager  *self,
 -                        GAsyncResult         *result,
@@ -707,30 +707,24 @@ index fc6ae0b..ae034d1 100644
 -{
 -        SECMOD_DestroyModule (operation->driver);
 -        g_free (operation);
-+        g_debug ("Done watching smartcards from module");
- }
- 
- static gboolean
+-}
+-
+-static gboolean
 -on_task_thread_to_complete_driver_registration (GTask *task)
-+module_has_removable_slot (GckModule *module)
- {
+-{
 -        DriverRegistrationOperation *operation;
 -        operation = g_task_get_task_data (task);
-+        g_autolist(GckSlot) slots = NULL;
-+        GList *l;
- 
+-
 -        if (operation->error != NULL)
 -                g_task_return_error (task, operation->error);
 -        else
 -                g_task_return_boolean (task, TRUE);
-+        slots = gck_module_get_slots (module, FALSE);
- 
+-
 -        return G_SOURCE_REMOVE;
--}
-+        for (l = slots; l; l = l->next) {
-+                GckSlot *slot = l->data;
++        g_debug ("Done watching smartcards from module");
+ }
  
--static gboolean
+ static gboolean
 -on_main_thread_to_register_driver (GTask *task)
 -{
 -        GsdSmartcardManager *self;
@@ -779,20 +773,26 @@ index fc6ae0b..ae034d1 100644
 -                 GCancellable        *cancellable,
 -                 GAsyncReadyCallback  callback,
 -                 gpointer             user_data)
--{
++module_has_removable_slot (GckModule *module)
+ {
 -        GTask *task;
 -
 -        g_debug ("Activating driver '%s'", driver->commonName);
--
++        g_autolist(GckSlot) slots = NULL;
++        GList *l;
+ 
 -        task = g_task_new (self, cancellable, callback, user_data);
--
++        slots = gck_module_get_slots (module, FALSE);
+ 
 -        register_driver (self,
 -                         driver,
 -                         cancellable,
 -                         (GAsyncReadyCallback) on_driver_registered,
 -                         task);
 -}
--
++        for (l = slots; l; l = l->next) {
++                GckSlot *slot = l->data;
+ 
 -typedef struct
 -{
 -  int pending_drivers_count;
@@ -924,7 +924,7 @@ index fc6ae0b..ae034d1 100644
 +                                                    NULL);
          }
 -        SECMOD_ReleaseReadLock (lock);
- 
+-
 -        try_to_complete_all_drivers_activation (task);
 -}
 -
@@ -948,7 +948,7 @@ index fc6ae0b..ae034d1 100644
 -        PK11SlotInfo *login_token;
 -
 -        driver_activated = activate_all_drivers_async_finish (self, result, &error);
--
+ 
 -        if (!driver_activated) {
 -                g_task_return_error (task, error);
 +        if (!self->smartcard_modules) {
@@ -1001,7 +1001,7 @@ index fc6ae0b..ae034d1 100644
  }
  
  static void
-@@ -697,7 +575,9 @@ watch_smartcards_async (GsdSmartcardManager *self,
+@@ -697,7 +575,9 @@ watch_smartcards_async (GsdSmartcardMana
  
          task = g_task_new (self, cancellable, callback, user_data);
  
@@ -1012,7 +1012,7 @@ index fc6ae0b..ae034d1 100644
  }
  
  static gboolean
-@@ -738,11 +618,12 @@ on_service_created (GObject             *source_object,
+@@ -738,11 +618,12 @@ on_service_created (GObject
  
          self->service = service;
  
@@ -1026,7 +1026,7 @@ index fc6ae0b..ae034d1 100644
  }
  
  static gboolean
-@@ -753,8 +634,6 @@ gsd_smartcard_manager_idle_cb (GsdSmartcardManager *self)
+@@ -753,8 +634,6 @@ gsd_smartcard_manager_idle_cb (GsdSmartc
          self->cancellable = g_cancellable_new();
          self->settings = g_settings_new (CONF_SCHEMA);
  
@@ -1035,7 +1035,7 @@ index fc6ae0b..ae034d1 100644
          gsd_smartcard_service_new_async (self,
                                           self->cancellable,
                                           (GAsyncReadyCallback) on_service_created,
-@@ -787,8 +666,7 @@ gsd_smartcard_manager_stop (GsdSmartcardManager *self)
+@@ -787,8 +666,7 @@ gsd_smartcard_manager_stop (GsdSmartcard
  
          g_cancellable_cancel (self->cancellable);
  
@@ -1045,7 +1045,7 @@ index fc6ae0b..ae034d1 100644
          g_clear_object (&self->settings);
          g_clear_object (&self->cancellable);
          g_clear_object (&self->session_manager);
-@@ -860,6 +738,7 @@ gsd_smartcard_manager_do_remove_action (GsdSmartcardManager *self)
+@@ -860,6 +738,7 @@ gsd_smartcard_manager_do_remove_action (
          char *remove_action;
  
          remove_action = g_settings_get_string (self->settings, KEY_REMOVE_ACTION);
@@ -1053,7 +1053,7 @@ index fc6ae0b..ae034d1 100644
  
          if (strcmp (remove_action, "lock-screen") == 0)
                  lock_screen (self);
-@@ -867,7 +746,7 @@ gsd_smartcard_manager_do_remove_action (GsdSmartcardManager *self)
+@@ -867,7 +746,7 @@ gsd_smartcard_manager_do_remove_action (
                  log_out (self);
  }
  
@@ -1062,7 +1062,7 @@ index fc6ae0b..ae034d1 100644
  get_login_token_for_operation (GsdSmartcardManager      *self,
                                 WatchSmartcardsOperation *operation)
  {
-@@ -876,23 +755,21 @@ get_login_token_for_operation (GsdSmartcardManager      *self,
+@@ -876,23 +755,21 @@ get_login_token_for_operation (GsdSmartc
  
          g_hash_table_iter_init (&iter, operation->smartcards);
          while (g_hash_table_iter_next (&iter, &key, &value)) {
@@ -1092,7 +1092,7 @@ index fc6ae0b..ae034d1 100644
          GList *node;
  
          G_LOCK (gsd_smartcards_watch_tasks);
-@@ -923,12 +800,10 @@ get_inserted_tokens_for_operation (GsdSmartcardManager      *self,
+@@ -923,12 +800,10 @@ get_inserted_tokens_for_operation (GsdSm
  
          g_hash_table_iter_init (&iter, operation->smartcards);
          while (g_hash_table_iter_next (&iter, &key, &value)) {
@@ -1108,10 +1108,10 @@ index fc6ae0b..ae034d1 100644
          }
  
          return inserted_tokens;
-diff --git a/plugins/smartcard/gsd-smartcard-manager.h b/plugins/smartcard/gsd-smartcard-manager.h
-index c2a9eb3..259b125 100644
---- a/plugins/smartcard/gsd-smartcard-manager.h
-+++ b/plugins/smartcard/gsd-smartcard-manager.h
+Index: gnome-settings-daemon/plugins/smartcard/gsd-smartcard-manager.h
+===================================================================
+--- gnome-settings-daemon.orig/plugins/smartcard/gsd-smartcard-manager.h
++++ gnome-settings-daemon/plugins/smartcard/gsd-smartcard-manager.h
 @@ -22,13 +22,7 @@
  #define __GSD_SMARTCARD_MANAGER_H
  
@@ -1127,7 +1127,7 @@ index c2a9eb3..259b125 100644
  
  G_BEGIN_DECLS
  
-@@ -40,7 +34,7 @@ G_DECLARE_FINAL_TYPE (GsdSmartcardManager, gsd_smartcard_manager, GSD, SMARTCARD
+@@ -40,7 +34,7 @@ G_DECLARE_FINAL_TYPE (GsdSmartcardManage
  typedef enum
  {
           GSD_SMARTCARD_MANAGER_ERROR_GENERIC = 0,
@@ -1136,7 +1136,7 @@ index c2a9eb3..259b125 100644
           GSD_SMARTCARD_MANAGER_ERROR_LOADING_DRIVER,
           GSD_SMARTCARD_MANAGER_ERROR_WATCHING_FOR_EVENTS,
           GSD_SMARTCARD_MANAGER_ERROR_REPORTING_EVENTS,
-@@ -56,7 +50,7 @@ gboolean                gsd_smartcard_manager_start       (GsdSmartcardManager
+@@ -56,7 +50,7 @@ gboolean                gsd_smartcard_ma
                                                             GError              **error);
  void                    gsd_smartcard_manager_stop        (GsdSmartcardManager  *manager);
  
@@ -1145,10 +1145,10 @@ index c2a9eb3..259b125 100644
  GList *                 gsd_smartcard_manager_get_inserted_tokens (GsdSmartcardManager *manager,
                                                                     gsize               *num_tokens);
  void                    gsd_smartcard_manager_do_remove_action (GsdSmartcardManager *manager);
-diff --git a/plugins/smartcard/gsd-smartcard-service.c b/plugins/smartcard/gsd-smartcard-service.c
-index 4d529c3..c29d377 100644
---- a/plugins/smartcard/gsd-smartcard-service.c
-+++ b/plugins/smartcard/gsd-smartcard-service.c
+Index: gnome-settings-daemon/plugins/smartcard/gsd-smartcard-service.c
+===================================================================
+--- gnome-settings-daemon.orig/plugins/smartcard/gsd-smartcard-service.c
++++ gnome-settings-daemon/plugins/smartcard/gsd-smartcard-service.c
 @@ -1,6 +1,7 @@
  /* -*- Mode: C; tab-width: 8; indent-tabs-mode: nil; c-basic-offset: 8 -*-
   *
@@ -1165,17 +1165,16 @@ index 4d529c3..c29d377 100644
  
  struct _GsdSmartcardService
  {
-@@ -227,24 +229,29 @@ async_initable_interface_init (GAsyncInitableIface *interface)
-         interface->init_finish = gsd_smartcard_service_initable_init_finish;
+@@ -228,23 +230,28 @@ async_initable_interface_init (GAsyncIni
  }
  
-+static char *
+ static char *
 +module_get_path (GckModule *module)
 +{
 +        return p11_kit_config_option (gck_module_get_functions (module), "module");
 +}
 +
- static char *
++static char *
  get_object_path_for_token (GsdSmartcardService *self,
 -                           PK11SlotInfo        *card_slot)
 +                           GckSlot             *slot)
@@ -1203,7 +1202,7 @@ index 4d529c3..c29d377 100644
          g_free (escaped_library_path);
  
          return object_path;
-@@ -255,7 +262,7 @@ gsd_smartcard_service_handle_get_login_token (GsdSmartcardServiceManager *manage
+@@ -255,7 +262,7 @@ gsd_smartcard_service_handle_get_login_t
                                                GDBusMethodInvocation      *invocation)
  {
          GsdSmartcardService *self = GSD_SMARTCARD_SERVICE (manager);
@@ -1212,7 +1211,7 @@ index 4d529c3..c29d377 100644
          char *object_path;
  
          card_slot = gsd_smartcard_manager_get_login_token (self->smartcard_manager);
-@@ -306,14 +313,14 @@ gsd_smartcard_service_handle_get_inserted_tokens (GsdSmartcardServiceManager *ma
+@@ -306,14 +313,14 @@ gsd_smartcard_service_handle_get_inserte
  
          object_paths = g_ptr_array_new ();
          for (node = inserted_tokens; node != NULL; node = node->next) {
@@ -1229,7 +1228,7 @@ index 4d529c3..c29d377 100644
  
          gsd_smartcard_service_manager_complete_get_inserted_tokens (manager,
                                                                      invocation,
-@@ -481,13 +488,13 @@ gsd_smartcard_service_new_finish (GAsyncResult  *result,
+@@ -481,13 +488,13 @@ gsd_smartcard_service_new_finish (GAsync
  }
  
  static char *
@@ -1246,7 +1245,7 @@ index 4d529c3..c29d377 100644
  
          object_path = g_build_path ("/",
                                      GSD_SMARTCARD_MANAGER_DRIVERS_DBUS_PATH,
-@@ -497,15 +504,30 @@ get_object_path_for_driver (GsdSmartcardService *self,
+@@ -497,15 +504,30 @@ get_object_path_for_driver (GsdSmartcard
          return object_path;
  }
  
@@ -1280,7 +1279,7 @@ index 4d529c3..c29d377 100644
          object = G_DBUS_OBJECT_SKELETON (gsd_smartcard_service_object_skeleton_new (object_path));
          g_free (object_path);
  
-@@ -513,9 +535,14 @@ gsd_smartcard_service_register_driver (GsdSmartcardService  *self,
+@@ -513,9 +535,14 @@ gsd_smartcard_service_register_driver (G
          g_dbus_object_skeleton_add_interface (object, interface);
          g_object_unref (interface);
  
@@ -1297,7 +1296,7 @@ index 4d529c3..c29d377 100644
                        NULL);
          g_dbus_object_manager_server_export (self->object_manager_server,
                                               object);
-@@ -524,11 +551,12 @@ gsd_smartcard_service_register_driver (GsdSmartcardService  *self,
+@@ -524,11 +551,12 @@ gsd_smartcard_service_register_driver (G
  
  static void
  synchronize_token_now (GsdSmartcardService *self,
@@ -1312,7 +1311,7 @@ index 4d529c3..c29d377 100644
          gboolean is_present, is_login_card;
  
          object_path = get_object_path_for_token (self, card_slot);
-@@ -540,11 +568,17 @@ synchronize_token_now (GsdSmartcardService *self,
+@@ -540,11 +568,17 @@ synchronize_token_now (GsdSmartcardServi
          if (interface == NULL)
                  goto out;
  
@@ -1343,7 +1342,7 @@ index 4d529c3..c29d377 100644
          char         *object_path;
          GSource      *main_thread_source;
  } RegisterNewTokenOperation;
-@@ -608,7 +643,8 @@ destroy_register_new_token_operation (RegisterNewTokenOperation *operation)
+@@ -608,7 +643,8 @@ destroy_register_new_token_operation (Re
  {
          g_clear_pointer (&operation->main_thread_source,
                           g_source_destroy);
@@ -1353,7 +1352,7 @@ index 4d529c3..c29d377 100644
          g_free (operation->object_path);
          g_free (operation);
  }
-@@ -620,7 +656,7 @@ on_main_thread_to_register_new_token (GTask *task)
+@@ -620,7 +656,7 @@ on_main_thread_to_register_new_token (GT
          GDBusObjectSkeleton *object;
          GDBusInterfaceSkeleton *interface;
          RegisterNewTokenOperation *operation;
@@ -1362,7 +1361,7 @@ index 4d529c3..c29d377 100644
          char *driver_object_path;
          const char *token_name;
  
-@@ -635,10 +671,9 @@ on_main_thread_to_register_new_token (GTask *task)
+@@ -635,10 +671,9 @@ on_main_thread_to_register_new_token (GT
          g_dbus_object_skeleton_add_interface (object, interface);
          g_object_unref (interface);
  
@@ -1376,7 +1375,7 @@ index 4d529c3..c29d377 100644
  
          g_object_set (G_OBJECT (interface),
                        "driver", driver_object_path,
-@@ -676,7 +711,7 @@ create_main_thread_source (GSourceFunc   callback,
+@@ -676,7 +711,7 @@ create_main_thread_source (GSourceFunc
  
  static void
  register_new_token_in_main_thread (GsdSmartcardService *self,
@@ -1385,7 +1384,7 @@ index 4d529c3..c29d377 100644
                                     char                *object_path,
                                     GCancellable        *cancellable,
                                     GAsyncReadyCallback  callback,
-@@ -686,7 +721,8 @@ register_new_token_in_main_thread (GsdSmartcardService *self,
+@@ -686,7 +721,8 @@ register_new_token_in_main_thread (GsdSm
          GTask *task;
  
          operation = g_new0 (RegisterNewTokenOperation, 1);
@@ -1395,7 +1394,7 @@ index 4d529c3..c29d377 100644
          operation->object_path = g_strdup (object_path);
  
          task = g_task_new (self, cancellable, callback, user_data);
-@@ -711,8 +747,9 @@ register_new_token_in_main_thread_finish (GsdSmartcardService  *self,
+@@ -711,8 +747,9 @@ register_new_token_in_main_thread_finish
  static void
  on_token_registered (GsdSmartcardService *self,
                       GAsyncResult        *result,
@@ -1406,7 +1405,7 @@ index 4d529c3..c29d377 100644
          gboolean registered;
          GError *error = NULL;
  
-@@ -721,19 +758,16 @@ on_token_registered (GsdSmartcardService *self,
+@@ -721,19 +758,16 @@ on_token_registered (GsdSmartcardService
          if (!registered) {
                  g_debug ("Couldn't register token: %s",
                           error->message);
@@ -1429,7 +1428,7 @@ index 4d529c3..c29d377 100644
  } SynchronizeTokenOperation;
  
  static void
-@@ -741,7 +775,7 @@ destroy_synchronize_token_operation (SynchronizeTokenOperation *operation)
+@@ -741,7 +775,7 @@ destroy_synchronize_token_operation (Syn
  {
          g_clear_pointer (&operation->main_thread_source,
                           g_source_destroy);
@@ -1438,7 +1437,7 @@ index 4d529c3..c29d377 100644
          g_free (operation);
  }
  
-@@ -774,7 +808,7 @@ synchronize_token_in_main_thread_finish (GsdSmartcardService  *self,
+@@ -774,7 +808,7 @@ synchronize_token_in_main_thread_finish
  
  static void
  synchronize_token_in_main_thread (GsdSmartcardService *self,
@@ -1447,7 +1446,7 @@ index 4d529c3..c29d377 100644
                                    GCancellable        *cancellable,
                                    GAsyncReadyCallback  callback,
                                    gpointer             user_data)
-@@ -783,7 +817,7 @@ synchronize_token_in_main_thread (GsdSmartcardService *self,
+@@ -783,7 +817,7 @@ synchronize_token_in_main_thread (GsdSma
          GTask *task;
  
          operation = g_new0 (SynchronizeTokenOperation, 1);
@@ -1456,7 +1455,7 @@ index 4d529c3..c29d377 100644
  
          task = g_task_new (self, cancellable, callback, user_data);
  
-@@ -801,7 +835,7 @@ synchronize_token_in_main_thread (GsdSmartcardService *self,
+@@ -801,7 +835,7 @@ synchronize_token_in_main_thread (GsdSma
  static void
  on_token_synchronized (GsdSmartcardService *self,
                         GAsyncResult        *result,
@@ -1465,7 +1464,7 @@ index 4d529c3..c29d377 100644
  {
          gboolean synchronized;
          GError *error = NULL;
-@@ -810,13 +844,11 @@ on_token_synchronized (GsdSmartcardService *self,
+@@ -810,13 +844,11 @@ on_token_synchronized (GsdSmartcardServi
  
          if (!synchronized)
                  g_debug ("Couldn't synchronize token: %s", error->message);
@@ -1480,7 +1479,7 @@ index 4d529c3..c29d377 100644
                                    GCancellable        *cancellable)
  {
          char *object_path;
-@@ -835,7 +867,7 @@ gsd_smartcard_service_sync_token (GsdSmartcardService *self,
+@@ -835,7 +867,7 @@ gsd_smartcard_service_sync_token (GsdSma
                                                     cancellable,
                                                     (GAsyncReadyCallback)
                                                     on_token_registered,
@@ -1489,7 +1488,7 @@ index 4d529c3..c29d377 100644
  
          else
                  synchronize_token_in_main_thread (self,
-@@ -843,7 +875,7 @@ gsd_smartcard_service_sync_token (GsdSmartcardService *self,
+@@ -843,7 +875,7 @@ gsd_smartcard_service_sync_token (GsdSma
                                                    cancellable,
                                                    (GAsyncReadyCallback)
                                                    on_token_synchronized,
@@ -1498,10 +1497,10 @@ index 4d529c3..c29d377 100644
  
          g_free (object_path);
  }
-diff --git a/plugins/smartcard/gsd-smartcard-service.h b/plugins/smartcard/gsd-smartcard-service.h
-index 11b3e22..16bdc4c 100644
---- a/plugins/smartcard/gsd-smartcard-service.h
-+++ b/plugins/smartcard/gsd-smartcard-service.h
+Index: gnome-settings-daemon/plugins/smartcard/gsd-smartcard-service.h
+===================================================================
+--- gnome-settings-daemon.orig/plugins/smartcard/gsd-smartcard-service.h
++++ gnome-settings-daemon/plugins/smartcard/gsd-smartcard-service.h
 @@ -28,13 +28,6 @@
  
  #include "org.gnome.SettingsDaemon.Smartcard.h"
@@ -1516,7 +1515,7 @@ index 11b3e22..16bdc4c 100644
  G_BEGIN_DECLS
  
  #define GSD_TYPE_SMARTCARD_SERVICE (gsd_smartcard_service_get_type ())
-@@ -48,10 +41,10 @@ void  gsd_smartcard_service_new_async (GsdSmartcardManager  *manager,
+@@ -48,10 +41,10 @@ void  gsd_smartcard_service_new_async (G
  GsdSmartcardService *gsd_smartcard_service_new_finish (GAsyncResult         *result,
                                                         GError              **error);
  
@@ -1530,11 +1529,11 @@ index 11b3e22..16bdc4c 100644
                                          GCancellable         *cancellable);
  
  
-diff --git a/plugins/smartcard/gsd-smartcard-utils.c b/plugins/smartcard/gsd-smartcard-utils.c
-index 6b9461b..b2bb863 100644
---- a/plugins/smartcard/gsd-smartcard-utils.c
-+++ b/plugins/smartcard/gsd-smartcard-utils.c
-@@ -172,3 +172,22 @@ gsd_smartcard_utils_escape_object_path (const char *unescaped_string)
+Index: gnome-settings-daemon/plugins/smartcard/gsd-smartcard-utils.c
+===================================================================
+--- gnome-settings-daemon.orig/plugins/smartcard/gsd-smartcard-utils.c
++++ gnome-settings-daemon/plugins/smartcard/gsd-smartcard-utils.c
+@@ -172,3 +172,22 @@ gsd_smartcard_utils_escape_object_path (
  
    return object_path;
  }
@@ -1557,10 +1556,10 @@ index 6b9461b..b2bb863 100644
 +
 +        return (info.flags & flags);
 +}
-diff --git a/plugins/smartcard/gsd-smartcard-utils.h b/plugins/smartcard/gsd-smartcard-utils.h
-index c7822bf..0e6c5b6 100644
---- a/plugins/smartcard/gsd-smartcard-utils.h
-+++ b/plugins/smartcard/gsd-smartcard-utils.h
+Index: gnome-settings-daemon/plugins/smartcard/gsd-smartcard-utils.h
+===================================================================
+--- gnome-settings-daemon.orig/plugins/smartcard/gsd-smartcard-utils.h
++++ gnome-settings-daemon/plugins/smartcard/gsd-smartcard-utils.h
 @@ -21,6 +21,7 @@
  #define __GSD_SMARTCARD_UTILS_H
  
@@ -1569,7 +1568,7 @@ index c7822bf..0e6c5b6 100644
  #include <gio/gio.h>
  
  G_BEGIN_DECLS
-@@ -28,6 +29,8 @@ void             gsd_smartcard_utils_register_error_domain             (GQuark e
+@@ -28,6 +29,8 @@ void             gsd_smartcard_utils_reg
                                                                          GType error_enum);
  char *           gsd_smartcard_utils_escape_object_path                (const char *unescaped_string);
  
@@ -1578,10 +1577,10 @@ index c7822bf..0e6c5b6 100644
  G_END_DECLS
  
  #endif /* __GSD_SMARTCARD_MANAGER_H */
-diff --git a/plugins/smartcard/meson.build b/plugins/smartcard/meson.build
-index 916a0fc..7cdee1b 100644
---- a/plugins/smartcard/meson.build
-+++ b/plugins/smartcard/meson.build
+Index: gnome-settings-daemon/plugins/smartcard/meson.build
+===================================================================
+--- gnome-settings-daemon.orig/plugins/smartcard/meson.build
++++ gnome-settings-daemon/plugins/smartcard/meson.build
 @@ -32,10 +32,10 @@ sources += gnome.gdbus_codegen(
  deps = plugins_deps + [
    gio_unix_dep,
