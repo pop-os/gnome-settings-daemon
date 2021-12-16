@@ -19,3 +19,4 @@ ubuntu/git-media-keys-Add-one-second-delay-between-each-rfkill-.patch
 
 # Pop!_OS patches
 oled_brightness.patch
+disable-window-system-color-transform.patch
