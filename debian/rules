@@ -3,7 +3,7 @@
 include /usr/share/dpkg/default.mk
 
 export DEB_BUILD_MAINT_OPTIONS = hardening=+all
-export DEB_LDFLAGS_MAINT_APPEND = -Wl,-z,defs -Wl,-O1 -Wl,--warn-unresolved-symbols -Wl,--as-needed
+export DEB_LDFLAGS_MAINT_APPEND = -Wl,-z,defs -Wl,-O1 -Wl,--warn-unresolved-symbols
 export DEB_LDFLAGS_MAINT_STRIP = -Wl,-Bsymbolic-functions
 
 export GSD_MAJOR_VERSION = $(shell echo $(DEB_VERSION_UPSTREAM) | cut -d. -f1)
@@ -45,11 +45,9 @@ override_dh_installchangelogs:
 # The build system is not installing the polkit policy files on non-linux
 # architectures even if the code requires libpolkit-gobject-1 library
 ifneq ($(DEB_HOST_ARCH_OS),linux)
-override_dh_install:
+execute_before_dh_install:
 	grep -E -v 'polkit-1' debian/gnome-settings-daemon.install > debian/gnome-settings-daemon.install.$(DEB_HOST_ARCH_OS)
-	dh_install
 endif
 
-override_dh_clean:
+execute_before_dh_clean:
 	rm -f debian/gnome-settings-daemon.install.$(DEB_HOST_ARCH_OS)
-	dh_clean
