@@ -1,4 +1,3 @@
 debian/01_debianize_xrdb.patch
-debian/Revert-xsettings-Add-support-for-XFixes-ClientDisconnect.patch
 debian/meson.build-Lower-polkit-requirement.patch
 meson-drop-unused-argument-for-i18n.merge_file.patch
