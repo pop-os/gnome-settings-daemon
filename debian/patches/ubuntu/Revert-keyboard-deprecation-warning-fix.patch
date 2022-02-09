@@ -1,0 +1,85 @@
+From: Jeremy Bicha <jbicha@debian.org>
+Date: Wed, 9 Feb 2022 15:56:34 -0500
+Subject: Revert "keyboard: deprecation warning fix"
+
+This reverts commit 95380d78c79c49cd92b36cc5b995e8a7c23ae716.
+
+In my testing, this commit seemed to cause the keyboard plugin
+to fail to load when logging in on Ubuntu but not on Debian.
+I don't understand why.
+---
+ plugins/keyboard/gsd-keyboard-manager.c | 28 ++++++++++++++--------------
+ 1 file changed, 14 insertions(+), 14 deletions(-)
+
+diff --git a/plugins/keyboard/gsd-keyboard-manager.c b/plugins/keyboard/gsd-keyboard-manager.c
+index 300043c..fb1e27a 100644
+--- a/plugins/keyboard/gsd-keyboard-manager.c
++++ b/plugins/keyboard/gsd-keyboard-manager.c
+@@ -87,7 +87,7 @@ struct _GsdKeyboardManager
+         GDBusProxy *localed;
+         GCancellable *cancellable;
+ 
+-        GdkSeat *user_seat;
++        GdkDeviceManager *device_manager;
+         guint device_added_id;
+         guint device_removed_id;
+ };
+@@ -278,7 +278,7 @@ settings_changed (GSettings          *settings,
+ }
+ 
+ static void
+-device_added_cb (GdkSeat            *user_seat,
++device_added_cb (GdkDeviceManager   *device_manager,
+                  GdkDevice          *device,
+                  GsdKeyboardManager *manager)
+ {
+@@ -291,7 +291,7 @@ device_added_cb (GdkSeat            *user_seat,
+ }
+ 
+ static void
+-device_removed_cb (GdkSeat            *user_seat,
++device_removed_cb (GdkDeviceManager   *device_manager,
+                    GdkDevice          *device,
+                    GsdKeyboardManager *manager)
+ {
+@@ -305,18 +305,18 @@ device_removed_cb (GdkSeat            *user_seat,
+ static void
+ set_devicepresence_handler (GsdKeyboardManager *manager)
+ {
+-        GdkSeat *user_seat;
++        GdkDeviceManager *device_manager;
+ 
+         if (gnome_settings_is_wayland ())
+                 return;
+ 
+-        user_seat = gdk_display_get_default_seat (gdk_display_get_default ());
++        device_manager = gdk_display_get_device_manager (gdk_display_get_default ());
+ 
+-        manager->device_added_id = g_signal_connect (G_OBJECT (user_seat), "device-added",
+-                                                     G_CALLBACK (device_added_cb), manager);
+-        manager->device_removed_id = g_signal_connect (G_OBJECT (user_seat), "device-removed",
+-                                                       G_CALLBACK (device_removed_cb), manager);
+-        manager->user_seat = user_seat;
++        manager->device_added_id = g_signal_connect (G_OBJECT (device_manager), "device-added",
++                                                           G_CALLBACK (device_added_cb), manager);
++        manager->device_removed_id = g_signal_connect (G_OBJECT (device_manager), "device-removed",
++                                                             G_CALLBACK (device_removed_cb), manager);
++        manager->device_manager = device_manager;
+ }
+ 
+ static gboolean
+@@ -790,10 +790,10 @@ gsd_keyboard_manager_stop (GsdKeyboardManager *manager)
+         g_clear_object (&manager->a11y_settings);
+         g_clear_object (&manager->localed);
+ 
+-        if (manager->user_seat != NULL) {
+-                g_signal_handler_disconnect (manager->user_seat, manager->device_added_id);
+-                g_signal_handler_disconnect (manager->user_seat, manager->device_removed_id);
+-                manager->user_seat = NULL;
++        if (manager->device_manager != NULL) {
++                g_signal_handler_disconnect (manager->device_manager, manager->device_added_id);
++                g_signal_handler_disconnect (manager->device_manager, manager->device_removed_id);
++                manager->device_manager = NULL;
+         }
+ }
+ 
