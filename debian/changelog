@@ -1,8 +1,10 @@
-gnome-settings-daemon (42~alpha-1) UNRELEASED; urgency=medium
+gnome-settings-daemon (42~alpha-1) experimental; urgency=medium
 
   * New upstream release
+  * Depend on gsettings-desktop-schemas 42~
+  * debian/rules: Handle pre-release versions too for dh13 variables
 
- -- Jeremy Bicha <jeremy.bicha@canonical.com>  Wed, 09 Feb 2022 11:12:19 -0500
+ -- Jeremy Bicha <jeremy.bicha@canonical.com>  Wed, 09 Feb 2022 11:38:32 -0500
 
 gnome-settings-daemon (41.0-4) unstable; urgency=medium
 
