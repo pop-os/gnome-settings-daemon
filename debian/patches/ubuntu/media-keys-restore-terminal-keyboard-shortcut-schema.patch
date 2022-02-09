@@ -9,10 +9,10 @@ Subject: media-keys: restore terminal keyboard shortcut schema
  plugins/media-keys/shortcuts-list.h                  |  1 +
  4 files changed, 32 insertions(+)
 
-Index: gnome-settings-daemon/data/org.gnome.settings-daemon.plugins.media-keys.gschema.xml.in
-===================================================================
---- gnome-settings-daemon.orig/data/org.gnome.settings-daemon.plugins.media-keys.gschema.xml.in
-+++ gnome-settings-daemon/data/org.gnome.settings-daemon.plugins.media-keys.gschema.xml.in
+diff --git a/data/org.gnome.settings-daemon.plugins.media-keys.gschema.xml.in b/data/org.gnome.settings-daemon.plugins.media-keys.gschema.xml.in
+index fb0c85c..5a05d7f 100644
+--- a/data/org.gnome.settings-daemon.plugins.media-keys.gschema.xml.in
++++ b/data/org.gnome.settings-daemon.plugins.media-keys.gschema.xml.in
 @@ -131,6 +131,11 @@
        <summary>Record a short video of the screen</summary>
        <description>Binding to record a short video of the screen</description>
@@ -37,14 +37,15 @@ Index: gnome-settings-daemon/data/org.gnome.settings-daemon.plugins.media-keys.g
      <key name="www" type="as">
        <default>['']</default>
        <summary>Launch web browser</summary>
-Index: gnome-settings-daemon/plugins/media-keys/gsd-media-keys-manager.c
-===================================================================
---- gnome-settings-daemon.orig/plugins/media-keys/gsd-media-keys-manager.c
-+++ gnome-settings-daemon/plugins/media-keys/gsd-media-keys-manager.c
-@@ -1134,6 +1134,22 @@ gnome_session_shutdown_cb (GObject *sour
+diff --git a/plugins/media-keys/gsd-media-keys-manager.c b/plugins/media-keys/gsd-media-keys-manager.c
+index a38be7a..a705007 100644
+--- a/plugins/media-keys/gsd-media-keys-manager.c
++++ b/plugins/media-keys/gsd-media-keys-manager.c
+@@ -1114,6 +1114,22 @@ gnome_session_shutdown_cb (GObject *source_object,
+         }
  }
  
- static void
++static void
 +do_terminal_action (GsdMediaKeysManager *manager)
 +{
 +        GSettings *settings;
@@ -60,11 +61,10 @@ Index: gnome-settings-daemon/plugins/media-keys/gsd-media-keys-manager.c
 +        g_object_unref (settings);
 +}
 +
-+static void
+ static void
  gnome_session_shutdown (GsdMediaKeysManager *manager)
  {
- 	GsdMediaKeysManagerPrivate *priv = GSD_MEDIA_KEYS_MANAGER_GET_PRIVATE (manager);
-@@ -2711,6 +2727,9 @@ do_action (GsdMediaKeysManager *manager,
+@@ -2490,6 +2506,9 @@ do_action (GsdMediaKeysManager *manager,
          case SCREENCAST_KEY:
                  do_screencast_action (manager);
                  break;
@@ -74,7 +74,7 @@ Index: gnome-settings-daemon/plugins/media-keys/gsd-media-keys-manager.c
          case WWW_KEY:
                  do_url_action (manager, "http", timestamp);
                  break;
-@@ -3321,6 +3340,7 @@ migrate_keybinding_settings (void)
+@@ -3100,6 +3119,7 @@ migrate_keybinding_settings (void)
                  { "window-screenshot-clip",     "window-screenshot-clip",       map_keybinding },
                  { "area-screenshot-clip",       "area-screenshot-clip",         map_keybinding },
                  { "screencast",                 "screencast",                   map_keybinding },
@@ -82,10 +82,10 @@ Index: gnome-settings-daemon/plugins/media-keys/gsd-media-keys-manager.c
                  { "www",                        "www",                          map_keybinding },
                  { "magnifier",                  "magnifier",                    map_keybinding },
                  { "screenreader",               "screenreader",                 map_keybinding },
-Index: gnome-settings-daemon/plugins/media-keys/media-keys.h
-===================================================================
---- gnome-settings-daemon.orig/plugins/media-keys/media-keys.h
-+++ gnome-settings-daemon/plugins/media-keys/media-keys.h
+diff --git a/plugins/media-keys/media-keys.h b/plugins/media-keys/media-keys.h
+index cc4ea8e..64362a4 100644
+--- a/plugins/media-keys/media-keys.h
++++ b/plugins/media-keys/media-keys.h
 @@ -49,6 +49,7 @@ typedef enum {
          WINDOW_SCREENSHOT_CLIP_KEY,
          AREA_SCREENSHOT_CLIP_KEY,
@@ -94,10 +94,10 @@ Index: gnome-settings-daemon/plugins/media-keys/media-keys.h
          WWW_KEY,
          PLAY_KEY,
          PAUSE_KEY,
-Index: gnome-settings-daemon/plugins/media-keys/shortcuts-list.h
-===================================================================
---- gnome-settings-daemon.orig/plugins/media-keys/shortcuts-list.h
-+++ gnome-settings-daemon/plugins/media-keys/shortcuts-list.h
+diff --git a/plugins/media-keys/shortcuts-list.h b/plugins/media-keys/shortcuts-list.h
+index 8ced72d..45f0772 100644
+--- a/plugins/media-keys/shortcuts-list.h
++++ b/plugins/media-keys/shortcuts-list.h
 @@ -71,6 +71,7 @@ static struct {
          { WINDOW_SCREENSHOT_CLIP_KEY, "window-screenshot-clip", FALSE, SHELL_ACTION_MODE_NORMAL, META_KEY_BINDING_IGNORE_AUTOREPEAT },
          { AREA_SCREENSHOT_CLIP_KEY, "area-screenshot-clip", FALSE, SHELL_ACTION_MODE_ALL, META_KEY_BINDING_IGNORE_AUTOREPEAT },
