@@ -1,6 +1,6 @@
 project(
   'gnome-settings-daemon', 'c',
-  version: '41.0',
+  version: '42.alpha',
   license: [ 'GPL2+', 'LGPLv2+' ],
   meson_version: '>= 0.49.0'
 )
@@ -93,7 +93,7 @@ geocode_glib_dep = dependency('geocode-glib-1.0', version: '>= 3.10.0')
 gio_dep = dependency('gio-2.0', version: '>= 2.53.0')
 gio_unix_dep = dependency('gio-unix-2.0')
 gnome_desktop_dep = dependency('gnome-desktop-3.0', version: '>= 3.37.1')
-gsettings_desktop_dep = dependency('gsettings-desktop-schemas', version: '>= 40')
+gsettings_desktop_dep = dependency('gsettings-desktop-schemas', version: '>= 42')
 gtk_dep = dependency('gtk+-3.0', version: '>= 3.15.3')
 gtk_x11_dep = dependency('gtk+-x11-3.0')
 gweather_dep = dependency('gweather-3.0', version: '>= 40.alpha')
@@ -104,7 +104,7 @@ libnotify_dep = dependency('libnotify', version: '>= 0.7.3')
 libpulse_mainloop_glib_dep = dependency('libpulse-mainloop-glib', version: '>= 2.0')
 pango_dep = dependency('pango', version: '>= 1.20.0')
 polkit_gobject_dep = dependency('polkit-gobject-1', version: '>= 0.114')
-upower_glib_dep = dependency('upower-glib', version: '>= 0.99.8')
+upower_glib_dep = dependency('upower-glib', version: '>= 0.99.12')
 x11_dep = dependency('x11')
 xfixes_dep = dependency('xfixes', version: '>= 6.0')
 
