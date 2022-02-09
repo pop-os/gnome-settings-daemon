@@ -6,7 +6,7 @@ export DEB_BUILD_MAINT_OPTIONS = hardening=+all
 export DEB_LDFLAGS_MAINT_APPEND = -Wl,-z,defs -Wl,-O1 -Wl,--warn-unresolved-symbols
 export DEB_LDFLAGS_MAINT_STRIP = -Wl,-Bsymbolic-functions
 
-export GSD_MAJOR_VERSION = $(shell echo $(DEB_VERSION_UPSTREAM) | cut -d. -f1)
+export GSD_MAJOR_VERSION = $(shell echo $(DEB_VERSION_UPSTREAM) | cut -d~ -f1 | cut -d. -f1)
 
 %:
 	dh $@
