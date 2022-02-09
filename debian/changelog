@@ -1,3 +1,32 @@
+gnome-settings-daemon (42~alpha-1ubuntu1) UNRELEASED; urgency=medium
+
+  * Merge with Debian. Remaining changes:
+    + debian/control.in:
+      - Build-depend on accountsservice
+      - Drop build-dependency on libnss-dev and add to libgck-1-dev
+    + debian/patches/ubuntu:
+      - keyboard-sync-input-sources-to-accountsservice.patch
+      - keyboard-Use-ibus-sources-from-locale.patch
+      - lid-close-suspend-support.patch
+      - media-keys-correct-logout-action.patch
+      - media-keys-restore-terminal-keyboard-shortcut-schema.patch
+      - print-notifications-suppress-printer-may-not-be-connected.patch
+      - teach-gsd-about-the-gnome-calculator-snap-.desktop-name.patch
+    + debian/patches/p11-kit:
+      - Use p11-kit (via gck) as smartcards backend
+    + debian/gnome-settings-daemon.install:
+      - Install apport hook
+
+ -- Jeremy Bicha <jeremy.bicha@canonical.com>  Wed, 09 Feb 2022 11:40:20 -0500
+
+gnome-settings-daemon (42~alpha-1) unstable; urgency=medium
+
+  * New upstream release
+  * Depend on gsettings-desktop-schemas 42~
+  * debian/rules: Handle pre-release versions too for dh13 variables
+
+ -- Jeremy Bicha <jeremy.bicha@canonical.com>  Wed, 09 Feb 2022 11:38:32 -0500
+
 gnome-settings-daemon (41.0-4ubuntu1) jammy; urgency=medium
 
   * Merge with Debian. Remaining changes:

@@ -10,7 +10,7 @@ Forwarded: not-needed
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/meson.build b/meson.build
-index 6bdd7d0..7e6ba9c 100644
+index 58b622a..2413de4 100644
 --- a/meson.build
 +++ b/meson.build
 @@ -103,7 +103,7 @@ libgeoclue_dep = dependency('libgeoclue-2.0', version: '>= 2.3.1')
@@ -19,6 +19,6 @@ index 6bdd7d0..7e6ba9c 100644
  pango_dep = dependency('pango', version: '>= 1.20.0')
 -polkit_gobject_dep = dependency('polkit-gobject-1', version: '>= 0.114')
 +polkit_gobject_dep = dependency('polkit-gobject-1', version: '>= 0.105')
- upower_glib_dep = dependency('upower-glib', version: '>= 0.99.8')
+ upower_glib_dep = dependency('upower-glib', version: '>= 0.99.12')
  x11_dep = dependency('x11')
  xfixes_dep = dependency('xfixes', version: '>= 6.0')
