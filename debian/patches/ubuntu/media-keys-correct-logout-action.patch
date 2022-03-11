@@ -11,10 +11,10 @@ Bug-GNOME: https://bugzilla.gnome.org/show_bug.cgi?id=671979
  1 file changed, 7 insertions(+), 1 deletion(-)
 
 diff --git a/plugins/media-keys/gsd-media-keys-manager.c b/plugins/media-keys/gsd-media-keys-manager.c
-index a705007..75c9edb 100644
+index 15e96e0..688baed 100644
 --- a/plugins/media-keys/gsd-media-keys-manager.c
 +++ b/plugins/media-keys/gsd-media-keys-manager.c
-@@ -1150,6 +1150,12 @@ gnome_session_shutdown (GsdMediaKeysManager *manager)
+@@ -1123,6 +1123,12 @@ gnome_session_shutdown (GsdMediaKeysManager *manager)
          g_object_unref (proxy);
  }
  
@@ -27,7 +27,7 @@ index a705007..75c9edb 100644
  static void
  do_eject_action_cb (GDrive              *drive,
                      GAsyncResult        *res,
-@@ -2475,7 +2481,7 @@ do_action (GsdMediaKeysManager *manager,
+@@ -2381,7 +2387,7 @@ do_action (GsdMediaKeysManager *manager,
                                   SOUND_ACTION_FLAG_IS_OUTPUT | SOUND_ACTION_FLAG_IS_PRECISE);
                  break;
          case LOGOUT_KEY:
