@@ -12,12 +12,11 @@ gnome-settings-daemon (42~rc-1ubuntu1) UNRELEASED; urgency=medium
       - media-keys-restore-terminal-keyboard-shortcut-schema.patch
       - print-notifications-suppress-printer-may-not-be-connected.patch
       - teach-gsd-about-the-gnome-calculator-snap-.desktop-name.patch
-      - revert a keyboard deprecation commit that may cause issues
-        logging into the Ubuntu session
     + debian/patches/p11-kit:
       - Use p11-kit (via gck) as smartcards backend
     + debian/gnome-settings-daemon.install:
       - Install apport hook
+  * Drop the keyboard deprecation revert since it doesn't look needed now
 
  -- Jeremy Bicha <jeremy.bicha@canonical.com>  Wed, 09 Feb 2022 15:59:26 -0500
 
