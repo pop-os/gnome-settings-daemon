@@ -22,7 +22,6 @@
 #include "weather-tz.h"
 #include "tz.h"
 
-#define GWEATHER_I_KNOW_THIS_IS_UNSTABLE
 #include <libgweather/gweather.h>
 
 static GList *
@@ -33,7 +32,7 @@ location_get_cities (GWeatherLocation *parent_location)
 
         while ((child = gweather_location_next_child (parent_location, child))) {
                 if (gweather_location_get_level (child) == GWEATHER_LOCATION_CITY) {
-                        cities = g_list_prepend (cities, gweather_location_ref (child));
+                        cities = g_list_prepend (cities, g_object_ref (child));
                 } else {
                         cities = g_list_concat (cities,
                                                 location_get_cities (child));
@@ -65,6 +64,7 @@ load_timezones (GList *cities)
                 TzLocation *loc;
                 const gchar *country;
                 const gchar *timezone_id;
+                GTimeZone *tz;
                 gdouble latitude;
                 gdouble longitude;
 
@@ -77,7 +77,8 @@ load_timezones (GList *cities)
                 }
 
                 country = gweather_location_get_country (l->data);
-                timezone_id = gweather_timezone_get_tzid (gweather_location_get_timezone (l->data));
+                tz = gweather_location_get_timezone (l->data);
+                timezone_id = g_time_zone_get_identifier (tz);
                 gweather_location_get_coords (l->data,
                                               &latitude,
                                               &longitude);

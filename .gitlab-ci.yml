@@ -1,9 +1,9 @@
 include:
- - remote: 'https://gitlab.freedesktop.org/freedesktop/ci-templates/-/raw/5888c7388134cbe4661600222fe9befb10441f6e/templates/fedora.yml'
+ - remote: 'https://gitlab.freedesktop.org/freedesktop/ci-templates/-/raw/80f87b3058efb75a1faae11826211375fba77e7f/templates/fedora.yml'
 
 variables:
   FDO_DISTRIBUTION_TAG: latest
-  FDO_DISTRIBUTION_VERSION: rawhide
+  FDO_DISTRIBUTION_VERSION: 36
   FDO_UPSTREAM_REPO: gnome/gnome-settings-daemon
   # Expiry sets fdo.expires on the image
   FEDORA_IMAGE: "$CI_REGISTRY/$FDO_UPSTREAM_REPO/fedora/$FDO_DISTRIBUTION_VERSION:$FDO_DISTRIBUTION_TAG"
@@ -31,7 +31,7 @@ variables:
     libcanberra-devel
     libgtop2-devel
     libgudev-devel
-    libgweather-devel
+    libgweather4-devel
     libnotify-devel
     librsvg2-devel
     libwacom-devel
@@ -103,6 +103,7 @@ stages:
 ##
 build:
   <<: *save_untracked_files
+  tags: ['crun']
   stage: build
 
   script:
@@ -129,6 +130,7 @@ build:
 ##
 test:
   <<: *save_build_logs
+  tags: ['crun']
   stage: test
 
   dependencies:
@@ -156,6 +158,7 @@ test:
 # Runs the coverage test.
 coverage:
   <<: *save_build_logs
+  tags: ['crun']
   stage: test
   # Appears to be broken on Fedora Rawhide as of 2018-02-05
   allow_failure: true
@@ -203,6 +206,7 @@ pages:
 ##
 .sanitizer: &sanitizer
   <<: *save_build_logs
+  tags: ['crun']
   stage: manual
   when: manual
   script:
@@ -215,12 +219,12 @@ pages:
       - $CI_PIPELINE_SOURCE == "schedule"
       - $CI_COMMIT_TITLE =~ /^Update.*translation$/
 
-asan:
-  <<: *sanitizer
-  # ASAN requires debugging capabilities
-  tags: [ asan ]
-  variables:
-    BUILD_OPTS: "-Db_sanitize=address"
+#asan:
+#  <<: *sanitizer
+#  # ASAN requires debugging capabilities
+#  tags: [ asan ]
+#  variables:
+#    BUILD_OPTS: "-Db_sanitize=address"
 
 tsan:
   <<: *sanitizer
