@@ -1,2 +1,3 @@
 debian/01_debianize_xrdb.patch
 debian/meson.build-Lower-polkit-requirement.patch
+Revert-Port-to-GWeather-4.patch
