@@ -16,4 +16,5 @@ ubuntu/media-keys-restore-terminal-keyboard-shortcut-schema.patch
 ubuntu/media-keys-correct-logout-action.patch
 ubuntu/lid-close-suspend-support.patch
 ubuntu/keyboard-Use-ibus-sources-from-locale.patch
+ubuntu/Revert-media-keys-fix-gnome-settings-desktop-file.patch
 ubuntu/teach-gsd-about-the-gnome-calculator-snap-.desktop-name.patch

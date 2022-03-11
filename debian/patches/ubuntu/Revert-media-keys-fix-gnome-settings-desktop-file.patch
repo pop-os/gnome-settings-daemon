@@ -1,0 +1,24 @@
+From: Jeremy Bicha <jbicha@debian.org>
+Date: Fri, 11 Mar 2022 10:45:31 -0500
+Subject: Revert "media-keys: fix gnome settings desktop file"
+
+This reverts commit 371a1260630035724e20972ae5bda7098e2928a7.
+
+Ubuntu isn't getting the rename until gnome-control-center 42
+---
+ plugins/media-keys/gsd-media-keys-manager.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/plugins/media-keys/gsd-media-keys-manager.c b/plugins/media-keys/gsd-media-keys-manager.c
+index 4b45532..f4c5755 100644
+--- a/plugins/media-keys/gsd-media-keys-manager.c
++++ b/plugins/media-keys/gsd-media-keys-manager.c
+@@ -2436,7 +2436,7 @@ do_action (GsdMediaKeysManager *manager,
+                 do_execute_desktop_or_desktop (manager, "org.gnome.Calculator.desktop", "gnome-calculator.desktop", timestamp);
+                 break;
+         case CONTROL_CENTER_KEY:
+-                do_execute_desktop_or_desktop (manager, "org.gnome.Settings.desktop", NULL, timestamp);
++                do_execute_desktop_or_desktop (manager, "gnome-control-center.desktop", NULL, timestamp);
+                 break;
+         case PLAY_KEY:
+                 return do_multimedia_player_action (manager, "Play");
