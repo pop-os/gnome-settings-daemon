@@ -20,3 +20,4 @@ ubuntu/teach-gsd-about-the-gnome-calculator-snap-.desktop-name.patch
 # Pop!_OS patches
 oled_brightness.patch
 disable-window-system-color-transform.patch
+keyboard-Add-launch-gnome-control-center-shortcut.patch

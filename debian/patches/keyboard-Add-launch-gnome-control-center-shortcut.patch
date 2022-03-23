@@ -1,0 +1,16 @@
+Index: gnome-settings-daemon/data/org.gnome.settings-daemon.plugins.media-keys.gschema.xml.in
+===================================================================
+--- gnome-settings-daemon.orig/data/org.gnome.settings-daemon.plugins.media-keys.gschema.xml.in
++++ gnome-settings-daemon/data/org.gnome.settings-daemon.plugins.media-keys.gschema.xml.in
+@@ -362,6 +362,11 @@
+       <summary>Launch terminal</summary>
+       <description>Binding to launch the terminal.</description>
+     </key>
++    <key name="wifi" type="s">
++      <default>'Launch1'</default>
++      <summary>Launch WiFi settigns</summary>
++      <description>Binding to launch the wifi settings</description>
++    </key>
+     <key name="www" type="as">
+       <default>['']</default>
+       <summary>Launch web browser</summary>
