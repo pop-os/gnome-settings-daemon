@@ -11,11 +11,11 @@ Forwarded: not-needed
  plugins/keyboard/gsd-keyboard-manager.c | 73 +++++++++++++++++++++++++++++++--
  1 file changed, 69 insertions(+), 4 deletions(-)
 
-diff --git a/plugins/keyboard/gsd-keyboard-manager.c b/plugins/keyboard/gsd-keyboard-manager.c
-index bb6ce39..300043c 100644
---- a/plugins/keyboard/gsd-keyboard-manager.c
-+++ b/plugins/keyboard/gsd-keyboard-manager.c
-@@ -145,6 +145,63 @@ schema_is_installed (const char *schema)
+Index: gnome-settings-daemon/plugins/keyboard/gsd-keyboard-manager.c
+===================================================================
+--- gnome-settings-daemon.orig/plugins/keyboard/gsd-keyboard-manager.c
++++ gnome-settings-daemon/plugins/keyboard/gsd-keyboard-manager.c
+@@ -129,6 +129,63 @@ schema_is_installed (const char *schema)
          return installed;
  }
  
@@ -79,22 +79,7 @@ index bb6ce39..300043c 100644
  static void
  apply_bell (GsdKeyboardManager *manager)
  {
-@@ -402,12 +459,12 @@ update_gtk_im_module (GsdKeyboardManager *manager)
-         if (user_manager_loaded)
-                 manager_notify_is_loaded_cb (G_OBJECT (user_manager),
-                                              NULL,
--                                             manager->priv->input_sources_settings);
-+                                             manager->input_sources_settings);
-         else
-                 g_signal_connect (user_manager,
-                                   "notify::is-loaded",
-                                   G_CALLBACK (manager_notify_is_loaded_cb),
--                                  manager->priv->input_sources_settings);
-+                                  manager->input_sources_settings);
- }
- 
- static void
-@@ -560,7 +617,7 @@ convert_libgnomekbd_layouts (GSettings *settings)
+@@ -354,7 +411,7 @@ convert_libgnomekbd_layouts (GSettings *
          g_object_unref (libgnomekbd_settings);
  }
  
@@ -103,7 +88,7 @@ index bb6ce39..300043c 100644
  maybe_convert_old_settings (GSettings *settings)
  {
          GVariant *sources;
-@@ -568,6 +625,7 @@ maybe_convert_old_settings (GSettings *settings)
+@@ -362,6 +419,7 @@ maybe_convert_old_settings (GSettings *s
          gchar *stamp_dir_path = NULL;
          gchar *stamp_file_path = NULL;
          GError *error = NULL;
@@ -111,7 +96,7 @@ index bb6ce39..300043c 100644
  
          stamp_dir_path = g_build_filename (g_get_user_data_dir (), PACKAGE_NAME, NULL);
          if (g_mkdir_with_parents (stamp_dir_path, 0755)) {
-@@ -579,6 +637,8 @@ maybe_convert_old_settings (GSettings *settings)
+@@ -373,6 +431,8 @@ maybe_convert_old_settings (GSettings *s
          if (g_file_test (stamp_file_path, G_FILE_TEST_EXISTS))
                  goto out;
  
@@ -120,7 +105,7 @@ index bb6ce39..300043c 100644
          sources = g_settings_get_value (settings, KEY_INPUT_SOURCES);
          if (g_variant_n_children (sources) < 1) {
                  convert_libgnomekbd_layouts (settings);
-@@ -597,6 +657,8 @@ maybe_convert_old_settings (GSettings *settings)
+@@ -391,6 +451,8 @@ maybe_convert_old_settings (GSettings *s
  out:
          g_free (stamp_file_path);
          g_free (stamp_dir_path);
@@ -129,7 +114,7 @@ index bb6ce39..300043c 100644
  }
  
  static void
-@@ -611,7 +673,7 @@ maybe_create_initial_settings (GsdKeyboardManager *manager)
+@@ -405,7 +467,7 @@ maybe_create_initial_settings (GsdKeyboa
          if (g_getenv ("RUNNING_UNDER_GDM"))
                  return;
  
@@ -138,7 +123,7 @@ index bb6ce39..300043c 100644
  
          /* if we still don't have anything do some educated guesses */
          sources = g_settings_get_value (settings, KEY_INPUT_SOURCES);
-@@ -619,6 +681,9 @@ maybe_create_initial_settings (GsdKeyboardManager *manager)
+@@ -413,6 +475,9 @@ maybe_create_initial_settings (GsdKeyboa
                  get_sources_from_xkb_config (manager);
          g_variant_unref (sources);
  
