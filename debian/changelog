@@ -1,4 +1,4 @@
-gnome-settings-daemon (42.1-1ubuntu1) UNRELEASED; urgency=medium
+gnome-settings-daemon (42.1-1ubuntu1) jammy; urgency=medium
 
   [ Jeremy Bicha ]
   * Merge with Debian. Remaining changes:
@@ -19,7 +19,7 @@ gnome-settings-daemon (42.1-1ubuntu1) UNRELEASED; urgency=medium
       - Install apport hook
   * Drop the keyboard deprecation revert since it doesn't look needed now
 
- -- Sebastien Bacher <seb128@ubuntu.com>  Fri, 25 Mar 2022 13:20:10 +0100
+ -- Sebastien Bacher <seb128@ubuntu.com>  Fri, 25 Mar 2022 13:25:29 +0100
 
 gnome-settings-daemon (42.1-1) unstable; urgency=medium
 
