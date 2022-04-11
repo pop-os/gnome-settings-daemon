@@ -1,7 +1,6 @@
 debian/01_debianize_xrdb.patch
 debian/meson.build-Lower-polkit-requirement.patch
 Revert-Port-to-GWeather-4.patch
-Revert-sharing-Don-t-manage-gnome-remote-desktop.patch
 p11-kit/smartcard-Rewrite-to-use-p11-kit-backend-via-Gck-APIs.patch
 p11-kit/smartcard-manager-Use-Blocking-wait-for-slot-event-if-ava.patch
 p11-kit/smartcard-manager-Only-sync-token-state-if-it-really-chan.patch
