@@ -1,3 +1,11 @@
+gnome-settings-daemon (42.1-1ubuntu2) jammy; urgency=medium
+
+  * Drop Revert-sharing-Don-t-manage-gnome-remote-desktop.patch
+    - gnome-remote-desktop 42 provides its own systemd user session
+      to start itself
+
+ -- Jeremy Bicha <jbicha@ubuntu.com>  Tue, 12 Apr 2022 10:06:23 -0400
+
 gnome-settings-daemon (42.1-1ubuntu1) jammy; urgency=medium
 
   [ Jeremy Bicha ]
