@@ -1,3 +1,10 @@
+gnome-settings-daemon (42.1-1ubuntu3) kinetic; urgency=medium
+
+  * Drop patch reverting switch to libgweather4
+  * debian/control.in: Build-Depend on libgweather4
+
+ -- Jeremy Bicha <jbicha@ubuntu.com>  Thu, 28 Apr 2022 21:42:48 -0400
+
 gnome-settings-daemon (42.1-1ubuntu2) jammy; urgency=medium
 
   * Drop Revert-sharing-Don-t-manage-gnome-remote-desktop.patch
