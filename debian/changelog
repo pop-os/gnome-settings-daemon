@@ -1,3 +1,9 @@
+gnome-settings-daemon (42.1-1ubuntu3pop0) jammy; urgency=medium
+
+  * Pop!_OS patches
+
+ -- Michael Aaron Murphy <mmstick@pm.me>  Wed, 04 May 2022 11:44:42 +0200
+
 gnome-settings-daemon (42.1-1ubuntu3) kinetic; urgency=medium
 
   * Drop patch reverting switch to libgweather4
